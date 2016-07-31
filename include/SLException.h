@@ -3,13 +3,17 @@
 
 #include "SubutaiException.h"
 
-class SLException : public SubutaiException {
-    public:
-        SLException(const std::string& msg, int code = 0);
-        const char* name() const throw();
-    protected:
-        int _code;
-        std::string _message;
+namespace SubutaiLauncher {
+
+    class SLException : public SubutaiException {
+        public:
+            SLException(const std::string& msg, int code = 0);
+            const char* name() const throw();
+        protected:
+            int _code;
+            std::string _message;
+    };
+
 };
 
 #endif

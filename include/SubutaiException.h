@@ -4,22 +4,26 @@
 #include <stdexcept>
 #include <string>
 
-class SubutaiException : public std::exception {
-    public:
-        SubutaiException(const std::string& msg, int code = 0);
+namespace SubutaiLauncher {
 
-        ~SubutaiException() throw();
+    class SubutaiException : public std::exception {
+        public:
+            SubutaiException(const std::string& msg, int code = 0);
 
-        virtual const char* name() const throw();
+            ~SubutaiException() throw();
 
-        const std::string& message() const;
+            virtual const char* name() const throw();
 
-        int code() const;
+            const std::string& message() const;
 
-        std::string displayText() const;
-    protected:
-        int _code;
-        std::string _message;
+            int code() const;
+
+            std::string displayText() const;
+        protected:
+            int _code;
+            std::string _message;
+    };
+
 };
 
 #endif

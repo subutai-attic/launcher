@@ -3,6 +3,8 @@
 
 #include "Core.h"
 
+using namespace SubutaiLauncher;
+
 int main(int argc, char* argv[]) {
     // TODO: Add library and components checks
     std::vector<std::string> args;

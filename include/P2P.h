@@ -3,15 +3,19 @@
 
 #include "Environment.h"
 
-class P2P {
-    public:
-        P2P();
-        ~P2P();
-        bool findInstallation();
-        std::string extractVersion();
-    private:
-        std::string _version;
-        std::string _location;
+namespace SubutaiLauncher {
+
+    class P2P {
+        public:
+            P2P();
+            ~P2P();
+            bool findInstallation();
+            std::string extractVersion();
+        private:
+            std::string _version;
+            std::string _location;
+    };
+
 };
 
 #endif

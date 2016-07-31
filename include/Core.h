@@ -9,18 +9,23 @@
 
 #include "SL.h"
 #include "SLFunctions.h"
+#include "Hub.h"
 
-class Core {
-    public:
-        Core(std::vector<std::string> args);
-        ~Core();
-        void initializePython();
-        void run();
-        void parseArgs();
-    private:
-        std::vector<std::string> _args;
-    protected:
-        void handleTest();
+namespace SubutaiLauncher {
+
+    class Core {
+        public:
+            Core(std::vector<std::string> args);
+            ~Core();
+            void initializePython();
+            void run();
+            void parseArgs();
+        private:
+            std::vector<std::string> _args;
+        protected:
+            void handleTest();
+    };
+
 };
 
 #endif
