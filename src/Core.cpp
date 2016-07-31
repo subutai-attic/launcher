@@ -35,8 +35,8 @@ namespace SubutaiLauncher {
         std::printf("Testing mode: HUB Rest API\n");
 
         Hub h;
-        h.setLogin("msavochkin@optimal-dynamics.com");
-        h.setPassword("GNfH(e\"L22cR$RVx");
+        h.setLogin("maria");
+        h.setPassword("juan");
         h.Auth();
 
         

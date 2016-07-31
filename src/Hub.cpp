@@ -26,7 +26,7 @@ namespace SubutaiLauncher {
         query["email"] = _login;
         query["password"] = _password;
         auto response = performPostRequest("tray/login", query);
-        std::printf("Received after auth: %s\n", response.c_str());
+        std::printf("[HUB] Received during auth: %s\n", response.c_str());
     }
 
     std::string Hub::performPostRequest(std::string endpoint, std::map<std::string, std::string> query) {
@@ -38,6 +38,8 @@ namespace SubutaiLauncher {
                 std::sprintf(post, "%s%s=%s&", post, it->first.c_str(), it->second.c_str());
             }
         }
+        
+        post[strlen(post)-1] = '\0';
 
         std::printf("Performing request: %s, POST: %s\n", request, post);
 
@@ -45,8 +47,8 @@ namespace SubutaiLauncher {
         struct curl_slist *headers = NULL;
         headers = curl_slist_append(headers, "Content-Type: application/json");
         curl_easy_setopt(curl, CURLOPT_URL, request);
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post);
         curl_easy_setopt(curl, CURLOPT_POST, 1);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post);
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleResponse);

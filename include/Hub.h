@@ -2,6 +2,7 @@
 #define __HUB_H__
 
 #include <string>
+#include <cstring>
 #include <map>
 #include <curl/curl.h>
 #include <json/json.h>
