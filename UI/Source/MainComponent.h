@@ -11,6 +11,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "LoginScreen.h"
+#include "MainMenuModel.h"
 
 
 //==============================================================================
@@ -31,6 +32,8 @@ public:
 private:
     void showLoginScreen();
     LoginScreen* _login;
+    ListBox _mainMenu;
+    MainMenuModel* _mainMenuModel;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };

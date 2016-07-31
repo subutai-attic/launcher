@@ -14,6 +14,13 @@ MainContentComponent::MainContentComponent()
 {
     // TODO: Add screen detection size and relative value at startup
     setSize (1024, 768);
+
+    _mainMenuModel = new MainMenuModel();
+
+    addAndMakeVisible(_mainMenu);
+    _mainMenu.setModel(_mainMenuModel);
+    _mainMenu.setColour (ListBox::backgroundColourId, Colour::greyLevel (0.2f));
+    _mainMenu.selectRow(0);
 }
 
 MainContentComponent::~MainContentComponent()
@@ -25,12 +32,16 @@ MainContentComponent::~MainContentComponent()
 
 void MainContentComponent::paint (Graphics& g)
 {
+    /*  
     g.fillAll (Colour (0xff222222));
 
     g.setFont (Font (16.0f));
     g.setColour (Colours::white);
     g.drawText ("Hello World!", getLocalBounds(), Justification::centred, true);
-    showLoginScreen();
+    */
+
+
+    // showLoginScreen();
 }
 
 void MainContentComponent::resized()

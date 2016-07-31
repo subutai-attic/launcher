@@ -211,6 +211,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\MainMenuModel.cpp">
+      <Filter>UI\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\LoginScreen.cpp">
       <Filter>UI\Source</Filter>
     </ClCompile>
@@ -1383,6 +1386,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\MainMenuModel.h">
+      <Filter>UI\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\LoginScreen.h">
       <Filter>UI\Source</Filter>
     </ClInclude>

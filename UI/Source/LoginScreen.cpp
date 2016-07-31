@@ -36,7 +36,7 @@ void LoginScreen::paint(Graphics& g) {
 
 void LoginScreen::buttonClicked(Button* button) {
     if (button == &_button) {
-        _button.setVisible(false);
-        //this->removeFromDesktop();
+        //_button.setVisible(false);
+        this->removeFromDesktop();
     }
 }
