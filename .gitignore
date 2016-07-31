@@ -3,3 +3,5 @@
 *ycm_extra_conf*
 bin
 build
+*.swp
+*.swo
