@@ -3,7 +3,7 @@
 namespace SubutaiLauncher {
 
     const std::string SubutaiDownloader::URL = "https://cdn.subut.ai:8338";
-    const std::string SubutaiDownloader::REST = "/kurjun/rest/file";
+    const std::string SubutaiDownloader::REST = "/kurjun/rest/raw";
 
     SubutaiDownloader::SubutaiDownloader(std::string filename) {
         _filename = filename;
@@ -52,18 +52,14 @@ namespace SubutaiLauncher {
         for (int i = 0; i < owners.size(); ++i) {
             _file.owner = owners[i].asString();
         }
-        _file.md5 = root.get("md5Sum", "").asString();
         _file.name = root.get("name", "").asString();
         _file.id = root.get("id", "").asString();
-        _file.fingerprint = root.get("fingerprint", "").asString();
         _file.size = root.get("size", "").asLargestInt();
 
         std::printf("File info:\n");
         std::printf("Owner: %s\n", _file.owner.c_str());
         std::printf("Name: %s\n", _file.name.c_str());
-        std::printf("Checksum: %s\n", _file.md5.c_str());
         std::printf("Id: %s\n", _file.id.c_str());
-        std::printf("Fingerprint: %s\n", _file.fingerprint.c_str());
         std::printf("Size: %o\n", _file.size);
 
         return size * nmemb;

@@ -49,6 +49,8 @@ ifeq ($(CONFIG),Release)
 endif
 
 OBJECTS := \
+  $(OBJDIR)/LibraryComponent_e4ba500b.o \
+  $(OBJDIR)/BannerComponent_ec70f312.o \
   $(OBJDIR)/MainMenuModel_77994232.o \
   $(OBJDIR)/LoginScreen_6bd9a116.o \
   $(OBJDIR)/MainComponent_a6ffb4a5.o \
@@ -76,6 +78,16 @@ clean:
 strip:
 	@echo Stripping UI
 	-@strip --strip-unneeded $(OUTDIR)/$(TARGET)
+
+$(OBJDIR)/LibraryComponent_e4ba500b.o: ../../Source/LibraryComponent.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling LibraryComponent.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/BannerComponent_ec70f312.o: ../../Source/BannerComponent.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling BannerComponent.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/MainMenuModel_77994232.o: ../../Source/MainMenuModel.cpp
 	-@mkdir -p $(OBJDIR)

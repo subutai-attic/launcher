@@ -65,7 +65,8 @@ public:
                                                     Colours::lightgrey,
                                                     DocumentWindow::allButtons)
         {
-            setUsingNativeTitleBar (true);
+            setUsingNativeTitleBar (false);
+            setTitleBarHeight(0);
             setContentOwned (new MainContentComponent(), true);
 
             centreWithSize (getWidth(), getHeight());

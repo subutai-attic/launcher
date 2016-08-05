@@ -129,6 +129,8 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\LibraryComponent.cpp"/>
+    <ClCompile Include="..\..\Source\BannerComponent.cpp"/>
     <ClCompile Include="..\..\Source\MainMenuModel.cpp"/>
     <ClCompile Include="..\..\Source\LoginScreen.cpp"/>
     <ClCompile Include="..\..\Source\MainComponent.cpp"/>
@@ -1206,6 +1208,8 @@
     <ClCompile Include="..\..\JuceLibraryCode\juce_gui_extra.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\LibraryComponent.h"/>
+    <ClInclude Include="..\..\Source\BannerComponent.h"/>
     <ClInclude Include="..\..\Source\MainMenuModel.h"/>
     <ClInclude Include="..\..\Source\LoginScreen.h"/>
     <ClInclude Include="..\..\Source\MainComponent.h"/>

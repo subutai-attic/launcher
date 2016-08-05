@@ -13,10 +13,8 @@ namespace SubutaiLauncher {
 
     struct SubutaiFile {
         std::string owner;
-        std::string md5;
         std::string name;
         std::string id;
-        std::string fingerprint;
         long size;
     };
 
