@@ -64,7 +64,7 @@ namespace SubutaiLauncher {
         std::printf("Checksum: %s\n", _file.md5.c_str());
         std::printf("Id: %s\n", _file.id.c_str());
         std::printf("Fingerprint: %s\n", _file.fingerprint.c_str());
-        std::printf("Size: %d\n", _file.size);
+        std::printf("Size: %o\n", _file.size);
 
         return size * nmemb;
     }

@@ -35,9 +35,14 @@ namespace SubutaiLauncher {
         std::printf("Testing mode: HUB Rest API\n");
 
         Hub h;
-        h.setLogin("maria");
-        h.setPassword("juan");
-        h.Auth();
+        h.setLogin("msavochkin@optimal-dynamics.com");
+        h.setPassword("GNfH(e\"L22cR$RVx");
+        if (h.auth()) {
+            std::printf("[TEST] Hub Auth: OK\n");
+        }
+        if (h.balance()) {
+            std::printf("[TEST] Hub Balance: OK\n");
+        }
 
         
         std::printf("Testing mode: Looking for a test script launcher-test.py\n");
