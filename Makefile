@@ -16,13 +16,16 @@ OBJECTS = $(patsubst %,$(BUILD_DIR)/%.o, $(subst src/,,$(subst .cpp,,$(SOURCES))
 
 .PHONE: lib all clean
 
-all: lib cli
+all: lib cli ui
 
 lib: directories
 lib: $(OUTPUT_DIR)/$(TARGET)
 
 cli: lib
 	$(MAKE) -C ./CLI
+
+ui:
+	$(MAKE) -C ./UI/Builds/LinuxMakefile
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
 	$(CC) -fPIC $(CFLAGS) -c $< -o $@

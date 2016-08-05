@@ -17,9 +17,10 @@ class MainMenuModel : public ListBoxModel {
     public:
         MainMenuModel();
         ~MainMenuModel();
-        int getNumRows();
-        void paintListBoxItem(int rowNumber, Graphics& g, int width, int height, bool rowIsSelected);
+        int getNumRows() override;
+        void paintListBoxItem(int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override;
     private:
+        std::vector<std::string> _menuItems;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainMenuModel);
 };
 

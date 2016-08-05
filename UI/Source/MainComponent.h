@@ -12,7 +12,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "LoginScreen.h"
 #include "MainMenuModel.h"
-
+#include "SubutaiLauncher.h"
 
 //==============================================================================
 /*
@@ -29,11 +29,15 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 
+    Path getLogo();
+
 private:
     void showLoginScreen();
     LoginScreen* _login;
     ListBox _mainMenu;
-    MainMenuModel* _mainMenuModel;
+    MainMenuModel _mainMenuModel;
+    Toolbar _header;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };
