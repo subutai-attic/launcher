@@ -1,54 +1,74 @@
 /*
-  ==============================================================================
+   ==============================================================================
 
-    This file was auto-generated!
+   This file was auto-generated!
 
-  ==============================================================================
-*/
+   ==============================================================================
+   */
 
 #ifndef MAINCOMPONENT_H_INCLUDED
 #define MAINCOMPONENT_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "LoginScreen.h"
-#include "MainMenuModel.h"
 #include "SubutaiLauncher.h"
+#include "LibraryComponent.h"
+#include "CommunityComponent.h"
+#include "HubComponent.h"
+#include "MarketplaceComponent.h"
 
 //==============================================================================
 /*
-    This component lives inside our window, and this is where you should put all
-    your controls and content.
-*/
-class MainContentComponent   : public Component, public ButtonListener
+   This component lives inside our window, and this is where you should put all
+   your controls and content.
+   */
+class MainContentComponent   : public Component, public ButtonListener, public ListBoxModel
 {
-public:
-    //==============================================================================
-    MainContentComponent();
-    ~MainContentComponent();
+    public:
+        static const int WINDOW_WIDTH = 1024;
+        static const int WINDOW_HEIGHT = 768;
+        static const int HEADER_HEIGHT = 22;
+        static const int MENU_WIDTH = 250;
 
-    void paint (Graphics&) override;
-    void resized() override;
+        //==============================================================================
+        MainContentComponent();
+        ~MainContentComponent();
 
-    void buttonClicked(Button* button) override;
+        void paint (Graphics&) override;
+        void resized() override;
 
-    Path getLogo();
+        void buttonClicked(Button* button) override;
 
-private:
-    void showLoginScreen();
-    LoginScreen* _login;
-    ListBox _mainMenu;
-    MainMenuModel _mainMenuModel;
-    Toolbar _header;
-    ImageComponent _banner;
-    ImageComponent _logo;
+        Path getLogo();
 
-    ImageButton *_closeButton;
+        // ListBoxModel overrides
+        int getNumRows() override;
+        void paintListBoxItem(int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override;
+        void selectedRowsChanged (int lastRowSelected) override;
 
-    // Launcher
-    SubutaiLauncher::Core* _core;
+    private:
+        void showLoginScreen();
+        LoginScreen* _login;
+        ListBox _mainMenu;
+        Toolbar _header;
+        ImageComponent _banner;
+        ImageComponent _logo;
 
-    //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
+        // Right-side components
+        LibraryComponent _library;
+        HubComponent _hub;
+        MarketplaceComponent _marketplace;
+        CommunityComponent _community;
+
+        ImageButton *_closeButton;
+
+        // Launcher
+        SubutaiLauncher::Core* _core;
+
+        std::vector<std::string> _menuItems;
+
+        //==============================================================================
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };
 
 

@@ -4,6 +4,25 @@
               includeBinaryInAppConfig="1" jucerVersion="4.2.3">
   <MAINGROUP id="zrqfkU" name="UI">
     <GROUP id="{AD2C375A-FD50-7F16-D5EA-0F6B4340942C}" name="Source">
+      <FILE id="maJz3Q" name="InstallationComponent.cpp" compile="1" resource="0"
+            file="Source/InstallationComponent.cpp"/>
+      <FILE id="b5cYmF" name="InstallationComponent.h" compile="0" resource="0"
+            file="Source/InstallationComponent.h"/>
+      <FILE id="riuRTo" name="MarketplaceComponent.cpp" compile="1" resource="0"
+            file="Source/MarketplaceComponent.cpp"/>
+      <FILE id="QCEPAL" name="MarketplaceComponent.h" compile="0" resource="0"
+            file="Source/MarketplaceComponent.h"/>
+      <FILE id="L1vF5X" name="HubComponent.cpp" compile="1" resource="0"
+            file="Source/HubComponent.cpp"/>
+      <FILE id="LxZ72y" name="HubComponent.h" compile="0" resource="0" file="Source/HubComponent.h"/>
+      <FILE id="XA7c3W" name="CommunityComponent.cpp" compile="1" resource="0"
+            file="Source/CommunityComponent.cpp"/>
+      <FILE id="LbFlaX" name="CommunityComponent.h" compile="0" resource="0"
+            file="Source/CommunityComponent.h"/>
+      <FILE id="d4o8LQ" name="InstallationDialog.cpp" compile="1" resource="0"
+            file="Source/InstallationDialog.cpp"/>
+      <FILE id="RPA6VV" name="InstallationDialog.h" compile="0" resource="0"
+            file="Source/InstallationDialog.h"/>
       <FILE id="whbjjs" name="LibraryComponent.cpp" compile="1" resource="0"
             file="Source/LibraryComponent.cpp"/>
       <FILE id="ScsTTa" name="LibraryComponent.h" compile="0" resource="0"
@@ -12,9 +31,6 @@
             file="Source/BannerComponent.cpp"/>
       <FILE id="pGiuaY" name="BannerComponent.h" compile="0" resource="0"
             file="Source/BannerComponent.h"/>
-      <FILE id="vhJjA8" name="MainMenuModel.cpp" compile="1" resource="0"
-            file="Source/MainMenuModel.cpp"/>
-      <FILE id="v68hwd" name="MainMenuModel.h" compile="0" resource="0" file="Source/MainMenuModel.h"/>
       <FILE id="wdbskD" name="LoginScreen.cpp" compile="1" resource="0" file="Source/LoginScreen.cpp"/>
       <FILE id="DpBE8l" name="LoginScreen.h" compile="0" resource="0" file="Source/LoginScreen.h"/>
       <FILE id="FQDk1p" name="MainComponent.cpp" compile="1" resource="0"

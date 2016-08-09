@@ -211,13 +211,25 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\InstallationComponent.cpp">
+      <Filter>UI\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\MarketplaceComponent.cpp">
+      <Filter>UI\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\HubComponent.cpp">
+      <Filter>UI\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\CommunityComponent.cpp">
+      <Filter>UI\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\InstallationDialog.cpp">
+      <Filter>UI\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\LibraryComponent.cpp">
       <Filter>UI\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\BannerComponent.cpp">
-      <Filter>UI\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\MainMenuModel.cpp">
       <Filter>UI\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\LoginScreen.cpp">
@@ -1392,13 +1404,25 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\InstallationComponent.h">
+      <Filter>UI\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\MarketplaceComponent.h">
+      <Filter>UI\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\HubComponent.h">
+      <Filter>UI\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\CommunityComponent.h">
+      <Filter>UI\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\InstallationDialog.h">
+      <Filter>UI\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\LibraryComponent.h">
       <Filter>UI\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\BannerComponent.h">
-      <Filter>UI\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\MainMenuModel.h">
       <Filter>UI\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\LoginScreen.h">

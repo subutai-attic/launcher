@@ -49,9 +49,13 @@ ifeq ($(CONFIG),Release)
 endif
 
 OBJECTS := \
+  $(OBJDIR)/InstallationComponent_9add89c4.o \
+  $(OBJDIR)/MarketplaceComponent_dbb66a7b.o \
+  $(OBJDIR)/HubComponent_4ff59811.o \
+  $(OBJDIR)/CommunityComponent_da01ba9d.o \
+  $(OBJDIR)/InstallationDialog_4854d4ab.o \
   $(OBJDIR)/LibraryComponent_e4ba500b.o \
   $(OBJDIR)/BannerComponent_ec70f312.o \
-  $(OBJDIR)/MainMenuModel_77994232.o \
   $(OBJDIR)/LoginScreen_6bd9a116.o \
   $(OBJDIR)/MainComponent_a6ffb4a5.o \
   $(OBJDIR)/Main_90ebc5c2.o \
@@ -79,6 +83,31 @@ strip:
 	@echo Stripping UI
 	-@strip --strip-unneeded $(OUTDIR)/$(TARGET)
 
+$(OBJDIR)/InstallationComponent_9add89c4.o: ../../Source/InstallationComponent.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling InstallationComponent.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/MarketplaceComponent_dbb66a7b.o: ../../Source/MarketplaceComponent.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling MarketplaceComponent.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/HubComponent_4ff59811.o: ../../Source/HubComponent.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling HubComponent.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/CommunityComponent_da01ba9d.o: ../../Source/CommunityComponent.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling CommunityComponent.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/InstallationDialog_4854d4ab.o: ../../Source/InstallationDialog.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling InstallationDialog.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
 $(OBJDIR)/LibraryComponent_e4ba500b.o: ../../Source/LibraryComponent.cpp
 	-@mkdir -p $(OBJDIR)
 	@echo "Compiling LibraryComponent.cpp"
@@ -87,11 +116,6 @@ $(OBJDIR)/LibraryComponent_e4ba500b.o: ../../Source/LibraryComponent.cpp
 $(OBJDIR)/BannerComponent_ec70f312.o: ../../Source/BannerComponent.cpp
 	-@mkdir -p $(OBJDIR)
 	@echo "Compiling BannerComponent.cpp"
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/MainMenuModel_77994232.o: ../../Source/MainMenuModel.cpp
-	-@mkdir -p $(OBJDIR)
-	@echo "Compiling MainMenuModel.cpp"
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/LoginScreen_6bd9a116.o: ../../Source/LoginScreen.cpp

@@ -1,11 +1,11 @@
 /*
-  ==============================================================================
+   ==============================================================================
 
-    LibraryComponent.h
-    Created: 5 Aug 2016 5:58:23pm
-    Author:  crioto
+   LibraryComponent.h
+Created: 5 Aug 2016 5:58:23pm
+Author:  crioto
 
-  ==============================================================================
+==============================================================================
 */
 
 #ifndef LIBRARYCOMPONENT_H_INCLUDED
@@ -13,12 +13,17 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-class LibraryComponent : public Component {
+#include "InstallationDialog.h"
+
+class LibraryComponent : public Component, public ButtonListener {
     public:
         LibraryComponent();
         ~LibraryComponent();
+        void paint (Graphics&) override;
+        void resized() override;
+        void buttonClicked(Button* button);
     private:
-
+        TextButton _installButton;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LibraryComponent)
 };
 

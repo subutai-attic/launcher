@@ -16,7 +16,7 @@ OBJECTS = $(patsubst %,$(BUILD_DIR)/%.o, $(subst src/,,$(subst .cpp,,$(SOURCES))
 
 .PHONE: lib all clean
 
-all: lib cli ui
+all: lib cli ui files
 
 lib: directories
 lib: $(OUTPUT_DIR)/$(TARGET)
@@ -36,6 +36,10 @@ $(OUTPUT_DIR)/$(TARGET): $(OBJECTS)
 directories:
 	@mkdir -p bin
 	@mkdir -p build
+
+files:
+	@cp assets/* bin/
+	@cp scripts/* bin/
 
 clean:
 	@rm -rf bin/*

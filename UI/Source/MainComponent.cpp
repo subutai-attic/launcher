@@ -10,9 +10,13 @@
 
 
 //==============================================================================
-MainContentComponent::MainContentComponent() : 
-    _mainMenu("MM", nullptr)
+MainContentComponent::MainContentComponent() 
 {
+    _menuItems.push_back("SUBUTAI");
+    _menuItems.push_back("LIBRARY");
+    _menuItems.push_back("TEMPLATES");
+    _menuItems.push_back("YOUR HUB");
+
     // TODO: Add screen detection size and relative value at startup
     setSize (1024, 768);
 
@@ -39,7 +43,7 @@ MainContentComponent::MainContentComponent() :
     addAndMakeVisible(_banner);
     _banner.setImage(ImageCache::getFromFile(File("launcher-banner-example1.jpg")));
 
-    _mainMenu.setModel(&_mainMenuModel);
+    _mainMenu.setModel(this);
     _mainMenu.setColour (ListBox::backgroundColourId, Colour::greyLevel (0.2f));
     _mainMenu.selectRow(0);
     _mainMenu.setRowHeight(40);
@@ -86,11 +90,69 @@ void MainContentComponent::paint (Graphics& g)
 void MainContentComponent::resized()
 {
     Rectangle<int> r (getLocalBounds().reduced (0));
-    _banner.setBounds(r.withSize(1024, 768));
-    //_mainMenu.setBounds (r.withSize (250, 748).reduced(20));
-    _mainMenu.setBounds (0, 20, 250, 748);
-    _header.setBounds(r.withSize(1024, 22));
+    _banner.setBounds(r.withSize(WINDOW_WIDTH, WINDOW_HEIGHT));
+    _mainMenu.setBounds (0, 20, MENU_WIDTH, 748);
+    _header.setBounds(r.withSize(1024, HEADER_HEIGHT));
     repaint();
+}
+
+int MainContentComponent::getNumRows() {
+    return 4; // random
+}
+
+void MainContentComponent::paintListBoxItem(int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) {
+    if (rowNumber > _menuItems.size()) {
+        return;
+    }
+
+    auto item = _menuItems.at(rowNumber);
+    AttributedString t;
+    t.append(item);
+    if (!rowIsSelected) {
+        t.setColour(Colour(200, 200, 200));
+    } else {
+        t.setColour(Colour(176, 224, 230));
+    }
+    t.setLineSpacing(40);
+    t.setJustification(Justification::centred);
+    Font f;
+    f.setHeight(30);
+    t.setFont(f);
+    t.draw(g, Rectangle<int>(width + 8, 40).reduced(20, 0).toFloat());
+}
+
+void MainContentComponent::selectedRowsChanged(int row) {
+    auto item = _menuItems.at(row);
+    Rectangle<int> r (MENU_WIDTH, HEADER_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT - HEADER_HEIGHT);
+    if (item == "LIBRARY") {
+        _community.setVisible(false);
+        _hub.setVisible(false);
+        _library.setVisible(false);
+        _marketplace.setVisible(false);
+        addAndMakeVisible(_library);
+        _library.setBounds(r.withSize(WINDOW_WIDTH - MENU_WIDTH, WINDOW_HEIGHT - HEADER_HEIGHT));
+    } else if (item == "SUBUTAI") {
+        _community.setVisible(false);
+        _hub.setVisible(false);
+        _library.setVisible(false);
+        _marketplace.setVisible(false);
+        addAndMakeVisible(_community);
+        _community.setBounds(r.withSize(WINDOW_WIDTH - MENU_WIDTH, WINDOW_HEIGHT - HEADER_HEIGHT));
+    } else if (item == "TEMPLATES") {
+        _community.setVisible(false);
+        _hub.setVisible(false);
+        _library.setVisible(false);
+        _marketplace.setVisible(false);
+        addAndMakeVisible(_marketplace);
+        _marketplace.setBounds(r.withSize(WINDOW_WIDTH - MENU_WIDTH, WINDOW_HEIGHT - HEADER_HEIGHT));
+    } else if (item == "YOUR HUB") {
+        _community.setVisible(false);
+        _hub.setVisible(false);
+        _library.setVisible(false);
+        _marketplace.setVisible(false);
+        addAndMakeVisible(_hub);
+        _hub.setBounds(r.withSize(WINDOW_WIDTH - MENU_WIDTH, WINDOW_HEIGHT - HEADER_HEIGHT));
+    }
 }
 
 void MainContentComponent::showLoginScreen() {
@@ -105,12 +167,11 @@ void MainContentComponent::showLoginScreen() {
     Rectangle<int> result (placement.appliedTo (area, Desktop::getInstance().getDisplays() 
                 .getMainDisplay().userArea.reduced (20)));
     _login->setBounds (result);
-
     _login->setVisible(true);
 }
 
 void MainContentComponent::buttonClicked(Button* button) {
-        JUCEApplication::getInstance()->systemRequestedQuit();
+    JUCEApplication::getInstance()->systemRequestedQuit();
 }
 
 Path MainContentComponent::getLogo() {

@@ -129,9 +129,13 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\InstallationComponent.cpp"/>
+    <ClCompile Include="..\..\Source\MarketplaceComponent.cpp"/>
+    <ClCompile Include="..\..\Source\HubComponent.cpp"/>
+    <ClCompile Include="..\..\Source\CommunityComponent.cpp"/>
+    <ClCompile Include="..\..\Source\InstallationDialog.cpp"/>
     <ClCompile Include="..\..\Source\LibraryComponent.cpp"/>
     <ClCompile Include="..\..\Source\BannerComponent.cpp"/>
-    <ClCompile Include="..\..\Source\MainMenuModel.cpp"/>
     <ClCompile Include="..\..\Source\LoginScreen.cpp"/>
     <ClCompile Include="..\..\Source\MainComponent.cpp"/>
     <ClCompile Include="..\..\Source\Main.cpp"/>
@@ -1208,9 +1212,13 @@
     <ClCompile Include="..\..\JuceLibraryCode\juce_gui_extra.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\InstallationComponent.h"/>
+    <ClInclude Include="..\..\Source\MarketplaceComponent.h"/>
+    <ClInclude Include="..\..\Source\HubComponent.h"/>
+    <ClInclude Include="..\..\Source\CommunityComponent.h"/>
+    <ClInclude Include="..\..\Source\InstallationDialog.h"/>
     <ClInclude Include="..\..\Source\LibraryComponent.h"/>
     <ClInclude Include="..\..\Source\BannerComponent.h"/>
-    <ClInclude Include="..\..\Source\MainMenuModel.h"/>
     <ClInclude Include="..\..\Source\LoginScreen.h"/>
     <ClInclude Include="..\..\Source\MainComponent.h"/>
     <ClInclude Include="..\..\JuceLibraryCode\modules\juce_core\containers\juce_AbstractFifo.h"/>
