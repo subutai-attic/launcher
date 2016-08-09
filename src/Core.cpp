@@ -32,6 +32,9 @@ namespace SubutaiLauncher {
     }
 
     void Core::handleTest() {
+        std::printf("Testing VirtualBox implementation");
+        VirtualBox vb;
+
         std::printf("Testing mode: HUB Rest API\n");
 
         Hub h;

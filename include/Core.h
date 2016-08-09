@@ -10,6 +10,7 @@
 #include "SL.h"
 #include "SLFunctions.h"
 #include "Hub.h"
+#include "VirtualBox.h"
 
 namespace SubutaiLauncher {
 

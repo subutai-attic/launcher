@@ -1,9 +1,11 @@
 CC=g++
 
 TARGET = libsubutai-launcher.so
-INCLUDES = -Iinclude -I/usr/include/python2.7
+VB_DIR=/usr/lib/virtualbox/sdk/bindings/xpcom/include
+VB = -I$(VB_DIR) -I$(VB_DIR)/xpcom -I$(VB_DIR)/nsprpub -I$(VB_DIR)/string -I$(VB_DIR)/ipcd
+INCLUDES = -Iinclude -I/usr/include/python2.7 $(VB)
 LIBS = -g -ggdb -lm -lrt -lpython2.7 -lcurl
-CFLAGS = -L/lib/x86_64-linux-gnu -Wno-write-strings $(INCLUDES) $(LIBS) -std=c++11
+CFLAGS = -L/lib/x86_64-linux-gnu -Wno-write-strings $(INCLUDES) $(LIBS) -std=c++11 -DRT_OS_LINUX
 
 SRC_DIR = src
 INCLUDE_DIR = include

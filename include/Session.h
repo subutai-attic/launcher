@@ -11,7 +11,7 @@ namespace SubutaiLauncher {
             static Session* instance();
             void destroyInstance();
         private:
-            VirtualBox* _virtualBox;
+            SubutaiLauncher::VirtualBox* _virtualBox;
         protected:
             static Session *_instance;
             Session();
