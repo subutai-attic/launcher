@@ -19,7 +19,7 @@ ifeq ($(CONFIG),Debug)
   endif
 
   CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 -I /usr/include -I /usr/include/freetype2 -I ../../JuceLibraryCode -I ../../JuceLibraryCode/modules -I ../../../../../Downloads/JUCE/modules -I ../../../include -I /usr/include/python2.7
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -ggdb -O0
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -ggdb -O0 -DRT_OS_LINUX
   CXXFLAGS += $(CFLAGS) -std=c++11
   LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -L/usr/X11R6/lib/ -L../../../bin -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -lrt -lcurl -lpython2.7 -lsubutai-launcher 
 
@@ -39,7 +39,7 @@ ifeq ($(CONFIG),Release)
   endif
 
   CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DNDEBUG=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 -I /usr/include -I /usr/include/freetype2 -I ../../JuceLibraryCode -I ../../JuceLibraryCode/modules -I ../../../../../Downloads/JUCE/modules
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -O3
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -O3 -DRT_OS_LINUX
   CXXFLAGS += $(CFLAGS) -std=c++11
   LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -fvisibility=hidden -L/usr/X11R6/lib/ -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -lrt -lcurl -lpython2.7 -lsubutai-launcher 
 

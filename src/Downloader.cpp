@@ -2,19 +2,22 @@
 
 namespace SubutaiLauncher {
 
-    const std::string SubutaiDownloader::URL = "https://cdn.subut.ai:8338";
-    const std::string SubutaiDownloader::REST = "/kurjun/rest/raw";
+    const std::string Downloader::URL = "https://cdn.subut.ai:8338";
+    const std::string Downloader::REST = "/kurjun/rest/raw";
 
-    SubutaiDownloader::SubutaiDownloader(std::string filename) {
+    Downloader::Downloader() : _content(""), _done(false) {
+        std::printf("Starting Downloader\n");
+    }
+
+    Downloader::~Downloader() {
+
+    }
+
+    void Downloader::setFilename(const std::string& filename) {
         _filename = filename;
-        std::printf("Starting downloader\n");
     }
 
-    SubutaiDownloader::~SubutaiDownloader() {
-
-    }
-
-    std::string SubutaiDownloader::buildRequest(std::string path, std::string key, std::string value) {
+    std::string Downloader::buildRequest(std::string path, std::string key, std::string value) {
         char r[1024];
         if (!key.empty()) {
             std::sprintf(r, "%s%s/%s?%s=%s", URL.c_str(), REST.c_str(), path.c_str(), key.c_str(), value.c_str());
@@ -25,7 +28,7 @@ namespace SubutaiLauncher {
         return std::string(r);
     }
 
-    bool SubutaiDownloader::retrieveFileInfo() {
+    bool Downloader::retrieveFileInfo() {
         auto curl = curl_easy_init();
         curl_easy_setopt(curl, CURLOPT_URL, buildRequest("info", "name", _filename).c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
@@ -37,12 +40,15 @@ namespace SubutaiLauncher {
         return false;
     }
 
-    size_t SubutaiDownloader::handleInfo(char *data, size_t size, size_t nmemb, void *p) {
-        return static_cast<SubutaiDownloader*>(p)->handleInfoImpl(data, size, nmemb);
+    size_t Downloader::handleInfo(char *data, size_t size, size_t nmemb, void *p) {
+        return static_cast<Downloader*>(p)->handleInfoImpl(data, size, nmemb);
     }
 
-    size_t SubutaiDownloader::handleInfoImpl(char* data, size_t size, size_t nmemb) {
+    size_t Downloader::handleInfoImpl(char* data, size_t size, size_t nmemb) {
+        _content.clear();
+        std::printf("Parsing file info: %s\n", data);
         _content.append(data, size * nmemb);
+        std::printf("content append failed\n");
         Json::Value root;
         std::istringstream str(_content);
         // TODO: Review stream
@@ -65,24 +71,34 @@ namespace SubutaiLauncher {
         return size * nmemb;
     }
 
-    bool SubutaiDownloader::download() {
+    std::thread Downloader::download() {
+        _progress = 0;
+        std::printf("Starting download of a file: %s\n", _filename.c_str());
+        _done = false;
+        //return std::thread(&Downloader::downloadImpl, this);
+        return std::thread( [=] { downloadImpl(); } );
+    }
+
+    void Downloader::downloadImpl() {
+        std::printf("Starting downloader thread\n");
         auto curl = curl_easy_init();
         curl_easy_setopt(curl, CURLOPT_URL, buildRequest("get", "name", _filename).c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleFile);
         auto result = curl_easy_perform(curl);
         if (result == 0) {
-            _done = true;
-            return true;
+            std::printf("Download completed without any errors\n");
+        } else {
+            std::printf("Download completed with errors\n");
         }
-        return false;
+        _done = true;
     }
 
-    size_t SubutaiDownloader::handleFile(char *data, size_t size, size_t nmemb, void *p) {
-        return static_cast<SubutaiDownloader*>(p)->handleFileImpl(data, size, nmemb);
+    size_t Downloader::handleFile(char *data, size_t size, size_t nmemb, void *p) {
+        return static_cast<Downloader*>(p)->handleFileImpl(data, size, nmemb);
     }
 
-    size_t SubutaiDownloader::handleFileImpl(char* data, size_t size, size_t nmemb) {
+    size_t Downloader::handleFileImpl(char* data, size_t size, size_t nmemb) {
         _content.clear();
         _content.append(data, size * nmemb);
 
@@ -99,12 +115,12 @@ namespace SubutaiLauncher {
         return size * nmemb;
     }
 
-    bool SubutaiDownloader::isDone() {
+    bool Downloader::isDone() {
         return _done;
     }
 
-    int SubutaiDownloader::getPercent() {
-        return 1;
+    int Downloader::getPercent() {
+        return (int)(_progress/(_file.size/100));
     }
 
 };

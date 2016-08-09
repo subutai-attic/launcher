@@ -11,6 +11,7 @@
 #include "SLFunctions.h"
 #include "Hub.h"
 #include "VirtualBox.h"
+#include "Session.h"
 
 namespace SubutaiLauncher {
 

@@ -5,6 +5,11 @@ def subutaistart():
     print subutai.hello()
     print subutai.debug()
     print subutai.version()
+    print subutai.download("p2p")
+
+    while subutai.isDownloadComplete() != 1:
+        print subutai.getProgress(), "%"
+
     return 0
 
 def multiply(a,b):

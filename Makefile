@@ -26,7 +26,7 @@ lib: $(OUTPUT_DIR)/$(TARGET)
 cli: lib
 	$(MAKE) -C ./CLI
 
-ui:
+ui: lib
 	$(MAKE) -C ./UI/Builds/LinuxMakefile
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)

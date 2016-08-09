@@ -5,7 +5,7 @@ namespace SubutaiLauncher {
     Session* Session::_instance = NULL;
 
     Session::Session() {
-
+        _downloader = new Downloader();
     }
 
     Session::~Session() {
@@ -21,4 +21,7 @@ namespace SubutaiLauncher {
         delete this;
     }
 
+    Downloader* Session::getDownloader() {
+        return _downloader;
+    }
 };

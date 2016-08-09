@@ -48,4 +48,31 @@ namespace SubutaiLauncher {
 
     }
 
+    void VirtualBox::loadMachines() {
+        /*  
+        uint32_t c;
+        IMachine** list;
+        auto res = _vbox->GetMachines(&c, &list);
+        
+        for (auto i = 0; i < c; i++) {
+            PRUnichar* name;
+            list[i]->GetName(&name);
+            //std::wstring_convert<std::codecvt<char16_t, char, std::mbstate_t>, char16_t> converter;
+            std::wstring_convert<codecvt<char16_t, char, std::mbstate_t>> converter;
+            std::string n = converter.to_bytes((wchar_t)name);
+            std::cout << "Name: " << n << std::endl;
+        }
+        */
+    }
+
+    void VirtualBox::convertName(PRUnichar* orig) {
+        /*
+        nsAutoString str;
+        str.Assign(orig);
+
+        int l = str.length();
+        *jj
+            */
+    }
+
 };

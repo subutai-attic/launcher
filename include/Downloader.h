@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <curl/curl.h>
 #include <json/json.h>
+#include <thread>
 
 namespace SubutaiLauncher {
 
@@ -18,15 +19,17 @@ namespace SubutaiLauncher {
         long size;
     };
 
-    class SubutaiDownloader {
+    class Downloader {
         public:
             static const std::string URL;
             static const std::string REST;
 
-            SubutaiDownloader(std::string filename);
-            ~SubutaiDownloader();
+            Downloader();
+            ~Downloader();
+            void setFilename(const std::string& filename);
             bool retrieveFileInfo();
-            bool download();
+            std::thread download();
+            void downloadImpl();
             bool isDone();
             int getPercent();
             static size_t handleInfo(char* data, size_t size, size_t nmemb, void *p);
@@ -34,6 +37,7 @@ namespace SubutaiLauncher {
             static size_t handleFile(char* data, size_t size, size_t nmemb, void *p);
             size_t handleFileImpl(char* data, size_t size, size_t nmemb);
         private:
+            //std::thread t;
             std::string buildRequest(std::string path, std::string key, std::string value);
             std::string _filename;
             std::string _content;

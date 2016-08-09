@@ -7,6 +7,10 @@ namespace SubutaiLauncher {
     }
 
     Core::~Core() {
+        while (!Session::instance()->getDownloader()->isDone()) {
+            // Waiting
+        };
+
         Py_Finalize();
     }
 
@@ -20,6 +24,7 @@ namespace SubutaiLauncher {
     void Core::run() {
         initializePython();
         curl_global_init(CURL_GLOBAL_ALL);
+        Session::instance();
         parseArgs();
     }
 

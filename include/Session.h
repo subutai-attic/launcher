@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "VirtualBox.h"
+#include "Downloader.h"
 
 namespace SubutaiLauncher {
 
@@ -10,8 +11,10 @@ namespace SubutaiLauncher {
         public:
             static Session* instance();
             void destroyInstance();
+            Downloader* getDownloader();
         private:
-            SubutaiLauncher::VirtualBox* _virtualBox;
+            //SubutaiLauncher::VirtualBox* _virtualBox;
+            Downloader* _downloader;
         protected:
             static Session *_instance;
             Session();
