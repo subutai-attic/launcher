@@ -10,6 +10,8 @@
 #include <json/json.h>
 #include <thread>
 
+#include "FileSystem.h"
+
 namespace SubutaiLauncher {
 
     struct SubutaiFile {
@@ -37,7 +39,6 @@ namespace SubutaiLauncher {
             static size_t handleFile(char* data, size_t size, size_t nmemb, void *p);
             size_t handleFileImpl(char* data, size_t size, size_t nmemb);
         private:
-            //std::thread t;
             std::string buildRequest(std::string path, std::string key, std::string value);
             std::string _filename;
             std::string _content;
