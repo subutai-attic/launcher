@@ -1,7 +1,8 @@
 CC=g++
 
 TARGET = sl-cli
-VB_DIR=/usr/lib/virtualbox/sdk/bindings/xpcom/include
+EXTRA_LIBS_DIR = ../third-party
+VB_DIR = ../third-party/xpcom
 VB = -I$(VB_DIR) -I$(VB_DIR)/xpcom -I$(VB_DIR)/nsprpub -I$(VB_DIR)/string -I$(VB_DIR)/ipcd
 INCLUDES = -Iinclude -I/usr/include/python2.7 -I../include $(VB) -I../third-party/md5 -I../third-party/json
 LIBS = -g -ggdb -lm -lrt -lpython2.7 -lcurl -lsubutai-launcher -L../bin
