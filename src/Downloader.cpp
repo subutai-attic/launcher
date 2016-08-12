@@ -123,4 +123,8 @@ namespace SubutaiLauncher {
         return (int)(_progress/(_file.size/100));
     }
 
+    bool Downloader::verifyDownload() {
+        return true;
+    }
+
 };

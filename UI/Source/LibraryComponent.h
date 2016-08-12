@@ -22,11 +22,10 @@ class LibraryComponent : public Component, public ButtonListener {
         void paint (Graphics&) override;
         void resized() override;
         void buttonClicked(Button* button);
+        void step1();
     private:
         TextButton _installButton;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LibraryComponent)
 };
-
-
 
 #endif  // LIBRARYCOMPONENT_H_INCLUDED

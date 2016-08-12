@@ -11,6 +11,7 @@
 #include <thread>
 
 #include "FileSystem.h"
+#include "MD5.h"
 
 namespace SubutaiLauncher {
 
@@ -38,6 +39,7 @@ namespace SubutaiLauncher {
             size_t handleInfoImpl(char* data, size_t size, size_t nmemb);
             static size_t handleFile(char* data, size_t size, size_t nmemb, void *p);
             size_t handleFileImpl(char* data, size_t size, size_t nmemb);
+            bool verifyDownload();
         private:
             std::string buildRequest(std::string path, std::string key, std::string value);
             std::string _filename;

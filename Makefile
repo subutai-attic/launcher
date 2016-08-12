@@ -12,7 +12,7 @@ INCLUDE_DIR = include
 BUILD_DIR = build
 OUTPUT_DIR = bin
 
-SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
+SOURCES = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard third-party/json/*.cpp)
 HEADERS = $(wildcard $(INCLUDE_DIR)/*.h)
 OBJECTS = $(patsubst %,$(BUILD_DIR)/%.o, $(subst src/,,$(subst .cpp,,$(SOURCES))))
 
@@ -32,12 +32,16 @@ ui: lib
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
 	$(CC) -fPIC $(CFLAGS) -c $< -o $@
 
+$(BUILD_DIR)/third-party/json/%.o: third-party/json/%.cpp $(HEADERS)
+	$(CC) -fPIC $(CFLAGS) -c $< -o $@
+
 $(OUTPUT_DIR)/$(TARGET): $(OBJECTS)
 	$(CC) -shared $(OBJECTS) $(LIBS) -o $@
 
 directories:
 	@mkdir -p bin
 	@mkdir -p build
+	@mkdir -p build/third-party/json
 
 files:
 	@cp assets/* bin/
