@@ -26,7 +26,7 @@ void MarketplaceComponent::paint(Graphics& g) {
 
     g.setFont (Font (16.0f));
     g.setColour (Colours::white);
-    g.drawText ("Marketplace", getLocalBounds(), Justification::centred, true);
+    g.drawText ("Coming soon", getLocalBounds(), Justification::centred, true);
     // Banner rotator
 
 }

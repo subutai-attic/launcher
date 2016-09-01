@@ -10,6 +10,12 @@
 #include <nsIServiceManager.h>
 #include <nsIEventQueue.h>
 #include <nsEventQueueUtils.h>
+#elif LAUNCHER_WINDOWS
+#error Not Implemented for this platform
+#elif LAUNCHER_MACOS
+#error Not Implemented for this platform
+#else
+#error Unknown Platform
 #endif
 
 namespace SubutaiLauncher {

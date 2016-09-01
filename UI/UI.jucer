@@ -4,6 +4,16 @@
               includeBinaryInAppConfig="1" jucerVersion="4.2.3">
   <MAINGROUP id="zrqfkU" name="UI">
     <GROUP id="{AD2C375A-FD50-7F16-D5EA-0F6B4340942C}" name="Source">
+      <FILE id="UGq48C" name="SocialMediaIcons.cpp" compile="1" resource="0"
+            file="Source/SocialMediaIcons.cpp"/>
+      <FILE id="RW3OUK" name="SocialMediaIcons.h" compile="0" resource="0"
+            file="Source/SocialMediaIcons.h"/>
+      <FILE id="U2B9fl" name="Sidebar.cpp" compile="1" resource="0" file="Source/Sidebar.cpp"/>
+      <FILE id="PSuoK3" name="Sidebar.h" compile="0" resource="0" file="Source/Sidebar.h"/>
+      <FILE id="s95mki" name="Logo.cpp" compile="1" resource="0" file="Source/Logo.cpp"/>
+      <FILE id="xuWC3W" name="Logo.h" compile="0" resource="0" file="Source/Logo.h"/>
+      <FILE id="TWcLMH" name="MainWindow.h" compile="0" resource="0" file="Source/MainWindow.h"/>
+      <FILE id="xtGi9g" name="Main.h" compile="0" resource="0" file="Source/Main.h"/>
       <FILE id="maJz3Q" name="InstallationComponent.cpp" compile="1" resource="0"
             file="Source/InstallationComponent.cpp"/>
       <FILE id="b5cYmF" name="InstallationComponent.h" compile="0" resource="0"
@@ -70,8 +80,8 @@
         <MODULEPATH id="juce_gui_extra" path="../../../Downloads/JUCE/modules"/>
       </MODULEPATHS>
     </VS2015>
-    <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraLinkerFlags="" externalLibraries="python2.7&#10;subutai-launcher"
-                extraCompilerFlags="-DRT_OS_LINUX">
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraLinkerFlags="-Wl,-Bstatic -lsubutai-launcher -Wl,-Bdynamic"
+                externalLibraries="python2.7" extraCompilerFlags="-DRT_OS_LINUX">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/&#10;../../../bin" isDebug="1"
                        optimisation="1" targetName="sl-ui" headerPath="../../../include&#10;../../../third-party/json&#10;../../../third-party/md5&#10;../../../third-party/xpcom&#10;../../../third-party/xpcom/xpcom&#10;../../../third-party/xpcom/nsprpub&#10;../../../third-party/xpcom/string&#10;../../../third-party/xpcom/ipcd&#10;/usr/include/python2.7"

@@ -6,6 +6,7 @@ namespace SubutaiLauncher {
 
     Session::Session() {
         _downloader = new Downloader();
+        _settings = new Settings();
     }
 
     Session::~Session() {
@@ -23,5 +24,9 @@ namespace SubutaiLauncher {
 
     Downloader* Session::getDownloader() {
         return _downloader;
+    }
+
+    Settings* Session::getSettings() {
+        return _settings;
     }
 };

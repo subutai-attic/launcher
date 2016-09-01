@@ -16,13 +16,15 @@
 #include "CommunityComponent.h"
 #include "HubComponent.h"
 #include "MarketplaceComponent.h"
+#include "Logo.h"
+#include "Sidebar.h"
 
 //==============================================================================
 /*
    This component lives inside our window, and this is where you should put all
    your controls and content.
    */
-class MainContentComponent   : public Component, public ButtonListener, public ListBoxModel
+class MainContentComponent : public Component, public ButtonListener, public ListBoxModel
 {
     public:
         static const int WINDOW_WIDTH = 1024;
@@ -39,8 +41,6 @@ class MainContentComponent   : public Component, public ButtonListener, public L
 
         void buttonClicked(Button* button) override;
 
-        Path getLogo();
-
         // ListBoxModel overrides
         int getNumRows() override;
         void paintListBoxItem(int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override;
@@ -48,11 +48,9 @@ class MainContentComponent   : public Component, public ButtonListener, public L
 
     private:
         void showLoginScreen();
-        LoginScreen* _login;
+        //LoginScreen* _login;
         ListBox _mainMenu;
         Toolbar _header;
-        ImageComponent _banner;
-        ImageComponent _logo;
 
         // Right-side components
         LibraryComponent _library;
@@ -61,6 +59,10 @@ class MainContentComponent   : public Component, public ButtonListener, public L
         CommunityComponent _community;
 
         ImageButton *_closeButton;
+        ImageButton *_minimizeButton;
+
+        Logo _logo;
+        SidebarComponent _sidebar;
 
         // Launcher
         SubutaiLauncher::Core* _core;

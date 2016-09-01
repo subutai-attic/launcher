@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <streambuf>
 #include <cstdio>
 #include <curl/curl.h>
 #include <json/json.h>
@@ -29,8 +30,10 @@ namespace SubutaiLauncher {
 
             Downloader();
             ~Downloader();
+            void reset();
             void setFilename(const std::string& filename);
             bool retrieveFileInfo();
+            SubutaiFile info();
             std::thread download();
             void downloadImpl();
             bool isDone();
@@ -40,6 +43,7 @@ namespace SubutaiLauncher {
             static size_t handleFile(char* data, size_t size, size_t nmemb, void *p);
             size_t handleFileImpl(char* data, size_t size, size_t nmemb);
             bool verifyDownload();
+            long currentProgress();
         private:
             std::string buildRequest(std::string path, std::string key, std::string value);
             std::string _filename;

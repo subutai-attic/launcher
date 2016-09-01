@@ -21,7 +21,7 @@ ifeq ($(CONFIG),Debug)
   CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 -I /usr/include -I /usr/include/freetype2 -I ../../JuceLibraryCode -I ../../JuceLibraryCode/modules -I ../../../../../Downloads/JUCE/modules -I ../../../include -I ../../../third-party/json -I ../../../third-party/md5 -I ../../../third-party/xpcom -I ../../../third-party/xpcom/xpcom -I ../../../third-party/xpcom/nsprpub -I ../../../third-party/xpcom/string -I ../../../third-party/xpcom/ipcd -I /usr/include/python2.7
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -ggdb -O0 -DRT_OS_LINUX
   CXXFLAGS += $(CFLAGS) -std=c++11
-  LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -L/usr/X11R6/lib/ -L../../../bin -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -lrt -lcurl -lpython2.7 -lsubutai-launcher 
+  LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -L/usr/X11R6/lib/ -L../../../bin -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -lrt -lcurl -lpython2.7 -Wl,-Bstatic -lsubutai-launcher -Wl,-Bdynamic
 
   TARGET := sl-ui
   BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
@@ -41,7 +41,7 @@ ifeq ($(CONFIG),Release)
   CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DNDEBUG=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 -I /usr/include -I /usr/include/freetype2 -I ../../JuceLibraryCode -I ../../JuceLibraryCode/modules -I ../../../../../Downloads/JUCE/modules
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -O3 -DRT_OS_LINUX
   CXXFLAGS += $(CFLAGS) -std=c++11
-  LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -fvisibility=hidden -L/usr/X11R6/lib/ -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -lrt -lcurl -lpython2.7 -lsubutai-launcher 
+  LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -fvisibility=hidden -L/usr/X11R6/lib/ -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -lrt -lcurl -lpython2.7 -Wl,-Bstatic -lsubutai-launcher -Wl,-Bdynamic
 
   TARGET := UI
   BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
@@ -49,6 +49,9 @@ ifeq ($(CONFIG),Release)
 endif
 
 OBJECTS := \
+  $(OBJDIR)/SocialMediaIcons_5a7a8dec.o \
+  $(OBJDIR)/Sidebar_ebdb4dbd.o \
+  $(OBJDIR)/Logo_a463cb4.o \
   $(OBJDIR)/InstallationComponent_9add89c4.o \
   $(OBJDIR)/MarketplaceComponent_dbb66a7b.o \
   $(OBJDIR)/HubComponent_4ff59811.o \
@@ -82,6 +85,21 @@ clean:
 strip:
 	@echo Stripping UI
 	-@strip --strip-unneeded $(OUTDIR)/$(TARGET)
+
+$(OBJDIR)/SocialMediaIcons_5a7a8dec.o: ../../Source/SocialMediaIcons.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling SocialMediaIcons.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/Sidebar_ebdb4dbd.o: ../../Source/Sidebar.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling Sidebar.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/Logo_a463cb4.o: ../../Source/Logo.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling Logo.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/InstallationComponent_9add89c4.o: ../../Source/InstallationComponent.cpp
 	-@mkdir -p $(OBJDIR)

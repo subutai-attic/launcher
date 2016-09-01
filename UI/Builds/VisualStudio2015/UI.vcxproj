@@ -129,6 +129,9 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\SocialMediaIcons.cpp"/>
+    <ClCompile Include="..\..\Source\Sidebar.cpp"/>
+    <ClCompile Include="..\..\Source\Logo.cpp"/>
     <ClCompile Include="..\..\Source\InstallationComponent.cpp"/>
     <ClCompile Include="..\..\Source\MarketplaceComponent.cpp"/>
     <ClCompile Include="..\..\Source\HubComponent.cpp"/>
@@ -1212,6 +1215,11 @@
     <ClCompile Include="..\..\JuceLibraryCode\juce_gui_extra.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\SocialMediaIcons.h"/>
+    <ClInclude Include="..\..\Source\Sidebar.h"/>
+    <ClInclude Include="..\..\Source\Logo.h"/>
+    <ClInclude Include="..\..\Source\MainWindow.h"/>
+    <ClInclude Include="..\..\Source\Main.h"/>
     <ClInclude Include="..\..\Source\InstallationComponent.h"/>
     <ClInclude Include="..\..\Source\MarketplaceComponent.h"/>
     <ClInclude Include="..\..\Source\HubComponent.h"/>

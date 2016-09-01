@@ -13,6 +13,17 @@ namespace SubutaiLauncher {
 
     }
 
+    void Downloader::reset() {
+        _file.name = "";
+        _file.owner = "";
+        _file.id = "";
+        _file.size = 0;
+        _content = "";
+        _filename = "";
+        _progress = 0;
+        _done = false;
+    }
+
     void Downloader::setFilename(const std::string& filename) {
         _filename = filename;
     }
@@ -48,7 +59,6 @@ namespace SubutaiLauncher {
         _content.clear();
         std::printf("Parsing file info: %s\n", data);
         _content.append(data, size * nmemb);
-        std::printf("content append failed\n");
         Json::Value root;
         std::istringstream str(_content);
         // TODO: Review stream
@@ -72,6 +82,9 @@ namespace SubutaiLauncher {
     }
 
     std::thread Downloader::download() {
+        info();
+
+
         _progress = 0;
         std::printf("Starting download of a file: %s\n", _filename.c_str());
         _done = false;
@@ -80,6 +93,18 @@ namespace SubutaiLauncher {
     }
 
     void Downloader::downloadImpl() {
+        FileSystem fs(".");
+        if (fs.isFileExists(_file.name)) {
+            std::printf("File %s already exists. Validating checksum", _file.name.c_str());
+            if (verifyDownload()) {
+                std::printf("File %s already exists and it was not changed on remote host\n", _file.name.c_str());
+                _done = true;
+                _progress = _file.size;
+                return;
+            } else {
+                fs.removeFile(_file.name);
+            }
+        }
         std::printf("Starting downloader thread\n");
         auto curl = curl_easy_init();
         curl_easy_setopt(curl, CURLOPT_URL, buildRequest("get", "name", _filename).c_str());
@@ -106,13 +131,18 @@ namespace SubutaiLauncher {
 
         std::ofstream out(_file.name.c_str(), std::fstream::app);
         if (!out) {
-            std::printf("Couldn't open file for writing");
+            std::printf("Couldn't open file %s for writing\n", _file.name.c_str());
+            _done = true;
         } else {
             out << _content;
             out.close();
         }
 
         return size * nmemb;
+    }
+
+    long Downloader::currentProgress() {
+        return _progress;
     }
 
     bool Downloader::isDone() {
@@ -124,7 +154,29 @@ namespace SubutaiLauncher {
     }
 
     bool Downloader::verifyDownload() {
-        return true;
+        std::ifstream file(_file.name.c_str());
+        std::string buffer;
+        file.seekg(0, std::ios::end);
+        buffer.reserve(file.tellg());
+        file.seekg(0, std::ios::beg);
+
+        buffer.assign((std::istreambuf_iterator<char>(file)),
+                std::istreambuf_iterator<char>());
+
+        auto sum = md5sum(buffer.c_str(), buffer.length());
+        std::printf("File checksum: %s, remote checksum: %s\n", sum.c_str(), _file.id.c_str());
+        if (sum == _file.id) {
+            return true;
+        }
+
+        return false;
+    }
+
+    SubutaiFile Downloader::info() {
+        if (_file.name == "") {
+            retrieveFileInfo();
+        }
+        return _file;
     }
 
 };

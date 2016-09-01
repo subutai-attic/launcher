@@ -20,6 +20,12 @@ namespace SubutaiLauncher {
         if (result != 0) {
             throw SubutaiException("Script file doesn't exists", 1);
         }
+#elif LAUNCHER_WINDOWS
+#error Not Implemented for this platform
+#elif LAUNCHER_MACOS
+#error Not Implemented for this platform
+#else
+#error Unknown Platform
 #endif
         _name = PyString_FromString(path.c_str());
     }

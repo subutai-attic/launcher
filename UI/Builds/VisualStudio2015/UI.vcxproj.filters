@@ -211,6 +211,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\SocialMediaIcons.cpp">
+      <Filter>UI\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Sidebar.cpp">
+      <Filter>UI\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Logo.cpp">
+      <Filter>UI\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\InstallationComponent.cpp">
       <Filter>UI\Source</Filter>
     </ClCompile>
@@ -1404,6 +1413,21 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\SocialMediaIcons.h">
+      <Filter>UI\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Sidebar.h">
+      <Filter>UI\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Logo.h">
+      <Filter>UI\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\MainWindow.h">
+      <Filter>UI\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Main.h">
+      <Filter>UI\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\InstallationComponent.h">
       <Filter>UI\Source</Filter>
     </ClInclude>

@@ -7,7 +7,7 @@
 #define LAUNCHER_MACOS 1
 #elif defined(_WIN32) || defined(_WIN64)
 #define LAUNCHER_WIN 1
-#elif
+#else
 #define LAUNCHER_LINUX 1
 #endif
 

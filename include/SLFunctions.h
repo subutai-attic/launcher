@@ -10,7 +10,7 @@
 
 namespace SubutaiLauncher {
 
-    static char* filename = "";
+    static char const* filename = "";
 
     static char* download_keywords[] = {"filename", NULL};
 
@@ -56,9 +56,23 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", percent);
     }
 
+    static PyObject* SLGetTmpDir(PyObject* self, PyObject* args) {
+        auto settings = Session::instance()->getSettings();
+        auto path = settings->getTmpPath();
+        return Py_BuildValue("s", path);
+    }
+
+    static PyObject* SLGetInstallDir(PyObject* self, PyObject* args) {
+        auto settings = Session::instance()->getSettings();
+        auto path = settings->getInstallationPath();
+        return Py_BuildValue("s", path);
+    }
+
     static PyMethodDef SubutaiSLMethods[] = {
         {"download", (PyCFunction)SLDownload, METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN"},
         {"isDownloadComplete", SLIsDownloaded, METH_VARARGS, "Returns bool"},
+        {"GetTmpDir", SLGetTmpDir, METH_VARARGS, "Returns tmp directory"},
+        {"GetInstallDir", SLGetInstallDir, METH_VARARGS, "Returns installation directory"},
         {"getProgress", SLGetProgress, METH_VARARGS, "Returns bool"},
         {"hello", SLHelloWorld, METH_VARARGS, "Hello World method of subutai scripting language"},
         {"debug", SLDebug, METH_VARARGS, "Shows debug information about current launcher instance and environment"},
