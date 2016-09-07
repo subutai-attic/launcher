@@ -2,6 +2,9 @@
 #define __SETTINGS_H__
 
 #include <string>
+#include <sstream>
+#include <fstream>
+#include <streambuf>
 
 #include "Vars.h"
 #include "FileSystem.h"
