@@ -12,6 +12,7 @@ Author:  crioto
 #define MAIN_H_INCLUDED
 
 #include "MainWindow.h"
+#include "Core.h"
 
 //==============================================================================
 class UIApplication  : public JUCEApplication
@@ -28,6 +29,9 @@ class UIApplication  : public JUCEApplication
         void initialise (const String& commandLine) override
         {
             // This method is where you should put your application's initialisation code..
+
+            _core = new SubutaiLauncher::Core(std::vector<std::string>());
+            _core->run();
 
             mainWindow = new MainWindow (getApplicationName());
         }
@@ -63,6 +67,7 @@ class UIApplication  : public JUCEApplication
 
     private:
         ScopedPointer<MainWindow> mainWindow;
+        SubutaiLauncher::Core* _core;
 };
 
 

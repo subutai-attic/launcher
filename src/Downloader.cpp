@@ -5,15 +5,20 @@ namespace SubutaiLauncher {
     const std::string Downloader::URL = "https://cdn.subut.ai:8338";
     const std::string Downloader::REST = "/kurjun/rest/raw";
 
-    Downloader::Downloader() : _content(""), _done(false) {
+    Downloader::Downloader() : _content(""), 
+    _done(false),
+    _outputDir(".")
+    {
         std::printf("Starting Downloader\n");
     }
 
-    Downloader::~Downloader() {
+    Downloader::~Downloader() 
+    {
 
     }
 
-    void Downloader::reset() {
+    void Downloader::reset() 
+    {
         _file.name = "";
         _file.owner = "";
         _file.id = "";
@@ -24,11 +29,13 @@ namespace SubutaiLauncher {
         _done = false;
     }
 
-    void Downloader::setFilename(const std::string& filename) {
+    void Downloader::setFilename(const std::string& filename) 
+    {
         _filename = filename;
     }
 
-    std::string Downloader::buildRequest(std::string path, std::string key, std::string value) {
+    std::string Downloader::buildRequest(std::string path, std::string key, std::string value) 
+    {
         char r[1024];
         if (!key.empty()) {
             std::sprintf(r, "%s%s/%s?%s=%s", URL.c_str(), REST.c_str(), path.c_str(), key.c_str(), value.c_str());
@@ -39,7 +46,8 @@ namespace SubutaiLauncher {
         return std::string(r);
     }
 
-    bool Downloader::retrieveFileInfo() {
+    bool Downloader::retrieveFileInfo() 
+    {
         auto curl = curl_easy_init();
         curl_easy_setopt(curl, CURLOPT_URL, buildRequest("info", "name", _filename).c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
@@ -51,11 +59,13 @@ namespace SubutaiLauncher {
         return false;
     }
 
-    size_t Downloader::handleInfo(char *data, size_t size, size_t nmemb, void *p) {
+    size_t Downloader::handleInfo(char *data, size_t size, size_t nmemb, void *p) 
+    {
         return static_cast<Downloader*>(p)->handleInfoImpl(data, size, nmemb);
     }
 
-    size_t Downloader::handleInfoImpl(char* data, size_t size, size_t nmemb) {
+    size_t Downloader::handleInfoImpl(char* data, size_t size, size_t nmemb) 
+    {
         _content.clear();
         std::printf("Parsing file info: %s\n", data);
         _content.append(data, size * nmemb);
@@ -76,26 +86,25 @@ namespace SubutaiLauncher {
         std::printf("Owner: %s\n", _file.owner.c_str());
         std::printf("Name: %s\n", _file.name.c_str());
         std::printf("Id: %s\n", _file.id.c_str());
-        std::printf("Size: %o\n", _file.size);
+        std::printf("Size: %lu\n", _file.size);
 
         return size * nmemb;
     }
 
-    std::thread Downloader::download() {
+    std::thread Downloader::download() 
+    {
         info();
-
-
         _progress = 0;
         std::printf("Starting download of a file: %s\n", _filename.c_str());
         _done = false;
-        //return std::thread(&Downloader::downloadImpl, this);
         return std::thread( [=] { downloadImpl(); } );
     }
 
-    void Downloader::downloadImpl() {
-        FileSystem fs(".");
+    void Downloader::downloadImpl() 
+    {
+        FileSystem fs(_outputDir);
         if (fs.isFileExists(_file.name)) {
-            std::printf("File %s already exists. Validating checksum", _file.name.c_str());
+            std::printf("File %s already exists. Validating checksum\n", _file.name.c_str());
             if (verifyDownload()) {
                 std::printf("File %s already exists and it was not changed on remote host\n", _file.name.c_str());
                 _done = true;
@@ -119,19 +128,25 @@ namespace SubutaiLauncher {
         _done = true;
     }
 
-    size_t Downloader::handleFile(char *data, size_t size, size_t nmemb, void *p) {
+    size_t Downloader::handleFile(char *data, size_t size, size_t nmemb, void *p) 
+    {
         return static_cast<Downloader*>(p)->handleFileImpl(data, size, nmemb);
     }
 
-    size_t Downloader::handleFileImpl(char* data, size_t size, size_t nmemb) {
+    size_t Downloader::handleFileImpl(char* data, size_t size, size_t nmemb) 
+    {
         _content.clear();
         _content.append(data, size * nmemb);
 
         _progress += size * nmemb;
 
-        std::ofstream out(_file.name.c_str(), std::fstream::app);
+        std::string path(_outputDir);
+        path.append(PATH_DELIM);
+        path.append(_file.name.c_str());
+
+        std::ofstream out(path, std::fstream::app);
         if (!out) {
-            std::printf("Couldn't open file %s for writing\n", _file.name.c_str());
+            std::printf("Couldn't open file %s for writing\n", path.c_str());
             _done = true;
         } else {
             out << _content;
@@ -141,20 +156,28 @@ namespace SubutaiLauncher {
         return size * nmemb;
     }
 
-    long Downloader::currentProgress() {
+    long Downloader::currentProgress() 
+    {
         return _progress;
     }
 
-    bool Downloader::isDone() {
+    bool Downloader::isDone() 
+    {
         return _done;
     }
 
-    int Downloader::getPercent() {
+    int Downloader::getPercent() 
+    {
         return (int)(_progress/(_file.size/100));
     }
 
-    bool Downloader::verifyDownload() {
-        std::ifstream file(_file.name.c_str());
+    bool Downloader::verifyDownload() 
+    {
+        std::string path(_outputDir);
+        path.append(PATH_DELIM);
+        path.append(_file.name);
+
+        std::ifstream file(path.c_str());
         std::string buffer;
         file.seekg(0, std::ios::end);
         buffer.reserve(file.tellg());
@@ -172,11 +195,25 @@ namespace SubutaiLauncher {
         return false;
     }
 
-    SubutaiFile Downloader::info() {
+    SubutaiFile Downloader::info() 
+    {
         if (_file.name == "") {
             retrieveFileInfo();
         }
         return _file;
+    }
+
+    void Downloader::setOutputDirectory(const std::string& dir) 
+    {
+        _outputDir = dir;
+    }
+
+    std::string Downloader::getFullPath() const 
+    {
+        std::string path(_outputDir);
+        path.append(PATH_DELIM);
+        path.append(_file.name);
+        return path;
     }
 
 };

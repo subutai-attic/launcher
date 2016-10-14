@@ -13,9 +13,11 @@
 #include "VirtualBox.h"
 #include "Session.h"
 
-namespace SubutaiLauncher {
+namespace SubutaiLauncher 
+{
 
-    class Core {
+    class Core 
+    {
         public:
             Core(std::vector<std::string> args);
             ~Core();

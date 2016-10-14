@@ -7,6 +7,7 @@
 #include "Vars.h"
 #include "SubutaiException.h"
 #include "SLException.h"
+#include "FileSystem.h"
 
 #if LAUNCHER_LINUX
 #include <sys/stat.h>
@@ -26,6 +27,7 @@ namespace SubutaiLauncher {
             ~SL();
             void open(const std::string& path);
             void execute();
+            void execute(std::string module);
             long exitCode();
         private:
             PyObject* _name;

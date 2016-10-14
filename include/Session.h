@@ -5,19 +5,24 @@
 #include "VirtualBox.h"
 #include "Downloader.h"
 #include "Settings.h"
+#include "ConfigurationManager.h"
 
-namespace SubutaiLauncher {
+namespace SubutaiLauncher 
+{
 
-    class Session {
+    class Session 
+    {
         public:
             static Session* instance();
             void destroyInstance();
             Downloader* getDownloader();
             Settings* getSettings();
+            ConfigurationManager* getConfManager();
         private:
             //SubutaiLauncher::VirtualBox* _virtualBox;
             Downloader* _downloader;
             Settings* _settings;
+            ConfigurationManager* _confManager;
         protected:
             static Session *_instance;
             Session();

@@ -5,29 +5,36 @@
 #include <string>
 
 #include "Vars.h"
-#include "Session.h"
 #include "Settings.h"
 #include "Downloader.h"
+#include "SL.h"
 
-namespace SubutaiLauncher {
+namespace SubutaiLauncher 
+{
 
-    struct InstallConfig {
+    struct InstallConfig 
+    {
         std::string title;
         std::string description;
+        std::string file;
     };
 
-    class ConfigurationManager {
+    class ConfigurationManager 
+    {
         public:
             static const std::string CONFIG_FILE;
-            ConfigurationManager();
+            ConfigurationManager(Downloader* d);
             ~ConfigurationManager();
             void addConfig(std::string name);
             void addDesc(std::string name, std::string description);
-            std::vector<std::string> getConfigs();
-        private:
+            void addFile(std::string name, std::string file);
+            std::vector<InstallConfig> getConfigs();
             void load();
             void run();
-            std::vector<std::string> _configs;
+        private:
+            std::vector<InstallConfig> _configs;
+            Downloader* _downloader;
+            std::string _file;
     };
 };
 

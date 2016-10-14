@@ -18,7 +18,9 @@ Author:  crioto
 
 #include "InstallationDialog.h"
 #include "Core.h"
+#include "ConfigurationManager.h"
 #include "Vars.h"
+#include "Session.h"
 
 typedef enum {
     INTRO,
@@ -128,6 +130,7 @@ class LibrarySystemConfigure : public Component {
         Label _installTypeField;
         ToggleButton* _installMaster;
         ToggleButton* _installDev;
+        std::vector<ToggleButton*> _installTypes;
 
         // Installation path
         Label _installPathField;

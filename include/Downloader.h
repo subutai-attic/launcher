@@ -14,16 +14,19 @@
 #include "FileSystem.h"
 #include "MD5.h"
 
-namespace SubutaiLauncher {
+namespace SubutaiLauncher 
+{
 
-    struct SubutaiFile {
+    struct SubutaiFile 
+    {
         std::string owner;
         std::string name;
         std::string id;
         long size;
     };
 
-    class Downloader {
+    class Downloader 
+    {
         public:
             static const std::string URL;
             static const std::string REST;
@@ -44,10 +47,13 @@ namespace SubutaiLauncher {
             size_t handleFileImpl(char* data, size_t size, size_t nmemb);
             bool verifyDownload();
             long currentProgress();
+            void setOutputDirectory(const std::string& dir);
+            std::string getFullPath() const;
         private:
             std::string buildRequest(std::string path, std::string key, std::string value);
             std::string _filename;
             std::string _content;
+            std::string _outputDir;
             SubutaiFile _file;
             long _progress;
             bool _done;

@@ -54,7 +54,7 @@ namespace SubutaiLauncher {
         conf << "tmp_path=" << getTmpPath() << "\n";
         std::ofstream out(CONFIG_FILE, std::fstream::app);
         if (!out) {
-            std::printf("Couldn't open file %s for writing\n", CONFIG_FILE);
+            std::printf("Couldn't open file %s for writing\n", CONFIG_FILE.c_str());
         } else {
             out << conf.str();
             out.close();

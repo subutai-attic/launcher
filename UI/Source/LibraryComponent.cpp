@@ -1,7 +1,7 @@
 /*
    ==============================================================================
 
-   LibraryComponent.cpp
+LibraryComponent.cpp
 Created: 5 Aug 2016 5:58:23pm
 Author:  crioto
 
@@ -251,7 +251,8 @@ void LibraryComponent::waitDownloadCompleteImpl() {
 
 // ============================================================================
 
-LibrarySystemCheck::LibrarySystemCheck() : _numLines(1) {
+LibrarySystemCheck::LibrarySystemCheck() : _numLines(1) 
+{
     //Notification note;
     addAndMakeVisible(_numCpuField);
     addAndMakeVisible(_numCpuValue);
@@ -287,6 +288,10 @@ LibrarySystemCheck::LibrarySystemCheck() : _numLines(1) {
     */
 }
 
+LibrarySystemCheck::~LibrarySystemCheck() {
+
+}
+
 void LibrarySystemCheck::addLine(Label* field, Label* value, Label* hint, std::string text, std::string hintText) {
     auto font = Font(16);
     field->setText(text, dontSendNotification);
@@ -310,10 +315,6 @@ void LibrarySystemCheck::addLine(Label* field, Label* value, Label* hint, std::s
     _numLines++;
 }
 
-LibrarySystemCheck::~LibrarySystemCheck() {
-
-}
-
 void LibrarySystemCheck::paint(Graphics& g) {
     g.fillAll (Colour (0xff222222));
     g.setFont (Font (16.0f));
@@ -332,6 +333,24 @@ LibrarySystemConfigure::LibrarySystemConfigure() {
     _installVmField.setBounds(0, 5, 500, 440);
     _installVmField.setJustificationType(Justification::top);
 
+    auto conf = SubutaiLauncher::Session::instance()->getConfManager();
+
+    auto configs = conf->getConfigs();
+    int i = 0;
+    for (auto it = configs.begin(); it != configs.end(); it++) {
+        auto b = new ToggleButton((*it).title);
+        b->setRadioGroupId(11);
+        b->setBounds(300, i*30, 200, 30);
+        b->setColour(ToggleButton::textColourId, Colours::white);
+        if (i == 0) {
+            b->triggerClick();
+        }
+        addAndMakeVisible(b);
+        _installTypes.push_back(b);
+        ++i;
+    }
+
+    /* 
     _installTray = new ToggleButton("Install only tray application");
     _installTray->setRadioGroupId(11);
     _installTray->setBounds(300, 0, 200, 30);
@@ -348,6 +367,8 @@ LibrarySystemConfigure::LibrarySystemConfigure() {
     _installTypeField.setColour(Label::textColourId, Colours::white);
     _installTypeField.setBounds(0, 65, 500, 440);
     _installTypeField.setJustificationType(Justification::top);
+
+
 
     _installMaster = new ToggleButton("Install latest stable release");
     _installMaster->setRadioGroupId(22);
@@ -389,11 +410,15 @@ LibrarySystemConfigure::LibrarySystemConfigure() {
     addAndMakeVisible(_installPathValue);
     addAndMakeVisible(_installTmpField);
     addAndMakeVisible(_installTmpValue);
+    */
 }
 
 LibrarySystemConfigure::~LibrarySystemConfigure() {
     delete(_installTray);
     delete(_installVm);
+    for (auto it = _installTypes.begin(); it != _installTypes.end(); it++) {
+        delete (*it);
+    }
 }
 
 void LibrarySystemConfigure::paint(Graphics& g) {
