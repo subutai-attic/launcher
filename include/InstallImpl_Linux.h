@@ -2,8 +2,15 @@
 #define __INSTALL_IMPL_H__
 
 #include <string.h>
+#include <unistd.h>
+#include <vector>
 
 #include "InstallImpl_Base.h"
+#include "FileSystem.h"
+#include "Environment.h"
+#include "Vars.h"
+#include "SubutaiException.h"
+#include "String.h"
 
 namespace SubutaiLauncher
 {

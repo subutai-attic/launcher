@@ -2,6 +2,7 @@
 #define __FILE_SYSTEM_H__
 
 #include <string>
+#include <fstream>
 #include "Vars.h"
 
 #if LAUNCHER_LINUX
@@ -25,6 +26,7 @@ namespace SubutaiLauncher {
             void setPath(const std::string& path);
             bool isFileExists(const std::string& filename);
             void removeFile(const std::string& filename);
+            void copyFile(const std::string& src, const std::string& dst);
         private:
             std::string _path;
     };
