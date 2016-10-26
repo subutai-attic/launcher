@@ -61,4 +61,12 @@ namespace SubutaiLauncher {
         }
     }
 
+    void FileSystem::copyFile(const std::string& src, const std::string& dst)
+    {
+        std::ifstream s(src, std::ios::binary);
+        std::ofstream d(dst, std::ios::binary);
+
+        d << s.rdbuf();
+    }
+
 };
