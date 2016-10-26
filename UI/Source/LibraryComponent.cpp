@@ -1,7 +1,7 @@
 /*
    ==============================================================================
 
-LibraryComponent.cpp
+   LibraryComponent.cpp
 Created: 5 Aug 2016 5:58:23pm
 Author:  crioto
 
@@ -10,8 +10,53 @@ Author:  crioto
 
 #include "LibraryComponent.h"
 
+LibraryItem::LibraryItem(const std::string& title, const std::string& desc) : 
+    _title(title),
+    _desc(desc)
+{
+    if (title != "") {
+        auto font = Font(24);
+        _titleLabel.setText(_title, dontSendNotification);
+        _titleLabel.setColour(Label::textColourId, Colours::white);
+        _titleLabel.setBounds(0, 15, 200, 40);
+        _titleLabel.setFont(font);
+        _titleLabel.setJustificationType(Justification::centred);
+        addAndMakeVisible(_titleLabel);
+    }
+
+    auto fontPlus = Font(72);
+    _plusLabel.setText("+", dontSendNotification);
+    _plusLabel.setColour(Label::textColourId, Colours::grey);
+    if (title != "") {
+        _plusLabel.setBounds(0, 50, 200, 100);
+    } else {
+        _plusLabel.setBounds(0, 0, 200, 100);
+    }
+    _plusLabel.setFont(fontPlus);
+    _plusLabel.setJustificationType(Justification::centred);
+    addAndMakeVisible(_plusLabel);
+}
+
+LibraryItem::~LibraryItem()
+{
+
+}
+
+void LibraryItem::paint(Graphics& g)
+{
+    g.setColour(Colours::grey);
+    g.drawRoundedRectangle(0, 0, WIDTH, HEIGHT, 4, 1);
+}
+
+void LibraryItem::resized()
+{
+
+}
+
+// ============================================================================
+
 LibraryComponent::LibraryComponent() : 
-    _installButton("Install..."),
+    _installButton("Installation Wizard"),
     _nextButton("Next"),
     _backButton("Back"),
     _cancelButton("Cancel"),
@@ -42,6 +87,11 @@ void LibraryComponent::paint(Graphics& g) {
     g.fillAll (Colour (0xff222222));
     g.setFont (Font (16.0f));
     g.setColour (Colours::white);
+
+    g.drawLine(10, 80, 800, 80, 1);
+    g.drawLine(10, 340, 800, 340, 1);
+
+
     //g.drawText ("Library", getLocalBounds(), Justification::centred, true);
 }
 
@@ -100,14 +150,44 @@ void LibraryComponent::buttonClicked(Button* button) {
 }
 
 void LibraryComponent::drawIntro() {
+
+    auto font = Font(24);
+    _componentsSectionLabel.setText("Subutai Components", dontSendNotification);
+    _componentsSectionLabel.setColour(Label::textColourId, Colours::white);
+    _componentsSectionLabel.setBounds(15, 50, 300, 40);
+    _componentsSectionLabel.setFont(font);
+    _componentsSectionLabel.setJustificationType(Justification::top);
+    addAndMakeVisible(_componentsSectionLabel);
+
+    _peersSectionLabel.setText("Subutai Peers", dontSendNotification);
+    _peersSectionLabel.setColour(Label::textColourId, Colours::white);
+    _peersSectionLabel.setBounds(15, 310, 300, 40);
+    _peersSectionLabel.setFont(font);
+    _peersSectionLabel.setJustificationType(Justification::top);
+    addAndMakeVisible(_peersSectionLabel);
+
+
+    auto conf = SubutaiLauncher::Session::instance()->getConfManager();
+
+    auto configs = conf->getConfigs();
+    int i = 0;
+    for (auto it = configs.begin(); it != configs.end(); it++) {
+        auto c = new LibraryItem((*it).title, (*it).description);
+        c->setBounds(i * 220+20, 100, LibraryItem::WIDTH, LibraryItem::HEIGHT);
+        addAndMakeVisible(c);
+        _components.push_back(c);
+        ++i;
+    }
+
+    auto p = new LibraryItem("", "");
+    p->setBounds(20, 400, LibraryItem::WIDTH, LibraryItem::HEIGHT);
+    addAndMakeVisible(p);
+    _peers.push_back(p);
+
     addAndMakeVisible(_installButton);
     _installButton.setVisible(true);
     _installButton.setBounds(600, 20, 150, 35);
-    _nextButton.setVisible(false);
-    _backButton.setVisible(false);
-    _cancelButton.setVisible(false);
-    //sleep(2);
-    //exit(10);
+
 }
 
 void LibraryComponent::drawSystemCheck() {
@@ -278,14 +358,14 @@ LibrarySystemCheck::LibrarySystemCheck() : _numLines(1)
     addAndMakeVisible(_sshValue);
     addAndMakeVisible(_sshHint);
     addLine(&_sshField, &_sshValue, &_sshHint, "SSH client version", "SSH client is used to configure peer during installation");
-    
+
     /* 
-    _info.setText("ing...", dontSendNotification);
-    _info.setColour(Label::textColourId, Colours::white);
-    _info.setBounds(00, 0, 800, 440);
-    _info.setFont(font);
-    _info.setJustificationType(Justification::top);
-    */
+       _info.setText("ing...", dontSendNotification);
+       _info.setColour(Label::textColourId, Colours::white);
+       _info.setBounds(00, 0, 800, 440);
+       _info.setFont(font);
+       _info.setJustificationType(Justification::top);
+       */
 }
 
 LibrarySystemCheck::~LibrarySystemCheck() {
@@ -351,15 +431,15 @@ LibrarySystemConfigure::LibrarySystemConfigure() {
     }
 
     /* 
-    _installTray = new ToggleButton("Install only tray application");
-    _installTray->setRadioGroupId(11);
-    _installTray->setBounds(300, 0, 200, 30);
-    _installTray->setColour(ToggleButton::textColourId, Colours::white);
-    _installTray->triggerClick();
-    _installVm = new ToggleButton("Install tray and setup a new peer");
-    _installVm->setRadioGroupId(11);
-    _installVm->setBounds(300, 30, 200, 30);
-    _installVm->setColour(ToggleButton::textColourId, Colours::white);
+       _installTray = new ToggleButton("Install only tray application");
+       _installTray->setRadioGroupId(11);
+       _installTray->setBounds(300, 0, 200, 30);
+       _installTray->setColour(ToggleButton::textColourId, Colours::white);
+       _installTray->triggerClick();
+       _installVm = new ToggleButton("Install tray and setup a new peer");
+       _installVm->setRadioGroupId(11);
+       _installVm->setBounds(300, 30, 200, 30);
+       _installVm->setColour(ToggleButton::textColourId, Colours::white);
 
     // Version
 

@@ -6,27 +6,22 @@
 #include <utility>
 #include <locale>
 #include <codecvt>
+#include <vector>
+#include <string>
 
 #include "Vars.h"
-
-#include <nsString.h>
 
 #include "Environment.h"
 #include "String.h"
 #include "FileSystem.h"
-#include "VBox.h"
+#include "Process.h"
 
 namespace SubutaiLauncher {
 
-    template <class Facet>
-        class usable_facet : public Facet {
-            public:
-                using Facet::Facet;
-                ~usable_facet() {}
-        };
-
-    template<typename internT, typename externT, typename stateT>
-        using codecvt = usable_facet<std::codecvt<internT, externT, stateT>>;
+    struct SubutaiVM {
+        std::string name;
+        std::string id;
+    };
 
     class VirtualBox {
         public:
@@ -37,18 +32,19 @@ namespace SubutaiLauncher {
             bool isRunning();
             bool isUpdateRequired();
             std::string retrieveVersion();
+            void getVms();
+            std::vector<SubutaiVM> parseVms(const std::string& buffer);
+            void addVm(SubutaiVM vm);
         protected:
-            void loadMachines();
-
         private:
-            void convertName(PRUnichar*);
             std::string _version;
             std::string _path;
+            std::string _location;
             bool _installed;
             bool _running;
             bool _updateRequired;
+            std::vector<SubutaiVM> _vms;
 
-            IVirtualBox* _vbox;
 
     };
 

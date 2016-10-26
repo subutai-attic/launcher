@@ -102,6 +102,13 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", 1);
     }
 
+    static PyObject* SL_SSHPeer(PyObject* self, PyObject* args, PyObject* keywords) {
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
+            return NULL;
+        Session::instance()->getConfManager()->addConfig(sl_string);
+        return Py_BuildValue("i", 1);
+    }
+
     static PyMethodDef SubutaiSLMethods[] = {
         {"download", (PyCFunction)SL_Download, METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN"},
         {"setTmpDir", (PyCFunction)SL_SetTmpDir, METH_VARARGS | METH_KEYWORDS, "Sets tmp output directory"},

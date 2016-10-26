@@ -38,7 +38,25 @@ class LibrarySystemCheck;
 class LibrarySystemConfigure;
 class LibraryDownload;
 
-class LibraryComponent : public Component, public ButtonListener {
+class LibraryItem : public Component 
+{
+    public:
+        static const int WIDTH = 200;
+        static const int HEIGHT = 150;
+        LibraryItem(const std::string& title, const std::string& desc);
+        ~LibraryItem();
+        void paint(Graphics& g) override;
+        void resized() override;
+    private:
+        std::string _title;
+        std::string _desc;
+        Label _titleLabel;
+        Label _plusLabel;
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LibraryItem)
+};
+
+class LibraryComponent : public Component, public ButtonListener 
+{
     public:
         LibraryComponent();
         ~LibraryComponent();
@@ -61,6 +79,8 @@ class LibraryComponent : public Component, public ButtonListener {
         std::thread waitDownloadComplete();
         void waitDownloadCompleteImpl();
     private:
+        Label _componentsSectionLabel;
+        Label _peersSectionLabel;
         LibrarySystemCheck* _systemCheck;
         LibrarySystemConfigure* _systemConfigure;
         LibraryDownload* _download;
@@ -69,6 +89,9 @@ class LibraryComponent : public Component, public ButtonListener {
         TextButton _nextButton;
         TextButton _backButton;
         TextButton _cancelButton;
+        std::vector<LibraryItem*> _components;
+        std::vector<LibraryItem*> _peers;
+        LibraryItem* _tb;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LibraryComponent)
 };
 

@@ -10,14 +10,12 @@ namespace SubutaiLauncher {
         std::vector<std::string> path;
         str.split(':', path);
         FileSystem fs;
-        std::printf("Searching for %s binary\n", BIN.c_str());
         for (auto it = path.begin(); it != path.end(); it++) {
-            std::printf("Looking in %s...\n", it->c_str());
             fs.setPath((*it));
             if (fs.isFileExists(BIN)) {
-                std::printf("Found in %s\n", it->c_str());
                 _installed = true;
                 _path = (*it);
+                _location = _path;
                 _path.append(FileSystem::DELIM);
                 _path.append(BIN);
                 break;
@@ -48,31 +46,36 @@ namespace SubutaiLauncher {
 
     }
 
-    void VirtualBox::loadMachines() {
-        /*  
-        uint32_t c;
-        IMachine** list;
-        auto res = _vbox->GetMachines(&c, &list);
-        
-        for (auto i = 0; i < c; i++) {
-            PRUnichar* name;
-            list[i]->GetName(&name);
-            //std::wstring_convert<std::codecvt<char16_t, char, std::mbstate_t>, char16_t> converter;
-            std::wstring_convert<codecvt<char16_t, char, std::mbstate_t>> converter;
-            std::string n = converter.to_bytes((wchar_t)name);
-            std::cout << "Name: " << n << std::endl;
-        }
-        */
+    void VirtualBox::getVms()
+    {
+        std::vector<std::string> args;
+        args.push_back("list");
+        args.push_back("vms");
+        Process p;
+        p.launch(BIN, args, _location);
+        p.wait();
+        auto out = p.getOutputBuffer();
     }
 
-    void VirtualBox::convertName(PRUnichar* orig) {
-        /*
-        nsAutoString str;
-        str.Assign(orig);
-
-        int l = str.length();
-        *jj
-            */
+    std::vector<SubutaiVM> VirtualBox::parseVms(const std::string& buffer)
+    {
+        char vmname[150];
+        char vmid[150];
+        // Parsing output of vboxmanage:
+        // "machine_name" {machine_id}
+        std::vector<SubutaiVM> vms;
+        String buf(buffer);
+        std::vector<std::string> lines;
+        buf.split('\n', lines);
+        for (auto it = lines.begin(); it != lines.end(); it++) {
+            const char* line = const_cast<char*>((*it).c_str());
+            sscanf(line, "\"%s\" {%s}", vmname, vmid);
+            SubutaiVM v;
+            v.name = std::string(vmname);
+            v.id = std::string(vmid);
+            vms.push_back(v);
+        }
+        return vms;
     }
 
 };
