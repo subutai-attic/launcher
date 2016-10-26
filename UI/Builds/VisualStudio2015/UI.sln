@@ -1,0 +1,19 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2015
+Project("{8DBB3811-E9EB-DD8C-8F99-7F0373AE9398}") = "UI", "UI.vcxproj", "{D0EA5CAC-4BDC-D3D6-C76D-0948A9BEA87D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D0EA5CAC-4BDC-D3D6-C76D-0948A9BEA87D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D0EA5CAC-4BDC-D3D6-C76D-0948A9BEA87D}.Debug|Win32.Build.0 = Debug|Win32
+		{D0EA5CAC-4BDC-D3D6-C76D-0948A9BEA87D}.Release|Win32.ActiveCfg = Release|Win32
+		{D0EA5CAC-4BDC-D3D6-C76D-0948A9BEA87D}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

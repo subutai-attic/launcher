@@ -1,0 +1,10 @@
+*.ropeproject
+*.pyc
+*ycm_extra_conf*
+bin
+build
+*.swp
+*.swo
+UI/Builds/LinuxMakefile/build
+CLI/bin
+CLI/build
