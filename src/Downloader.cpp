@@ -208,6 +208,11 @@ namespace SubutaiLauncher {
         _outputDir = dir;
     }
 
+    std::string Downloader::getOutputDirectory() const
+    {
+        return _outputDir;
+    }
+
     std::string Downloader::getFullPath() const 
     {
         std::string path(_outputDir);

@@ -48,6 +48,7 @@ namespace SubutaiLauncher
             bool verifyDownload();
             long currentProgress();
             void setOutputDirectory(const std::string& dir);
+            std::string getOutputDirectory() const;
             std::string getFullPath() const;
         private:
             std::string buildRequest(std::string path, std::string key, std::string value);

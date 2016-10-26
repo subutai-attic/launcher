@@ -7,6 +7,7 @@
 
 #include "Downloader.h"
 #include "Session.h"
+#include "Install.h"
 
 namespace SubutaiLauncher {
 
@@ -14,6 +15,8 @@ namespace SubutaiLauncher {
     static char const* sl_tmpdir = "";
     static char const* sl_string = "";
     static char const* sl_desc = "";
+    static char const* sl_destination = "";
+
 
     static char* download_keywords[] = {"filename", NULL};
     static char* tmpdir_keywords[] = {"tmpdir", NULL};
@@ -51,9 +54,9 @@ namespace SubutaiLauncher {
     static PyObject* SL_IsDownloaded(PyObject* self, PyObject* args) {
         auto downloader = Session::instance()->getDownloader();
         if (downloader->isDone())
-        return Py_BuildValue("i", 1);
+            return Py_BuildValue("i", 1);
         else 
-        return Py_BuildValue("i", 0);
+            return Py_BuildValue("i", 0);
     }
 
     static PyObject* SL_GetProgress(PyObject* self, PyObject* args) {
@@ -109,8 +112,28 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", 1);
     }
 
+    static PyObject* SL_Install(PyObject* self, PyObject* args, PyObject* keywords) {
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", string_keywords, &sl_filename, &sl_destination))
+            return NULL;
+        Install i;
+        i.setFilename(sl_filename);
+        i.setSrcPath(Session::instance()->getDownloader()->getOutputDirectory());
+        i.setDstPath(sl_destination);
+        try {
+            i.preInstall();
+            i.install();
+            i.postInstall();
+        } catch (SubutaiException &e) {
+            return Py_BuildValue("i", 1);
+
+        }
+        return Py_BuildValue("i", 0);
+    }
+
+
     static PyMethodDef SubutaiSLMethods[] = {
         {"download", (PyCFunction)SL_Download, METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN"},
+        {"install", (PyCFunction)SL_Install, METH_VARARGS | METH_KEYWORDS, "Installs a file"},
         {"setTmpDir", (PyCFunction)SL_SetTmpDir, METH_VARARGS | METH_KEYWORDS, "Sets tmp output directory"},
         {"NewConfiguration", (PyCFunction)SL_NewConfiguration, METH_VARARGS | METH_KEYWORDS, "Creates a new configuration with a given name"},
         {"SetConfigurationDesc", (PyCFunction)SL_SetConfigurationDesc, METH_VARARGS | METH_KEYWORDS, "Sets a description to a given configuration"},
