@@ -30,6 +30,6 @@ namespace SubutaiLauncher
             void handleTest();
     };
 
-};
+}
 
 #endif

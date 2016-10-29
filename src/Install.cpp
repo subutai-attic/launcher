@@ -28,4 +28,4 @@ namespace SubutaiLauncher
         _impl->postInstall();
     }
 
-};
+}

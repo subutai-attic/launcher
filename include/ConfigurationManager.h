@@ -36,6 +36,6 @@ namespace SubutaiLauncher
             Downloader* _downloader;
             std::string _file;
     };
-};
+}
 
 #endif

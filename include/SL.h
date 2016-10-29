@@ -35,6 +35,6 @@ namespace SubutaiLauncher {
             long _exitCode;
     };
 
-};
+}
 
 #endif

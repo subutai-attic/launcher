@@ -58,8 +58,8 @@ namespace SubutaiLauncher
             SubutaiFile _file;
             long _progress;
             bool _done;
-    };
+	};
 
-};
+}
 
 #endif

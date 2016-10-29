@@ -25,6 +25,6 @@ namespace SubutaiLauncher {
             bool _installed;
     };
 
-};
+}
 
 #endif

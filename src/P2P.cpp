@@ -1,20 +1,19 @@
 #include "P2P.h"
 
-namespace SubutaiLauncher {
 
-    const std::string SubutaiLauncher::P2P::BIN = "p2p";
+    const std::string SubutaiLauncher::SubutaiLauncher::P2P::BIN = "p2p";
 
-    P2P::P2P() 
+	SubutaiLauncher::P2P::P2P()
     {
         _version = "";
     }
 
-    P2P::~P2P() 
+	SubutaiLauncher::P2P::~P2P()
     {
 
     }
 
-    bool P2P::findInstallation() 
+    bool SubutaiLauncher::P2P::findInstallation()
     {
         auto env = new Environment();
         String pathVar(env->getVar("PATH", ""));
@@ -35,7 +34,7 @@ namespace SubutaiLauncher {
         return false;
     }
 
-    std::string P2P::extractVersion()
+    std::string SubutaiLauncher::P2P::extractVersion()
     {
         if (_version != "") {
             return _version;
@@ -53,19 +52,18 @@ namespace SubutaiLauncher {
         return "";
     }
 
-    void P2P::start()
+    void SubutaiLauncher::P2P::start()
     {
 
     }
 
-    void P2P::stop()
+    void SubutaiLauncher::P2P::stop()
     {
 
     }
 
-    bool P2P::isRunning()
+    bool SubutaiLauncher::P2P::isRunning()
     {
         return false;
     }
 
-};

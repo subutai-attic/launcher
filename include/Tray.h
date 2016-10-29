@@ -9,6 +9,6 @@ namespace SubutaiLauncher {
             ~Tray();
     };
 
-};
+}
 
 #endif

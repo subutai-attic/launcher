@@ -39,6 +39,6 @@ namespace SubutaiLauncher {
             bool _connected;
             bool _authenticated;
     };
-};
+}
 
 #endif

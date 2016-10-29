@@ -148,6 +148,6 @@ namespace SubutaiLauncher {
         {NULL, NULL, 0, NULL}
     };
 
-};
+}
 
 #endif

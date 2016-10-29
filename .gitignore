@@ -5,6 +5,15 @@ bin
 build
 *.swp
 *.swo
+*.sdf
 UI/Builds/LinuxMakefile/build
+UI/Builds/VisualStudio2015/.vs/
+UI/Builds/VisualStudio2015/Debug/
 CLI/bin
 CLI/build
+/win/
+*.filter
+*.user
+/subutai-launcher/ipch
+/subutai-laucher/Debug
+*.opendb

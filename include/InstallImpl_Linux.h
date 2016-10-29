@@ -22,6 +22,6 @@ namespace SubutaiLauncher
             void install();
             void postInstall();
     };
-};
+}
 
 #endif

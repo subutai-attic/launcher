@@ -4,12 +4,18 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#ifdef LAUNCHER_LINUX
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#endif
 #include <errno.h>
 
 #include "SubutaiException.h"
+
+#ifdef LAUNCHER_WINDOWS
+typedef long pid_t;
+#endif
 
 namespace SubutaiLauncher {
     class Process {
@@ -33,6 +39,6 @@ namespace SubutaiLauncher {
             int _errWrite;
             pid_t _pid;
     };
-};
+}
 
 #endif

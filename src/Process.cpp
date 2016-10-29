@@ -1,23 +1,23 @@
 #include "Process.h"
 
-namespace SubutaiLauncher {
 
-    Process::Process()
+
+SubutaiLauncher::Process::Process()
     {
 
     }
 
-    Process::~Process()
+SubutaiLauncher::Process::~Process()
     {
         closeFds();
     }
 
-    void Process::runBasic(const std::string& command, std::vector<std::string> args) 
+    void SubutaiLauncher::Process::runBasic(const std::string& command, std::vector<std::string> args)
     {
 
     }
 
-    pid_t Process::launch(const std::string& cmd, std::vector<std::string> args, const std::string& dir) 
+	SubutaiLauncher::pid_t SubutaiLauncher::Process::launch(const std::string& cmd, std::vector<std::string> args, const std::string& dir)
     {
         std::vector<char> env;
         std::vector<char*> argv(args.size() + 2);
@@ -64,7 +64,7 @@ namespace SubutaiLauncher {
         return pid;
     }
 
-    int Process::wait()
+    int SubutaiLauncher::Process::wait()
     {
         int status, rc;
         do {
@@ -75,7 +75,7 @@ namespace SubutaiLauncher {
         return WEXITSTATUS(status);
     }
 
-    std::string Process::getOutputBuffer()
+    std::string SubutaiLauncher::Process::getOutputBuffer()
     {
         if (_outRead == -1) {
             throw SubutaiException("Reading from closed pipe");
@@ -90,7 +90,7 @@ namespace SubutaiLauncher {
         } else throw SubutaiException("Failed to read output from anonymous pipe");
     }
 
-    std::string Process::getErrorBuffer()
+    std::string SubutaiLauncher::Process::getErrorBuffer()
     {
         if (_errRead == -1) {
             throw SubutaiException("Reading from closed pipe");
@@ -105,7 +105,7 @@ namespace SubutaiLauncher {
         } else throw SubutaiException("Failed to read output from anonymous pipe");
     }
 
-    void Process::setupFds()
+    void SubutaiLauncher::Process::setupFds()
     {
         int ifds[2], ofds[2], efds[2];
         int rc = pipe(ifds);
@@ -125,7 +125,7 @@ namespace SubutaiLauncher {
         } else throw SubutaiException("Anonymous Pipe");
     }
 
-    void Process::closeFds()
+    void SubutaiLauncher::Process::closeFds()
     {
         if (_inRead != -1) {
             close(_inRead);
@@ -152,4 +152,3 @@ namespace SubutaiLauncher {
             _errWrite = -1;
         }
     }
-};

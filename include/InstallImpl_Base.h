@@ -19,6 +19,6 @@ namespace SubutaiLauncher
             std::string _srcPath;
             std::string _dstPath;
     };
-};
+}
 
 #endif

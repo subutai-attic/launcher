@@ -34,6 +34,6 @@ namespace SubutaiLauncher {
             CURL* curl;
     };
 
-};
+}
 
 #endif

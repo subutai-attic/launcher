@@ -14,6 +14,6 @@ namespace SubutaiLauncher {
             std::string getVar(const std::string& name, const std::string& defaultValue);
     };
 
-};
+}
 
 #endif

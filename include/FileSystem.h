@@ -30,6 +30,6 @@ namespace SubutaiLauncher {
         private:
             std::string _path;
     };
-};
+}
 
 #endif
