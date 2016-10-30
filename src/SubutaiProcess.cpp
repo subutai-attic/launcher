@@ -17,8 +17,8 @@ void SubutaiLauncher::SubutaiProcess::runBasic(const std::string& command, std::
 
 }
 
-#if LAUNCHER_LINIX
-SubutaiLauncher::pid_t SubutaiLauncher::SubutaiProcess::launch(const std::string& cmd, std::vector<std::string> args, const std::string& dir)
+#if LAUNCHER_LINUX
+pid_t SubutaiLauncher::SubutaiProcess::launch(const std::string& cmd, std::vector<std::string> args, const std::string& dir)
 {
 	std::vector<char> env;
 	std::vector<char*> argv(args.size() + 2);
@@ -64,7 +64,9 @@ SubutaiLauncher::pid_t SubutaiLauncher::SubutaiProcess::launch(const std::string
 	_errWrite = -1;
 	_pid = pid;
 	return pid;
+
 }
+
 #elif LAUNCHER_WINDOWS
 SubutaiLauncher::pid_t SubutaiLauncher::SubutaiProcess::launch(const std::string& cmd, std::vector<std::string> args, const std::string& dir)
 {
@@ -137,11 +139,11 @@ SubutaiLauncher::pid_t SubutaiLauncher::SubutaiProcess::launch(const std::string
 		return pi.dwProcessId;
 	}
 	throw new SubutaiException("Can't launch process");
+}
 
 #elif LAUNCHER_MACOS
 #error Not implemented on this platform
 #endif
-}
 
 int SubutaiLauncher::SubutaiProcess::wait()
 {

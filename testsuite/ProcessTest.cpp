@@ -14,13 +14,13 @@
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/XmlOutputter.h>
 
-#include "Process.h"
+#include "SubutaiProcess.h"
 
 using namespace CppUnit;
 
-class ProcessTest : public CppUnit::TestFixture
+class SubutaiProcessTest : public CppUnit::TestFixture
 {
-    CPPUNIT_TEST_SUITE(ProcessTest);
+    CPPUNIT_TEST_SUITE(SubutaiProcessTest);
     CPPUNIT_TEST(testNormalCommand);
     CPPUNIT_TEST(testBadCommand);
     CPPUNIT_TEST_SUITE_END();
@@ -32,23 +32,23 @@ class ProcessTest : public CppUnit::TestFixture
     void testBadCommand(void);
 };
 
-void ProcessTest::setUp(void)
+void SubutaiProcessTest::setUp(void)
 {
 
 }
 
-void ProcessTest::tearDown(void)
+void SubutaiProcessTest::tearDown(void)
 {
 
 }
 
-void ProcessTest::testNormalCommand()
+void SubutaiProcessTest::testNormalCommand()
 {
     std::printf("Running ls -l /\n");
     std::vector<std::string> args;
     args.push_back("-l");
     args.push_back("/");
-    SubutaiLauncher::Process p;
+    SubutaiLauncher::SubutaiProcess p;
     p.launch("ls", args, "/bin");
     int exit_code = p.wait();
     auto buffer = p.getOutputBuffer();
@@ -58,12 +58,12 @@ void ProcessTest::testNormalCommand()
     CPPUNIT_ASSERT(err.empty());
 }
 
-void ProcessTest::testBadCommand()
+void SubutaiProcessTest::testBadCommand()
 {
 
 }
 
-CPPUNIT_TEST_SUITE_REGISTRATION(ProcessTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(SubutaiProcessTest);
 int main(int argc, char* argv[])
 {
     CPPUNIT_NS::TestResult testResult;

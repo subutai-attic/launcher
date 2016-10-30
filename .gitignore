@@ -21,6 +21,9 @@ CLI/build
 /third-party/curl
 /third-party/libssh
 
+# linux build
+config.make
+
 # windows build
 subutai-launcher/Debug
 subutai-launcher/x64

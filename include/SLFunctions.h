@@ -148,6 +148,19 @@ namespace SubutaiLauncher {
         {NULL, NULL, 0, NULL}
     };
 
+#if PY_MAJOR_VERSION >= 3
+    static PyModuleDef SubutaiModule = {
+        PyModuleDef_HEAD_INIT, "subutai", NULL, -1, SubutaiSLMethods, 
+        NULL, NULL, NULL, NULL
+    };
+
+    static PyObject* PyInit_Subutai(void)
+    {
+        return PyModule_Create(&SubutaiModule);
+    }
+#endif
+
+
 }
 
 #endif

@@ -1,12 +1,15 @@
-CC=g++
+sinclude config.make
 
+CC=g++
 TARGET = libsubutai-launcher.so
 STARGET = libsubutai-launcher.a
 EXTRA_LIBS_DIR = third-party
 VB_DIR = third-party/xpcom
 VB = -I$(VB_DIR) -I$(VB_DIR)/xpcom -I$(VB_DIR)/nsprpub -I$(VB_DIR)/string -I$(VB_DIR)/ipcd
-INCLUDES = -Iinclude -I/usr/include/python2.7 $(VB) -Ithird-party/md5 -Ithird-party/json
-LIBS = -g -ggdb -lm -lrt -lpython2.7 -lcurl -lssh
+INCLUDES = -Iinclude -I/usr/include/$(PYTHON_VER) $(VB) -Ithird-party/md5 -Ithird-party/json
+LIBS = -g -ggdb -lm -lrt -l$(PYTHON_VER) -lcurl -lssh -L$(PYLIB_DIR)
+#INCLUDES = -Iinclude -I/usr/include/python3.5 $(VB) -Ithird-party/md5 -Ithird-party/json
+#LIBS = -g -ggdb -lm -lrt -lpython3.5 -lcurl -lssh
 CFLAGS = -L/lib/x86_64-linux-gnu -Wno-write-strings $(INCLUDES) $(LIBS) -std=c++11 -DRT_OS_LINUX
 
 SRC_DIR = src
@@ -85,3 +88,4 @@ mrproper:
 	@rm -rf bin
 	@rm -rf build
 	$(MAKE) -C ./CLI mrproper
+	@rm -f config.make

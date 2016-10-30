@@ -1,10 +1,14 @@
 #ifndef __SSH_H__
 #define __SSH_H__
 
+#include "Vars.h"
+
 #include <cstdlib>
 #include <string>
 #include <vector>
+#if LAUNCHER_WINDOWS
 #include <io.h>
+#endif
 #include <libssh/libssh.h>
 #include "Environment.h"
 #include "SubutaiProcess.h"

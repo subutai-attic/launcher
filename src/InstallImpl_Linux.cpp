@@ -36,7 +36,7 @@ void SubutaiLauncher::InstallImpl::postInstall()
 	binPath.push_back("/bin");
 
 	auto env = new Environment();
-	String pathVar(env->getVar("PATH", ""));
+	SubutaiString pathVar(env->getVar("PATH", ""));
 	std::vector<std::string> path;
 	pathVar.split(':', path);
 	std::string pathCandidate = "";

@@ -1,11 +1,14 @@
 #ifndef __ENVIRONMENT_H__
 #define __ENVIRONMENT_H__
 
+#include "Vars.h"
+
 #include <string>
 #include <cstdlib>
+#if LAUNCHER_WINDOWS
 #include <windows.h>
+#endif
 
-#include "Vars.h"
 #include "SubutaiException.h"
 
 namespace SubutaiLauncher {

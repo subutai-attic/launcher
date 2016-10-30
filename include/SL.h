@@ -23,7 +23,7 @@ namespace SubutaiLauncher {
 
     class SL {
         public:
-            SL();
+            SL(const std::string& dir = "/");
             ~SL();
             void open(const std::string& path);
             void execute();
@@ -33,6 +33,7 @@ namespace SubutaiLauncher {
             PyObject* _name;
             PyObject* _module;
             long _exitCode;
+            std::string _dir;
     };
 
 }

@@ -27,6 +27,7 @@ namespace SubutaiLauncher
             void parseArgs();
         private:
             std::vector<std::string> _args;
+            bool _running;
         protected:
             void handleTest();
     };

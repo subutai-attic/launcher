@@ -14,7 +14,7 @@
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/XmlOutputter.h>
 
-#include "P2P.h"
+#include "SubutaiP2P.h"
 
 using namespace CppUnit;
 
