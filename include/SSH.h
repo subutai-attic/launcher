@@ -4,11 +4,12 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <io.h>
 #include <libssh/libssh.h>
 #include "Environment.h"
-#include "Process.h"
+#include "SubutaiProcess.h"
 #include "FileSystem.h"
-#include "String.h"
+#include "SubutaiString.h"
 
 namespace SubutaiLauncher {
     class SSH {

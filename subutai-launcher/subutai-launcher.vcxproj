@@ -29,7 +29,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -42,7 +42,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -70,7 +70,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(IncludePath);$(ProjectDir)..\include;</IncludePath>
+    <IncludePath>$(IncludePath);$(ProjectDir)..\include;..\third-party\curl\include;..\third-party\json;..\third-party\md5;..\third-party\libssh\include;..\third-party\python\Include;..\third-party\python\PC</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(IncludePath);$(ProjectDir)..\include;..\third-party\curl\include;..\third-party\json;..\third-party\md5;..\third-party\libssh\include;..\third-party\python\Include;..\third-party\python\PC</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -86,7 +89,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -142,8 +145,9 @@
     <ClInclude Include="..\include\Install.h" />
     <ClInclude Include="..\include\InstallImpl_Base.h" />
     <ClInclude Include="..\include\InstallImpl_Linux.h" />
-    <ClInclude Include="..\include\P2P.h" />
-    <ClInclude Include="..\include\Process.h" />
+    <ClInclude Include="..\include\InstallImpl_Windows.h" />
+    <ClInclude Include="..\include\SubutaiP2P.h" />
+    <ClInclude Include="..\include\SubutaiProcess.h" />
     <ClInclude Include="..\include\Session.h" />
     <ClInclude Include="..\include\Settings.h" />
     <ClInclude Include="..\include\SL.h" />
@@ -165,18 +169,19 @@
     <ClCompile Include="..\src\Environment.cpp" />
     <ClCompile Include="..\src\FileSystem.cpp" />
     <ClCompile Include="..\src\Hub.cpp" />
+    <ClCompile Include="..\src\InstalImpl_Windows.cpp" />
     <ClCompile Include="..\src\Install.cpp" />
     <ClCompile Include="..\src\InstallImpl_Base.cpp" />
     <ClCompile Include="..\src\InstallImpl_Linux.cpp" />
     <ClCompile Include="..\src\P2P.cpp" />
-    <ClCompile Include="..\src\Process.cpp" />
+    <ClCompile Include="..\src\SubutaiProcess.cpp" />
     <ClCompile Include="..\src\Session.cpp" />
     <ClCompile Include="..\src\Settings.cpp" />
     <ClCompile Include="..\src\SL.cpp" />
     <ClCompile Include="..\src\SLException.cpp" />
     <ClCompile Include="..\src\SLFunctions.cpp" />
     <ClCompile Include="..\src\SSH.cpp" />
-    <ClCompile Include="..\src\String.cpp" />
+    <ClCompile Include="..\src\SubutaiString.cpp" />
     <ClCompile Include="..\src\SubutaiException.cpp" />
     <ClCompile Include="..\src\VBox.cpp" />
     <ClCompile Include="..\src\VirtualBox.cpp" />

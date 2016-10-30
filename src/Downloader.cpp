@@ -37,10 +37,18 @@ std::string SubutaiLauncher::Downloader::buildRequest(std::string path, std::str
 {
 	char r[1024];
 	if (!key.empty()) {
+#if LAUNCHER_WINDOWS
+		sprintf_s(r, sizeof(r), "%s%s/%s?%s=%s", URL.c_str(), REST.c_str(), path.c_str(), key.c_str(), value.c_str());
+#else
 		std::sprintf(r, "%s%s/%s?%s=%s", URL.c_str(), REST.c_str(), path.c_str(), key.c_str(), value.c_str());
+#endif
 	}
 	else {
+#if LAUNCHER_WINDOWS
+		sprintf_s(r, sizeof(r), "%s%s/%s", URL.c_str(), REST.c_str(), path.c_str());
+#else
 		std::sprintf(r, "%s%s/%s", URL.c_str(), REST.c_str(), path.c_str());
+#endif
 	}
 	std::printf("Requesting: %s\n", r);
 	return std::string(r);
@@ -75,7 +83,7 @@ size_t SubutaiLauncher::Downloader::handleInfoImpl(char* data, size_t size, size
 	str >> root;
 
 	const Json::Value owners = root["owner"];
-	for (int i = 0; i < owners.size(); ++i) {
+	for (unsigned int i = 0; i < owners.size(); ++i) {
 		_file.owner = owners[i].asString();
 	}
 	_file.name = root.get("name", "").asString();

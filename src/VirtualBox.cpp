@@ -5,7 +5,7 @@ const std::string SubutaiLauncher::VirtualBox::BIN = "vboxmanage";
 SubutaiLauncher::VirtualBox::VirtualBox() : _version("") 
 {
 	auto env = new Environment();
-	String str(env->getVar("PATH", ""));
+	SubutaiString str(env->getVar("PATH", ""));
 	std::vector<std::string> path;
 	str.split(':', path);
 	FileSystem fs;
@@ -55,25 +55,32 @@ void SubutaiLauncher::VirtualBox::getVms()
 	std::vector<std::string> args;
 	args.push_back("list");
 	args.push_back("vms");
-	Process p;
+	SubutaiProcess p;
 	p.launch(BIN, args, _location);
 	p.wait();
 	auto out = p.getOutputBuffer();
 }
 
-std::vector<SubutaiVM> SubutaiLauncher::VirtualBox::parseVms(const std::string& buffer)
+std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::parseVms(const std::string& buffer)
 {
 	char vmname[150];
 	char vmid[150];
+	int bsize = 256;
 	// Parsing output of vboxmanage:
 	// "machine_name" {machine_id}
 	std::vector<SubutaiVM> vms;
-	String buf(buffer);
+	SubutaiString buf(buffer);
 	std::vector<std::string> lines;
 	buf.split('\n', lines);
 	for (auto it = lines.begin(); it != lines.end(); it++) {
 		const char* line = const_cast<char*>((*it).c_str());
+#if LAUNCHER_LINUX
 		sscanf(line, "\"%s\" {%s}", vmname, vmid);
+#elif LAUNCHER_WINDOWS
+		sscanf_s(line, "\"%s\" {%s}", vmname, bsize, vmid, bsize);
+#elif LAUNCHER_MACOS
+#error Not Implemented on this platform
+#endif
 		SubutaiVM v;
 		v.name = std::string(vmname);
 		v.id = std::string(vmid);

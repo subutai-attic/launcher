@@ -17,7 +17,8 @@ SubutaiLauncher::Core::~Core()
 void SubutaiLauncher::Core::initializePython()
 {
 	std::printf("Initializing Python\n");
-	setenv("PYTHONPATH", ".", 1);
+	Environment e;
+	e.setVar("PYTHONPATH", ".");
 	Py_Initialize();
 	Py_InitModule("subutai", SubutaiSLMethods);
 }

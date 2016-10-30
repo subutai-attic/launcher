@@ -12,6 +12,7 @@
 #include "Hub.h"
 #include "VirtualBox.h"
 #include "Session.h"
+#include "Environment.h"
 
 namespace SubutaiLauncher 
 {

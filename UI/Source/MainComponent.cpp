@@ -76,7 +76,7 @@ void MainContentComponent::paint (Graphics& g)
 
 void MainContentComponent::resized()
 {
-    Rectangle<int> r (getLocalBounds().reduced (0));
+    juce::Rectangle<int> r (getLocalBounds().reduced (0));
     _mainMenu.setBounds (0, 120, MENU_WIDTH, 728);
     _logo.setBounds(0, 20, MENU_WIDTH, 100);
     _header.setBounds(r.withSize(1024, HEADER_HEIGHT));
@@ -105,12 +105,12 @@ void MainContentComponent::paintListBoxItem(int rowNumber, Graphics& g, int widt
     Font f;
     f.setHeight(30);
     t.setFont(f);
-    t.draw(g, Rectangle<int>(width + 8, 40).reduced(20, 0).toFloat());
+    t.draw(g, juce::Rectangle<int>(width + 8, 40).reduced(20, 0).toFloat());
 }
 
 void MainContentComponent::selectedRowsChanged(int row) {
     auto item = _menuItems.at(row);
-    Rectangle<int> r (MENU_WIDTH, HEADER_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT - HEADER_HEIGHT);
+	juce::Rectangle<int> r (MENU_WIDTH, HEADER_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT - HEADER_HEIGHT);
     if (item == "Library") {
         _community.setVisible(false);
         _hub.setVisible(false);

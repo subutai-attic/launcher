@@ -11,7 +11,11 @@ Author:  crioto
 #ifndef LIBRARYCOMPONENT_H_INCLUDED
 #define LIBRARYCOMPONENT_H_INCLUDED
 
+#include "Vars.h"
+
+#if LAUNCHER_LINUX
 #include <unistd.h>
+#endif
 #include <thread>
 
 #include "../JuceLibraryCode/JuceHeader.h"

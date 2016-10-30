@@ -11,8 +11,8 @@ Author:  crioto
 #ifndef MAIN_H_INCLUDED
 #define MAIN_H_INCLUDED
 
-#include "MainWindow.h"
 #include "Core.h"
+#include "MainWindow.h"
 
 //==============================================================================
 class UIApplication  : public JUCEApplication

@@ -8,6 +8,7 @@ Author:  crioto
 ==============================================================================
 */
 
+#include "Core.h"
 #include "LibraryComponent.h"
 
 LibraryItem::LibraryItem(const std::string& title, const std::string& desc) : 
@@ -207,7 +208,7 @@ void LibraryComponent::drawDownload() {
 #if LAUNCHER_LINUX
     const std::string& file("launcher-linux-install.py");
 #elif LAUNCHER_WINDOWS
-#error Not Implemented for this platform
+	const std::string& file("launcher-windows-install.py");
 #elif LAUNCHER_MACOS
 #error Not Implemented for this platform
 #else
@@ -321,7 +322,11 @@ std::thread LibraryComponent::waitDownloadComplete() {
 
 void LibraryComponent::waitDownloadCompleteImpl() {
     while (!_download->isComplete()) {
+#if LAUNCHER_LINUX
         sleep(1);
+#elif LAUNCHER_WINDOWS
+		Sleep(1000);
+#endif
         if (_download->isCanceled()) {
             return;
         }
@@ -593,7 +598,7 @@ void LibraryDownload::downloadImpl() {
 #if LAUNCHER_LINUX
             usleep(1000);
 #elif LAUNCHER_WINDOWS
-#error Not Implemented for this platform
+			Sleep(1000);
 #elif LAUNCHER_MACOS
 #error Not Implemented for this platform
 #else

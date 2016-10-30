@@ -2,9 +2,11 @@
 #define __P2P_H__
 
 #include "Environment.h"
-#include "String.h"
+#include "SubutaiString.h"
 #include "FileSystem.h"
-#include "Process.h"
+#include "SubutaiProcess.h"
+
+#include <string>
 
 namespace SubutaiLauncher {
 

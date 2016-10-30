@@ -23,7 +23,7 @@ SubutaiLauncher::SSH::~SSH()
 bool SubutaiLauncher::SSH::findInstallation()
 {
 	auto env = new Environment();
-	String pathVar(env->getVar("PATH", ""));
+	SubutaiLauncher::SubutaiString pathVar(env->getVar("PATH", ""));
 	std::vector<std::string> path;
 	pathVar.split(':', path);
 	FileSystem fs;
@@ -55,19 +55,26 @@ void SubutaiLauncher::SSH::setHost(const std::string& host, long port)
 
 std::string SubutaiLauncher::SSH::run(const std::string& command) const
 {
+	
+	std::vector<std::string> args;
+#if LAUNCHER_WINDOWS
+	char usr[512];
+	char port[64];
+	sprintf_s(port, sizeof(port), "%lu", _port);
+	sprintf_s(usr, sizeof(usr), "%s@%s", _username.c_str(), _host.c_str());
+#else
 	char* usr;
 	char* port;
-	std::vector<std::string> args;
-
 	std::sprintf(port, "%lu", _port);
 	std::sprintf(usr, "%s@%s", _username.c_str(), _host.c_str());
+#endif
 
 	args.push_back("-p");
 	args.push_back(port);
 	args.push_back(std::string(usr));
 	args.push_back(command);
 
-	Process p;
+	SubutaiProcess p;
 	p.launch(BIN, args, _location);
 	p.wait();
 	return p.getOutputBuffer();
@@ -165,7 +172,11 @@ void SubutaiLauncher::SSH::execute(const std::string& command)
 
 	nbytes = ssh_channel_read(chan, buffer, sizeof(buffer), 0);
 	while (nbytes > 0) {
+#if LAUNCHER_WINDOWS
+		if (_write(1, buffer, nbytes) != (unsigned int)nbytes) {
+#else
 		if (write(1, buffer, nbytes) != (unsigned int)nbytes) {
+#endif
 			ssh_channel_close(chan);
 			ssh_channel_free(chan);
 			throw SubutaiException("Failed to write to channel");

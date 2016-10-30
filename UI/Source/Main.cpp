@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+#include "Core.h"
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Main.h"
 

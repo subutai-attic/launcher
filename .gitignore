@@ -17,3 +17,11 @@ CLI/build
 /subutai-launcher/ipch
 /subutai-laucher/Debug
 *.opendb
+/third-party/python*
+/third-party/curl
+/third-party/libssh
+
+# windows build
+subutai-launcher/Debug
+subutai-launcher/x64
+subutai-launcher/.vs

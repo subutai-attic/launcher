@@ -12,9 +12,9 @@
 #include <string>
 
 #include "Environment.h"
-#include "String.h"
+#include "SubutaiString.h"
 #include "FileSystem.h"
-#include "Process.h"
+#include "SubutaiProcess.h"
 
 namespace SubutaiLauncher {
 

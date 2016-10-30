@@ -83,7 +83,7 @@ void SubutaiLauncher::ConfigurationManager::addFile(std::string name, std::strin
 	}
 }
 
-std::vector<InstallConfig> SubutaiLauncher::ConfigurationManager::getConfigs()
+std::vector<SubutaiLauncher::InstallConfig> SubutaiLauncher::ConfigurationManager::getConfigs()
 {
 	return _configs;
 }

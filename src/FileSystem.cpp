@@ -4,7 +4,7 @@
 #if LAUNCHER_LINUX
 const std::string SubutaiLauncher::FileSystem::DELIM = "/";
 #elif LAUNCHER_WINDOWS
-#error Not Implemented for this platform
+const std::string SubutaiLauncher::FileSystem::DELIM = "\\";
 #elif LAUNCHER_MACOS
 #error Not Implemented for this platform
 #else
@@ -31,7 +31,20 @@ bool SubutaiLauncher::FileSystem::isFileExists(const std::string& filename) {
 	struct stat st;
 	return stat(fullpath.c_str(), &st) == 0;
 #elif LAUNCHER_WINDOWS
-#error Not Implemented for this platform
+	DWORD attr = GetFileAttributes(fullpath.c_str());
+	if (attr == INVALID_FILE_ATTRIBUTES)
+	{
+		switch (GetLastError()) {
+		case ERROR_FILE_NOT_FOUND:
+		case ERROR_PATH_NOT_FOUND:
+		case ERROR_NOT_READY:
+		case ERROR_INVALID_DRIVE:
+			return false;
+		default:
+			throw SubutaiException("Unknown windows file error");
+		};
+	}
+	return true;
 #elif LAUNCHER_MACOS
 #error Not Implemented for this platform
 #else
@@ -49,7 +62,7 @@ void SubutaiLauncher::FileSystem::removeFile(const std::string& filename) {
 #if LAUNCHER_LINUX
 	rc = unlink(fullpath.c_str());
 #elif LAUNCHER_WINDOWS
-#error Not Implemented for this platform
+	rc = _unlink(fullpath.c_str());
 #elif LAUNCHER_MACOS
 #error Not Implemented for this platform
 #else
@@ -60,6 +73,7 @@ void SubutaiLauncher::FileSystem::removeFile(const std::string& filename) {
 	}
 }
 
+#if LAUNCHER_LINUX
 void SubutaiLauncher::FileSystem::copyFile(const std::string& src, const std::string& dst)
 {
 	std::ifstream s(src, std::ios::binary);
@@ -67,3 +81,13 @@ void SubutaiLauncher::FileSystem::copyFile(const std::string& src, const std::st
 
 	d << s.rdbuf();
 }
+#elif LAUNCHER_WINDOWS
+void SubutaiLauncher::FileSystem::copyFile(LPCSTR in_file, LPCSTR out_file) {
+	if (!CopyFile(in_file, out_file, true))
+	{
+		throw SubutaiException("Failed to copy file");
+	}
+}
+#elif LAUNCHER_MACOS
+#error Not Implemented for this platform
+#endif

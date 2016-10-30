@@ -1,5 +1,6 @@
 #include "InstallImpl_Linux.h"
 
+#if LAUNCHER_LINUX
 SubutaiLauncher::InstallImpl::InstallImpl()
 {
 
@@ -59,3 +60,4 @@ void SubutaiLauncher::InstallImpl::postInstall()
 	std::sprintf(dp, "%s%s%s", pathCandidate.c_str(), PATH_DELIM, _filename.c_str());
 	int rc = symlink(sp, dp);
 }
+#endif

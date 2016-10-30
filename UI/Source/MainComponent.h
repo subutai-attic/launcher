@@ -9,6 +9,8 @@
 #ifndef MAINCOMPONENT_H_INCLUDED
 #define MAINCOMPONENT_H_INCLUDED
 
+#include "Core.h"
+
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "LoginScreen.h"
 #include "SubutaiLauncher.h"
