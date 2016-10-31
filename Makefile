@@ -76,7 +76,6 @@ directories:
 
 files:
 	@cp assets/* bin/
-	@cp scripts/* bin/
 
 clean:
 	@rm -rf bin/*

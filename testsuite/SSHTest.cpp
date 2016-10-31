@@ -14,6 +14,7 @@
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/XmlOutputter.h>
 
+#include "Arguments.h"
 #include "SSH.h"
 
 using namespace CppUnit;
@@ -54,6 +55,11 @@ void SSHTest::testFindInstallation()
 
 void SSHTest::testConnect()
 {
+    if (!Arguments::instance()->find("--ssh-host"))
+    {
+        std::printf(": Skipping SSH");
+        return;
+    }
     SubutaiLauncher::SSH p;
     p.setHost("127.0.0.1", 22);
     p.connect();
@@ -62,6 +68,11 @@ void SSHTest::testConnect()
 
 void SSHTest::testAuthenticate()
 {
+    if (!Arguments::instance()->find("--ssh-host"))
+    {
+        std::printf(": Skipping SSH");
+        return;
+    }
     SubutaiLauncher::SSH p;
     p.setHost("127.0.0.1", 22);
     p.setUsername("ubuntu", "ubuntu");
@@ -72,6 +83,11 @@ void SSHTest::testAuthenticate()
 
 void SSHTest::testCommand()
 {
+    if (!Arguments::instance()->find("--ssh-host"))
+    {
+        std::printf(": Skipping SSH");
+        return;
+    }
     SubutaiLauncher::SSH p;
     p.setHost("127.0.0.1", 22);
     p.setUsername("ubuntu", "ubuntu");

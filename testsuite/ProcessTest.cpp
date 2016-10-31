@@ -52,10 +52,8 @@ void SubutaiProcessTest::testNormalCommand()
     p.launch("ls", args, "/bin");
     int exit_code = p.wait();
     auto buffer = p.getOutputBuffer();
-    auto err = p.getErrorBuffer();
     CPPUNIT_ASSERT(exit_code == 0);
     CPPUNIT_ASSERT(!buffer.empty());
-    CPPUNIT_ASSERT(err.empty());
 }
 
 void SubutaiProcessTest::testBadCommand()
@@ -64,17 +62,3 @@ void SubutaiProcessTest::testBadCommand()
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(SubutaiProcessTest);
-int main(int argc, char* argv[])
-{
-    CPPUNIT_NS::TestResult testResult;
-    CPPUNIT_NS::TestResultCollector collectedResults;
-    testResult.addListener(&collectedResults);
-    CPPUNIT_NS::BriefTestProgressListener progress;
-    testResult.addListener(&progress);
-    CPPUNIT_NS::TestRunner testRunner;
-    testRunner.addTest(CPPUNIT_NS::TestFactoryRegistry::getRegistry().makeTest());
-    testRunner.run(testResult);
-    CPPUNIT_NS::CompilerOutputter compilerOutputter(&collectedResults, std::cerr);
-    compilerOutputter.write();
-    return collectedResults.wasSuccessful() ? 0 : 1;
-}

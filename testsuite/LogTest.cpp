@@ -14,45 +14,37 @@
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/XmlOutputter.h>
 
-#include "VirtualBox.h"
+#include "Arguments.h"
+#include "SubutaiLog.h"
 
 using namespace CppUnit;
 
-class VirtualBoxTest : public CppUnit::TestFixture
+class SubutaiLogTest : public CppUnit::TestFixture
 {
-    CPPUNIT_TEST_SUITE(VirtualBoxTest);
-    CPPUNIT_TEST(testParseVms);
+    CPPUNIT_TEST_SUITE(SubutaiLogTest);
+    CPPUNIT_TEST(testDebug);
     CPPUNIT_TEST_SUITE_END();
     public:
     void setUp(void);
     void tearDown(void);
     protected:
-    void testParseVms(void);
+    void testDebug(void);
 };
 
-void VirtualBoxTest::setUp(void)
+void SubutaiLogTest::setUp(void)
 {
 
 }
 
-void VirtualBoxTest::tearDown(void)
+void SubutaiLogTest::tearDown(void)
 {
 
 }
 
-void VirtualBoxTest::testParseVms()
+void SubutaiLogTest::testDebug()
 {
-    SubutaiLauncher::VirtualBox v;
-
-    const std::string& source = R"END(
-"Name1" {ID1}
-"Name2" {ID2}
-    )END";
-
-    auto vms = v.parseVms(source);
-    CPPUNIT_ASSERT(vms.size() == 2);
-    CPPUNIT_ASSERT(vms[0].name == "Name1");
-    CPPUNIT_ASSERT(vms[1].name == "Name2");
+    SubutaiLauncher::Log log(SubutaiLauncher::LL_DEBUG);
+    log.debug() << "This " << "is " << "a " << "debug " << "message" << std::endl;
 }
 
-CPPUNIT_TEST_SUITE_REGISTRATION(VirtualBoxTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(SubutaiLogTest);

@@ -54,7 +54,7 @@ void P2PTest::testExtractVersion()
     p.findInstallation();
     auto version = p.extractVersion();
     CPPUNIT_ASSERT(!version.empty());
-    std::printf("p2p version: %s", version.c_str());
+    CPPUNIT_ASSERT(version.substr(0, 3) == "p2p");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(P2PTest);

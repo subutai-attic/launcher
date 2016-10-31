@@ -22,6 +22,7 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
         auto d = std::wstring(dir.begin(), dir.end());
         wcscat(newpath, d.c_str()); 
         wcscat(newpath, L":.");
+        std::wprintf(L"NEWPATH: %sl\n", newpath);
         PySys_SetPath(newpath); 
 #else
         char *path, *newpath; 
@@ -36,6 +37,7 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
 #endif
         // ":." for unix, or ";." for windows 
     }
+
 }
 
 SubutaiLauncher::SL::~SL()
@@ -52,7 +54,11 @@ void SubutaiLauncher::SL::open(const std::string& path)
 		throw SubutaiException("Script file doesn't exists", 1);
 	}
 #if PY_MAJOR_VERSION >= 3
-    _name = PyUnicode_DecodeFSDefault(path.c_str());
+    //auto d = std::wstring(path.begin(), path.end());
+    //std::printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1 %s\n", path.c_str());
+    //_name = PyUnicode_DecodeFSDefault(path.c_str());
+    //std::printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!2\n");
+    _name = PyUnicode_FromString(path.c_str());
 #else
 	_name = PyString_FromString(path.c_str());
 #endif
@@ -70,15 +76,20 @@ void SubutaiLauncher::SL::execute(std::string module) {
 void SubutaiLauncher::SL::execute()
 {
 	std::printf("Starting script execution\n");
+    if (_name == NULL)
+    {
+        throw SLException("Empty module name", 12);
+    }
 	PyObject* sysPath = PySys_GetObject((char*)"path");
 #if PY_MAJOR_VERSION >= 3
-    PyObject* tmpPath = PyUnicode_DecodeFSDefault("/tmp");
+    PyObject* tmpPath = PyUnicode_FromString(_dir.c_str());
+    //PyObject* tmpPath = PyUnicode_DecodeFSDefault(_dir.c_str());
 #else
-	PyObject* tmpPath = PyString_FromString("/tmp");
+	PyObject* tmpPath = PyString_FromString(_dir.c_str());
 #endif
 	PyList_Append(sysPath, tmpPath);
 	_module = PyImport_Import(_name);
-	Py_DECREF(_name);
+	//Py_DECREF(_name);
 
 	PyObject *pFunc, *pArgs, *pValue;
 	if (_module != NULL) {

@@ -73,9 +73,10 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::parseVms(co
 	std::vector<std::string> lines;
 	buf.split('\n', lines);
 	for (auto it = lines.begin(); it != lines.end(); it++) {
+        if ((*it).empty() || (*it).length() < 10) continue;
 		const char* line = const_cast<char*>((*it).c_str());
 #if LAUNCHER_LINUX
-		sscanf(line, "\"%s\" {%s}", vmname, vmid);
+		sscanf(line, "\"%[^\"]\" {%s}", vmname, vmid);
 #elif LAUNCHER_WINDOWS
 		sscanf_s(line, "\"%s\" {%s}", vmname, bsize, vmid, bsize);
 #elif LAUNCHER_MACOS

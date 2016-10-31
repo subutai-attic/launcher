@@ -33,20 +33,21 @@ void SubutaiLauncher::ConfigurationManager::load()
 void SubutaiLauncher::ConfigurationManager::run()
 {
 	_configs.clear();
-	std::printf("Reading main configuration\n");
+	std::printf("Reading main configuration from %s/%s\n", _downloader->getOutputDirectory().c_str(), CONFIG_FILE.c_str());
 	auto f = _file.substr(0, _file.size() - 3);
-	SL script;
+	SL script(_downloader->getOutputDirectory());
 	try {
-		script.open(f);
+		script.open(CONFIG_FILE);
 	}
 	catch (SubutaiException& e) {
 		if (e.code() == 1) {
-			std::printf("%s file was not found\n", CONFIG_FILE.c_str());
+			std::printf("Configuration (%s) file was not found in %s\n", CONFIG_FILE.c_str(), _downloader->getOutputDirectory().c_str());
 			return;
 		}
+        return;
 	}
 	try {
-		script.execute(CONFIG_FILE);
+		script.execute();
 	}
 	catch (SLException& e) {
 		std::printf("SL Exception: %s\n", e.displayText().c_str());
