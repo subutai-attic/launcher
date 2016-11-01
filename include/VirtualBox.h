@@ -1,6 +1,8 @@
 #ifndef __SL_VIRTUAL_BOX_H__
 #define __SL_VIRTUAL_BOX_H__
 
+#include "Vars.h"
+
 #include <cstdlib>
 #include <iostream>
 #include <utility>
@@ -9,12 +11,10 @@
 #include <vector>
 #include <string>
 
-#include "Vars.h"
-
 #include "Environment.h"
-#include "String.h"
+#include "SubutaiString.h"
 #include "FileSystem.h"
-#include "Process.h"
+#include "SubutaiProcess.h"
 
 namespace SubutaiLauncher {
 
@@ -48,6 +48,6 @@ namespace SubutaiLauncher {
 
     };
 
-};
+}
 
 #endif

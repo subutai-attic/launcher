@@ -1,14 +1,19 @@
 #ifndef __SSH_H__
 #define __SSH_H__
 
+#include "Vars.h"
+
 #include <cstdlib>
 #include <string>
 #include <vector>
+#if LAUNCHER_WINDOWS
+#include <io.h>
+#endif
 #include <libssh/libssh.h>
 #include "Environment.h"
-#include "Process.h"
+#include "SubutaiProcess.h"
 #include "FileSystem.h"
-#include "String.h"
+#include "SubutaiString.h"
 
 namespace SubutaiLauncher {
     class SSH {
@@ -39,6 +44,6 @@ namespace SubutaiLauncher {
             bool _connected;
             bool _authenticated;
     };
-};
+}
 
 #endif

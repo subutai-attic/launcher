@@ -43,9 +43,14 @@ void VirtualBoxTest::tearDown(void)
 void VirtualBoxTest::testParseVms()
 {
     SubutaiLauncher::VirtualBox v;
-    auto vms = v.parseVms("\"Name1\" {ID1}\n\"Name2\" {ID2}\n");
+
+    const std::string& source = R"END(
+"Name1" {ID1}
+"Name2" {ID2}
+    )END";
+
+    auto vms = v.parseVms(source);
     CPPUNIT_ASSERT(vms.size() == 2);
-    std::printf("!!!!!!!!%s\n", vms[0].name.c_str());
     CPPUNIT_ASSERT(vms[0].name == "Name1");
     CPPUNIT_ASSERT(vms[1].name == "Name2");
 }

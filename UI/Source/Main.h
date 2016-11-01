@@ -12,24 +12,25 @@ Author:  crioto
 #define MAIN_H_INCLUDED
 
 #include "MainWindow.h"
-#include "Core.h"
+#include <Python.h>
 
 //==============================================================================
-class UIApplication  : public JUCEApplication
+class UIApplication  : public juce::JUCEApplication
 {
     public:
         //==============================================================================
         UIApplication() {}
 
-        const String getApplicationName() override       { return ProjectInfo::projectName; }
-        const String getApplicationVersion() override    { return ProjectInfo::versionString; }
+        const juce::String getApplicationName() override       { return ProjectInfo::projectName; }
+        const juce::String getApplicationVersion() override    { return ProjectInfo::versionString; }
         bool moreThanOneInstanceAllowed() override       { return true; }
 
         //==============================================================================
-        void initialise (const String& commandLine) override
+        void initialise (const juce::String& commandLine) override
         {
             // This method is where you should put your application's initialisation code..
-
+            //
+            //
             _core = new SubutaiLauncher::Core(std::vector<std::string>());
             _core->run();
 
@@ -39,7 +40,7 @@ class UIApplication  : public JUCEApplication
         void shutdown() override
         {
             // Add your application's shutdown code here..
-
+            delete _core;
             mainWindow = nullptr; // (deletes our window)
         }
 
@@ -51,7 +52,7 @@ class UIApplication  : public JUCEApplication
             quit();
         }
 
-        void anotherInstanceStarted (const String& commandLine) override
+        void anotherInstanceStarted (const juce::String& commandLine) override
         {
             // When another instance of the app is launched while this one is running,
             // this method is invoked, and the commandLine parameter tells you what
@@ -66,7 +67,7 @@ class UIApplication  : public JUCEApplication
            */
 
     private:
-        ScopedPointer<MainWindow> mainWindow;
+        juce::ScopedPointer<MainWindow> mainWindow;
         SubutaiLauncher::Core* _core;
 };
 

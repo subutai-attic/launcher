@@ -8,11 +8,12 @@
 #include "SubutaiException.h"
 #include "SLException.h"
 #include "FileSystem.h"
+#include "SubutaiLog.h"
 
 #if LAUNCHER_LINUX
 #include <sys/stat.h>
 #elif LAUNCHER_WINDOWS
-#error Not Implemented for this platform
+//#error Not Implemented for this platform
 #elif LAUNCHER_MACOS
 #error Not Implemented for this platform
 #else
@@ -23,7 +24,7 @@ namespace SubutaiLauncher {
 
     class SL {
         public:
-            SL();
+            SL(const std::string& dir = "/");
             ~SL();
             void open(const std::string& path);
             void execute();
@@ -33,8 +34,9 @@ namespace SubutaiLauncher {
             PyObject* _name;
             PyObject* _module;
             long _exitCode;
+            std::string _dir;
     };
 
-};
+}
 
 #endif

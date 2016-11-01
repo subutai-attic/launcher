@@ -8,7 +8,7 @@
 #define LAUNCHER_MACOS 1
 #define PATH_DELIM "/"
 #elif defined(_WIN32) || defined(_WIN64)
-#define LAUNCHER_WIN 1
+#define LAUNCHER_WINDOWS 1
 #define PATH_DELIM "\\"
 #else
 #define LAUNCHER_LINUX 1

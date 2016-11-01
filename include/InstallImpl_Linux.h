@@ -1,6 +1,10 @@
 #ifndef __INSTALL_IMPL_H__
 #define __INSTALL_IMPL_H__
 
+#include "Vars.h"
+
+#if LAUNCHER_LINUX
+
 #include <string.h>
 #include <unistd.h>
 #include <vector>
@@ -8,9 +12,8 @@
 #include "InstallImpl_Base.h"
 #include "FileSystem.h"
 #include "Environment.h"
-#include "Vars.h"
 #include "SubutaiException.h"
-#include "String.h"
+#include "SubutaiString.h"
 
 namespace SubutaiLauncher
 {
@@ -22,6 +25,8 @@ namespace SubutaiLauncher
             void install();
             void postInstall();
     };
-};
+}
+
+#endif
 
 #endif

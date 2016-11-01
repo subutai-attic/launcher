@@ -14,12 +14,12 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainComponent.h"
 
-class MainWindow : public DocumentWindow
+class MainWindow : public juce::DocumentWindow
 {
     public:
-        MainWindow (String name)  : DocumentWindow (name,
-                Colours::lightgrey,
-                DocumentWindow::allButtons)
+        MainWindow (juce::String name)  : juce::DocumentWindow (name,
+                juce::Colours::lightgrey,
+                juce::DocumentWindow::allButtons)
     {
         setUsingNativeTitleBar (false);
         setTitleBarHeight(0);
@@ -35,7 +35,7 @@ class MainWindow : public DocumentWindow
             // This is called when the user tries to close this window. Here, we'll just
             // ask the app to quit when this happens, but you can change this to do
             // whatever you need.
-            JUCEApplication::getInstance()->systemRequestedQuit();
+            juce::JUCEApplication::getInstance()->systemRequestedQuit();
         }
 
         /* Note: Be careful if you override any DocumentWindow methods - the base

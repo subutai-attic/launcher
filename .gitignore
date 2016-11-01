@@ -1,10 +1,41 @@
 *.ropeproject
-*.pyc
 *ycm_extra_conf*
 bin
 build
-*.swp
-*.swo
-UI/Builds/LinuxMakefile/build
 CLI/bin
 CLI/build
+
+# extra libs
+/third-party/python*
+/third-party/curl
+/third-party/libssh
+
+# linux build
+*.swp
+*.swo
+config.make
+UI/Builds/LinuxMakefile/build
+
+# windows build
+*.sdf
+*.filter
+*.user
+*.opendb
+subutai-launcher/Debug
+subutai-launcher/x64
+subutai-launcher/.vs
+subutai-launcher/ipch
+subutai-laucher/Debug
+UI/Builds/VisualStudio2015/.vs/
+UI/Builds/VisualStudio2015/Debug/
+/win/
+
+# python
+__pycache__
+*.pyc
+
+# misc
+/deploy
+
+# runtime
+lnchr.conf

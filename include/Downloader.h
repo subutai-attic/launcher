@@ -13,6 +13,7 @@
 
 #include "FileSystem.h"
 #include "MD5.h"
+#include "SubutaiLog.h"
 
 namespace SubutaiLauncher 
 {
@@ -58,8 +59,8 @@ namespace SubutaiLauncher
             SubutaiFile _file;
             long _progress;
             bool _done;
-    };
+	};
 
-};
+}
 
 #endif

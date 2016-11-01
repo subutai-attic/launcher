@@ -10,31 +10,72 @@ Author:  crioto
 
 #include "LibraryComponent.h"
 
-LibraryItem::LibraryItem(const std::string& title, const std::string& desc) : 
+// ============================================================================
+
+LibraryItem::LibraryItem(const std::string& title, const std::string& desc, const std::string& is, const std::string& us, const std::string& rs) : 
     _title(title),
-    _desc(desc)
+    _desc(desc),
+    _installScript(is),
+    _updateScript(us),
+    _removeScript(rs)
 {
-    if (title != "") {
+    if (title != "") 
+    {
         auto font = Font(24);
         _titleLabel.setText(_title, dontSendNotification);
         _titleLabel.setColour(Label::textColourId, Colours::white);
-        _titleLabel.setBounds(0, 15, 200, 40);
+        _titleLabel.setBounds(0, 15, WIDTH, 40);
         _titleLabel.setFont(font);
         _titleLabel.setJustificationType(Justification::centred);
+        _titleLabel.setInterceptsMouseClicks(false, true);
         addAndMakeVisible(_titleLabel);
     }
 
     auto fontPlus = Font(72);
     _plusLabel.setText("+", dontSendNotification);
     _plusLabel.setColour(Label::textColourId, Colours::grey);
-    if (title != "") {
-        _plusLabel.setBounds(0, 50, 200, 100);
-    } else {
-        _plusLabel.setBounds(0, 0, 200, 100);
+    if (title != "") 
+    {
+        _plusLabel.setBounds(0, 50, WIDTH, 100);
+    } 
+    else 
+    {
+        _plusLabel.setBounds(0, 0, WIDTH, 100);
     }
+    _plusLabel.setInterceptsMouseClicks(false, true);
     _plusLabel.setFont(fontPlus);
     _plusLabel.setJustificationType(Justification::centred);
     addAndMakeVisible(_plusLabel);
+    bool displayVersion = false;
+    // TODO: This approach is a POS. We need to make it more universal
+    if (title == "P2P")
+    {
+        SubutaiLauncher::P2P p2p;
+        p2p.findInstallation();
+        if (p2p.isInstalled()) {
+            _version.setText(p2p.extractVersion(), dontSendNotification);
+            displayVersion = true;
+        }
+    } 
+    else if (title == "Tray")
+    {
+
+    }
+    else if (title == "Browser Plugin")
+    {
+
+    }
+    auto verFont = Font(12);
+    _version.setInterceptsMouseClicks(false, true);
+    _version.setColour(Label::textColourId, Colours::white);
+    _version.setBounds(0, HEIGHT-30, WIDTH, 40);
+    _version.setFont(verFont);
+    _version.setJustificationType(Justification::centredLeft);
+    if (displayVersion)
+    {
+        addAndMakeVisible(_version);
+    }
+
 }
 
 LibraryItem::~LibraryItem()
@@ -51,6 +92,33 @@ void LibraryItem::paint(Graphics& g)
 void LibraryItem::resized()
 {
 
+}
+
+void LibraryItem::mouseUp(const juce::MouseEvent& e)
+{
+    juce::PopupMenu menu;
+    menu.addItem(1, "Install");
+    menu.addItem(2, "Update");
+    menu.addItem(3, "Remove");
+
+    const int res = menu.show();
+    if (res == 0) {
+
+    } 
+    else if (res == 1)
+    {
+        std::string windowTitle = "Installing ";
+        windowTitle.append(_title);
+        (new DemoBackgroundThread("install", _title, windowTitle))->launchThread();
+    }
+    else if (res == 2)
+    {
+
+    } 
+    else if (res == 3)
+    {
+
+    }
 }
 
 // ============================================================================
@@ -207,7 +275,7 @@ void LibraryComponent::drawDownload() {
 #if LAUNCHER_LINUX
     const std::string& file("launcher-linux-install.py");
 #elif LAUNCHER_WINDOWS
-#error Not Implemented for this platform
+	const std::string& file("launcher-windows-install.py");
 #elif LAUNCHER_MACOS
 #error Not Implemented for this platform
 #else
@@ -321,7 +389,11 @@ std::thread LibraryComponent::waitDownloadComplete() {
 
 void LibraryComponent::waitDownloadCompleteImpl() {
     while (!_download->isComplete()) {
+#if LAUNCHER_LINUX
         sleep(1);
+#elif LAUNCHER_WINDOWS
+		Sleep(1000);
+#endif
         if (_download->isCanceled()) {
             return;
         }
@@ -593,7 +665,7 @@ void LibraryDownload::downloadImpl() {
 #if LAUNCHER_LINUX
             usleep(1000);
 #elif LAUNCHER_WINDOWS
-#error Not Implemented for this platform
+			Sleep(1000);
 #elif LAUNCHER_MACOS
 #error Not Implemented for this platform
 #else

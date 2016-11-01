@@ -7,6 +7,8 @@
 #include <curl/curl.h>
 #include <json/json.h>
 
+#include "Vars.h"
+
 namespace SubutaiLauncher {
 
     class Hub {
@@ -34,6 +36,6 @@ namespace SubutaiLauncher {
             CURL* curl;
     };
 
-};
+}
 
 #endif

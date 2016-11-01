@@ -2,9 +2,12 @@
 #define __P2P_H__
 
 #include "Environment.h"
-#include "String.h"
+#include "SubutaiString.h"
 #include "FileSystem.h"
-#include "Process.h"
+#include "SubutaiProcess.h"
+#include "SubutaiLog.h"
+
+#include <string>
 
 namespace SubutaiLauncher {
 
@@ -18,6 +21,7 @@ namespace SubutaiLauncher {
             void start();
             void stop();
             bool isRunning();
+            bool isInstalled();
         private:
             std::string _version;
             std::string _path;
@@ -25,6 +29,6 @@ namespace SubutaiLauncher {
             bool _installed;
     };
 
-};
+}
 
 #endif

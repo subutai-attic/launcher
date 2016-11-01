@@ -13,7 +13,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-class BannerComponent : public Component {
+class BannerComponent : public juce::Component {
     public:
         BannerComponent();
         ~BannerComponent();

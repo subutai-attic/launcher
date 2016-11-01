@@ -1,6 +1,7 @@
 #ifndef __VBOX_H__
 #define __VBOX_H__
 
+/*
 #include "Vars.h"
 
 #ifdef LAUNCHER_LINUX
@@ -27,5 +28,6 @@ namespace SubutaiLauncher {
     };
 
 };
+*/
 
 #endif

@@ -105,8 +105,11 @@
     <MODULE id="juce_events" showAllCode="1" useLocalCopy="1"/>
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="1"/>
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="1"/>
-    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="1"/>
   </MODULES>
   <JUCEOPTIONS JUCE_USE_CURL="enabled" JUCE_USE_COREIMAGE_LOADER="enabled" JUCE_USE_DIRECTWRITE="enabled"
                JUCE_USE_XSHM="enabled" JUCE_USE_XRENDER="enabled" JUCE_USE_XCURSOR="enabled"/>
+  <LIVE_SETTINGS>
+    <LINUX/>
+  </LIVE_SETTINGS>
 </JUCERPROJECT>

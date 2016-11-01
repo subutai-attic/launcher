@@ -24,6 +24,6 @@ namespace SubutaiLauncher {
             std::string _message;
     };
 
-};
+}
 
 #endif

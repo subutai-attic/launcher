@@ -22,6 +22,6 @@ namespace SubutaiLauncher {
         private:
             InstallImpl* _impl;
     };
-};
+}
 
 #endif

@@ -27,6 +27,6 @@ namespace SubutaiLauncher {
             std::string _installationPath;
             std::string _tmpPath;
     };
-};
+}
 
 #endif

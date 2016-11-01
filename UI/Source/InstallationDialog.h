@@ -13,9 +13,9 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-class InstallationDialog : public DocumentWindow {
+class InstallationDialog : public juce::DocumentWindow {
     public:
-        InstallationDialog(const String& name, Colour backgroundColour, int buttonsNeeded);
+        InstallationDialog(const juce::String& name, juce::Colour backgroundColour, int buttonsNeeded);
         ~InstallationDialog();
         void closeButtonPressed();
     private:

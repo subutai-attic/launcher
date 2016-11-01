@@ -13,12 +13,12 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-class Logo : public Component {
+class Logo : public juce::Component {
     public:
         Logo();
-        void paint(Graphics &g) override;
+        void paint(juce::Graphics &g) override;
         void resized() override;
-        Path getLogo();
+        juce::Path getLogo();
 
     private:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Logo)

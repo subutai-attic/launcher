@@ -13,11 +13,11 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-class MarketplaceComponent : public Component {
+class MarketplaceComponent : public juce::Component {
     public:
         MarketplaceComponent();
         ~MarketplaceComponent();
-        void paint (Graphics&) override;
+        void paint (juce::Graphics&) override;
         void resized() override;
     private:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MarketplaceComponent)

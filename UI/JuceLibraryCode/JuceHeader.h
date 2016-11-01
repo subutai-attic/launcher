@@ -13,6 +13,7 @@
 #ifndef __APPHEADERFILE_FTKWCV__
 #define __APPHEADERFILE_FTKWCV__
 
+
 #include "AppConfig.h"
 
 #include <juce_core/juce_core.h>
@@ -22,6 +23,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 
+#include "SubutaiLauncher.h"
 
 #if ! DONT_SET_USING_JUCE_NAMESPACE
  // If your code uses a lot of JUCE classes, then this will obviously save you

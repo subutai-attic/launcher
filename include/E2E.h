@@ -9,6 +9,6 @@ namespace SubutaiLauncher {
             ~E2E();
     };
 
-};
+}
 
 #endif
