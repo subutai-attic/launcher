@@ -13,29 +13,29 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-class SocialMediaIcons : public Component, public ButtonListener {
+class SocialMediaIcons : public juce::Component, public juce::ButtonListener {
     public:
         SocialMediaIcons();
         ~SocialMediaIcons();
-        void paint (Graphics&) override;
+        void paint (juce::Graphics&) override;
         void resized() override;
-        void buttonClicked(Button* button) override;
+        void buttonClicked(juce::Button* button) override;
 
     private:
-        Path getFacebook();
-        Path getTwitter();
-        Path getLinkedin();
-        Path getGithub();
+        juce::Path getFacebook();
+        juce::Path getTwitter();
+        juce::Path getLinkedin();
+        juce::Path getGithub();
 
-        DrawableButton* _facebook;
-        DrawableButton* _twitter;
-        DrawableButton* _linkedin;
-        DrawableButton* _github;
+        juce::DrawableButton* _facebook;
+        juce::DrawableButton* _twitter;
+        juce::DrawableButton* _linkedin;
+        juce::DrawableButton* _github;
 
-        HyperlinkButton _facebookLink;
-        HyperlinkButton _twitterLink;
-        HyperlinkButton _linkedinLink;
-        HyperlinkButton _githubLink;
+        juce::HyperlinkButton _facebookLink;
+        juce::HyperlinkButton _twitterLink;
+        juce::HyperlinkButton _linkedinLink;
+        juce::HyperlinkButton _githubLink;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SocialMediaIcons)
 };
 

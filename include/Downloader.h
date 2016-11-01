@@ -13,6 +13,7 @@
 
 #include "FileSystem.h"
 #include "MD5.h"
+#include "SubutaiLog.h"
 
 namespace SubutaiLauncher 
 {

@@ -4,6 +4,8 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
     _exitCode(-1000),
     _dir(dir)
 {
+    auto logger = Log::instance()->logger();
+    logger->debug() << "Starting Scripting Language interface" << std::endl;
     if (dir != "/")
     {
         /*  
@@ -14,14 +16,20 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
         */
 
 #if PY_MAJOR_VERSION >= 3
+        char dst[1024];
         wchar_t *path, *newpath;
+
         path = Py_GetPath(); 
+        std::wcstombs(dst, path, sizeof(dst));
+        logger->debug() << "Default path in Python: " << dst << std::endl;
         newpath = new wchar_t[1024];
         wcscpy(newpath, path); 
         wcscat(newpath, L":");
         auto d = std::wstring(dir.begin(), dir.end());
         wcscat(newpath, d.c_str()); 
         wcscat(newpath, L":.");
+        std::wcstombs(dst, newpath, sizeof(dst));
+        logger->debug() << "New path in Python: " << dst << std::endl;
         std::wprintf(L"NEWPATH: %sl\n", newpath);
         PySys_SetPath(newpath); 
 #else
@@ -75,7 +83,8 @@ void SubutaiLauncher::SL::execute(std::string module) {
 
 void SubutaiLauncher::SL::execute()
 {
-	std::printf("Starting script execution\n");
+    auto l = Log::instance()->logger();
+    l->info() << "Starting script execution" << std::endl;
     if (_name == NULL)
     {
         throw SLException("Empty module name", 12);
@@ -96,7 +105,7 @@ void SubutaiLauncher::SL::execute()
 		pFunc = PyObject_GetAttrString(_module, "subutaistart");
 
 		if (pFunc && PyCallable_Check(pFunc)) {
-			std::printf("subutaistart entry point found\n");
+            l->error() << "subutaistart() entry point was not found" << std::endl;
 			pArgs = PyTuple_New(0);
 			pValue = PyObject_CallObject(pFunc, pArgs);
 			Py_DECREF(pArgs);
@@ -106,7 +115,7 @@ void SubutaiLauncher::SL::execute()
 #else
 				_exitCode = PyInt_AsLong(pValue);
 #endif
-				printf("Result of call: %ld\n", _exitCode);
+                l->debug() << "Script execution exit status: " << _exitCode << std::endl;
 				Py_DECREF(pValue);
 			}
 			else {
@@ -127,7 +136,7 @@ void SubutaiLauncher::SL::execute()
         PyErr_Print();
 		throw SLException("Cannot find specified module", 7);
 	}
-	std::printf("Script exection completed without any errors\n");
+    l->info() << "Script execution completed without any errors" << std::endl;
 }
 
 long SubutaiLauncher::SL::exitCode() {

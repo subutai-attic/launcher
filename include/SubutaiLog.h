@@ -179,24 +179,32 @@ namespace SubutaiLauncher
     };
 
 
-    class Log : public LogIOS, public std::ostream
+    class Logger : public LogIOS, public std::ostream
     {
         public:
-            Log(LogLevel level);
-            ~Log();
-            Log& level(LogLevel level);
-            Log& debug(const std::string& message);
-            Log& debug();
-            Log& info(const std::string& message);
-            Log& info();
-            Log& warning(const std::string& message);
-            Log& warning();
-            Log& error(const std::string& message);
-            Log& error();
-            Log& fatal(const std::string& message);
-            Log& fatal();
+            Logger(LogLevel level);
+            ~Logger();
+            Logger& level(LogLevel level);
+            Logger& debug();
+            Logger& info();
+            Logger& warning();
+            Logger& error();
+            Logger& fatal();
         private:
             
+    };
+
+    class Log
+    {
+        public:
+            static Log* instance();
+            ~Log();
+            Logger* logger();
+        protected:
+            Log();
+            static Log* _instance;
+        private:
+            Logger* _logger;
     };
 };
 

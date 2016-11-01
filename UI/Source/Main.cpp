@@ -8,7 +8,8 @@
   ==============================================================================
 */
 
-#include "Core.h"
+#define DONT_SET_USING_JUCE_NAMESPACE 1
+
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Main.h"
 

@@ -15,11 +15,11 @@
 
 #include "SocialMediaIcons.h"
 
-class SidebarComponent : public Component {
+class SidebarComponent : public juce::Component {
     public:
         SidebarComponent();
         ~SidebarComponent();
-        void paint (Graphics&) override;
+        void paint (juce::Graphics&) override;
         void resized() override;
     private:
         SocialMediaIcons* _social;

@@ -3,6 +3,8 @@
 namespace SubutaiLauncher
 {
 
+    Log* Log::_instance = NULL;
+
     LogBuffer::LogBuffer(LogLevel level) : _level(level)
     {
 
@@ -36,6 +38,7 @@ namespace SubutaiLauncher
             if (_message.find_first_not_of("\r\n") != std::string::npos)
             {
                 log(_level, _message);
+                _message.clear();
             }
         }
         else _message += c;
@@ -61,76 +64,70 @@ namespace SubutaiLauncher
     
     // ========================================================================
 
-    Log::Log(LogLevel level) :
+    Logger::Logger(LogLevel level) :
         LogIOS(level),
         std::ostream(&_buf)
     {
 
     }
 
-    Log::~Log()
+    Logger::~Logger()
     {
 
     }
 
-    Log& Log::level(LogLevel level)
+    Logger& Logger::level(LogLevel level)
     {
         _buf.setLevel(level);
         return *this;
     }
 
-    Log& Log::debug(const std::string& message)
-    {
-//        _buf.log(message);
-        return level(LL_DEBUG);
-    }
-
-    Log& Log::debug()
+    Logger& Logger::debug()
     {
         return level(LL_DEBUG);
     }
 
-    Log& Log::info(const std::string& message)
-    {
-//        _buf.log(message);
-        return level(LL_INFO);
-    }
-
-    Log& Log::info()
+    Logger& Logger::info()
     {
         return level(LL_INFO);
     }
 
-    Log& Log::warning(const std::string& message)
-    {
-//        _buf.log(message);
-        return level(LL_WARNING);
-    }
-
-    Log& Log::warning()
+    Logger& Logger::warning()
     {
         return level(LL_WARNING);
     }
 
-    Log& Log::error(const std::string& message)
-    {
-//        _buf.log(message);
-        return level(LL_FATAL);
-    }
-
-    Log& Log::error()
+    Logger& Logger::error()
     {
         return level(LL_ERROR);
     }
 
-    Log& Log::fatal(const std::string& message)
+    Logger& Logger::fatal()
     {
-//        _buf.log(message);
         return level(LL_FATAL);
     }
 
-    Log& Log::fatal()
+    // ========================================================================
+
+    Log::Log()
     {
-        return level(LL_FATAL);
+        _logger = new Logger(LL_INFO);
     }
+
+    Log::~Log()
+    {
+        delete _logger;
+    }
+
+    Log* Log::instance()
+    {
+        if (!_instance) _instance = new Log();
+        return _instance;
+    }
+
+    Logger* Log::logger()
+    {
+        return _logger;
+    }
+
 };

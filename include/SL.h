@@ -8,6 +8,7 @@
 #include "SubutaiException.h"
 #include "SLException.h"
 #include "FileSystem.h"
+#include "SubutaiLog.h"
 
 #if LAUNCHER_LINUX
 #include <sys/stat.h>

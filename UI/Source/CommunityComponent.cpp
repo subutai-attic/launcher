@@ -16,8 +16,6 @@ CommunityComponent::CommunityComponent() {
     auto t = d->download();
     t.join();
 
-    auto _core = new SubutaiLauncher::Core(std::vector<std::string>());
-    _core->run();
     auto sl = new SubutaiLauncher::SL();
     try {
         sl->open("ui-banner");

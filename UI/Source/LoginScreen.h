@@ -13,16 +13,16 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-class LoginScreen : public Component, public ButtonListener {
+class LoginScreen : public juce::Component, public juce::ButtonListener {
     public:
         LoginScreen();
         ~LoginScreen();
-        void paint(Graphics& g);
-        void buttonClicked(Button* button);
+        void paint(juce::Graphics& g);
+        void buttonClicked(juce::Button* button);
     private:
-        TextEditor _login;
-        TextEditor _password;
-        TextButton _button;
+        juce::TextEditor _login;
+        juce::TextEditor _password;
+        juce::TextButton _button;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LoginScreen)
 };
 

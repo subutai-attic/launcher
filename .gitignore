@@ -33,3 +33,9 @@ UI/Builds/VisualStudio2015/Debug/
 # python
 __pycache__
 *.pyc
+
+# misc
+/deploy
+
+# runtime
+lnchr.conf

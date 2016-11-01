@@ -8,6 +8,7 @@
 #include "Settings.h"
 #include "Downloader.h"
 #include "SL.h"
+#include "SubutaiLog.h"
 
 namespace SubutaiLauncher 
 {

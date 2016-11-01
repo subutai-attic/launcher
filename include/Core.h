@@ -13,6 +13,7 @@
 #include "VirtualBox.h"
 #include "Session.h"
 #include "Environment.h"
+#include "SubutaiLog.h"
 
 namespace SubutaiLauncher 
 {

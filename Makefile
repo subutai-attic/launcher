@@ -7,10 +7,10 @@ EXTRA_LIBS_DIR = third-party
 VB_DIR = third-party/xpcom
 VB = -I$(VB_DIR) -I$(VB_DIR)/xpcom -I$(VB_DIR)/nsprpub -I$(VB_DIR)/string -I$(VB_DIR)/ipcd
 INCLUDES = -Iinclude -I/usr/include/$(PYTHON_VER) $(VB) -Ithird-party/md5 -Ithird-party/json
-LIBS = -g -ggdb -lm -lrt -l$(PYTHON_VER) -lcurl -lssh -L$(PYLIB_DIR)
+LIBS = -g -ggdb -lm -lrt -l$(PYTHON_VER) -Wl,-Bstatic -lcurl -Wl,-Bdynamic -lssh -L$(PYLIB_DIR)
 #INCLUDES = -Iinclude -I/usr/include/python3.5 $(VB) -Ithird-party/md5 -Ithird-party/json
 #LIBS = -g -ggdb -lm -lrt -lpython3.5 -lcurl -lssh
-CFLAGS = -L/lib/x86_64-linux-gnu -Wno-write-strings $(INCLUDES) $(LIBS) -std=c++11 -DRT_OS_LINUX
+CFLAGS = -L/lib/x86_64-linux-gnu -Wno-write-strings $(INCLUDES) $(LIBS) -std=c++11 -DRT_OS_LINUX -DCURL_LIBSTATIC
 
 SRC_DIR = src
 INCLUDE_DIR = include
@@ -26,7 +26,7 @@ T_OBJECTS = $(patsubst %,$(BUILD_DIR)/$(TEST_DIR)/%.o, $(subst $(TEST_DIR)/,,$(s
 
 .PHONE: lib all clean
 
-all: lib cli ui files
+all: lib cli ui files test
 
 lib: directories dynamic static
 
@@ -73,6 +73,7 @@ directories:
 	@mkdir -p $(BUILD_DIR)/third-party/json
 	@mkdir -p $(BUILD_DIR)/third-party/md5
 	@mkdir -p $(BUILD_DIR)/$(TEST_DIR)
+	@mkdir -p $(BUILD_DIR)/UI
 
 files:
 	@cp assets/* bin/
@@ -88,3 +89,6 @@ mrproper:
 	@rm -rf build
 	$(MAKE) -C ./CLI mrproper
 	@rm -f config.make
+
+newui:
+

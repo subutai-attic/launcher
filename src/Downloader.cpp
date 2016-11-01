@@ -8,7 +8,7 @@ SubutaiLauncher::Downloader::Downloader() : _content(""),
 _done(false),
 _outputDir(".")
 {
-	std::printf("Starting Downloader\n");
+    Log::instance()->logger()->debug() << "Starting Downloader instance" << std::endl;
 }
 
 SubutaiLauncher::Downloader::~Downloader()
@@ -50,7 +50,7 @@ std::string SubutaiLauncher::Downloader::buildRequest(std::string path, std::str
 		std::sprintf(r, "%s%s/%s", URL.c_str(), REST.c_str(), path.c_str());
 #endif
 	}
-	std::printf("Requesting: %s\n", r);
+    Log::instance()->logger()->debug() << "Requesting " << r << std::endl;
 	return std::string(r);
 }
 
@@ -75,7 +75,8 @@ size_t SubutaiLauncher::Downloader::handleInfo(char *data, size_t size, size_t n
 size_t SubutaiLauncher::Downloader::handleInfoImpl(char* data, size_t size, size_t nmemb)
 {
 	_content.clear();
-	std::printf("Parsing file info: %s\n", data);
+    auto l = Log::instance()->logger();
+    l->debug() << "Parsign file info: " << data << std::endl;
 	_content.append(data, size * nmemb);
 	Json::Value root;
 	std::istringstream str(_content);
@@ -90,11 +91,10 @@ size_t SubutaiLauncher::Downloader::handleInfoImpl(char* data, size_t size, size
 	_file.id = root.get("id", "").asString();
 	_file.size = root.get("size", "").asLargestInt();
 
-	std::printf("File info:\n");
-	std::printf("Owner: %s\n", _file.owner.c_str());
-	std::printf("Name: %s\n", _file.name.c_str());
-	std::printf("Id: %s\n", _file.id.c_str());
-	std::printf("Size: %lu\n", _file.size);
+    l->debug() << "Owner: " << _file.owner << std::endl;
+    l->debug() << "Name: " << _file.name << std::endl;
+    l->debug() << "ID: " << _file.id << std::endl;
+    l->debug() << "Size: " << _file.size << std::endl;
 
 	return size * nmemb;
 }
@@ -103,18 +103,19 @@ std::thread SubutaiLauncher::Downloader::download()
 {
 	info();
 	_progress = 0;
-	std::printf("Starting download of a file: %s\n", _filename.c_str());
+    Log::instance()->logger()->info() << "Downloading " << _filename << std::endl;
 	_done = false;
 	return std::thread([=] { downloadImpl(); });
 }
 
 void SubutaiLauncher::Downloader::downloadImpl()
 {
+    auto l = Log::instance()->logger();
 	FileSystem fs(_outputDir);
 	if (fs.isFileExists(_file.name)) {
-		std::printf("File %s already exists. Validating checksum\n", _file.name.c_str());
+        l->info() << "File " << _file.name << " is already exists. Validating checksum" << std::endl;
 		if (verifyDownload()) {
-			std::printf("File %s already exists and it was not changed on remote host\n", _file.name.c_str());
+            l->info() << "File " << _file.name << " is in actual state" << std::endl;
 			_done = true;
 			_progress = _file.size;
 			return;
@@ -123,17 +124,17 @@ void SubutaiLauncher::Downloader::downloadImpl()
 			fs.removeFile(_file.name);
 		}
 	}
-	std::printf("Starting downloader thread\n");
+    l->debug() << "Spawning downloader thread" << std::endl;
 	auto curl = curl_easy_init();
 	curl_easy_setopt(curl, CURLOPT_URL, buildRequest("get", "name", _filename).c_str());
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleFile);
 	auto result = curl_easy_perform(curl);
 	if (result == 0) {
-		std::printf("Download completed without any errors\n");
+        l->info() << "Download completed" << std::endl;
 	}
 	else {
-		std::printf("Download completed with errors\n");
+        l->error() << "Failed to download " << _filename << std::endl;
 	}
 	_done = true;
 }
@@ -156,7 +157,7 @@ size_t SubutaiLauncher::Downloader::handleFileImpl(char* data, size_t size, size
 
 	std::ofstream out(path, std::fstream::app);
 	if (!out) {
-		std::printf("Couldn't open file %s for writing\n", path.c_str());
+        Log::instance()->logger()->error() << "Can't open " << path << " for writing" << std::endl;
 		_done = true;
 	}
 	else {
@@ -198,7 +199,7 @@ bool SubutaiLauncher::Downloader::verifyDownload()
 		std::istreambuf_iterator<char>());
 
 	auto sum = md5sum(buffer.c_str(), buffer.length());
-	std::printf("File checksum: %s, remote checksum: %s\n", sum.c_str(), _file.id.c_str());
+    Log::instance()->logger()->debug() << "Local: " << sum << ". Remote: " << _file.id << std::endl;
 	if (sum == _file.id) {
 		return true;
 	}

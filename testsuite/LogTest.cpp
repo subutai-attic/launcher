@@ -43,8 +43,8 @@ void SubutaiLogTest::tearDown(void)
 
 void SubutaiLogTest::testDebug()
 {
-    SubutaiLauncher::Log log(SubutaiLauncher::LL_DEBUG);
-    log.debug() << "This " << "is " << "a " << "debug " << "message" << std::endl;
+    auto l = SubutaiLauncher::Log::instance()->logger();
+    l->debug() << "This " << "is " << "a " << "debug " << "message" << std::endl;
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(SubutaiLogTest);

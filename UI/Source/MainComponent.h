@@ -9,11 +9,8 @@
 #ifndef MAINCOMPONENT_H_INCLUDED
 #define MAINCOMPONENT_H_INCLUDED
 
-#include "Core.h"
-
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "LoginScreen.h"
-#include "SubutaiLauncher.h"
 #include "LibraryComponent.h"
 #include "CommunityComponent.h"
 #include "HubComponent.h"
@@ -26,7 +23,7 @@
    This component lives inside our window, and this is where you should put all
    your controls and content.
    */
-class MainContentComponent : public Component, public ButtonListener, public ListBoxModel
+class MainContentComponent : public juce::Component, public juce::ButtonListener, public juce::ListBoxModel
 {
     public:
         static const int WINDOW_WIDTH = 1024;
@@ -38,21 +35,21 @@ class MainContentComponent : public Component, public ButtonListener, public Lis
         MainContentComponent();
         ~MainContentComponent();
 
-        void paint (Graphics&) override;
+        void paint (juce::Graphics&) override;
         void resized() override;
 
-        void buttonClicked(Button* button) override;
+        void buttonClicked(juce::Button* button) override;
 
         // ListBoxModel overrides
         int getNumRows() override;
-        void paintListBoxItem(int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override;
+        void paintListBoxItem(int rowNumber, juce::Graphics& g, int width, int height, bool rowIsSelected) override;
         void selectedRowsChanged (int lastRowSelected) override;
 
     private:
         void showLoginScreen();
         //LoginScreen* _login;
-        ListBox _mainMenu;
-        Toolbar _header;
+        juce::ListBox _mainMenu;
+        juce::Toolbar _header;
 
         // Right-side components
         LibraryComponent _library;
@@ -60,14 +57,11 @@ class MainContentComponent : public Component, public ButtonListener, public Lis
         MarketplaceComponent _marketplace;
         CommunityComponent _community;
 
-        ImageButton *_closeButton;
-        ImageButton *_minimizeButton;
+        juce::ImageButton *_closeButton;
+        juce::ImageButton *_minimizeButton;
 
         Logo _logo;
         SidebarComponent _sidebar;
-
-        // Launcher
-        SubutaiLauncher::Core* _core;
 
         std::vector<std::string> _menuItems;
 

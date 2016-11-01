@@ -5,6 +5,7 @@
 #include "SubutaiString.h"
 #include "FileSystem.h"
 #include "SubutaiProcess.h"
+#include "SubutaiLog.h"
 
 #include <string>
 
@@ -20,6 +21,7 @@ namespace SubutaiLauncher {
             void start();
             void stop();
             bool isRunning();
+            bool isInstalled();
         private:
             std::string _version;
             std::string _path;

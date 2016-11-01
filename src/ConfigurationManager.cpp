@@ -33,33 +33,34 @@ void SubutaiLauncher::ConfigurationManager::load()
 void SubutaiLauncher::ConfigurationManager::run()
 {
 	_configs.clear();
-	std::printf("Reading main configuration from %s/%s\n", _downloader->getOutputDirectory().c_str(), CONFIG_FILE.c_str());
+    auto l = Log::instance()->logger();
+    l->debug() << "Reading configuration from " << _downloader->getOutputDirectory() << "/" << CONFIG_FILE << std::endl;
 	auto f = _file.substr(0, _file.size() - 3);
-	SL script(_downloader->getOutputDirectory());
+	SL* script = new SL(_downloader->getOutputDirectory());
 	try {
-		script.open(CONFIG_FILE);
+		script->open(CONFIG_FILE);
 	}
 	catch (SubutaiException& e) {
 		if (e.code() == 1) {
-			std::printf("Configuration (%s) file was not found in %s\n", CONFIG_FILE.c_str(), _downloader->getOutputDirectory().c_str());
+            l->error() << CONFIG_FILE << " was not found in " << _downloader->getOutputDirectory() << std::endl;
 			return;
 		}
         return;
 	}
 	try {
-		script.execute();
+		script->execute();
 	}
 	catch (SLException& e) {
-		std::printf("SL Exception: %s\n", e.displayText().c_str());
+        l->error() << e.displayText();
 	}
 	catch (std::exception e) {
-		std::printf("Exception: %s\n", e.what());
+        l->error() << e.what();
 	}
 }
 
 void SubutaiLauncher::ConfigurationManager::addConfig(std::string name)
 {
-	std::printf("Adding new configuration\n");
+    Log::instance()->logger()->debug() << "Adding new configuration" << std::endl;
 	InstallConfig c;
 	c.title = name;
 	_configs.push_back(c);
@@ -67,7 +68,7 @@ void SubutaiLauncher::ConfigurationManager::addConfig(std::string name)
 
 void SubutaiLauncher::ConfigurationManager::addDesc(std::string name, std::string description)
 {
-	std::printf("Setting configuration description\n");
+    Log::instance()->logger()->debug() << "Setting configuration description" << std::endl;
 	for (auto it = _configs.begin(); it != _configs.end(); it++) {
 		if ((*it).title == name) {
 			(*it).description = description;

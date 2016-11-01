@@ -20,9 +20,8 @@ SubutaiLauncher::Core::~Core()
 
 void SubutaiLauncher::Core::initializePython()
 {
-    std::printf("Initializing Python v%d.%d\n", PY_MAJOR_VERSION, PY_MINOR_VERSION);
-    Environment e;
-
+    Log::instance()->logger()->info() << "Initializing Python v" << PY_MAJOR_VERSION << "." << PY_MINOR_VERSION << std::endl;
+    //Environment e;
     //e.setVar("PYTHONPATH", ".");
     //
 #if PY_MAJOR_VERSION >= 3 
@@ -51,6 +50,7 @@ void SubutaiLauncher::Core::initializePython()
 void SubutaiLauncher::Core::run()
 {
     _running = true;
+    Log::instance();
     initializePython();
     curl_global_init(CURL_GLOBAL_ALL);
     Session::instance();
