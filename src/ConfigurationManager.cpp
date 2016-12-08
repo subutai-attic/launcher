@@ -1,4 +1,5 @@
 #include "ConfigurationManager.h"
+#include "SL.h"
 
 
 #if LAUNCHER_LINUX

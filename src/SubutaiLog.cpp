@@ -27,7 +27,7 @@ namespace SubutaiLauncher
 
     void LogBuffer::log(LogLevel level, const std::string& msg)
     {
-        char* levels[] = {"", "FATAL", "ERROR", "WARNING", "INFO", "DEBUG", NULL};
+        char* levels[] = {(char*)"", (char*)"FATAL", (char*)"ERROR", (char*)"WARNING", (char*)"INFO", (char*)"DEBUG", NULL};
         std::printf("[%s] %s\n", levels[level], msg.c_str());
     }
 

@@ -8,6 +8,7 @@
 #include "Downloader.h"
 #include "Session.h"
 #include "Install.h"
+#include "NotificationCenter.h"
 
 namespace SubutaiLauncher {
 
@@ -18,10 +19,10 @@ namespace SubutaiLauncher {
     static char const* sl_destination = "";
 
 
-    static char* download_keywords[] = {"filename", NULL};
-    static char* tmpdir_keywords[] = {"tmpdir", NULL};
-    static char* string_keywords[] = {"string", NULL};
-    static char* desc_keywords[] = {"string", "desc", NULL};
+    static char* download_keywords[] = {(char*)"filename", NULL};
+    static char* tmpdir_keywords[] = {(char*)"tmpdir", NULL};
+    static char* string_keywords[] = {(char*)"string", NULL};
+    static char* desc_keywords[] = {(char*)"string", (char*)"desc", NULL};
 
     static PyObject* SL_HelloWorld(PyObject* self, PyObject* args) {
         return Py_BuildValue("s", "Hello, World!");
@@ -35,6 +36,59 @@ namespace SubutaiLauncher {
         return Py_BuildValue("s", "Version: 0.1.0");
     }
 
+    static PyObject* SL_GetMasterVersion(PyObject* self, PyObject* args) {
+        return Py_BuildValue("s", "4.0.5");
+    }
+
+    static PyObject* SL_GetDevVersion(PyObject* self, PyObject* args) {
+        return Py_BuildValue("s", "4.0.6");
+    }
+
+    static PyObject* SL_Shutdown(PyObject* self, PyObject* args) {
+        Session::instance()->getNotificationCenter()->add(SCRIPT_FINISHED);
+        return Py_BuildValue("i", 1);
+    }
+
+    static PyObject* SL_CheckDirectories(PyObject* self, PyObject* args) {
+        auto settings = Session::instance()->getSettings();
+        auto tmpDir = settings->getTmpPath();
+        auto installDir = settings->getInstallationPath();
+
+        try {
+
+            FileSystem fs("/");
+            if (!fs.isFileExists(installDir)) {
+                fs.createDirectory(installDir);
+            }
+            FileSystem ifs(installDir);
+            if (!ifs.isFileExists("bin"))
+            {
+                ifs.createDirectory("bin");
+            }
+            if (!ifs.isFileExists("etc"))
+            {
+                ifs.createDirectory("etc");
+            }
+            if (!ifs.isFileExists("log"))
+            {
+                ifs.createDirectory("log");
+            }
+            if (!ifs.isFileExists("resources"))
+            {
+                ifs.createDirectory("resources");
+            }
+            if (!ifs.isFileExists("lib"))
+            {
+                ifs.createDirectory("lib");
+            }
+
+        } catch (SubutaiException e) {
+            return Py_BuildValue("i", 0);
+        }
+
+        return Py_BuildValue("i", 1);
+    }
+
     static PyObject* SL_Download(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", download_keywords, &sl_filename))
             return NULL;
@@ -44,6 +98,7 @@ namespace SubutaiLauncher {
         if (!downloader->retrieveFileInfo()) {
             std::printf("Failed to retrieve file data");
         } else {
+            Session::instance()->getNotificationCenter()->add(DOWNLOAD_STARTED);
             std::printf("File info retrieved\n");
             auto t = downloader->download();
             t.detach();
@@ -54,9 +109,14 @@ namespace SubutaiLauncher {
     static PyObject* SL_IsDownloaded(PyObject* self, PyObject* args) {
         auto downloader = Session::instance()->getDownloader();
         if (downloader->isDone())
+        {
+            Session::instance()->getNotificationCenter()->add(DOWNLOAD_FINISHED);
             return Py_BuildValue("i", 1);
+        }
         else 
+        {
             return Py_BuildValue("i", 0);
+        }
     }
 
     static PyObject* SL_GetProgress(PyObject* self, PyObject* args) {
@@ -67,13 +127,13 @@ namespace SubutaiLauncher {
 
     static PyObject* SL_GetTmpDir(PyObject* self, PyObject* args) {
         auto settings = Session::instance()->getSettings();
-        auto path = settings->getTmpPath();
+        auto path = settings->getTmpPath().c_str();
         return Py_BuildValue("s", path);
     }
 
     static PyObject* SL_GetInstallDir(PyObject* self, PyObject* args) {
         auto settings = Session::instance()->getSettings();
-        auto path = settings->getInstallationPath();
+        auto path = settings->getInstallationPath().c_str();
         return Py_BuildValue("s", path);
     }
 
@@ -130,6 +190,42 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", 0);
     }
 
+    // Notification messages
+
+    static PyObject* SL_RaiseError(PyObject* self, PyObject* args, PyObject* keywords) {
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
+            return NULL;
+        Session::instance()->getNotificationCenter()->notificationRaised(N_ERROR, sl_string);
+        return Py_BuildValue("i", 1);
+    }
+
+    static PyObject* SL_RaiseWarning(PyObject* self, PyObject* args, PyObject* keywords) {
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
+            return NULL;
+        Session::instance()->getNotificationCenter()->notificationRaised(N_WARNING, sl_string);
+        return Py_BuildValue("i", 1);
+    }
+
+    static PyObject* SL_RaiseInfo(PyObject* self, PyObject* args, PyObject* keywords) {
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
+            return NULL;
+        Session::instance()->getNotificationCenter()->notificationRaised(N_INFO, sl_string);
+        return Py_BuildValue("i", 1);
+    }
+
+    static PyObject* SL_VBox(PyObject* self, PyObject* args, PyObject* keywords) {
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
+            return NULL;
+
+        Log::instance()->logger()->debug() << "VBox: " << sl_string << std::endl;
+
+        VirtualBox vb;
+        vb.execute(sl_string);
+        
+        return Py_BuildValue("i", 1);
+    }
+
+    // Module bindings
 
     static PyMethodDef SubutaiSLMethods[] = {
         {"download", (PyCFunction)SL_Download, METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN"},
@@ -145,6 +241,14 @@ namespace SubutaiLauncher {
         {"hello", SL_HelloWorld, METH_VARARGS, "Hello World method of subutai scripting language"},
         {"debug", SL_Debug, METH_VARARGS, "Shows debug information about current launcher instance and environment"},
         {"version", SL_Version, METH_VARARGS, "Display launcher version"},
+        {"CheckDirectories", SL_CheckDirectories, METH_VARARGS, "Display launcher version"},
+        {"RaiseError", (PyCFunction)SL_RaiseError, METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN"},
+        {"VBox", (PyCFunction)SL_VBox, METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something"},
+        {"RaiseWarning", (PyCFunction)SL_RaiseWarning, METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN"},
+        {"RaiseInfo", (PyCFunction)SL_RaiseInfo, METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN"},
+        {"Shutdown", SL_Shutdown, METH_VARARGS, "Finalizes the script"},
+        {"GetMasterVersion", SL_GetMasterVersion, METH_VARARGS, "Returns master version of a product"},
+        {"GetDevVersion", SL_GetDevVersion, METH_VARARGS, "Returns dev version of a product"},
         {NULL, NULL, 0, NULL}
     };
 

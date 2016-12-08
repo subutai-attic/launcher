@@ -89,3 +89,14 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::parseVms(co
 	}
 	return vms;
 }
+
+void SubutaiLauncher::VirtualBox::execute(const std::string& command)
+{
+    SubutaiString str(command);
+    std::vector<std::string> args;
+    str.split(' ', args);
+    SubutaiProcess p;
+    p.launch(BIN, args, _location);
+    p.wait();
+    Log::instance()->logger()->debug() << p.getOutputBuffer() << std::endl;
+}

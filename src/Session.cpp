@@ -9,6 +9,7 @@ SubutaiLauncher::Session::Session()
 	_downloader = new Downloader();
 	_downloader->setOutputDirectory(_settings->getTmpPath());
 	_confManager = new ConfigurationManager(_downloader);
+    _notificationCenter = new NotificationCenter();
 }
 
 SubutaiLauncher::Session::~Session()
@@ -40,4 +41,9 @@ SubutaiLauncher::Settings* SubutaiLauncher::Session::getSettings()
 SubutaiLauncher::ConfigurationManager* SubutaiLauncher::Session::getConfManager()
 {
 	return _confManager;
+}
+
+SubutaiLauncher::NotificationCenter* SubutaiLauncher::Session::getNotificationCenter()
+{
+    return _notificationCenter;
 }

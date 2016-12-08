@@ -1,21 +1,21 @@
-#include "SubutaiP2P.h"
+#include "Tray.h"
 
-const std::string SubutaiLauncher::P2P::BIN = "p2p";
+const std::string SubutaiLauncher::Tray::BIN = "subutai-tray";
 
-SubutaiLauncher::P2P::P2P()
+SubutaiLauncher::Tray::Tray()
 {
 	_version = "";
 }
 
-SubutaiLauncher::P2P::~P2P()
+SubutaiLauncher::Tray::~Tray()
 {
 
 }
 
-bool SubutaiLauncher::P2P::findInstallation()
+bool SubutaiLauncher::Tray::findInstallation()
 {
     auto l = Log::instance()->logger();
-    l->debug() << "Searching for P2P installation" << std::endl;
+    l->debug() << "Searching for Tray installation" << std::endl;
 	auto env = new Environment();
 	SubutaiString pathVar(env->getVar("PATH", ""));
 	std::vector<std::string> path;
@@ -29,23 +29,22 @@ bool SubutaiLauncher::P2P::findInstallation()
 			_location = _path;
 			_path.append(FileSystem::DELIM);
 			_path.append(BIN);
-            l->debug() << "P2P found in " << _location << std::endl;
+            l->debug() << "Tray found in " << _location << std::endl;
 			return true;
 		}
 	}
-    l->debug() << "P2P was not found" << std::endl;
+    l->debug() << "Tray was not found" << std::endl;
 	return false;
 }
 
-std::string SubutaiLauncher::P2P::extractVersion()
+std::string SubutaiLauncher::Tray::extractVersion()
 {
 	if (_version != "") {
 		return _version;
 	}
 
 	std::vector<std::string> args;
-	args.push_back("version");
-	args.push_back("-n");
+	args.push_back("-v");
 
 	SubutaiProcess p;
 	p.launch(BIN, args, _location);
@@ -60,22 +59,7 @@ std::string SubutaiLauncher::P2P::extractVersion()
 	return "";
 }
 
-void SubutaiLauncher::P2P::start()
-{
-
-}
-
-void SubutaiLauncher::P2P::stop()
-{
-
-}
-
-bool SubutaiLauncher::P2P::isRunning()
-{
-	return false;
-}
-
-bool SubutaiLauncher::P2P::isInstalled()
+bool SubutaiLauncher::Tray::isInstalled()
 {
     return _installed;
 }

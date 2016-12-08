@@ -1,11 +1,11 @@
 /*
-  ==============================================================================
+   ==============================================================================
 
-    CommunityComponent.cpp
-    Created: 8 Aug 2016 2:15:00pm
-    Author:  crioto
+   CommunityComponent.cpp
+Created: 8 Aug 2016 2:15:00pm
+Author:  crioto
 
-  ==============================================================================
+==============================================================================
 */
 
 #include "CommunityComponent.h"
@@ -20,6 +20,7 @@ CommunityComponent::CommunityComponent() {
     try {
         sl->open("ui-banner");
     } catch (SubutaiLauncher::SubutaiException& e) {
+        delete sl;
         if (e.code() == 1) {
             std::printf("ui-banner.py file was not found\n");
             return;
@@ -28,10 +29,13 @@ CommunityComponent::CommunityComponent() {
     try {
         sl->execute();
     } catch (SubutaiLauncher::SLException& e) {
+        delete sl;
         std::printf("Exception: %s\n", e.displayText().c_str());
     } catch (std::exception e) {
+        delete sl;
         std::printf("Exception: %s\n", e.what());
     }
+    delete sl;
 
     auto mainFont = new Font(30.0);
     auto secFont = new Font(24.0);
@@ -84,17 +88,17 @@ CommunityComponent::CommunityComponent() {
     _label3.setBounds(397, 642, 357, 100);
     addAndMakeVisible(_label3);
 
-        /*  
-    b1.img.setImage(ImageCache::getFromFile(File("launcher-banner-example1.jpg")));
-    b1.label.setText("Subutai text example 1");
-    b1.label.setColour(Label::textColourId, Colours::white);
-    b1.label.setColour(Label::backgroundColourId, Colours::grey);
-    */
+    /*  
+        b1.img.setImage(ImageCache::getFromFile(File("launcher-banner-example1.jpg")));
+        b1.label.setText("Subutai text example 1");
+        b1.label.setColour(Label::textColourId, Colours::white);
+        b1.label.setColour(Label::backgroundColourId, Colours::grey);
+        */
 
     /* 
-    addAndMakeVisible(_banner);
-    _banner.setImage(ImageCache::getFromFile(File("launcher-banner-example1.jpg")));
-    */
+       addAndMakeVisible(_banner);
+       _banner.setImage(ImageCache::getFromFile(File("launcher-banner-example1.jpg")));
+       */
 }
 
 CommunityComponent::~CommunityComponent() {

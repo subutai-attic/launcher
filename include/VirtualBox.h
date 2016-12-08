@@ -35,6 +35,7 @@ namespace SubutaiLauncher {
             void getVms();
             std::vector<SubutaiVM> parseVms(const std::string& buffer);
             void addVm(SubutaiVM vm);
+            void execute(const std::string& command);
         protected:
         private:
             std::string _version;

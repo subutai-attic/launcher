@@ -73,6 +73,17 @@ void SubutaiLauncher::FileSystem::removeFile(const std::string& filename) {
 	}
 }
 
+void SubutaiLauncher::FileSystem::createDirectory(const std::string& dir)
+{
+    std::string fullpath(_path);
+	fullpath.append(DELIM);
+	fullpath.append(dir);
+    if (mkdir(fullpath.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0) {
+        Log::instance()->logger()->fatal() << "Failed to create directory " << fullpath << ". Errorno: " << errno << std::endl;
+        throw SubutaiException("Failed to create directory");
+    }
+}
+
 #if LAUNCHER_LINUX
 void SubutaiLauncher::FileSystem::copyFile(const std::string& src, const std::string& dst)
 {

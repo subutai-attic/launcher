@@ -57,9 +57,14 @@ LibraryItem::LibraryItem(const std::string& title, const std::string& desc, cons
             displayVersion = true;
         }
     } 
-    else if (title == "Tray")
+    else if (title == "Tray Client")
     {
-
+        SubutaiLauncher::Tray tray;
+        tray.findInstallation();
+        if (tray.isInstalled()) {
+            _version.setText(tray.extractVersion(), dontSendNotification);
+            displayVersion = true;
+        }
     }
     else if (title == "Browser Plugin")
     {
@@ -109,7 +114,11 @@ void LibraryItem::mouseUp(const juce::MouseEvent& e)
     {
         std::string windowTitle = "Installing ";
         windowTitle.append(_title);
-        (new DemoBackgroundThread("install", _title, windowTitle))->launchThread();
+        auto t = new LibraryActionThread("install", _title, windowTitle);
+        t->launchThread();
+        while (t->isRunning()) {
+            sleep(1);
+        }
     }
     else if (res == 2)
     {

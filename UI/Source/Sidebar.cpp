@@ -18,7 +18,7 @@ SidebarComponent::SidebarComponent() {
 }
 
 SidebarComponent::~SidebarComponent() {
-
+    delete _social;
 }
 
 void SidebarComponent::paint(Graphics& g) {

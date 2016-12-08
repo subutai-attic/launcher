@@ -5,6 +5,7 @@
 #include "VirtualBox.h"
 #include "Downloader.h"
 #include "Settings.h"
+#include "NotificationCenter.h"
 #include "ConfigurationManager.h"
 
 namespace SubutaiLauncher 
@@ -18,11 +19,13 @@ namespace SubutaiLauncher
             Downloader* getDownloader();
             Settings* getSettings();
             ConfigurationManager* getConfManager();
+            NotificationCenter* getNotificationCenter();
         private:
             //SubutaiLauncher::VirtualBox* _virtualBox;
             Downloader* _downloader;
             Settings* _settings;
             ConfigurationManager* _confManager;
+            NotificationCenter* _notificationCenter;
         protected:
             static Session *_instance;
             Session();
