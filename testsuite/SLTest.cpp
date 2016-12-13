@@ -1,3 +1,4 @@
+/*
 #include <iostream>
 #include <cstdio>
 #include <string>
@@ -164,3 +165,4 @@ void SLTest::testInstall_peer(void)
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(SLTest);
+*/

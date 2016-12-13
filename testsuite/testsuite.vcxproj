@@ -19,33 +19,33 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3A3142D5-5F37-4D16-B03B-A1637C6E8879}</ProjectGuid>
+    <ProjectGuid>{47D8077A-C780-44DC-AF3D-233262BA301D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>subutailauncher</RootNamespace>
+    <RootNamespace>testsuite</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -70,121 +70,91 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(IncludePath);$(ProjectDir)..\include;..\third-party\curl\include;..\third-party\json;..\third-party\md5;..\third-party\libssh\include;..\third-party\python\Include;..\third-party\python\PC</IncludePath>
+    <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>$(POCO_ROOT)\lib64;..\third-party\Python3\PCBuild\amd64;..\bin;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(POCO_ROOT)\CppUnit\Include;..\include;..\third-party\Python3\Include;..\third-party\Python3\PC;..\third-party\MD5;..\third-party\json;..\third-party\libssh\include;..\third-party\curl\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(IncludePath);$(ProjectDir)..\include;..\third-party\curl\include;..\third-party\json;..\third-party\md5;..\third-party\libssh\include;..\third-party\python\Include;..\third-party\python\PC</IncludePath>
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(POCO_ROOT)\CppUnit\Include;..\include;..\third-party\Python3\Include;..\third-party\Python3\PC;..\third-party\MD5;..\third-party\json;..\third-party\libssh\include;..\third-party\curl\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(POCO_ROOT)\lib64;..\third-party\Python3\PCBuild\amd64;$(VC_LibraryPath_x64);..\third-party\curl\lib;..\bin;$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <OutDir>.\bin\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>PocoCppUnit.lib;launcher.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>PocoCppUnit.lib;launcher.lib;libcurl_a.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
+    <ClInclude Include="Arguments.h" />
+    <ClInclude Include="LogTest.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\ConfigurationManager.h" />
-    <ClInclude Include="..\include\Core.h" />
-    <ClInclude Include="..\include\Downloader.h" />
-    <ClInclude Include="..\include\E2E.h" />
-    <ClInclude Include="..\include\Environment.h" />
-    <ClInclude Include="..\include\FileSystem.h" />
-    <ClInclude Include="..\include\Hub.h" />
-    <ClInclude Include="..\include\Install.h" />
-    <ClInclude Include="..\include\InstallImpl_Base.h" />
-    <ClInclude Include="..\include\InstallImpl_Linux.h" />
-    <ClInclude Include="..\include\InstallImpl_Windows.h" />
-    <ClInclude Include="..\include\SubutaiP2P.h" />
-    <ClInclude Include="..\include\SubutaiProcess.h" />
-    <ClInclude Include="..\include\Session.h" />
-    <ClInclude Include="..\include\Settings.h" />
-    <ClInclude Include="..\include\SL.h" />
-    <ClInclude Include="..\include\SLException.h" />
-    <ClInclude Include="..\include\SLFunctions.h" />
-    <ClInclude Include="..\include\SSH.h" />
-    <ClInclude Include="..\include\SubutaiString.h" />
-    <ClInclude Include="..\include\SubutaiException.h" />
-    <ClInclude Include="..\include\SubutaiLauncher.h" />
-    <ClInclude Include="..\include\Tray.h" />
-    <ClInclude Include="..\include\Vars.h" />
-    <ClInclude Include="..\include\VBox.h" />
-    <ClInclude Include="..\include\VirtualBox.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\ConfigurationManager.cpp" />
-    <ClCompile Include="..\src\Core.cpp" />
-    <ClCompile Include="..\src\Downloader.cpp" />
-    <ClCompile Include="..\src\Environment.cpp" />
-    <ClCompile Include="..\src\FileSystem.cpp" />
-    <ClCompile Include="..\src\Hub.cpp" />
-    <ClCompile Include="..\src\InstalImpl_Windows.cpp" />
-    <ClCompile Include="..\src\Install.cpp" />
-    <ClCompile Include="..\src\InstallImpl_Base.cpp" />
-    <ClCompile Include="..\src\InstallImpl_Linux.cpp" />
-    <ClCompile Include="..\src\P2P.cpp" />
-    <ClCompile Include="..\src\SubutaiProcess.cpp" />
-    <ClCompile Include="..\src\Session.cpp" />
-    <ClCompile Include="..\src\Settings.cpp" />
-    <ClCompile Include="..\src\SL.cpp" />
-    <ClCompile Include="..\src\SLException.cpp" />
-    <ClCompile Include="..\src\SLFunctions.cpp" />
-    <ClCompile Include="..\src\SSH.cpp" />
-    <ClCompile Include="..\src\SubutaiString.cpp" />
-    <ClCompile Include="..\src\SubutaiException.cpp" />
-    <ClCompile Include="..\src\VBox.cpp" />
-    <ClCompile Include="..\src\VirtualBox.cpp" />
+    <ClCompile Include="LogTest.cpp" />
+    <ClCompile Include="TestSuite.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

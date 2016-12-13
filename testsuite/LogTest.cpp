@@ -1,18 +1,46 @@
+#include "LogTest.h"
+#include "SubutaiLauncher.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
+
+LogTest::LogTest(const std::string& name) : CppUnit::TestCase(name)
+{
+
+}
+
+LogTest::~LogTest()
+{
+
+}
+
+void LogTest::setUp()
+{
+}
+
+void LogTest::tearDown()
+{
+}
+
+void LogTest::debug()
+{
+	auto l = SubutaiLauncher::Log::instance()->logger();
+	l->debug() << "This " << "is " << "a " << "debug " << "message" << std::endl;
+}
+
+CppUnit::Test * LogTest::suite()
+{
+	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("LogTest");
+
+
+
+	return pSuite;
+}
+
+/*
 #include <iostream>
 #include <cstdio>
 #include <string>
 #include <vector>
-#include <cppunit/TestCase.h>
-#include <cppunit/TestFixture.h>
-#include <cppunit/ui/text/TextTestRunner.h>
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/XmlOutputter.h>
 
 #include "Arguments.h"
 #include "SubutaiLog.h"
@@ -48,3 +76,4 @@ void SubutaiLogTest::testDebug()
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(SubutaiLogTest);
+*/

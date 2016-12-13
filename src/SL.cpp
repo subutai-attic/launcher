@@ -13,15 +13,31 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
         wchar_t *path, *newpath;
 
         path = Py_GetPath(); 
+#if LAUNCHER_WINDOWS
+		size_t ret;
+		wcstombs_s(&ret, dst, path, sizeof(dst));
+#else
         std::wcstombs(dst, path, sizeof(dst));
+#endif
         logger->debug() << "Default path in Python: " << dst << std::endl;
         newpath = new wchar_t[1024];
-        wcscpy(newpath, path); 
-        wcscat(newpath, L":");
+#if LAUNCHER_WINDOWS
+		wcscpy_s(newpath, 1024, path);
+		wcscat_s(newpath, 1024, L":");
+#else
+		wcscpy(newpath, path);
+		wcscat(newpath, L":");
+#endif
         auto d = std::wstring(dir.begin(), dir.end());
+#if LAUNCHER_WINDOWS
+		wcscat_s(newpath, 1024, d.c_str());
+		wcscat_s(newpath, 1024, L":.");
+		wcstombs_s(&ret, dst, newpath, sizeof(dst));
+#else
         wcscat(newpath, d.c_str()); 
         wcscat(newpath, L":.");
-        std::wcstombs(dst, newpath, sizeof(dst));
+		std::wcstombs(dst, newpath, sizeof(dst));
+#endif
         logger->debug() << "New path in Python: " << dst << std::endl;
         std::wprintf(L"NEWPATH: %sl\n", newpath);
         PySys_SetPath(newpath); 
@@ -29,10 +45,17 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
         char *path, *newpath; 
         path = Py_GetPath(); 
         newpath = new char[strlen(path)+dir.length()+6]; 
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
         strcpy(newpath, path); 
         strcat(newpath, ":");
         strcat(newpath, dir.c_str()); 
         strcat(newpath, ":.");
+#else
+		strcpy_s(newpath, 1024, path);
+		strcpy_s(newpath, 1024, ":");
+		strcpy_s(newpath, 1024, dir.c_str());
+		strcpy_s(newpath, 1024, ":.");
+#endif
         PySys_SetPath(newpath); 
         delete[] newpath;
 #endif
@@ -75,7 +98,11 @@ void SubutaiLauncher::SL::execute()
     auto ncenter = Session::instance()->getNotificationCenter();
     while (ncenter->isRunning())
     {
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
         usleep(100);
+#else
+		Sleep(100);
+#endif
     }
     ncenter->clear();
     ncenter->start();

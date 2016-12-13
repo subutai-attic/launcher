@@ -1,3 +1,4 @@
+/*
 #include <iostream>
 #include <cstdio>
 #include <string>
@@ -56,3 +57,4 @@ void VirtualBoxTest::testParseVms()
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(VirtualBoxTest);
+*/

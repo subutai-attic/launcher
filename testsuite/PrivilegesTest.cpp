@@ -1,3 +1,4 @@
+/*
 #include <iostream>
 #include <cstdio>
 #include <string>
@@ -55,3 +56,4 @@ void PrivilegesTest::testSudo()
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(PrivilegesTest);
+*/

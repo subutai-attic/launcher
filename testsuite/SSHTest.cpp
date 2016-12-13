@@ -1,3 +1,4 @@
+/*
 #include <iostream>
 #include <cstdio>
 #include <string>
@@ -98,3 +99,4 @@ void SSHTest::testCommand()
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(SSHTest);
+*/
