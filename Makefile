@@ -66,7 +66,7 @@ $(OUTPUT_DIR)/$(STATIC_LIB_TARGET): $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(OUTPUT_DIR)/$(DYNAMIC_LIB_TARGET)-test: $(T_OBJECTS)
-	$(CC) $(T_OBJECTS) -Wall $(LIBS) -lcppunit -L$(OUTPUT_DIR) -lsubutai-launcher -o $@
+	$(CC) $(T_OBJECTS) -Wall $(LIBS) -lPocoCppUnit -L$(OUTPUT_DIR) -lsubutai-launcher -o $@
 
 directories:
 	@mkdir -p $(OUTPUT_DIR)
