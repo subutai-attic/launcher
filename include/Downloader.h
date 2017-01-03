@@ -10,6 +10,14 @@
 #include <curl/curl.h>
 #include <json/json.h>
 #include <thread>
+#include <memory>
+
+#include <Poco/URIStreamOpener.h>
+#include <Poco/StreamCopier.h>
+#include <Poco/Path.h>
+#include <Poco/Exception.h>
+#include <Poco/Net/HTTPStreamFactory.h>
+#include <Poco/Net/FTPStreamFactory.h>
 
 #include "FileSystem.h"
 #include "MD5.h"
