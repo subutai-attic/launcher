@@ -2,6 +2,7 @@
 
 const std::string SubutaiLauncher::Downloader::URL = "https://cdn.subut.ai:8338";
 const std::string SubutaiLauncher::Downloader::REST = "/kurjun/rest/raw";
+const std::string SubutaiLauncher::Downloader::HOST = "cdn.subut.ai";
 
 SubutaiLauncher::Downloader::Downloader() : 
     _content(""),
@@ -56,31 +57,23 @@ std::string SubutaiLauncher::Downloader::buildRequest(std::string path, std::str
 
 bool SubutaiLauncher::Downloader::retrieveFileInfo()
 {
-    auto curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_URL, buildRequest("info", "name", _filename).c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleInfo);
-    auto result = curl_easy_perform(curl);
-    if (result == 0) {
-        return true;
-    }
-    return false;
-}
+    Poco::Net::HTTPSClientSession s(HOST, PORT);
+    std::string path(REST);
+    path.append("/info");
+    Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_GET, path);
+    Poco::Net::HTMLForm form;
+    form.add("name", _filename);
+    form.prepareSubmit(request);
+    s.sendRequest(request);
 
-size_t SubutaiLauncher::Downloader::handleInfo(char *data, size_t size, size_t nmemb, void *p)
-{
-    return static_cast<Downloader*>(p)->handleInfoImpl(data, size, nmemb);
-}
+    Poco::Net::HTTPResponse response;
+    std::istream& rs = s.receiveResponse(response);
+    std::string output;
+    Poco::StreamCopier::copyToString(rs, output);
 
-size_t SubutaiLauncher::Downloader::handleInfoImpl(char* data, size_t size, size_t nmemb)
-{
-    _content.clear();
-    auto l = Log::instance()->logger();
-    l->debug() << "Parsign file info: " << data << std::endl;
-    _content.append(data, size * nmemb);
+    // TODO: Replace JSON lib with Poco
     Json::Value root;
-    std::istringstream str(_content);
-    // TODO: Review stream
+    std::istringstream str(output);
     str >> root;
 
     const Json::Value owners = root["owner"];
@@ -91,12 +84,13 @@ size_t SubutaiLauncher::Downloader::handleInfoImpl(char* data, size_t size, size
     _file.id = root.get("id", "").asString();
     _file.size = root.get("size", "").asLargestInt();
 
+    auto l = Log::instance()->logger();
     l->debug() << "Owner: " << _file.owner << std::endl;
     l->debug() << "Name: " << _file.name << std::endl;
     l->debug() << "ID: " << _file.id << std::endl;
     l->debug() << "Size: " << _file.size << std::endl;
 
-    return size * nmemb;
+    return true;
 }
 
 std::thread SubutaiLauncher::Downloader::download()
@@ -110,6 +104,20 @@ std::thread SubutaiLauncher::Downloader::download()
 
 void SubutaiLauncher::Downloader::downloadImpl()
 {
+    Poco::Net::HTTPStreamFactory::registerFactory();
+    Poco::Net::HTTPSStreamFactory::registerFactory();
+
+    Poco::URI uri(buildRequest("get", "name", _filename));
+    std::auto_ptr<std::istream> pStr(Poco::URIStreamOpener::defaultOpener().open(uri));
+    std::string path(_outputDir);
+    path.append(PATH_DELIM);
+    path.append(_file.name.c_str());
+    std::ofstream out(path, std::fstream::app);
+    Poco::StreamCopier::copyStream(*pStr.get(), out);
+    _done = true;
+
+    return;
+    //
     auto l = Log::instance()->logger();
     FileSystem fs(_outputDir);
     if (fs.isFileExists(_file.name)) {

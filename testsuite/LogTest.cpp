@@ -31,7 +31,7 @@ CppUnit::Test * LogTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("LogTest");
 
-
+    CppUnit_addTest(pSuite, LogTest, debug);
 
 	return pSuite;
 }
