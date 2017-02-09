@@ -28,4 +28,9 @@ namespace SubutaiLauncher
         _impl->postInstall();
     }
 
+    void Install::unInstall()
+    {
+        _impl->unInstall();
+    }
+
 }

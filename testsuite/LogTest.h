@@ -1,7 +1,7 @@
 #ifndef __LOG_TEST_H__
 #define __LOG_TEST_H__
 
-#include "Poco/CppUnit/TestCase.h"
+#include <Poco/CppUnit/TestCase.h>
 
 class LogTest : public CppUnit::TestCase
 {

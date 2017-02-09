@@ -122,7 +122,13 @@ void LibraryItem::mouseUp(const juce::MouseEvent& e)
     }
     else if (res == 2)
     {
-
+        std::string windowTitle = "Removing ";
+        windowTitle.append(_title);
+        auto t = new LibraryActionThread("remove", _title, windowTitle);
+        t->launchThread();
+        while (t->isRunning()) {
+            sleep(1);
+        }
     } 
     else if (res == 3)
     {

@@ -4,6 +4,8 @@ bin
 build
 CLI/bin
 CLI/build
+*_back
+scripts_tt
 
 # extra libs
 /third-party/python*

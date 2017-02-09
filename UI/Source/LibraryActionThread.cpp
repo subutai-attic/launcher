@@ -50,11 +50,26 @@ void LibraryActionThread::run()
     l->debug() << _component << " configuration found" << std::endl;
 
     auto d = SubutaiLauncher::Session::instance()->getDownloader();
+
+    l->debug() << "LibraryActionTread::run getDownloader" << std::endl;
+
     auto file = std::string(config.file);
+
+    l->debug() << "LibraryActionTread::run config.file " << file << std::endl;
+
     file.append(".py");
     d->reset();
+
+    l->debug() << "LibraryActionTread::run reset " << file << std::endl;
+
     d->setFilename(file);
+
+    l->debug() << "LibraryActionTread::run setFilename " << file << std::endl;
+
     auto dt = d->download();
+    
+    l->debug() << "LibraryActionTread::run d->download" << std::endl;
+
     dt.detach();
     while (!d->isDone())
     {

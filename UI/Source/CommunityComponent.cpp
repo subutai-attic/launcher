@@ -40,7 +40,7 @@ CommunityComponent::CommunityComponent() {
     auto mainFont = new Font(30.0);
     auto secFont = new Font(24.0);
 
-    _mainBanner.setImage(ImageCache::getFromFile(File("launcher-ad-1.png")));
+    _mainBanner.setImage(ImageCache::getFromFile(File("/tmp/subutai/launcher-ad-1.png")));
     _mainBanner.setBounds(20, 20, 357, 708);
     addAndMakeVisible(_mainBanner);
 
@@ -52,15 +52,15 @@ CommunityComponent::CommunityComponent() {
     _mainLabel.setBounds(20, 708-202, 357, 222);
     addAndMakeVisible(_mainLabel);
 
-    _banner1.setImage(ImageCache::getFromFile(File("launcher-ad-2.png")));
+    _banner1.setImage(ImageCache::getFromFile(File("/tmp/subutai/launcher-ad-2.png")));
     _banner1.setBounds(397, 20, 357, 222);
     addAndMakeVisible(_banner1);
 
-    _banner2.setImage(ImageCache::getFromFile(File("launcher-ad-3.png")));
+    _banner2.setImage(ImageCache::getFromFile(File("/tmp/subutai/launcher-ad-3.png")));
     _banner2.setBounds(397, 264, 357, 222);
     addAndMakeVisible(_banner2);
 
-    _banner3.setImage(ImageCache::getFromFile(File("launcher-ad-4.png")));
+    _banner3.setImage(ImageCache::getFromFile(File("/tmp/subutai/launcher-ad-4.png")));
     _banner3.setBounds(397, 506, 357, 222);
     addAndMakeVisible(_banner3);
 
@@ -80,7 +80,7 @@ CommunityComponent::CommunityComponent() {
     _label2.setBounds(397, 392, 357, 100);
     addAndMakeVisible(_label2);
 
-    _label3.setText("4.0.3 is live! See patch notes", dontSendNotification);
+    _label3.setText("4.0.15 is live! See patch notes", dontSendNotification);
     _label3.setColour(Label::backgroundColourId, Colour(0xaa222222));
     _label3.setColour(Label::textColourId, Colours::white);
     _label3.setJustificationType(Justification::centred);

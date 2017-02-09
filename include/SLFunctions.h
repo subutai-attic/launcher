@@ -190,6 +190,21 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", 0);
     }
 
+
+    static PyObject* SL_UnInstall(PyObject* self, PyObject* args, PyObject* keywords) {
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", string_keywords, &sl_filename, &sl_destination))
+            return NULL;
+        Install i;
+        i.setFilename(sl_filename);
+        try {
+            i.unInstall();
+            } catch (SubutaiException &e) {
+            return Py_BuildValue("i", 1);
+
+        }
+        return Py_BuildValue("i", 0);
+    }
+
     // Notification messages
 
     static PyObject* SL_RaiseError(PyObject* self, PyObject* args, PyObject* keywords) {
@@ -230,6 +245,7 @@ namespace SubutaiLauncher {
     static PyMethodDef SubutaiSLMethods[] = {
         {"download", (PyCFunction)SL_Download, METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN"},
         {"install", (PyCFunction)SL_Install, METH_VARARGS | METH_KEYWORDS, "Installs a file"},
+        {"uninstall", (PyCFunction)SL_UnInstall, METH_VARARGS | METH_KEYWORDS, "Uninstalls a file"},
         {"setTmpDir", (PyCFunction)SL_SetTmpDir, METH_VARARGS | METH_KEYWORDS, "Sets tmp output directory"},
         {"NewConfiguration", (PyCFunction)SL_NewConfiguration, METH_VARARGS | METH_KEYWORDS, "Creates a new configuration with a given name"},
         {"SetConfigurationDesc", (PyCFunction)SL_SetConfigurationDesc, METH_VARARGS | METH_KEYWORDS, "Sets a description to a given configuration"},

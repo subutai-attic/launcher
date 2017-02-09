@@ -2,7 +2,7 @@ CC=g++
 TARGET = subutai-launcher
 EXTRA_LIB_DIR = ../third-party
 INCLUDES = -Iinclude -I/usr/include/$(PYTHON_VER) -I../include -I../third-party/md5 -I../third-party/json
-LIBS = -L/lib/x86_64-linux-gnu -L../bin -L$(PYLIB_DIR) -g -ggdb -lm -lrt -l$(PYTHON_VER) -lcurl -lssh -lsubutai-launcher -L/usr/X11R6/lib -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread 
+LIBS = -L/lib/x86_64-linux-gnu -L../bin -L$(PYLIB_DIR) -g -ggdb -lm -lrt -l$(PYTHON_VER) -lcurl -lssh -lPocoNet -lsubutai-launcher -L/usr/X11R6/lib -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread 
 CFLAGS = -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 $(INCLUDES) -I/usr/include -I/usr/include/freetype2 -IJuceLibraryCode -IJuceLibraryCode/modules -std=c++11
 
 JUCE=JuceLibraryCode

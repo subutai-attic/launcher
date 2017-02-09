@@ -99,26 +99,71 @@ std::thread SubutaiLauncher::Downloader::download()
     _progress = 0;
     Log::instance()->logger()->info() << "Downloading " << _filename << std::endl;
     _done = false;
+    Log::instance()->logger()->info() << "Downloading before thread"  << std::endl;
     return std::thread([=] { downloadImpl(); });
 }
 
 void SubutaiLauncher::Downloader::downloadImpl()
 {
-    Poco::Net::HTTPStreamFactory::registerFactory();
-    Poco::Net::HTTPSStreamFactory::registerFactory();
+        auto l = Log::instance()->logger();
+    l->info() << "DownloadImpl start " << std::endl;
+    
+    try {
+	Poco::Net::HTTPStreamFactory::unregisterFactory();
+	Poco::Net::HTTPSStreamFactory::unregisterFactory();
+	l->info() << "Downloading UNREGISTER " << _filename << std::endl;
+    } catch (...) {
+	l->info() << "Downloading UNREGISTER failed " << _filename << std::endl;
+    }
 
+    try {
+        Poco::Net::HTTPStreamFactory::registerFactory();
+	l->info() << "DownloadImpl Poco::Net::HTTPStreamFactory::registerFactory(); " << std::endl;
+    }
+    catch (...){
+	l->info() << "Stream factory error: "   << std::endl;
+	//std::cerr << e.what();
+    }
+    Poco::Net::HTTPSStreamFactory::registerFactory();
+    l->info() << "Downloading Poco::Net::HTTPSStreamFactory::registerFactory(); " << std::endl;
     Poco::URI uri(buildRequest("get", "name", _filename));
+    l->info() << "Downloading Poco::URI uri " << buildRequest("get", "name", _filename)  << std::endl;
+
     std::auto_ptr<std::istream> pStr(Poco::URIStreamOpener::defaultOpener().open(uri));
     std::string path(_outputDir);
+    l->info() << "Downloading path _outputDir " << path << std::endl;
     path.append(PATH_DELIM);
-    path.append(_file.name.c_str());
+    l->info() << "Downloading path PATH_DELIM " << path << std::endl;
+    path.append(_filename.c_str());
+    l->info() << "Downloading path _file.name.c_str() " << path << std::endl;
+
+    FileSystem fs(_outputDir);
+    l->info() << "File: _file.name " << _file.name << " already exists. Validating checksum" << std::endl;
+    l->info() << "File: _filename " << _filename << " already exists. Validating checksum" << std::endl;
+    if (fs.isFileExists(_filename)) {
+        l->info() << "File: _file.name " << _file.name << " already exists. Validating checksum" << std::endl;
+        if (verifyDownload()) {
+            l->info() << "File " << _file.name << " is in actual state" << std::endl;
+            _done = true;
+            _progress = _file.size;
+            return;
+        }
+        else {
+            fs.removeFile(_file.name);
+        }
+    }
+    l->debug() << "Spawning downloader thread" << std::endl;
+
+    //downloading
     std::ofstream out(path, std::fstream::app);
     Poco::StreamCopier::copyStream(*pStr.get(), out);
+    Log::instance()->logger()->info() << "Downloading " << _filename << std::endl;
+    
     _done = true;
 
     return;
-    //
-    auto l = Log::instance()->logger();
+
+/*
     FileSystem fs(_outputDir);
     if (fs.isFileExists(_file.name)) {
         l->info() << "File " << _file.name << " is already exists. Validating checksum" << std::endl;
@@ -145,6 +190,7 @@ void SubutaiLauncher::Downloader::downloadImpl()
         l->error() << "Failed to download " << _filename << std::endl;
     }
     _done = true;
+*/
 }
 
 size_t SubutaiLauncher::Downloader::handleFile(char *data, size_t size, size_t nmemb, void *p)

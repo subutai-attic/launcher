@@ -60,4 +60,15 @@ void SubutaiLauncher::InstallImpl::postInstall()
 	std::sprintf(dp, "%s%s%s", pathCandidate.c_str(), PATH_DELIM, _filename.c_str());
 	int rc = symlink(sp, dp);
 }
+
+void SubutaiLauncher::InstallImpl::unInstall()
+{
+	//char* sp;
+	char* dp;
+	//std::sprintf(sp, "%s%s%s", _srcPath.c_str(), PATH_DELIM, _filename.c_str());
+	std::sprintf(dp, "%s%s%s", _dstPath.c_str(), PATH_DELIM, _filename.c_str());
+	//FileSystem fs;
+	//fs.copyFile(std::string(sp), std::string(dp));
+}
+
 #endif

@@ -24,9 +24,14 @@ void SubutaiLauncher::FileSystem::setPath(const std::string& path) {
 }
 
 bool SubutaiLauncher::FileSystem::isFileExists(const std::string& filename) {
+	auto l = Log::instance()->logger();
+	l->info() << "FileSysten::FileExists: _path " << _path << std::endl;
 	std::string fullpath(_path);
+	l->info() << "FileSysten::FileExists: fullpath " << fullpath << std::endl;
 	fullpath.append(DELIM);
+	l->info() << "FileSysten::FileExists: fullpath DELIM " << fullpath << std::endl;
 	fullpath.append(filename);
+	l->info() << "FileSysten::FileExists: fullpath append filename " << fullpath << std::endl;
 #if LAUNCHER_LINUX
 	struct stat st;
 	return stat(fullpath.c_str(), &st) == 0;

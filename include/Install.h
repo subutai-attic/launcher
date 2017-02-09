@@ -19,6 +19,7 @@ namespace SubutaiLauncher {
             void preInstall();
             void install();
             void postInstall();
+	    void unInstall();
         private:
             InstallImpl* _impl;
     };

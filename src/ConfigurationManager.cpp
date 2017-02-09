@@ -3,7 +3,7 @@
 
 
 #if LAUNCHER_LINUX
-const std::string SubutaiLauncher::ConfigurationManager::CONFIG_FILE = "install_config_linux";
+const std::string SubutaiLauncher::ConfigurationManager::CONFIG_FILE = "install_config_linux_tt";
 #elif LAUNCHER_WINDOWS
 const std::string SubutaiLauncher::ConfigurationManager::CONFIG_FILE = "install_config_windows";
 #elif LAUNCHER_MACOS

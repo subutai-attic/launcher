@@ -71,10 +71,22 @@ SubutaiLauncher::SL::~SL()
 
 void SubutaiLauncher::SL::open(const std::string& path)
 {
-    auto p = path;
+    auto l = Log::instance()->logger();
+    //auto p = path;
+    auto settings = Session::instance()->getSettings();
+    std::string p = settings->getTmpPath().c_str();
+    l->info() << "SL tmp path: " << p << std::endl;
+    p.append(PATH_DELIM);
+    p.append(path);
     p.append(".py");
+    l->info() << "SL open path: " << p << std::endl;
     FileSystem fs(_dir);
-    if (!fs.isFileExists(p)) {
+    l->info() << "FileSystem fs(_dir): " << _dir << std::endl;
+    
+    std::string f = path;
+    f.append(".py");
+    l->info() << "SL f: " << f << std::endl;
+    if (!fs.isFileExists(f) && !fs.isFileExists(p)) {
         throw SubutaiException("Script file doesn't exists", 1);
     }
 #if PY_MAJOR_VERSION >= 3
@@ -108,6 +120,9 @@ void SubutaiLauncher::SL::execute()
     ncenter->start();
     auto l = Log::instance()->logger();
     l->info() << "Starting script execution" << std::endl;
+
+    l->info() << "SL::execute " << _name << std::endl;
+
     if (_name == NULL)
     {
         ncenter->stop();
@@ -121,7 +136,13 @@ void SubutaiLauncher::SL::execute()
     PyObject* tmpPath = PyString_FromString(_dir.c_str());
 #endif
     PyList_Append(sysPath, tmpPath);
+
+    l->info() << "SL::execute sysPath " << sysPath << "tmpPath " << tmpPath  << std::endl;
+
     _module = PyImport_Import(_name);
+
+    l->info() << "SL::execute import module " << _name << std::endl;
+
     Py_DECREF(_name);
     Py_DECREF(PyImport_ImportModule("threading"));
     PyEval_InitThreads();
