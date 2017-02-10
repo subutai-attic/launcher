@@ -12,7 +12,7 @@ Author:  crioto
 
 // ============================================================================
 
-LibraryItem::LibraryItem(const std::string& title, const std::string& desc, const std::string& is, const std::string& us, const std::string& rs) : 
+LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, const std::string& is, const std::string& us, const std::string& rs) : 
     _title(title),
     _desc(desc),
     _installScript(is),
@@ -33,7 +33,7 @@ LibraryItem::LibraryItem(const std::string& title, const std::string& desc, cons
 
     auto fontPlus = Font(72);
     _plusLabel.setText("+", dontSendNotification);
-    _plusLabel.setColour(Label::textColourId, Colours::grey);
+    _plusLabel.setColour(Label::textColourId, Colours::green);
     if (title != "") 
     {
         _plusLabel.setBounds(0, 50, WIDTH, 100);
@@ -46,7 +46,8 @@ LibraryItem::LibraryItem(const std::string& title, const std::string& desc, cons
     _plusLabel.setFont(fontPlus);
     _plusLabel.setJustificationType(Justification::centred);
     addAndMakeVisible(_plusLabel);
-    bool displayVersion = false;
+//    bool displayVersion = false;
+     bool displayVersion = true;
     // TODO: This approach is a POS. We need to make it more universal
     if (title == "P2P")
     {
@@ -55,6 +56,8 @@ LibraryItem::LibraryItem(const std::string& title, const std::string& desc, cons
         if (p2p.isInstalled()) {
             _version.setText(p2p.extractVersion(), dontSendNotification);
             displayVersion = true;
+	    addAndMakeVisible(_version);
+
         }
     } 
     else if (title == "Tray Client")
@@ -64,6 +67,7 @@ LibraryItem::LibraryItem(const std::string& title, const std::string& desc, cons
         if (tray.isInstalled()) {
             _version.setText(tray.extractVersion(), dontSendNotification);
             displayVersion = true;
+	    addAndMakeVisible(_version);
         }
     }
     else if (title == "Browser Plugin")
@@ -90,7 +94,7 @@ LibraryItem::~LibraryItem()
 
 void LibraryItem::paint(Graphics& g)
 {
-    g.setColour(Colours::grey);
+    g.setColour(Colours::green);
     g.drawRoundedRectangle(0, 0, WIDTH, HEIGHT, 4, 1);
 }
 
@@ -122,9 +126,9 @@ void LibraryItem::mouseUp(const juce::MouseEvent& e)
     }
     else if (res == 2)
     {
-        std::string windowTitle = "Removing ";
+        std::string windowTitle = "Updatiing ";
         windowTitle.append(_title);
-        auto t = new LibraryActionThread("remove", _title, windowTitle);
+        auto t = new LibraryActionThread("update", _title, windowTitle);
         t->launchThread();
         while (t->isRunning()) {
             sleep(1);
@@ -132,7 +136,13 @@ void LibraryItem::mouseUp(const juce::MouseEvent& e)
     } 
     else if (res == 3)
     {
-
+	std::string windowTitle = "Removing ";
+        windowTitle.append(_title);
+        auto t = new LibraryActionThread("uninstall", _title, windowTitle);
+        t->launchThread();
+        while (t->isRunning()) {
+            sleep(1);
+        }
     }
 }
 
@@ -249,14 +259,30 @@ void LibraryComponent::drawIntro() {
     _peersSectionLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_peersSectionLabel);
 
+  auto l = SubutaiLauncher::Log::instance()->logger();
 
     auto conf = SubutaiLauncher::Session::instance()->getConfManager();
 
     auto configs = conf->getConfigs();
     int i = 0;
     for (auto it = configs.begin(); it != configs.end(); it++) {
-        auto c = new LibraryItem((*it).title, (*it).description);
-        c->setBounds(i * 220+20, 100, LibraryItem::WIDTH, LibraryItem::HEIGHT);
+	std::string bs = (*it).file;
+	l->debug() << "LibraryComponent::drawIntro(): bs = " << bs << std::endl;
+	size_t index = 0;
+	std::string is = bs;
+	index = bs.find("install");
+	bs = bs.replace(index, 7, "update");
+	l->debug() << "LibraryComponent::drawIntro():bs = " << bs << std::endl;
+	std::string us = bs;
+	index = bs.find("update");
+	bs = bs.replace(index, 6, "remove");
+	l->debug() << "LibraryComponent::drawIntro():bs = " << bs << std::endl;
+	std::string rs = bs;
+
+	l->debug() << "is: " << is << ", us= " << us << ", rs=" << rs << std::endl;
+
+        auto c = new LibraryItem((*it).title, (*it).description, is, us, rs);
+        c->setBounds(i*220+20, 100, LibraryItem::WIDTH, LibraryItem::HEIGHT);
         addAndMakeVisible(c);
         _components.push_back(c);
         ++i;

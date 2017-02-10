@@ -80,9 +80,13 @@ void SubutaiLauncher::SL::open(const std::string& path)
     p.append(path);
     p.append(".py");
     l->info() << "SL open path: " << p << std::endl;
+
     FileSystem fs(_dir);
+//    l->info() << "FileSytem fs(_dir): " << _dir << std::endl;
+
+//    FileSystem fs();
     l->info() << "FileSystem fs(_dir): " << _dir << std::endl;
-    
+
     std::string f = path;
     f.append(".py");
     l->info() << "SL f: " << f << std::endl;

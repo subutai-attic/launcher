@@ -33,7 +33,7 @@ void SubutaiLauncher::ConfigurationManager::load()
 
 void SubutaiLauncher::ConfigurationManager::run()
 {
-	_configs.clear();
+    _configs.clear();
     auto l = Log::instance()->logger();
     l->debug() << "Reading configuration from " << _downloader->getOutputDirectory() << "/" << CONFIG_FILE << std::endl;
 	auto f = _file.substr(0, _file.size() - 3);

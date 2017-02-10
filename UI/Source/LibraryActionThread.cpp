@@ -54,9 +54,15 @@ void LibraryActionThread::run()
     l->debug() << "LibraryActionTread::run getDownloader" << std::endl;
 
     auto file = std::string(config.file);
+    size_t ind = 0;
+    ind = file.find(_process);
+    if (ind == std::string::npos){
+	ind = file.find("install");
+	file = file.replace(ind, 7, _process);
+    }
 
     l->debug() << "LibraryActionTread::run config.file " << file << std::endl;
-
+    std::string file_short = file;
     file.append(".py");
     d->reset();
 
@@ -84,7 +90,8 @@ void LibraryActionThread::run()
 
     auto nc = SubutaiLauncher::Session::instance()->getNotificationCenter();
     SubutaiLauncher::SL sl(d->getOutputDirectory());
-    sl.open(config.file);
+//    sl.open(config.file);
+    sl.open(file_short);
     auto t = sl.executeInThread();
 
     bool inProgress = true;
