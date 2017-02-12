@@ -88,6 +88,7 @@ class LibraryComponent : public juce::Component, public juce::ButtonListener
         void drawPostInstall();
         void drawFinished();
         void drawIntro();
+	void hideIntro();
         void onStepChange();
         void drawProgressButtons(bool next = true, bool back = true, bool cancel = true);
         void nextStep();

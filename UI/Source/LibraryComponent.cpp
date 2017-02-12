@@ -1,7 +1,7 @@
 /*
    ==============================================================================
 
-   LibraryComponent.cpp
+LibraryComponent.cpp
 Created: 5 Aug 2016 5:58:23pm
 Author:  crioto
 
@@ -296,16 +296,52 @@ void LibraryComponent::drawIntro() {
     addAndMakeVisible(_installButton);
     _installButton.setVisible(true);
     _installButton.setBounds(600, 20, 150, 35);
+    drawProgressButtons(false, false, false);
+
 
 }
 
+void LibraryComponent::hideIntro() {
+
+    _componentsSectionLabel.setVisible(false);
+    _peersSectionLabel.setVisible(false);
+
+    auto conf = SubutaiLauncher::Session::instance()->getConfManager();
+
+    int i = 0;
+    auto l = SubutaiLauncher::Log::instance()->logger();
+    for (auto c = _components.begin(); c != _components.end(); c++) 
+    {
+	l->debug() << "cmponent: " << (**c).WIDTH <<std::endl;
+	(**c).setVisible(false);
+        ++i;
+    }
+
+    for (auto p = _peers.begin(); p != _peers.end(); p++) 
+    {
+	l->debug() << "peer: " << (**p).WIDTH <<std::endl;
+	(**p).setVisible(false);
+        ++i;
+    }
+
+    _installButton.setVisible(false);
+}
+
+
 void LibraryComponent::drawSystemCheck() {
+    hideIntro();
+    drawProgressButtons(true, false, true);
     _systemCheck->setVisible(true);
     _systemCheck->setBounds(20, 20, 1024-250-40, 768 - 60 - 40);
     drawProgressButtons(true, false, true);
+    _systemConfigure->setVisible(false);
+    _download->setVisible(false);
 }
 
 void LibraryComponent::drawSystemConfigure() {
+    drawProgressButtons(true, true, true);
+    _systemCheck->setVisible(false);
+    _download->setVisible(false);
     _systemConfigure->setVisible(true);
     _systemConfigure->setBounds(20, 20, 1024-250-40, 768 - 60 - 40);
     drawProgressButtons(true, true, true);
@@ -314,7 +350,7 @@ void LibraryComponent::drawSystemConfigure() {
 
 void LibraryComponent::drawDownload() {
 #if LAUNCHER_LINUX
-    const std::string& file("launcher-linux-install.py");
+    const std::string& file("launcher-linux-install.py_tt");
 #elif LAUNCHER_WINDOWS
 	const std::string& file("launcher-windows-install.py");
 #elif LAUNCHER_MACOS
@@ -322,6 +358,8 @@ void LibraryComponent::drawDownload() {
 #else
 #error Unknown Platform
 #endif
+    _systemCheck->setVisible(false);
+    _systemConfigure->setVisible(false);
     _download->setWithPeer(_systemConfigure->isPeerInstallChecked());
     _download->setVisible(true);
     _download->setBounds(20, 20, 1024-250-40, 768 - 60 - 40);
