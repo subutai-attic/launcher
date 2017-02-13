@@ -1,7 +1,5 @@
 #include "SubutaiProcess.h"
 
-
-
 SubutaiLauncher::SubutaiProcess::SubutaiProcess()
 {
 
@@ -176,6 +174,7 @@ std::string SubutaiLauncher::SubutaiProcess::getOutputBuffer()
 		throw SubutaiException("Reading from closed pipe");
 	}
 	char buffer[4096];
+	memset(buffer, 0, 4096);
 	int n;
 	do {
 		read(_outRead, buffer, sizeof(buffer));

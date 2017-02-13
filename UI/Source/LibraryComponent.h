@@ -25,6 +25,7 @@ Author:  crioto
 #include "ConfigurationManager.h"
 #include "Vars.h"
 #include "Session.h"
+#include "SubutaiProcess.h"
 
 typedef enum {
     INTRO,
@@ -35,7 +36,8 @@ typedef enum {
     PREINSTALL,
     INSTALL,
     POSTINSTALL,
-    FINISHED
+    FINISHED,
+    UNINSTALL
 } InstallStep;
 
 class LibrarySystemCheck;
@@ -123,6 +125,15 @@ class LibrarySystemCheck : public juce::Component {
         void resized();
         void addLine(juce::Label* field, juce::Label* value, juce::Label* hint, std::string text, std::string hintText);
     private:
+        
+	juce::Label _osField;
+        juce::Label _osValue;
+        juce::Label _osHint;
+
+        juce::Label _if64Field;
+        juce::Label _if64Value;
+        juce::Label _if64Hint;
+
         juce::Label _numCpuField;
         juce::Label _numCpuValue;
         juce::Label _numCpuHint;

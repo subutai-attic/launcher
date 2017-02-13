@@ -9,7 +9,6 @@ Author:  crioto
 */
 
 #include "LibraryComponent.h"
-
 // ============================================================================
 
 LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, const std::string& is, const std::string& us, const std::string& rs) : 
@@ -312,7 +311,6 @@ void LibraryComponent::hideIntro() {
     auto l = SubutaiLauncher::Log::instance()->logger();
     for (auto c = _components.begin(); c != _components.end(); c++) 
     {
-	l->debug() << "cmponent: " << (**c).WIDTH <<std::endl;
 	(**c).setVisible(false);
         ++i;
     }
@@ -477,38 +475,70 @@ void LibraryComponent::waitDownloadCompleteImpl() {
             return;
         }
     }
-    drawProgressButtons(true, false, true);
+    drawProgressButtons(true, false, true);	
 }
 
 // ============================================================================
 
 LibrarySystemCheck::LibrarySystemCheck() : _numLines(1) 
 {
+    auto l = SubutaiLauncher::Log::instance()->logger();
+
+    SubutaiLauncher::Environment env;
+    
     //Notification note;
+    addAndMakeVisible(_osField);
+    addAndMakeVisible(_osValue);
+    _osValue.setText(env.versionOS(), dontSendNotification);
+    addAndMakeVisible(_osHint);
+    addLine(&_osField, &_osValue, &_osHint, "OS vesion", "We need version > 16");
+
+    addAndMakeVisible(_if64Field);
+    addAndMakeVisible(_if64Value);
+    int intBuf = 0;
+    //intBuf = env.is64();
+    //intBuf = env.osArch();
+    //_if64Value.setText(std::to_string(intBuf), dontSendNotification);
+    _if64Value.setText(env.cpuArch(), dontSendNotification);
+    addAndMakeVisible(_if64Hint);
+    addLine(&_if64Field, &_if64Value, &_if64Hint, "Processor architecture", "We need x64 architecture");
+
     addAndMakeVisible(_numCpuField);
     addAndMakeVisible(_numCpuValue);
+    intBuf = 0;
+    //intBuf = env.processorNum();
+    intBuf = env.cpuNum();
+    _numCpuValue.setText(std::to_string(intBuf), dontSendNotification);
     addAndMakeVisible(_numCpuHint);
     addLine(&_numCpuField, &_numCpuValue, &_numCpuHint, "Number of CPU Cores", "Each peer requires at least 2 CPU cores");
 
     addAndMakeVisible(_maxMemoryField);
     addAndMakeVisible(_maxMemoryValue);
     addAndMakeVisible(_maxMemoryHint);
+    intBuf = env.ramSize();
+    _maxMemoryValue.setText(std::to_string(intBuf), dontSendNotification);
     addLine(&_maxMemoryField, &_maxMemoryValue, &_maxMemoryHint, "Total System Memory", "4GB will be taken to each peer's virtual machine");
-
-    addAndMakeVisible(_vboxField);
-    addAndMakeVisible(_vboxValue);
-    addAndMakeVisible(_vboxHint);
-    addLine(&_vboxField, &_vboxValue, &_vboxHint, "Oracle VirtualBox version", "We're running our peer on VirtualBox VMs");
 
     addAndMakeVisible(_vtxField);
     addAndMakeVisible(_vtxValue);
     addAndMakeVisible(_vtxHint);
+    _vtxValue.setText(env.vtxEnabled(), dontSendNotification);
     addLine(&_vtxField, &_vtxValue, &_vtxHint, "Hardware Virtualization Support", "VTx should be supported by your CPU");
 
+    addAndMakeVisible(_vboxField);
+    addAndMakeVisible(_vboxValue);
+    addAndMakeVisible(_vboxHint);
+    intBuf = env.versionVBox();
+    _vboxValue.setText(std::to_string(intBuf), dontSendNotification);
+    addLine(&_vboxField, &_vboxValue, &_vboxHint, "Oracle VirtualBox version", "We're running our peer on VirtualBox VMs");
+
+/*
     addAndMakeVisible(_sshField);
     addAndMakeVisible(_sshValue);
     addAndMakeVisible(_sshHint);
+    _sshValue.setText( env.versionSSH(), dontSendNotification);
     addLine(&_sshField, &_sshValue, &_sshHint, "SSH client version", "SSH client is used to configure peer during installation");
+*/
 
     /* 
        _info.setText("ing...", dontSendNotification);
@@ -531,7 +561,7 @@ void LibrarySystemCheck::addLine(Label* field, Label* value, Label* hint, std::s
     field->setFont(font);
     field->setJustificationType(Justification::top);
 
-    value->setText("Checking...", dontSendNotification);
+    //value->setText("Checking...", dontSendNotification);
     value->setColour(Label::textColourId, Colours::white);
     value->setBounds(320, _numLines * 50, 800, 50);
     value->setFont(font);

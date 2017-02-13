@@ -4,8 +4,10 @@
 #include "Vars.h"
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
+#include <string.h>
 #if LAUNCHER_LINUX
 #include <sys/types.h>
 #include <sys/wait.h>
