@@ -32,7 +32,7 @@ LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, con
 
     auto fontPlus = Font(72);
     _plusLabel.setText("+", dontSendNotification);
-    _plusLabel.setColour(Label::textColourId, Colours::green);
+    _plusLabel.setColour(Label::textColourId, Colours::white);
     if (title != "") 
     {
         _plusLabel.setBounds(0, 50, WIDTH, 100);
@@ -53,10 +53,9 @@ LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, con
         SubutaiLauncher::P2P p2p;
         p2p.findInstallation();
         if (p2p.isInstalled()) {
-            _version.setText(p2p.extractVersion(), dontSendNotification);
+            _version.setText("Version: " + p2p.extractVersion(), dontSendNotification);
             displayVersion = true;
 	    addAndMakeVisible(_version);
-
         }
     } 
     else if (title == "Tray Client")
@@ -64,7 +63,7 @@ LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, con
         SubutaiLauncher::Tray tray;
         tray.findInstallation();
         if (tray.isInstalled()) {
-            _version.setText(tray.extractVersion(), dontSendNotification);
+            _version.setText("Version: " + tray.extractVersion(), dontSendNotification);
             displayVersion = true;
 	    addAndMakeVisible(_version);
         }
@@ -79,9 +78,13 @@ LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, con
     _version.setBounds(0, HEIGHT-30, WIDTH, 40);
     _version.setFont(verFont);
     _version.setJustificationType(Justification::centredLeft);
+    addAndMakeVisible(_version);
+    _version.setVisible(true);
+
     if (displayVersion)
     {
         addAndMakeVisible(_version);
+	_version.setVisible(true);
     }
 
 }
@@ -93,7 +96,7 @@ LibraryItem::~LibraryItem()
 
 void LibraryItem::paint(Graphics& g)
 {
-    g.setColour(Colours::green);
+    g.setColour(Colours::white);
     g.drawRoundedRectangle(0, 0, WIDTH, HEIGHT, 4, 1);
 }
 
@@ -176,7 +179,8 @@ LibraryComponent::~LibraryComponent() {
 }
 
 void LibraryComponent::paint(Graphics& g) {
-    g.fillAll (Colour (0xff222222));
+    //g.fillAll (Colour (0xff222222));
+    g.fillAll (Colour (0xff333333));
     g.setFont (Font (16.0f));
     g.setColour (Colours::white);
 
@@ -223,7 +227,7 @@ void LibraryComponent::buttonClicked(Button* button) {
         _step = SYSTEM_CHECK;
         /*  
             _installButton.setEnabled(false);
-            auto dialog = new InstallationDialog("Subutai Installation", Colours::grey, DocumentWindow::allButtons);
+            auto dialog = new InstallationDialog("Subutai Installation", Colours::blue, DocumentWindow::allButtons);
             dialog->setBounds(0, 0, 800, 640);
             dialog->centreWithSize(dialog->getWidth(), dialog->getHeight());
             dialog->setTitleBarHeight(0);
@@ -317,7 +321,7 @@ void LibraryComponent::hideIntro() {
 
     for (auto p = _peers.begin(); p != _peers.end(); p++) 
     {
-	l->debug() << "peer: " << (**p).WIDTH <<std::endl;
+	//l->debug() << "peer: " << (**p).WIDTH <<std::endl;
 	(**p).setVisible(false);
         ++i;
     }
@@ -350,7 +354,7 @@ void LibraryComponent::drawDownload() {
 #if LAUNCHER_LINUX
     const std::string& file("launcher-linux-install.py_tt");
 #elif LAUNCHER_WINDOWS
-	const std::string& file("launcher-windows-install.py");
+    const std::string& file("launcher-windows-install.py");
 #elif LAUNCHER_MACOS
 #error Not Implemented for this platform
 #else
@@ -774,7 +778,7 @@ void LibraryDownload::downloadImpl() {
 #if LAUNCHER_LINUX
             usleep(1000);
 #elif LAUNCHER_WINDOWS
-			Sleep(1000);
+	    Sleep(1000);
 #elif LAUNCHER_MACOS
 #error Not Implemented for this platform
 #else
@@ -800,6 +804,7 @@ void LibraryDownload::updateProgress(long p) {
     std::sprintf(val, "%ld / %ld", _progress + p, _totalSize);
     _sizeProgress.setText(std::string(val), dontSendNotification);
     _progressBar->setValue((float)((_progress + p)/(_totalSize/100)));
+    _progressBar->setVisible(true);
     resized();
 }
 

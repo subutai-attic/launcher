@@ -23,6 +23,7 @@ void LibraryActionThread::run()
     auto l = SubutaiLauncher::Log::instance()->logger();
     l->debug() << "Starting dialog thread" << std::endl;
     setProgress (-1.0); // setting a value beyond the range 0 -> 1 will show a spinning bar..
+    //setProgress (0); // setting a value beyond the range 0 -> 1 will show a spinning bar..
     setStatusMessage ("Download installation script");
 
     auto conf = SubutaiLauncher::Session::instance()->getConfManager();
@@ -86,7 +87,6 @@ void LibraryActionThread::run()
     }
 
     l->debug() << d->getOutputDirectory() << "/" << file << " download complete" << std::endl;
-
 
     auto nc = SubutaiLauncher::Session::instance()->getNotificationCenter();
     SubutaiLauncher::SL sl(d->getOutputDirectory());
@@ -153,26 +153,80 @@ void LibraryActionThread::run()
 
 void LibraryActionThread::threadComplete (bool userPressedCancel)
 {
+    char m1[255];
+    char m2[255];
+    int n = 0;
+    unsigned pn = process_no();
+
+    auto l = SubutaiLauncher::Log::instance()-> logger();
+
     if (_error)
     {
-        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
-                "Error occured",
-                "Unknown error occured during process");
+	strcpy(m1, "Installation process stopped\0");
+	strcpy(m2, "Component was not installed!\0");
     } else if (userPressedCancel)
     {
-        juce::AlertWindow::showMessageBoxAsync (juce::AlertWindow::WarningIcon,
-                "Installation process stopped",
-                "Component was not installed!");
+	switch (pn){
+	    case 1: 
+		strcpy(m1, "Installation process stopped\0");
+		strcpy(m2, "Component was not installed!\0");
+		break;
+	    case 2: 
+		strcpy(m1, "Update process stopped\0");
+		strcpy(m2, "Component was not updated!\0");
+		break;
+	    case 3: 
+		strcpy(m1, "Uninstall process stopped\0");
+		strcpy(m2, "Component was not uninstalled!\0");
+		break;
+	    default: 
+		strcpy(m1, "Process stopped\0");
+		strcpy(m2, "Unknown error!\0");
+		break;    
+	}        
     }
     else
     {
         // thread finished normally..
-        juce::AlertWindow::showMessageBoxAsync (juce::AlertWindow::WarningIcon,
-                "Installation has been completed",
-                "Component is now installed!");
+	n = _process.find("uninstall", 0);
+	switch (pn){
+	    case 1: 
+		strcpy(m1, "Installation has been completed\0");
+		strcpy(m2, "Component is installed!\0");
+		break;
+	    case 2: 
+		strcpy(m1, "Update process has been completed\0");
+		strcpy(m2, "Component is updated!\0");
+		break;
+	    case 3: 
+		strcpy(m1, "Uninstall has been completed\0");
+		strcpy(m2, "Component is uninstalled!\0");
+		break;
+	    default: 
+		strcpy(m1, "Process completed\0");
+		strcpy(m2, "Process completed without errors!\0");
+		break;    
+        }
     }
+    juce::AlertWindow::showMessageBoxAsync (juce::AlertWindow::WarningIcon,
+                m1, m2);
 
     // ..and clean up by deleting our thread object..
     delete this;
 }
 
+unsigned LibraryActionThread::process_no(){
+    int n = _process.find("uninstall", 0);
+    if (n !=std::string::npos){
+	return 3;
+    }
+    n = _process.find("install", 0);
+    if (n !=std::string::npos){
+	return 1;
+    } 
+    n = _process.find("update", 0);
+    if (n !=std::string::npos){
+	return 2;
+    }
+    return 0;
+}

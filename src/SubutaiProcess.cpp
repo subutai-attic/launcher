@@ -203,6 +203,7 @@ std::string SubutaiLauncher::SubutaiProcess::getErrorBuffer()
 		throw SubutaiException("Reading from closed pipe");
 	}
 	char buffer[4096];
+	memset(buffer, 0, 4096);
 	int n;
 	do {
 		read(_errRead, buffer, sizeof(buffer));

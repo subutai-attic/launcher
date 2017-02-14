@@ -13,7 +13,7 @@ class LibraryActionThread  : public juce::ThreadWithProgressWindow
         bool _error;
     public:
         LibraryActionThread(const std::string& process, const std::string& component, const std::string& title);
-
+	unsigned process_no();
         bool isRunning();
         void run() override;
         void threadComplete (bool userPressedCancel) override;
