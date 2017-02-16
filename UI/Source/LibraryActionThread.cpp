@@ -18,12 +18,53 @@ bool LibraryActionThread::isRunning()
 
 void LibraryActionThread::run() 
 {
+    auto l = SubutaiLauncher::Log::instance()->logger();
+    l->debug() << "LibraryAT::run  process: " << _process << " process_no:" << process_no() << std::endl;
+    if (_component == "P2P")
+    {
+        SubutaiLauncher::P2P p2p;
+        p2p.findInstallation();
+	l->debug() << "LibraryAT::run  p2p is installed: " << std::to_string(p2p.isInstalled()) << std::endl;
+        //if (p2p.isInstalled() && process_no() == 1) {
+	if (p2p.findInstallation() && process_no() == 1) {
+	    l->debug() << "LAT::run  p2p installed already " << std::endl;
+	    //Show alert and return
+	    //_error = true;
+	    return;
+        }
+	//if (!p2p.isInstalled() && process_no() == 3) {
+	if (!p2p.findInstallation() && process_no() == 3) {
+	    l->debug() << "LibraryAT::run p2p is uninstalled already " << std::endl;
+	    //Show alert and return
+	    //_error = true;
+	    return;
+        }
+    } 
+    else if (_component == "Tray Client")
+    {
+        SubutaiLauncher::Tray tray;
+        tray.findInstallation();
+	//l->debug() << "LibraryComponent::constructor tray is installed: " << tray.isInstalled() << std::endl;
+        if (tray.findInstallation() && process_no() == 1) {
+	    //l->debug() << "LibraryComponent::constructor tray version: " << tray.extractVersion() << std::endl;
+	    //_error = true;
+	    return;
+        }
+	if (!tray.findInstallation() && process_no() == 3) {
+	    //l->debug() << "LibraryComponent::constructor tray version: " << tray.extractVersion() << std::endl;
+	    //_error = true;
+	    return;
+        }
+    }
+    else if (_component == "Browser Plugin")
+    {
+
+    }
+
     _running = true;
     _error = false;
-    auto l = SubutaiLauncher::Log::instance()->logger();
-    l->debug() << "Starting dialog thread" << std::endl;
+    l->debug() << "LAT::run Starting dialog thread" << std::endl;
     setProgress (-1.0); // setting a value beyond the range 0 -> 1 will show a spinning bar..
-    //setProgress (0); // setting a value beyond the range 0 -> 1 will show a spinning bar..
     setStatusMessage ("Download installation script");
 
     auto conf = SubutaiLauncher::Session::instance()->getConfManager();
@@ -71,13 +112,14 @@ void LibraryActionThread::run()
 
     d->setFilename(file);
 
-    l->debug() << "LibraryActionTread::run setFilename " << file << std::endl;
+    l->debug() << "LibraryActionTread::run setFilename " << file << " file short: " << file_short << std::endl;
 
     auto dt = d->download();
     
     l->debug() << "LibraryActionTread::run d->download" << std::endl;
 
     dt.detach();
+
     while (!d->isDone())
     {
         if (threadShouldExit()) {
@@ -86,11 +128,12 @@ void LibraryActionThread::run()
         }
     }
 
-    l->debug() << d->getOutputDirectory() << "/" << file << " download complete" << std::endl;
+    l->debug() << "LATh::run " << d->getOutputDirectory() << "/" << file << " download complete" << std::endl;
 
     auto nc = SubutaiLauncher::Session::instance()->getNotificationCenter();
     SubutaiLauncher::SL sl(d->getOutputDirectory());
 //    sl.open(config.file);
+    l->debug() << "LATh::run file_short:" << d->getOutputDirectory() << "/" << file_short  << std::endl;
     sl.open(file_short);
     auto t = sl.executeInThread();
 
@@ -162,8 +205,8 @@ void LibraryActionThread::threadComplete (bool userPressedCancel)
 
     if (_error)
     {
-	strcpy(m1, "Installation process stopped\0");
-	strcpy(m2, "Component was not installed!\0");
+	strcpy(m1, "Process stopped\0");
+	strcpy(m2, "Process was not completed!\0");
     } else if (userPressedCancel)
     {
 	switch (pn){

@@ -18,6 +18,8 @@ LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, con
     _updateScript(us),
     _removeScript(rs)
 {
+    auto l = SubutaiLauncher::Log::instance()->logger();
+
     if (title != "") 
     {
         auto font = Font(24);
@@ -52,7 +54,10 @@ LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, con
     {
         SubutaiLauncher::P2P p2p;
         p2p.findInstallation();
-        if (p2p.isInstalled()) {
+	//l->debug() << "LibraryComponent::constructor p2p is installed: " << p2p.isInstalled() << std::endl;
+        //if (p2p.isInstalled()) {
+	if (p2p.findInstallation()) {
+	    //l->debug() << "LibraryComponent::constructor p2p version: " << p2p.extractVersion() << std::endl;
             _version.setText("Version: " + p2p.extractVersion(), dontSendNotification);
             displayVersion = true;
 	    addAndMakeVisible(_version);
@@ -62,7 +67,10 @@ LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, con
     {
         SubutaiLauncher::Tray tray;
         tray.findInstallation();
-        if (tray.isInstalled()) {
+	l->debug() << "LibraryComponent::constructor tray is installed: " << tray.findInstallation() << std::endl;
+        //if (tray.isInstalled()) {
+	if (tray.findInstallation()) {
+	    l->debug() << "LibraryComponent::constructor tray version: " << tray.extractVersion() << std::endl;
             _version.setText("Version: " + tray.extractVersion(), dontSendNotification);
             displayVersion = true;
 	    addAndMakeVisible(_version);
@@ -79,7 +87,7 @@ LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, con
     _version.setFont(verFont);
     _version.setJustificationType(Justification::centredLeft);
     addAndMakeVisible(_version);
-    _version.setVisible(true);
+    //_version.setVisible(true);
 
     if (displayVersion)
     {
@@ -108,9 +116,10 @@ void LibraryItem::resized()
 void LibraryItem::mouseUp(const juce::MouseEvent& e)
 {
     juce::PopupMenu menu;
+
     menu.addItem(1, "Install");
     menu.addItem(2, "Update");
-    menu.addItem(3, "Remove");
+    menu.addItem(3, "Remove");    
 
     const int res = menu.show();
     if (res == 0) {
@@ -262,8 +271,8 @@ void LibraryComponent::drawIntro() {
     _peersSectionLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_peersSectionLabel);
 
-  auto l = SubutaiLauncher::Log::instance()->logger();
 
+  auto l = SubutaiLauncher::Log::instance()->logger();
     auto conf = SubutaiLauncher::Session::instance()->getConfManager();
 
     auto configs = conf->getConfigs();
@@ -278,10 +287,9 @@ void LibraryComponent::drawIntro() {
 	l->debug() << "LibraryComponent::drawIntro():bs = " << bs << std::endl;
 	std::string us = bs;
 	index = bs.find("update");
-	bs = bs.replace(index, 6, "remove");
+	bs = bs.replace(index, 6, "uninstall");
 	l->debug() << "LibraryComponent::drawIntro():bs = " << bs << std::endl;
 	std::string rs = bs;
-
 	l->debug() << "is: " << is << ", us= " << us << ", rs=" << rs << std::endl;
 
         auto c = new LibraryItem((*it).title, (*it).description, is, us, rs);
@@ -325,7 +333,8 @@ void LibraryComponent::hideIntro() {
 	(**p).setVisible(false);
         ++i;
     }
-
+    
+    drawProgressButtons(false, false, false);
     _installButton.setVisible(false);
 }
 
@@ -403,18 +412,21 @@ void LibraryComponent::drawProgressButtons(bool next, bool back, bool cancel) {
         _nextButton.setEnabled(true);
     } else {
         _nextButton.setEnabled(false);
+	_nextButton.setVisible(false);
     }
     if (back) {
         _backButton.setBounds(540, 700, 100, 30);
         _backButton.setEnabled(true);
     } else {
         _backButton.setEnabled(false);
+	_backButton.setVisible(false);
     }
     if (cancel) {
         _cancelButton.setBounds(420, 700, 100, 30);
         _cancelButton.setEnabled(true);
     } else {
         _cancelButton.setEnabled(false);
+        _cancelButton.setVisible(false);
     }
 }
 

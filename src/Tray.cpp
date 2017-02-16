@@ -1,6 +1,6 @@
 #include "Tray.h"
 
-const std::string SubutaiLauncher::Tray::BIN = "subutai-tray";
+const std::string SubutaiLauncher::Tray::BIN = "SubutaiTray";
 
 SubutaiLauncher::Tray::Tray()
 {
@@ -48,13 +48,14 @@ std::string SubutaiLauncher::Tray::extractVersion()
 
 	SubutaiProcess p;
 	p.launch(BIN, args, _location);
+	std::string res;
+	std::vector<std::string> vres;
 	if (p.wait() == 0) {
-		_version = p.getOutputBuffer();
-        size_t pos = _version.find_first_of("-");
-        if (pos != std::string::npos) {
-            _version = _version.substr(0, pos);
-        }
-		return _version;
+	    res = p.getOutputBuffer();
+	    SubutaiString st(res);
+	    vres = st.ssplit("\n");
+	    _version = vres.back();
+	    return _version;
 	}
 	return "";
 }

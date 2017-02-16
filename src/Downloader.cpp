@@ -32,6 +32,7 @@ void SubutaiLauncher::Downloader::reset()
 void SubutaiLauncher::Downloader::setFilename(const std::string& filename)
 {
     _filename = filename;
+    Log::instance()->logger()->debug() << "Downloader::setFilename after" << std::endl;
 }
 
 std::string SubutaiLauncher::Downloader::buildRequest(std::string path, std::string key, std::string value)
@@ -95,12 +96,14 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo()
 
 std::thread SubutaiLauncher::Downloader::download()
 {
+    Log::instance()->logger()->info() << "Downloader::download() start of sub, file name: " << _filename << std::endl;
     info();
+    Log::instance()->logger()->info() << "Downloader::download() info received: " << _filename << std::endl;
     _progress = 0;
-    Log::instance()->logger()->info() << "Downloading " << _filename << std::endl;
     _done = false;
-    Log::instance()->logger()->info() << "Downloading before thread"  << std::endl;
+    Log::instance()->logger()->info() << "Downloader::download() Downloading before thread"  << std::endl;
     return std::thread([=] { downloadImpl(); });
+    Log::instance()->logger()->info() << "Downloader::download() after thread start"  << std::endl;
 }
 
 void SubutaiLauncher::Downloader::downloadImpl()

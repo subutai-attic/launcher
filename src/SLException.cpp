@@ -6,6 +6,8 @@ SubutaiLauncher::SLException::SLException(const std::string& msg, int code) : Su
 }
 
 const char* SubutaiLauncher::SLException::name() const throw() {
-	return "Scripting Language Exception";
+	
+    Log::instance()->logger()->debug() << "SSLException "  << " code: "  << std::endl;
+    return "Scripting Language Exception";
 }
 
