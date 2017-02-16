@@ -24,6 +24,7 @@ namespace SubutaiLauncher {
             Environment();
             ~Environment();
 	    std::string versionOS();
+	    std::string distroOS(std::string ar);
 	    std::string cpuArch();
 	    unsigned cpuNum();
             unsigned processorNum();

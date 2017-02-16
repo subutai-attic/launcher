@@ -146,11 +146,53 @@ std::string SubutaiLauncher::Environment::vtxEnabled()
 
 std::string SubutaiLauncher::Environment::versionOS() 
 {
-    auto l = Log::instance()->logger();
-    std::string os = Poco::Environment::osDisplayName() + " " + Poco::Environment::osVersion();
-    //l->debug() << "SubutaiLAuncher::Environment: os=" << os << std::endl;
+    std::string os;
+#if LAUNCHER_LINUX
+    os = distroOS("-d");
+    os.append(" ");
+    os.append(distroOS("-c"));
+    SubutaiString sstr(os);
+    os = sstr.remove("\n", " ");
     return os;
+#elif LAUNCHER_WINDOWS || LAUNCHER_MACOS
+    os = Poco::Environment::osDisplayName() + " " + Poco::Environment::osVersion();
+    return os;
+#endif
+return "Can not define OS";
 }
+
+std::string SubutaiLauncher::Environment::distroOS(std::string ar) 
+{
+    auto l = Log::instance()->logger();
+
+    SubutaiProcess sp;
+    std::string out;
+    std::string err;
+    std::vector<std::string> args;
+    std::string res;
+
+#if LAUNCHER_LINUX
+    args.push_back(ar);
+    sp.launch("lsb_release", args, "/usr/bin");
+    if (sp.wait() == 0) 
+    {
+	out = sp.getOutputBuffer();
+	err = sp.getErrorBuffer();
+    }
+
+    SubutaiString sstr(out);
+    std::vector<std::string> splitted = sstr.ssplit("\t");
+    out = splitted.back();
+    l->debug() << "Environment::distroOS output res" << res  << std::endl;
+    return out;
+#elif LAUNCHER_WINDOWS
+    return std::string dis = Poco::Environment::osDisplayName();
+#elif LAUNCHER_MACOS
+#endif
+    return "";
+}
+
+
 
 std::string SubutaiLauncher::Environment::cpuArch() 
 {
