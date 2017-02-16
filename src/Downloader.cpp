@@ -32,7 +32,7 @@ void SubutaiLauncher::Downloader::reset()
 void SubutaiLauncher::Downloader::setFilename(const std::string& filename)
 {
     _filename = filename;
-    Log::instance()->logger()->debug() << "Downloader::setFilename after" << std::endl;
+    Log::instance()->logger()->debug() << "Downloader::setFilename after" << _filename << std::endl;
 }
 
 std::string SubutaiLauncher::Downloader::buildRequest(std::string path, std::string key, std::string value)
@@ -58,6 +58,7 @@ std::string SubutaiLauncher::Downloader::buildRequest(std::string path, std::str
 
 bool SubutaiLauncher::Downloader::retrieveFileInfo()
 {
+    auto l = Log::instance()->logger();
     Poco::Net::HTTPSClientSession s(HOST, PORT);
     std::string path(REST);
     path.append("/info");
@@ -72,11 +73,15 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo()
     std::string output;
     Poco::StreamCopier::copyToString(rs, output);
 
+    l->debug() << "Before JSon(change to Poco!): responce: " << output << std::endl;
+
     // TODO: Replace JSON lib with Poco
     Json::Value root;
     std::istringstream str(output);
     str >> root;
 
+    l->debug() << "JSon(change to Poco!): root copied: " << std::endl;
+    
     const Json::Value owners = root["owner"];
     for (unsigned int i = 0; i < owners.size(); ++i) {
         _file.owner = owners[i].asString();
@@ -85,7 +90,6 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo()
     _file.id = root.get("id", "").asString();
     _file.size = root.get("size", "").asLargestInt();
 
-    auto l = Log::instance()->logger();
     l->debug() << "Owner: " << _file.owner << std::endl;
     l->debug() << "Name: " << _file.name << std::endl;
     l->debug() << "ID: " << _file.id << std::endl;

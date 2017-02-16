@@ -2,7 +2,17 @@
 
 const std::string SubutaiLauncher::VirtualBox::BIN = "vboxmanage";
 
-SubutaiLauncher::VirtualBox::VirtualBox() : _version("") 
+SubutaiLauncher::VirtualBox::VirtualBox()
+{
+     _version = ""; 
+}
+
+SubutaiLauncher::VirtualBox::~VirtualBox() 
+{
+
+}
+
+bool SubutaiLauncher::VirtualBox::findInstallation()
 {
 	auto env = new Environment();
 	SubutaiString str(env->getVar("PATH", ""));
@@ -17,15 +27,12 @@ SubutaiLauncher::VirtualBox::VirtualBox() : _version("")
 			_location = _path;
 			_path.append(FileSystem::DELIM);
 			_path.append(BIN);
-			break;
+			return true;
 		}
 	}
+	return false;
 }
 
-SubutaiLauncher::VirtualBox::~VirtualBox() 
-{
-
-}
 
 bool SubutaiLauncher::VirtualBox::isInstalled() 
 {
@@ -42,12 +49,22 @@ bool SubutaiLauncher::VirtualBox::isUpdateRequired()
 	return false;
 }
 
-std::string SubutaiLauncher::VirtualBox::retrieveVersion()
+std::string SubutaiLauncher::VirtualBox::extractVersion()
 {
 	if (_version != "") {
-		return _version;
+	    return _version;
 	}
 
+	std::vector<std::string> args;
+	args.push_back("-v");
+
+	SubutaiProcess p;
+	p.launch(BIN, args, _location);
+	if (p.wait() == 0) {
+	    _version = p.getOutputBuffer();
+	    return _version;
+	}
+	return "";
 }
 
 void SubutaiLauncher::VirtualBox::getVms()

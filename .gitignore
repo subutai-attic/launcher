@@ -6,6 +6,8 @@ CLI/bin
 CLI/build
 *_back
 scripts_tt
+bui.sh
+kurjun/*
 
 # extra libs
 /third-party/python*

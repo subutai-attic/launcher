@@ -28,10 +28,11 @@ namespace SubutaiLauncher {
             static const std::string BIN;
             VirtualBox();
             ~VirtualBox();
+	    bool findInstallation();
             bool isInstalled();
             bool isRunning();
             bool isUpdateRequired();
-            std::string retrieveVersion();
+            std::string extractVersion();
             void getVms();
             std::vector<SubutaiVM> parseVms(const std::string& buffer);
             void addVm(SubutaiVM vm);

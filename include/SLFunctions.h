@@ -9,6 +9,7 @@
 #include "Session.h"
 #include "Install.h"
 #include "NotificationCenter.h"
+#include "Environment.h"
 
 namespace SubutaiLauncher {
 
@@ -42,6 +43,12 @@ namespace SubutaiLauncher {
 
     static PyObject* SL_GetDevVersion(PyObject* self, PyObject* args) {
         return Py_BuildValue("s", "4.0.6");
+    }
+
+    static PyObject* SL_getDistro(PyObject* self, PyObject* args) {
+	Environment e;
+        std::string distro = e.distroOS("-c");
+        return Py_BuildValue("s", distro);
     }
 
     static PyObject* SL_Shutdown(PyObject* self, PyObject* args) {
@@ -94,6 +101,7 @@ namespace SubutaiLauncher {
             return NULL;
         std::printf("Requested download of a file: %s\n", sl_filename);
         auto downloader = Session::instance()->getDownloader();
+	PyErr_Print();
         downloader->setFilename(sl_filename);
         if (!downloader->retrieveFileInfo()) {
             std::printf("Failed to retrieve file data");
@@ -265,6 +273,7 @@ namespace SubutaiLauncher {
         {"Shutdown", SL_Shutdown, METH_VARARGS, "Finalizes the script"},
         {"GetMasterVersion", SL_GetMasterVersion, METH_VARARGS, "Returns master version of a product"},
         {"GetDevVersion", SL_GetDevVersion, METH_VARARGS, "Returns dev version of a product"},
+        {"getDistro", SL_getDistro, METH_VARARGS, "Returns OS distro"},
         {NULL, NULL, 0, NULL}
     };
 

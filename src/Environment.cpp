@@ -169,7 +169,6 @@ std::string SubutaiLauncher::Environment::distroOS(std::string ar)
     std::string out;
     std::string err;
     std::vector<std::string> args;
-    std::string res;
 
 #if LAUNCHER_LINUX
     args.push_back(ar);
@@ -183,7 +182,7 @@ std::string SubutaiLauncher::Environment::distroOS(std::string ar)
     SubutaiString sstr(out);
     std::vector<std::string> splitted = sstr.ssplit("\t");
     out = splitted.back();
-    l->debug() << "Environment::distroOS output res" << res  << std::endl;
+    l->debug() << "Environment::distroOS output " << out  << std::endl;
     return out;
 #elif LAUNCHER_WINDOWS
     return std::string dis = Poco::Environment::osDisplayName();

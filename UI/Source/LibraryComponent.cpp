@@ -80,6 +80,19 @@ LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, con
     {
 
     }
+    else if (title == "VBox")
+    {
+        SubutaiLauncher::VirtualBox vbox;
+        vbox.findInstallation();
+	l->debug() << "LibraryComponent::constructor vbox is installed: " << vbox.findInstallation() << std::endl;
+        //if (vbox.isInstalled()) {
+	if (vbox.findInstallation()) {
+	    l->debug() << "LibraryComponent::constructor vbox version: " << vbox.extractVersion() << std::endl;
+            _version.setText("Version: " + vbox.extractVersion(), dontSendNotification);
+            displayVersion = true;
+	    addAndMakeVisible(_version);
+        }
+    }
     auto verFont = Font(12);
     _version.setInterceptsMouseClicks(false, true);
     _version.setColour(Label::textColourId, Colours::white);
