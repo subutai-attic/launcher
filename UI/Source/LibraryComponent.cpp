@@ -70,7 +70,7 @@ LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, con
 	l->debug() << "LibraryComponent::constructor tray is installed: " << tray.findInstallation() << std::endl;
         //if (tray.isInstalled()) {
 	if (tray.findInstallation()) {
-	    l->debug() << "LibraryComponent::constructor tray version: " << tray.extractVersion() << std::endl;
+	    //l->debug() << "LibraryComponent::constructor tray version: " << tray.extractVersion() << std::endl;
             _version.setText("Version: " + tray.extractVersion(), dontSendNotification);
             displayVersion = true;
 	    addAndMakeVisible(_version);
@@ -78,7 +78,7 @@ LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, con
     }
     else if (title == "Browser Plugin")
     {
-
+	_version.setText("Version: Hello", dontSendNotification);
     }
     else if (title == "VBox")
     {
@@ -147,6 +147,8 @@ void LibraryItem::mouseUp(const juce::MouseEvent& e)
         while (t->isRunning()) {
             sleep(1);
         }
+	SubutaiLauncher::Log::instance()->logger()->debug() << "thread finished " <<std::endl;
+
     }
     else if (res == 2)
     {
@@ -156,7 +158,8 @@ void LibraryItem::mouseUp(const juce::MouseEvent& e)
         t->launchThread();
         while (t->isRunning()) {
             sleep(1);
-        }
+        }
+	
     } 
     else if (res == 3)
     {
@@ -292,18 +295,18 @@ void LibraryComponent::drawIntro() {
     int i = 0;
     for (auto it = configs.begin(); it != configs.end(); it++) {
 	std::string bs = (*it).file;
-	l->debug() << "LibraryComponent::drawIntro(): bs = " << bs << std::endl;
+	//l->debug() << "LibraryComponent::drawIntro(): bs = " << bs << std::endl;
 	size_t index = 0;
 	std::string is = bs;
 	index = bs.find("install");
 	bs = bs.replace(index, 7, "update");
-	l->debug() << "LibraryComponent::drawIntro():bs = " << bs << std::endl;
+	//l->debug() << "LibraryComponent::drawIntro():bs = " << bs << std::endl;
 	std::string us = bs;
 	index = bs.find("update");
 	bs = bs.replace(index, 6, "uninstall");
-	l->debug() << "LibraryComponent::drawIntro():bs = " << bs << std::endl;
+	//l->debug() << "LibraryComponent::drawIntro():bs = " << bs << std::endl;
 	std::string rs = bs;
-	l->debug() << "is: " << is << ", us= " << us << ", rs=" << rs << std::endl;
+	//l->debug() << "is: " << is << ", us= " << us << ", rs=" << rs << std::endl;
 
         auto c = new LibraryItem((*it).title, (*it).description, is, us, rs);
         c->setBounds(i*220+20, 100, LibraryItem::WIDTH, LibraryItem::HEIGHT);

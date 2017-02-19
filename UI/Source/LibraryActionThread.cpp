@@ -5,9 +5,18 @@ LibraryActionThread::LibraryActionThread(const std::string& process, const std::
     _component(component),
     _title(title),
     _running(false),
-    ThreadWithProgressWindow (title, true, true)
+    ThreadWithProgressWindow (title, true, true) //with progress bar and cancel button, timeout can be added
 {
     setStatusMessage ("Getting ready...");
+
+    SubutaiLauncher::Log::instance()->logger()->debug() << "LAT::constructor this->runThread()" << std::endl;
+    this->runThread();
+    _running = false;
+    //setProgress (-1.0);
+    //SubutaiLauncher::Log::instance()->logger()->debug() << "run()" << std::endl;
+    //run();
+    SubutaiLauncher::Log::instance()->logger()->debug() << "LAT::constructor returned" << std::endl;
+//    threadComplete(false);
 
 }
 
@@ -16,10 +25,16 @@ bool LibraryActionThread::isRunning()
     return _running;
 }
 
+
 void LibraryActionThread::run() 
 {
+    
     auto l = SubutaiLauncher::Log::instance()->logger();
+    l->debug() << "LAT::run   " << std::endl;
     l->debug() << "LibraryAT::run  process: " << _process << " process_no:" << process_no() << std::endl;
+    //setProgress (-1.0);
+
+    setProgress (0);
     if (_component == "P2P")
     {
         SubutaiLauncher::P2P p2p;
@@ -60,13 +75,37 @@ void LibraryActionThread::run()
     {
 
     }
-
+    else if (_component == "VBox")
+    {
+        SubutaiLauncher::VirtualBox vbox;
+        vbox.findInstallation();
+	//l->debug() << "LibraryComponent::constructor vbox is installed: " << vbox.isInstalled() << std::endl;
+        if (vbox.findInstallation() && process_no() == 1) {
+	    //l->debug() << "LibraryComponent::constructor tray version: " << vbox.extractVersion() << std::endl;
+	    //_error = true;
+	    return;
+        }
+	if (!vbox.findInstallation() && process_no() == 3) {
+	    //l->debug() << "LibraryComponent::constructor vbox version: " << vbox.extractVersion() << std::endl;
+	    //_error = true;
+	    return;
+        }
+    }
+    
+    l->debug() << "LAT::before running true" << std::endl;
+    
+    setProgress (0.1);
     _running = true;
     _error = false;
+    
+    //this->runThread();
+    
     l->debug() << "LAT::run Starting dialog thread" << std::endl;
-    setProgress (-1.0); // setting a value beyond the range 0 -> 1 will show a spinning bar..
+     //  - indeterminate progress bar
     setStatusMessage ("Download installation script");
-
+    
+    //l->debug() << "setStatusMessage (\"Download installation script\") " << std::endl;
+    
     auto conf = SubutaiLauncher::Session::instance()->getConfManager();
 
     auto configs = conf->getConfigs();
@@ -89,6 +128,7 @@ void LibraryActionThread::run()
         _running = false;
         return;
     }
+    
     l->debug() << _component << " configuration found" << std::endl;
 
     auto d = SubutaiLauncher::Session::instance()->getDownloader();
@@ -116,24 +156,30 @@ void LibraryActionThread::run()
 
     auto dt = d->download();
     
-    l->debug() << "LibraryActionTread::run d->download" << std::endl;
 
-    dt.detach();
+
+    if (dt.joinable()){
+	l->debug() << "before dt.join(): is joinable " << std::endl;
+	dt.detach();
+    }
+    l->debug() << "LibraryActionTread:: d->download detached" << std::endl;
 
     while (!d->isDone())
     {
-        if (threadShouldExit()) {
+        
+	if (threadShouldExit()) {
             _running = false;
             return;
         }
     }
 
-    l->debug() << "LATh::run " << d->getOutputDirectory() << "/" << file << " download complete" << std::endl;
-
+    l->debug() << "LAT::run  download complete" << std::endl;
+    setProgress (0.6);
+    
     auto nc = SubutaiLauncher::Session::instance()->getNotificationCenter();
     SubutaiLauncher::SL sl(d->getOutputDirectory());
 //    sl.open(config.file);
-    l->debug() << "LATh::run file_short:" << d->getOutputDirectory() << "/" << file_short  << std::endl;
+    l->debug() << "LAT::run file_short:" << d->getOutputDirectory() << "/" << file_short  << std::endl;
     sl.open(file_short);
     auto t = sl.executeInThread();
 
@@ -146,34 +192,53 @@ void LibraryActionThread::run()
         {
             case SubutaiLauncher::DOWNLOAD_STARTED:
                 setStatusMessage("Downloading necessary files");
+		//l->debug() << "setStatusMessage (\"Downloading necessary files\") " << std::endl;
                 setProgress(100 / (double)d->getPercent());
                 break;
             case SubutaiLauncher::DOWNLOAD_FINISHED:
                 setStatusMessage("Download complete");
+		//l->debug() << "setStatusMessage (\"Download complete\") " << std::endl;
                 break;
             case SubutaiLauncher::INSTALL_STARTED:
+		setStatusMessage("Installing");
+		//l->debug() << "setStatusMessage (\"Installing\") " << std::endl;
                 break;
             case SubutaiLauncher::INSTALL_FINISHED:
-                break;
+                setStatusMessage("Installation finished");
+		//l->debug() << "setStatusMessage (\"Installation finished\") " << std::endl;
+		break;
             case SubutaiLauncher::SHOW_MESSAGE:
+		setStatusMessage("Message?");
+		//l->debug() << "setStatusMessage (\"Message?\") " << std::endl;
                 break;
             case SubutaiLauncher::SCRIPT_FINISHED:
+		setStatusMessage("Script finished");
+		//l->debug() << "setStatusMessage (\"Script finished\") " << std::endl;
                 inProgress = false;
                 break;
             default:
+		setStatusMessage("Default");
+		//l->debug() << "setStatusMessage (\"Default\") " << std::endl;
                 break;
         };
     }
 
-    t.join();
-    _running = false;
-
-    return;
+    setProgress (0.8);
+    //t.join();
+    //wait (1000);
+    //_running = false;
+    //return;
 
     //wait (1000);
 
     const int thingsToDo = 10;
 
+    if (t.joinable()){
+	l->debug() << "before t.join(): is joinable " << std::endl;
+	t.join();
+    }
+
+    /*
     for (int i = 0; i < thingsToDo; ++i)
     {
         // must check this as often as possible, because this is
@@ -185,13 +250,24 @@ void LibraryActionThread::run()
         setProgress (i / (double) thingsToDo);
 
         setStatusMessage (juce::String (thingsToDo - i) + " things left to do...");
-
-        wait (500);
+	l->debug() << "setStatusMessage (juce::String (thingsToDo - i) + \" things left to do..\") " << std::endl;
+        wait (1000);
     }
+    */
 
-    setProgress (-1.0); // setting a value beyond the range 0 -> 1 will show a spinning bar..
+    //setProgress (-1.0); // setting a value beyond the range 0 -> 1 will show a spinning bar..
     setStatusMessage ("Finishing off the last few bits and pieces!");
+    l->debug() << "LAT::run set StatusMessage (\"Finishing off the last few bits and pieces!\") " << std::endl;
     wait (2000);
+    setProgress (1.0);
+
+    l->debug() << "LAT::run before running false" << std::endl;
+    _running = false;
+
+    l->debug() << "LAT::run before return " << std::endl;
+
+
+    return;
 }
 
 void LibraryActionThread::threadComplete (bool userPressedCancel)
@@ -203,6 +279,7 @@ void LibraryActionThread::threadComplete (bool userPressedCancel)
 
     auto l = SubutaiLauncher::Log::instance()-> logger();
 
+    l->debug() << "LAT::threadComplete start error: " << _error << std::endl;
     if (_error)
     {
 	strcpy(m1, "Process stopped\0");
@@ -230,7 +307,8 @@ void LibraryActionThread::threadComplete (bool userPressedCancel)
     }
     else
     {
-        // thread finished normally..
+	l->debug() << "LAT::threadComplete normal " << std::endl;
+	// thread finished normally..
 	n = _process.find("uninstall", 0);
 	switch (pn){
 	    case 1: 
@@ -251,7 +329,12 @@ void LibraryActionThread::threadComplete (bool userPressedCancel)
 		break;    
         }
     }
-    juce::AlertWindow::showMessageBoxAsync (juce::AlertWindow::WarningIcon,
+
+    l->debug() << "LAT::threadComplete before alert " << m1 << " " << m2 << std::endl;
+//    juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+//                m1, m2);
+
+juce::AlertWindow::showMessageBox(juce::AlertWindow::WarningIcon,
                 m1, m2);
 
     // ..and clean up by deleting our thread object..

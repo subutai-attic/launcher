@@ -14,7 +14,7 @@ namespace SubutaiLauncher
 
     void NotificationCenter::add(ScriptAction action)
     {
-        Log::instance()->logger()->debug() << "Notification received" << std::endl;
+        Log::instance()->logger()->debug() << "Notification received " << action << std::endl;
         _pool.push_back(action);
     }
 

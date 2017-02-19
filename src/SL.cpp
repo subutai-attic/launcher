@@ -134,10 +134,11 @@ void SubutaiLauncher::SL::execute()
     {
         ncenter->stop();
 	l->error() << "SL::execute _module name zero: exception Empty module name, 12 " << _module << std::endl;
-        throw SLException("Empty module name", 12);
+        PyErr_Print();
+	throw SLException("Empty module name", 12);
     }
     PyObject* sysPath = PySys_GetObject((char*)"path");
-    l->debug() << "SL::execute   sysPath " << sysPath<< std::endl;
+    l->debug() << "SL::execute   sysPath " << sysPath << std::endl;
 
 #if PY_MAJOR_VERSION >= 3
     PyObject* tmpPath = PyUnicode_FromString(_dir.c_str());
@@ -178,6 +179,7 @@ void SubutaiLauncher::SL::execute()
 
         if (pFunc && PyCallable_Check(pFunc)) {
             l->error() << "SL::execute subutaistart() entry point was not found" << std::endl;
+	    PyErr_Print();
             pArgs = PyTuple_New(0);
             pValue = PyObject_CallObject(pFunc, pArgs);
             Py_DECREF(pArgs);
@@ -196,6 +198,7 @@ void SubutaiLauncher::SL::execute()
                 PyErr_Print();
                 ncenter->stop();
 		l->error() << "SL::execute exit code: " << _exitCode << std::endl;
+		PyErr_Print();
                 throw SLException("Script execution failed", 5);
             }
         }
@@ -215,7 +218,8 @@ void SubutaiLauncher::SL::execute()
 	//catch  
         ncenter->stop();
 	l->error() << "SL::execute _module zero: Cannot find specified module " << _module << std::endl;
-        throw SLException("Cannot find specified module", 7);
+        PyErr_Print();
+	throw SLException("Cannot find specified module", 7);
     }
     l->info() << "SL::execute Script execution completed without any errors" << std::endl;
     ncenter->stop();
