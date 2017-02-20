@@ -140,7 +140,7 @@ void LibraryItem::mouseUp(const juce::MouseEvent& e)
     {
         std::string windowTitle = "Installing ";
         windowTitle.append(_title);
-        LibraryActionThread t = new LibraryActionThread("install", _title, windowTitle);
+        auto t = new LibraryActionThread("install", _title, windowTitle);
 	
 	SubutaiLauncher::Log::instance()->logger()->debug() << "LibraryComponent::LibraryItem::mouseUp before Launch thread " <<std::endl;
 
