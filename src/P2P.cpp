@@ -14,8 +14,8 @@ SubutaiLauncher::P2P::~P2P()
 
 bool SubutaiLauncher::P2P::findInstallation()
 {
-    auto l = Log::instance()->logger();
-    l->debug() << "Searching for P2P installation" << std::endl;
+	auto l = Log::instance()->logger();
+	//l->debug() << "Searching for P2P installation" << std::endl;
 	auto env = new Environment();
 	SubutaiString pathVar(env->getVar("PATH", ""));
 	std::vector<std::string> path;
@@ -29,11 +29,11 @@ bool SubutaiLauncher::P2P::findInstallation()
 			_location = _path;
 			_path.append(FileSystem::DELIM);
 			_path.append(BIN);
-            l->debug() << "P2P found in " << _location << std::endl;
+	                //l->debug() << "P2P found in " << _location << std::endl;
 			return true;
 		}
 	}
-    l->debug() << "P2P was not found" << std::endl;
+	//l->debug() << "P2P was not found" << std::endl;
 	return false;
 }
 

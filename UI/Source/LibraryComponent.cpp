@@ -47,51 +47,8 @@ LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, con
     _plusLabel.setFont(fontPlus);
     _plusLabel.setJustificationType(Justification::centred);
     addAndMakeVisible(_plusLabel);
-     bool displayVersion = true;
-    // TODO: This approach is a POS. We need to make it more universal
-    if (title == "P2P")
-    {
-        SubutaiLauncher::P2P p2p;
-        p2p.findInstallation();
-	//l->debug() << "LibraryComponent::constructor p2p is installed: " << p2p.isInstalled() << std::endl;
-        //if (p2p.isInstalled()) {
-	if (p2p.findInstallation()) {
-	    //l->debug() << "LibraryComponent::constructor p2p version: " << p2p.extractVersion() << std::endl;
-            _version.setText("Version: " + p2p.extractVersion(), dontSendNotification);
-            displayVersion = true;
-	    addAndMakeVisible(_version);
-        }
-    } 
-    else if (title == "Tray Client")
-    {
-        SubutaiLauncher::Tray tray;
-        tray.findInstallation();
-	l->debug() << "LibraryComponent::constructor tray is installed: " << tray.findInstallation() << std::endl;
-        //if (tray.isInstalled()) {
-	if (tray.findInstallation()) {
-	    //l->debug() << "LibraryComponent::constructor tray version: " << tray.extractVersion() << std::endl;
-            _version.setText("Version: " + tray.extractVersion(), dontSendNotification);
-            displayVersion = true;
-	    addAndMakeVisible(_version);
-        }
-    }
-    else if (title == "Browser Plugin")
-    {
-	_version.setText("Version: Hello", dontSendNotification);
-    }
-    else if (title == "VBox")
-    {
-        SubutaiLauncher::VirtualBox vbox;
-        vbox.findInstallation();
-	l->debug() << "LibraryComponent::constructor vbox is installed: " << vbox.findInstallation() << std::endl;
-        //if (vbox.isInstalled()) {
-	if (vbox.findInstallation()) {
-	    l->debug() << "LibraryComponent::constructor vbox version: " << vbox.extractVersion() << std::endl;
-            _version.setText("Version: " + vbox.extractVersion(), dontSendNotification);
-            displayVersion = true;
-	    addAndMakeVisible(_version);
-        }
-    }
+    bool displayVersion = true;
+
     auto verFont = Font(12);
     _version.setInterceptsMouseClicks(false, true);
     _version.setColour(Label::textColourId, Colours::white);
@@ -100,17 +57,75 @@ LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, con
     _version.setJustificationType(Justification::centredLeft);
     addAndMakeVisible(_version);
 
-    if (displayVersion)
-    {
-        addAndMakeVisible(_version);
-	_version.setVisible(true);
-    }
+    drawVersion();
 
 }
 
 LibraryItem::~LibraryItem()
 {
 
+}
+
+void LibraryItem::drawVersion()
+{
+    auto verFont = Font(12);
+    _version.setInterceptsMouseClicks(false, true);
+    _version.setColour(Label::textColourId, Colours::white);
+    _version.setBounds(0, HEIGHT-30, WIDTH, 40);
+    _version.setFont(verFont);
+    _version.setJustificationType(Justification::centredLeft);
+    addAndMakeVisible(_version);
+    std::string vText = findVersion(_title);
+    if (vText != "") {
+	_version.setText("Version: " + vText, dontSendNotification);
+        _version.setVisible(true);
+    } else {
+	_version.setVisible(false);
+    }
+}
+
+
+std::string LibraryItem::findVersion(std::string cname)
+{
+    std::string v = "";
+    if (cname == "P2P")
+    {
+        SubutaiLauncher::P2P p2p;
+        p2p.findInstallation();
+	//l->debug() << "LibraryComponent::constructor p2p is installed: " << p2p.isInstalled() << std::endl;
+        //if (p2p.isInstalled()) {
+	if (p2p.findInstallation()) {
+	    //l->debug() << "LibraryComponent::constructor p2p version: " << p2p.extractVersion() << std::endl;
+            v =  p2p.extractVersion();
+        }
+    } 
+    else if (cname == "Tray Client")
+    {
+        SubutaiLauncher::Tray tray;
+        tray.findInstallation();
+	//l->debug() << "LibraryComponent::constructor tray is installed: " << tray.findInstallation() << std::endl;
+        //if (tray.isInstalled()) {
+	if (tray.findInstallation()) {
+	    //l->debug() << "LibraryComponent::constructor tray version: " << tray.extractVersion() << std::endl;
+            v = tray.extractVersion();
+        }
+    }
+    else if (cname == "Browser Plugin")
+    {
+	v = "Version: Hello";
+    }
+    else if (cname == "VBox")
+    {
+        SubutaiLauncher::VirtualBox vbox;
+        vbox.findInstallation();
+	//l->debug() << "LibraryComponent::constructor vbox is installed: " << vbox.findInstallation() << std::endl;
+        //if (vbox.isInstalled()) {
+	if (vbox.findInstallation()) {
+	    //l->debug() << "LibraryComponent::constructor vbox version: " << vbox.extractVersion() << std::endl;
+            v = vbox.extractVersion();
+        }
+    }
+    return v;
 }
 
 void LibraryItem::paint(Graphics& g)
@@ -147,19 +162,18 @@ void LibraryItem::mouseUp(const juce::MouseEvent& e)
         //t->launchThread();
 	if (!t->runThread()){
 	    SubutaiLauncher::Log::instance()->logger()->debug() << "LibraryComponent::LibraryItem::mouseUp cancelled " <<std::endl;
-	    return;
+	    //return;
 	}
 
 	SubutaiLauncher::Log::instance()->logger()->debug() << "LibraryComponent::LibraryItem::mouseUp after launch thread " <<std::endl;
 
-/*
+	/*
 	while (t->isRunning()) {
             sleep(1);
 	    //SubutaiLauncher::Log::instance()->logger()->debug() << "LibraryComponent::LibraryItem::mouseUp   thread running " <<std::endl;
         }
-*/
+	*/
 	SubutaiLauncher::Log::instance()->logger()->debug() << "LibraryComponent::LibraryItem::mouseUp thread finished " <<std::endl;
-
     }
     else if (res == 2)
     {
@@ -177,11 +191,17 @@ void LibraryItem::mouseUp(const juce::MouseEvent& e)
 	std::string windowTitle = "Removing ";
         windowTitle.append(_title);
         auto t = new LibraryActionThread("uninstall", _title, windowTitle);
-        t->launchThread();
+        /*
+	t->launchThread();
         while (t->isRunning()) {
             sleep(1);
-        }
+        }*/
+	if (!t->runThread()){
+	    SubutaiLauncher::Log::instance()->logger()->debug() << "LibraryComponent::LibraryItem::mouseUp cancelled " <<std::endl;
+	    //return;
+	}
     }
+    drawVersion();
 }
 
 // ============================================================================

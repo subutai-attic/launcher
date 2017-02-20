@@ -62,6 +62,8 @@ class LibraryItem : public juce::Component
         void paint(juce::Graphics& g) override;
         void resized() override;
         void mouseUp(const juce::MouseEvent& e) override;
+	void drawVersion();
+	std::string findVersion(std::string cname);
     private:
         std::string _title;
         std::string _desc;

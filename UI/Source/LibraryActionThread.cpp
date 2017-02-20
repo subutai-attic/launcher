@@ -7,8 +7,9 @@ LibraryActionThread::LibraryActionThread(const std::string& process, const std::
     _running(false),
     ThreadWithProgressWindow (title, true, true) //with progress bar and cancel button, timeout can be added
 {
-    setStatusMessage ("Getting ready...");
-    run();
+    //setStatusMessage ("Getting ready...");
+    //setProgress (0.05);
+    //run();
 
 }
 
@@ -20,71 +21,74 @@ bool LibraryActionThread::isRunning()
 
 void LibraryActionThread::run() 
 {
-    
     auto l = SubutaiLauncher::Log::instance()->logger();
-    l->debug() << "LAT::run   " << std::endl;
-    l->debug() << "LibraryAT::run  process: " << _process << " process_no:" << process_no() << std::endl;
+    l->debug() << "LAT::run  process: " << _process << " process_no:" << process_no() << std::endl;
     //setProgress (-1.0);//  - indeterminate progress bar
 
-    setProgress (0.0);
+    //auto conf = SubutaiLauncher::Session::instance()->getConfManager();
+
+    _running = true;
+    _error = false;
+    setStatusMessage ("Getting ready...");
+    setProgress (0.1);
     if (_component == "P2P")
     {
         SubutaiLauncher::P2P p2p;
-        p2p.findInstallation();
-	l->debug() << "LibraryAT::run  p2p is installed: " << std::to_string(p2p.isInstalled()) << std::endl;
+        //p2p.findInstallation();
+	//l->debug() << "LibraryAT::run  p2p is installed: " << std::to_string(p2p.isInstalled()) << std::endl;
         //if (p2p.isInstalled() && process_no() == 1) {
 	if (p2p.findInstallation() && process_no() == 1) {
-	    l->debug() << "LAT::run  p2p installed already " << std::endl;
+	    //l->debug() << "LAT::run  p2p installed already " << std::endl;
 	    //Show alert and return
-	    //_error = true;
+	    _error = true;
 	    return;
         }
 	//if (!p2p.isInstalled() && process_no() == 3) {
 	if (!p2p.findInstallation() && process_no() == 3) {
-	    l->debug() << "LibraryAT::run p2p is uninstalled already " << std::endl;
+	    //l->debug() << "LibraryAT::run p2p is uninstalled already " << std::endl;
 	    //Show alert and return
-	    //_error = true;
+	    _error = true;
 	    return;
         }
     } 
     else if (_component == "Tray Client")
     {
         SubutaiLauncher::Tray tray;
-        tray.findInstallation();
+        //tray.findInstallation();
         if (tray.findInstallation() && process_no() == 1) {
 	    //l->debug() << "LibraryComponent::constructor tray version: " << tray.extractVersion() << std::endl;
-	    //_error = true;
+	    _error = true;
 	    return;
         }
 	if (!tray.findInstallation() && process_no() == 3) {
 	    //l->debug() << "LibraryComponent::constructor tray version: " << tray.extractVersion() << std::endl;
-	    //_error = true;
+	    _error = true;
 	    return;
         }
     }
     else if (_component == "Browser Plugin")
     {
-
+	sleep(4000);
     }
     else if (_component == "VBox")
     {
         SubutaiLauncher::VirtualBox vbox;
-        vbox.findInstallation();
+        //vbox.findInstallation();
         if (vbox.findInstallation() && process_no() == 1) {
 	    //l->debug() << "LibraryComponent::constructor tray version: " << vbox.extractVersion() << std::endl;
-	    //_error = true;
+	    _error = true;
 	    return;
         }
 	if (!vbox.findInstallation() && process_no() == 3) {
 	    //l->debug() << "LibraryComponent::constructor vbox version: " << vbox.extractVersion() << std::endl;
-	    //_error = true;
+	    _error = true;
 	    return;
         }
     }
     
-    setProgress (0.1);
-    _running = true;
-    _error = false;
+    setProgress (0.2);
+    //_running = true;
+    //_error = false;
     
     setStatusMessage ("Download installation script");
 
@@ -139,6 +143,7 @@ void LibraryActionThread::run()
     }
     l->debug() << "LibraryActionTread:: d->download detached" << std::endl;
 
+    setProgress (-0.1);
     while (!d->isDone())
     {
 	if (threadShouldExit()) {
@@ -147,7 +152,7 @@ void LibraryActionThread::run()
         }
     }
 
-    l->debug() << "LAT::run  download complete" << std::endl;
+    l->debug() << "LAT::run  download completed" << std::endl;
     setProgress (0.6);
     
     auto nc = SubutaiLauncher::Session::instance()->getNotificationCenter();
@@ -158,7 +163,6 @@ void LibraryActionThread::run()
     auto t = sl.executeInThread();
 
     bool inProgress = true;
-
     while (inProgress)
     {
         auto event = nc->dispatch();
@@ -190,24 +194,16 @@ void LibraryActionThread::run()
                 inProgress = false;
                 break;
             default:
-		setStatusMessage("Default");
+		setStatusMessage("Running");
+    		setProgress(100 / (double)d->getPercent());
 		//l->debug() << "setStatusMessage (\"Default\") " << std::endl;
                 break;
         };
     }
 
     setProgress (0.8);
-    //t.join();
-    //wait (1000);
-    //_running = false;
-    //return;
-
-    //wait (1000);
-
-    const int thingsToDo = 10;
 
     if (t.joinable()){
-	l->debug() << "before t.join(): is joinable " << std::endl;
 	t.join();
     }
 
