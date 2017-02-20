@@ -47,7 +47,6 @@ LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, con
     _plusLabel.setFont(fontPlus);
     _plusLabel.setJustificationType(Justification::centred);
     addAndMakeVisible(_plusLabel);
-//    bool displayVersion = false;
      bool displayVersion = true;
     // TODO: This approach is a POS. We need to make it more universal
     if (title == "P2P")
@@ -100,7 +99,6 @@ LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, con
     _version.setFont(verFont);
     _version.setJustificationType(Justification::centredLeft);
     addAndMakeVisible(_version);
-    //_version.setVisible(true);
 
     if (displayVersion)
     {
@@ -142,12 +140,25 @@ void LibraryItem::mouseUp(const juce::MouseEvent& e)
     {
         std::string windowTitle = "Installing ";
         windowTitle.append(_title);
-        auto t = new LibraryActionThread("install", _title, windowTitle);
-        t->launchThread();
-        while (t->isRunning()) {
+        LibraryActionThread t = new LibraryActionThread("install", _title, windowTitle);
+	
+	SubutaiLauncher::Log::instance()->logger()->debug() << "LibraryComponent::LibraryItem::mouseUp before Launch thread " <<std::endl;
+
+        //t->launchThread();
+	if (!t->runThread()){
+	    SubutaiLauncher::Log::instance()->logger()->debug() << "LibraryComponent::LibraryItem::mouseUp cancelled " <<std::endl;
+	    return;
+	}
+
+	SubutaiLauncher::Log::instance()->logger()->debug() << "LibraryComponent::LibraryItem::mouseUp after launch thread " <<std::endl;
+
+/*
+	while (t->isRunning()) {
             sleep(1);
+	    //SubutaiLauncher::Log::instance()->logger()->debug() << "LibraryComponent::LibraryItem::mouseUp   thread running " <<std::endl;
         }
-	SubutaiLauncher::Log::instance()->logger()->debug() << "thread finished " <<std::endl;
+*/
+	SubutaiLauncher::Log::instance()->logger()->debug() << "LibraryComponent::LibraryItem::mouseUp thread finished " <<std::endl;
 
     }
     else if (res == 2)
@@ -295,18 +306,14 @@ void LibraryComponent::drawIntro() {
     int i = 0;
     for (auto it = configs.begin(); it != configs.end(); it++) {
 	std::string bs = (*it).file;
-	//l->debug() << "LibraryComponent::drawIntro(): bs = " << bs << std::endl;
 	size_t index = 0;
 	std::string is = bs;
 	index = bs.find("install");
 	bs = bs.replace(index, 7, "update");
-	//l->debug() << "LibraryComponent::drawIntro():bs = " << bs << std::endl;
 	std::string us = bs;
 	index = bs.find("update");
 	bs = bs.replace(index, 6, "uninstall");
-	//l->debug() << "LibraryComponent::drawIntro():bs = " << bs << std::endl;
 	std::string rs = bs;
-	//l->debug() << "is: " << is << ", us= " << us << ", rs=" << rs << std::endl;
 
         auto c = new LibraryItem((*it).title, (*it).description, is, us, rs);
         c->setBounds(i*220+20, 100, LibraryItem::WIDTH, LibraryItem::HEIGHT);
@@ -345,7 +352,6 @@ void LibraryComponent::hideIntro() {
 
     for (auto p = _peers.begin(); p != _peers.end(); p++) 
     {
-	//l->debug() << "peer: " << (**p).WIDTH <<std::endl;
 	(**p).setVisible(false);
         ++i;
     }

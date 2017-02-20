@@ -8,15 +8,7 @@ LibraryActionThread::LibraryActionThread(const std::string& process, const std::
     ThreadWithProgressWindow (title, true, true) //with progress bar and cancel button, timeout can be added
 {
     setStatusMessage ("Getting ready...");
-
-    SubutaiLauncher::Log::instance()->logger()->debug() << "LAT::constructor this->runThread()" << std::endl;
-    this->runThread();
-    _running = false;
-    //setProgress (-1.0);
-    //SubutaiLauncher::Log::instance()->logger()->debug() << "run()" << std::endl;
-    //run();
-    SubutaiLauncher::Log::instance()->logger()->debug() << "LAT::constructor returned" << std::endl;
-//    threadComplete(false);
+    run();
 
 }
 
@@ -32,9 +24,9 @@ void LibraryActionThread::run()
     auto l = SubutaiLauncher::Log::instance()->logger();
     l->debug() << "LAT::run   " << std::endl;
     l->debug() << "LibraryAT::run  process: " << _process << " process_no:" << process_no() << std::endl;
-    //setProgress (-1.0);
+    //setProgress (-1.0);//  - indeterminate progress bar
 
-    setProgress (0);
+    setProgress (0.0);
     if (_component == "P2P")
     {
         SubutaiLauncher::P2P p2p;
@@ -59,7 +51,6 @@ void LibraryActionThread::run()
     {
         SubutaiLauncher::Tray tray;
         tray.findInstallation();
-	//l->debug() << "LibraryComponent::constructor tray is installed: " << tray.isInstalled() << std::endl;
         if (tray.findInstallation() && process_no() == 1) {
 	    //l->debug() << "LibraryComponent::constructor tray version: " << tray.extractVersion() << std::endl;
 	    //_error = true;
@@ -79,7 +70,6 @@ void LibraryActionThread::run()
     {
         SubutaiLauncher::VirtualBox vbox;
         vbox.findInstallation();
-	//l->debug() << "LibraryComponent::constructor vbox is installed: " << vbox.isInstalled() << std::endl;
         if (vbox.findInstallation() && process_no() == 1) {
 	    //l->debug() << "LibraryComponent::constructor tray version: " << vbox.extractVersion() << std::endl;
 	    //_error = true;
@@ -92,22 +82,13 @@ void LibraryActionThread::run()
         }
     }
     
-    l->debug() << "LAT::before running true" << std::endl;
-    
     setProgress (0.1);
     _running = true;
     _error = false;
     
-    //this->runThread();
-    
-    l->debug() << "LAT::run Starting dialog thread" << std::endl;
-     //  - indeterminate progress bar
     setStatusMessage ("Download installation script");
-    
-    //l->debug() << "setStatusMessage (\"Download installation script\") " << std::endl;
-    
-    auto conf = SubutaiLauncher::Session::instance()->getConfManager();
 
+    auto conf = SubutaiLauncher::Session::instance()->getConfManager();
     auto configs = conf->getConfigs();
     SubutaiLauncher::InstallConfig config;
     bool found = false;
@@ -146,27 +127,20 @@ void LibraryActionThread::run()
     l->debug() << "LibraryActionTread::run config.file " << file << std::endl;
     std::string file_short = file;
     file.append(".py");
+
     d->reset();
-
-    l->debug() << "LibraryActionTread::run reset " << file << std::endl;
-
     d->setFilename(file);
 
     l->debug() << "LibraryActionTread::run setFilename " << file << " file short: " << file_short << std::endl;
 
     auto dt = d->download();
-    
-
-
     if (dt.joinable()){
-	l->debug() << "before dt.join(): is joinable " << std::endl;
 	dt.detach();
     }
     l->debug() << "LibraryActionTread:: d->download detached" << std::endl;
 
     while (!d->isDone())
     {
-        
 	if (threadShouldExit()) {
             _running = false;
             return;
@@ -192,7 +166,6 @@ void LibraryActionThread::run()
         {
             case SubutaiLauncher::DOWNLOAD_STARTED:
                 setStatusMessage("Downloading necessary files");
-		//l->debug() << "setStatusMessage (\"Downloading necessary files\") " << std::endl;
                 setProgress(100 / (double)d->getPercent());
                 break;
             case SubutaiLauncher::DOWNLOAD_FINISHED:
@@ -255,19 +228,14 @@ void LibraryActionThread::run()
     }
     */
 
-    //setProgress (-1.0); // setting a value beyond the range 0 -> 1 will show a spinning bar..
-    setStatusMessage ("Finishing off the last few bits and pieces!");
-    l->debug() << "LAT::run set StatusMessage (\"Finishing off the last few bits and pieces!\") " << std::endl;
-    wait (2000);
-    setProgress (1.0);
+    setProgress (0.9);
+    setStatusMessage ("Finishing !");
+    //wait (200);
+    sleep(2000);
 
-    l->debug() << "LAT::run before running false" << std::endl;
+    setProgress (1.0);
     _running = false;
 
-    l->debug() << "LAT::run before return " << std::endl;
-
-
-    return;
 }
 
 void LibraryActionThread::threadComplete (bool userPressedCancel)
@@ -334,7 +302,7 @@ void LibraryActionThread::threadComplete (bool userPressedCancel)
 //    juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
 //                m1, m2);
 
-juce::AlertWindow::showMessageBox(juce::AlertWindow::WarningIcon,
+    juce::AlertWindow::showMessageBox(juce::AlertWindow::WarningIcon,
                 m1, m2);
 
     // ..and clean up by deleting our thread object..

@@ -51,10 +51,10 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
         strcat(newpath, dir.c_str()); 
         strcat(newpath, ":.");
 #else
-		strcpy_s(newpath, 1024, path);
-		strcpy_s(newpath, 1024, ":");
-		strcpy_s(newpath, 1024, dir.c_str());
-		strcpy_s(newpath, 1024, ":.");
+	strcpy_s(newpath, 1024, path);
+	strcpy_s(newpath, 1024, ":");
+	strcpy_s(newpath, 1024, dir.c_str());
+	strcpy_s(newpath, 1024, ":.");
 #endif
         PySys_SetPath(newpath); 
         delete[] newpath;
@@ -138,7 +138,8 @@ void SubutaiLauncher::SL::execute()
 	throw SLException("Empty module name", 12);
     }
     PyObject* sysPath = PySys_GetObject((char*)"path");
-    l->debug() << "SL::execute   sysPath " << sysPath << std::endl;
+    //l->debug() << "SL::execute   sysPath " << sysPath << std::endl;
+    l->debug() << "SL::execute   sysPath " << std::endl;
 
 #if PY_MAJOR_VERSION >= 3
     PyObject* tmpPath = PyUnicode_FromString(_dir.c_str());
@@ -148,35 +149,38 @@ void SubutaiLauncher::SL::execute()
 #endif
     PyList_Append(sysPath, tmpPath);
 
-    l->debug() << "SL::execute sysPath " << sysPath  << "     tmpPath " << tmpPath << " _dir " << _dir  << std::endl;
+    //l->debug() << "SL::execute sysPath " << sysPath  << "     tmpPath " << tmpPath << " _dir " << _dir  << std::endl;
+    l->debug() << "SL::execute sysPath     tmpPath     _dir "  << std::endl;
 
     try 
     {
         _module = PyImport_Import(_name);
+	Py_DECREF(_name);
     }
-     catch (std::exception const &exc)
+    catch (std::exception const &exc)
     {
         std::cerr << "Exception caught " << exc.what() << "\n";
     }
+    
+    l->error() << "SL::execute module tryed , 7 " << std::endl;
 
-
-//    if (_module == NULL || _module == 0){
-    if (_module == nullptr){
+    if (_module == NULL || _module == 0){
+//    if (_module == nullptr){
 	l->error() << "SL::execute module import Cannot find specified module, 7 " << _module << std::endl;
-	PyErr_Print();
+	//PyErr_Print();
 	throw SLException("Cannot find specified module", 7);
     }
 
-    l->debug() << "SL::execute import module " << _module << " _name " << _name << std::endl;
+    l->debug() << "SL::execute import module " << _module << " _name "  << std::endl;
 
-    Py_DECREF(_name);
+    //Py_DECREF(_name);
     Py_DECREF(PyImport_ImportModule("threading"));
     PyEval_InitThreads();
 
     PyObject *pFunc, *pArgs, *pValue;
     if (!(_module == NULL || _module == 0)) {
         pFunc = PyObject_GetAttrString(_module, "subutaistart");
-
+	
         if (pFunc && PyCallable_Check(pFunc)) {
             l->error() << "SL::execute subutaistart() entry point was not found" << std::endl;
 	    PyErr_Print();
