@@ -10,11 +10,15 @@
 #include <codecvt>
 #include <vector>
 #include <string>
+#include <iomanip>
+#include <ctime>
 
 #include "Environment.h"
 #include "SubutaiString.h"
 #include "FileSystem.h"
 #include "SubutaiProcess.h"
+#include "SSH.h"
+#include "Session.h"
 
 namespace SubutaiLauncher {
 
@@ -26,6 +30,8 @@ namespace SubutaiLauncher {
     class VirtualBox {
         public:
             static const std::string BIN;
+	    static std::string cloneName;
+	    static std::string subutaiBranch;
             VirtualBox();
             ~VirtualBox();
 	    bool findInstallation();
@@ -35,8 +41,25 @@ namespace SubutaiLauncher {
             std::string extractVersion();
             void getVms();
             std::vector<SubutaiVM> parseVms(const std::string& buffer);
+            std::vector<SubutaiVM> getPeers();
             void addVm(SubutaiVM vm);
-            void execute(const std::string& command);
+            std::string execute(const std::string& command);
+	    std::string sysExecute(const std::string& command, const std::string& cargs);
+	    std::string sysExecute(const std::string& command, const std::vector<std::string>& cargs);
+	    std::string cloneVM(const std::string& cName);
+	    bool cleanKnownHosts(std::string sport);
+	    bool runScripts(std::string snapFile);
+	    bool setAutobuildIP(SSH &s_ssh);
+	    bool stopVM();
+	    bool restoreNet();
+	    bool startVM();
+	    bool waitingSSH(SSH &s_ssh, std::string sport);
+	    bool connectSSH(SSH &s_ssh);
+	    bool waitPeerIP();
+	    bool runAutobuild();
+	    bool importManagement();
+	    std::string getBranch();
+
         protected:
         private:
             std::string _version;
