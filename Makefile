@@ -44,7 +44,7 @@ cli: lib
 #ui: lib
 #	$(MAKE) -C ./UI/Builds/LinuxMakefile
 
-ui: lib
+ui: static
 	$(MAKE) -C ./UI
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
