@@ -15,6 +15,7 @@ Author:  crioto
 bool instEnabled = true;
 std::map <std::string, std::string> mapInstalled;
 std::vector <std::string> vComponents2Install;
+std::string vboxVersion;
 
 LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, const std::string& is, const std::string& us, const std::string& rs) : 
     _title(title),
@@ -86,6 +87,7 @@ void LibraryItem::drawVersion()
     std::string vText = findVersion(_title);
     if (vText != "") {
 	_version.setText(vText, dontSendNotification);
+	//_version.setText(mapInstalled[_title], dontSendNotification);
         _version.setVisible(true);
     } else {
 	_version.setVisible(false);
@@ -131,6 +133,7 @@ std::string LibraryItem::findVersion(std::string cname)
     {
         SubutaiLauncher::VirtualBox vbox;
         vbox.findInstallation();
+
 	//l->debug() << "LibraryComponent::constructor vbox is installed: " << vbox.findInstallation() << std::endl;
         //if (vbox.isInstalled()) {
 	if (vbox.findInstallation()) {
@@ -278,14 +281,12 @@ LibraryComponent::LibraryComponent() :
     addAndMakeVisible(_systemConfigure);
     addAndMakeVisible(_download);
     addAndMakeVisible(_install);
-    
+
     addChildComponent(_nextButton);
     addChildComponent(_backButton);
     addChildComponent(_cancelButton);
     auto l = SubutaiLauncher::Log::instance()->logger();
-    //l->debug() << "LibraryComponent  map size before: " << mapInstalled.size() << std::endl;
-    //appsInstalled(mapInstalled);
-    //l->debug() << "LibraryComponent  map size after: " << mapInstalled.size() << std::endl;
+
 }
 
 LibraryComponent::~LibraryComponent() {
@@ -295,46 +296,7 @@ LibraryComponent::~LibraryComponent() {
     delete(_install);
 }
 
-void LibraryComponent::appsInstalled(std::map <std::string, std::string> &mapTmp){
-    std::string v = "";
-    //std::map <std::string, std::string> mapTmp;
 
-    auto l = SubutaiLauncher::Log::instance()->logger();
-    //P2P 
-    SubutaiLauncher::P2P p2p;
-    //if (p2p.isInstalled()) {
-    if (p2p.findInstallation()) {
-        v =  p2p.extractVersion();
-	mapTmp["P2P"] =  v;
-	l->debug() << "LibraryComponent::appsInstalled p2p map: " << mapTmp["P2P"] << std::endl;
-    }
-
-    SubutaiLauncher::Tray tray;
-    //l->debug() << "LibraryComponent::constructor tray is installed: " << tray.findInstallation() << std::endl;
-    //if (tray.isInstalled()) {
-    if (tray.findInstallation()) {
-        v = tray.extractVersion();
-	mapTmp["Tray"] = v;
-	l->debug() << "LibraryComponent::appsInstalled tray map: " << mapTmp["Tray"] << std::endl;
-    }
-
-    v = "Version: Chrome";
-    mapTmp["Chrome"] = v;
-    l->debug() << "LibraryComponent::appsInstalled chrome map: " << mapTmp["Chrome"] << std::endl;
-
-    v = "Version: Plugin";
-    mapTmp["E2E"] = v;
-    l->debug() << "LibraryComponent::appsInstalled e2e map: " << mapTmp["E2E"] << std::endl;
-
-    SubutaiLauncher::VirtualBox vbox;
-    //l->debug() << "LibraryComponent::constructor vbox is installed: " << vbox.findInstallation() << std::endl;
-    //if (vbox.isInstalled()) {
-    if (vbox.findInstallation()) {
-	v = vbox.extractVersion();
-	mapTmp["VBox"] = v;
-	l->debug() << "LibraryComponent::appsInstalled vbox map: " << mapTmp["VBox"] << std::endl;
-    }
-}
 
 void LibraryComponent::paint(Graphics& g) {
     g.fillAll (Colour (0xff222222));
@@ -352,7 +314,6 @@ void LibraryComponent::paint(Graphics& g) {
 }
 
 void LibraryComponent::resized() {
-    //appsInstalled(mapInstalled);
     onStepChange();
     switch(_step) {
         case SYSTEM_CHECK:
@@ -418,7 +379,6 @@ void LibraryComponent::buttonClicked(Button* button) {
 }
 
 void LibraryComponent::drawIntro() {
-
 
     auto font = Font(24);
     _componentsSectionLabel.setText("Subutai Components", dontSendNotification);
@@ -749,6 +709,10 @@ LibrarySystemCheck::LibrarySystemCheck() : _numLines(1) {
 
     auto l = SubutaiLauncher::Log::instance()->logger();
 
+    l->debug() << "LibrarySystemCheck()  map size before: " << mapInstalled.size() << std::endl;
+    appsInstalled();
+    l->debug() << "LibrarySystemCheck()  map size after: " << mapInstalled.size() << std::endl;
+
     int fieldFont = 20;
     SubutaiLauncher::Environment env;
 
@@ -763,8 +727,22 @@ LibrarySystemCheck::LibrarySystemCheck() : _numLines(1) {
     envCurrent.s_vtx = env.vtxEnabled();
     envCurrent.b_vtx = true;
 
-    envCurrent.s_vbox = "Vbox: " + mapInstalled["VBox"].size();
-    l->debug() << "LibrarySystemCheck() mapInstalled[VBox]=" << mapInstalled["VBox"] << std::endl;
+    envCurrent.s_vbox = LibraryItem::findVersion("VBox");
+   
+/*
+    SubutaiLauncher::VirtualBox vbox;
+    vbox.findInstallation();
+    std::string v;
+    //l->debug() << "LibraryComponent::constructor vbox is installed: " << vbox.findInstallation() << std::endl;
+    //if (vbox.isInstalled()) {
+    if (vbox.findInstallation()) {
+        //l->debug() << "LibraryComponent::constructor vbox version: " << vbox.extractVersion() << std::endl;
+        v = vbox.extractVersion();
+    }
+    l->debug() << "LibrarySystemCheck() v=" << v << std::endl;
+    envCurrent.s_vbox = v;
+*/
+    l->debug() << "LibrarySystemCheck()  envCurrent.s_vbox=" <<  envCurrent.s_vbox << std::endl;
     envCurrent.b_vbox = true;
 
     checkSystem();
@@ -809,8 +787,11 @@ LibrarySystemCheck::LibrarySystemCheck() : _numLines(1) {
     addAndMakeVisible(_vboxField);
     addAndMakeVisible(_vboxValue);
     addAndMakeVisible(_vboxHint);
-    //envCurrent.s_vbox
-    _vboxValue.setText(envCurrent.s_vbox, dontSendNotification);
+
+
+    //_vboxValue.setText(envCurrent.s_vbox, dontSendNotification);
+    _vboxValue.setText(mapInstalled["VBox"], dontSendNotification);
+    //_vboxValue.setText(v, dontSendNotification);
     addLine(&_vboxField, &_vboxValue, &_vboxHint, "Oracle VirtualBox version",
 	"We're running our peer on VirtualBox VMs", envCurrent.b_vbox);
 
@@ -845,12 +826,54 @@ LibrarySystemCheck::~LibrarySystemCheck() {
 
 }
 
+void LibrarySystemCheck::appsInstalled(){
+    std::string v = "";
+    //std::map <std::string, std::string> mapTmp;
+
+    auto l = SubutaiLauncher::Log::instance()->logger();
+    //P2P 
+    SubutaiLauncher::P2P p2p;
+    //if (p2p.isInstalled()) {
+    if (p2p.findInstallation()) {
+        v =  p2p.extractVersion();
+	mapInstalled["P2P"] =  v;
+	l->debug() << "LibraryComponent::appsInstalled p2p map: " << mapInstalled["P2P"] << std::endl;
+    }
+
+    SubutaiLauncher::Tray tray;
+    //l->debug() << "LibraryComponent::constructor tray is installed: " << tray.findInstallation() << std::endl;
+    //if (tray.isInstalled()) {
+    if (tray.findInstallation()) {
+        v = tray.extractVersion();
+	mapInstalled["Tray"] = v;
+	l->debug() << "LibraryComponent::appsInstalled tray map: " << mapInstalled["Tray"] << std::endl;
+    }
+
+    v = "Version: Chrome";
+    mapInstalled["Chrome"] = v;
+    l->debug() << "LibraryComponent::appsInstalled chrome map: " << mapInstalled["Chrome"] << std::endl;
+
+    v = "Version: Plugin";
+    mapInstalled["E2E"] = v;
+    l->debug() << "LibraryComponent::appsInstalled e2e map: " << mapInstalled["E2E"] << std::endl;
+
+    SubutaiLauncher::VirtualBox vbox;
+    //l->debug() << "LibraryComponent::constructor vbox is installed: " << vbox.findInstallation() << std::endl;
+    //if (vbox.isInstalled()) {
+    if (vbox.findInstallation()) {
+	v = vbox.extractVersion();
+	l->debug() << "LibraryComponent::appsInstalled vbox map: " << mapInstalled.size() << std::endl;
+	mapInstalled["VBox"] = v;
+	l->debug() << "LibraryComponent::appsInstalled vbox map: " << mapInstalled["VBox"] << std::endl;
+    }else {
+	mapInstalled["VBox"] = "Not installed";
+    }
+}
+
+
 bool LibrarySystemCheck::checkSystem(){
 
     auto l = SubutaiLauncher::Log::instance()->logger();
-    envCurrent.s_vbox = "Vbox: " + mapInstalled["VBox"].size();
-    l->debug() << "LibrarySystemCheck::checkSystem() mapInstalled[VBox]=" << mapInstalled["VBox"] << std::endl;
-    envCurrent.b_vbox = true;
 
     instEnabled = true;
     int found = 0;

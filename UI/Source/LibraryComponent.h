@@ -17,6 +17,7 @@ Author:  crioto
 #include <unistd.h>
 #endif
 #include <thread>
+#include <map>
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "LibraryActionThread.h"
@@ -79,7 +80,7 @@ class LibraryItem : public juce::Component
         void resized() override;
         void mouseUp(const juce::MouseEvent& e) override;
 	void drawVersion();
-	std::string findVersion(std::string cname);
+	static std::string findVersion(std::string cname);
     private:
         std::string _title;
         std::string _desc;
@@ -113,7 +114,7 @@ class LibraryComponent : public juce::Component, public juce::ButtonListener
         void drawProgressButtons(bool next = true, bool back = true, bool cancel = true);
         void nextStep();
         void previousStep();
-	void appsInstalled(std::map <std::string, std::string> &mapTmp);
+
 
     private:
         std::thread waitDownloadComplete();
@@ -161,6 +162,7 @@ class LibrarySystemCheck : public juce::Component {
 	    std::string s_vbox;
 	    bool b_vbox;
 	} envCurrent;
+	void appsInstalled();
 	bool checkSystem();
 
     private:
