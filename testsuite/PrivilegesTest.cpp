@@ -15,46 +15,45 @@
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/XmlOutputter.h>
 
-#include "VirtualBox.h"
+#include "SubutaiProcess.h"
 
 using namespace CppUnit;
 
-class VirtualBoxTest : public CppUnit::TestFixture
+class PrivilegesTest : public CppUnit::TestFixture
 {
-    CPPUNIT_TEST_SUITE(VirtualBoxTest);
-    CPPUNIT_TEST(testParseVms);
+    CPPUNIT_TEST_SUITE(PrivilegesTest);
+    CPPUNIT_TEST(testSudo);
     CPPUNIT_TEST_SUITE_END();
     public:
     void setUp(void);
     void tearDown(void);
     protected:
-    void testParseVms(void);
+    void testSudo(void);
 };
 
-void VirtualBoxTest::setUp(void)
+void PrivilegesTest::setUp(void)
 {
 
 }
 
-void VirtualBoxTest::tearDown(void)
+void PrivilegesTest::tearDown(void)
 {
 
 }
 
-void VirtualBoxTest::testParseVms()
+void PrivilegesTest::testSudo()
 {
-    SubutaiLauncher::VirtualBox v;
+    SubutaiLauncher::SubutaiProcess p;
+    std::vector<std::string> args;
+    args.push_back("touch");
+    args.push_back("/test-file");
+    p.launch("gksudo", args, "/usr/bin");
 
-    const std::string& source = R"END(
-"Name1" {ID1}
-"Name2" {ID2}
-    )END";
-
-    auto vms = v.parseVms(source);
-    CPPUNIT_ASSERT(vms.size() == 2);
-    CPPUNIT_ASSERT(vms[0].name == "Name1");
-    CPPUNIT_ASSERT(vms[1].name == "Name2");
+    SubutaiLauncher::SubutaiProcess p2;
+    args.clear();
+    args.push_back("/test-file2");
+    p.launch("touch", args, "/usr/bin/touch");
 }
 
-CPPUNIT_TEST_SUITE_REGISTRATION(VirtualBoxTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(PrivilegesTest);
 */

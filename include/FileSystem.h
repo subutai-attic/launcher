@@ -32,6 +32,7 @@
 #endif
 
 #include "SubutaiException.h"
+#include "SubutaiLog.h"
 
 namespace SubutaiLauncher {
     class FileSystem {
@@ -42,6 +43,7 @@ namespace SubutaiLauncher {
             void setPath(const std::string& path);
             bool isFileExists(const std::string& filename);
             void removeFile(const std::string& filename);
+            void createDirectory(const std::string& dir);
 #if LAUNCHER_LINUX
             void copyFile(const std::string& src, const std::string& dst);
 #elif LAUNCHER_WINDOWS

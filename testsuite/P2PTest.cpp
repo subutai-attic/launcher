@@ -1,4 +1,4 @@
-#include <iostream>
+/*#include <iostream>
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -58,3 +58,4 @@ void P2PTest::testExtractVersion()
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(P2PTest);
+*/

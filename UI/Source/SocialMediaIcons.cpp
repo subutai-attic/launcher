@@ -70,7 +70,10 @@ SocialMediaIcons::SocialMediaIcons() {
 }
 
 SocialMediaIcons::~SocialMediaIcons() {
-
+    delete _facebook;
+    delete _twitter;
+    delete _linkedin;
+    delete _github;
 }
 
 void SocialMediaIcons::buttonClicked(Button* button) {

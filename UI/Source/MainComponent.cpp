@@ -98,7 +98,8 @@ void MainContentComponent::paintListBoxItem(int rowNumber, Graphics& g, int widt
     if (!rowIsSelected) {
         t.setColour(Colour(200, 200, 200));
     } else {
-        t.setColour(Colour(176, 224, 230));
+        //t.setColour(Colour(176, 224, 230));
+	t.setColour(Colour(7, 141, 208));
     }
     t.setLineSpacing(40);
     t.setJustification(Justification::left);

@@ -18,10 +18,11 @@ ifeq ($(CONFIG),Debug)
     TARGET_ARCH := -march=native
   endif
 
-  CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 -I /usr/include -I /usr/include/freetype2 -I ../../JuceLibraryCode -I ../../JuceLibraryCode/modules -I ../../../include -I ../../../third-party/json -I ../../../third-party/md5 -I ../../../third-party/xpcom -I ../../../third-party/xpcom/xpcom -I ../../../third-party/xpcom/nsprpub -I ../../../third-party/xpcom/string -I ../../../third-party/xpcom/ipcd -I /usr/include/python3.5 -DCURL_STATICLIB
+  CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 -I /usr/include -I /usr/include/freetype2 -I ../../JuceLibraryCode -I ../../JuceLibraryCode/modules -I ../../../include -I ../../../third-party/json -I ../../../third-party/md5 -I ../../../third-party/xpcom -I ../../../third-party/xpcom/xpcom -I ../../../third-party/xpcom/nsprpub -I ../../../third-party/xpcom/string -I ../../../third-party/xpcom/ipcd -I /usr/include/python3.5 
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -ggdb -O0 -DRT_OS_LINUX
   CXXFLAGS += $(CFLAGS) -std=c++11
-  LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -L/usr/X11R6/lib/ -L../../../bin -L$(PYLIB_DIR) -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -lrt -lpython3.5 -Wl,-Bstatic -lsubutai-launcher -Wl,-Bdynamic
+#  LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -L/usr/X11R6/lib/ -L../../../bin -L$(PYLIB_DIR) -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -lrt -lpython3.5 -Wl,-Bstatic -lsubutai-launcher -Wl,-Bdynamic
+   LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -L/usr/X11R6/lib/ -L../../../bin -L$(PYLIB_DIR) -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -lrt -lcurl -lpython3.5 -lsubutai-launcher
 
   TARGET := sl-ui
   BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)

@@ -4,6 +4,10 @@ bin
 build
 CLI/bin
 CLI/build
+*_back
+scripts_tt
+bui.sh
+kurjun/*
 
 # extra libs
 /third-party/python*
@@ -18,7 +22,7 @@ UI/Builds/LinuxMakefile/build
 
 # windows build
 *.sdf
-*.filter
+*.filter*
 *.user
 *.opendb
 subutai-launcher/Debug
@@ -29,6 +33,10 @@ subutai-laucher/Debug
 UI/Builds/VisualStudio2015/.vs/
 UI/Builds/VisualStudio2015/Debug/
 /win/
+/Debug
+/x64
+/testsuite/Debug
+/testsuite/x64
 
 # python
 __pycache__

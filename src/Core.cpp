@@ -49,6 +49,19 @@ void SubutaiLauncher::Core::initializePython()
 
 void SubutaiLauncher::Core::run()
 {
+    FileSystem fs("/");
+    try 
+    {
+	if (! fs.isFileExists("/tmp/subutai"))
+	{
+	    //create /tmp/subutai
+	    fs.createDirectory("/tmp/subutai");
+	}
+    }
+    catch(SubutaiException e) 
+    {
+	return ;
+    }
     _running = true;
     Log::instance();
     initializePython();

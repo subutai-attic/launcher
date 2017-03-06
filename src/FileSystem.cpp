@@ -24,14 +24,19 @@ void SubutaiLauncher::FileSystem::setPath(const std::string& path) {
 }
 
 bool SubutaiLauncher::FileSystem::isFileExists(const std::string& filename) {
+	auto l = Log::instance()->logger();
+	//l->debug() << "FileSysten::FileExists: _path " << _path << std::endl;
 	std::string fullpath(_path);
+	//l->debug() << "FileSysten::FileExists: fullpath " << fullpath << std::endl;
 	fullpath.append(DELIM);
+	//l->debug() << "FileSysten::FileExists: fullpath DELIM " << fullpath << std::endl;
 	fullpath.append(filename);
+	//l->debug() << "FileSysten::FileExists: fullpath append filename " << fullpath << std::endl;
 #if LAUNCHER_LINUX
 	struct stat st;
 	return stat(fullpath.c_str(), &st) == 0;
 #elif LAUNCHER_WINDOWS
-	DWORD attr = GetFileAttributes(fullpath.c_str());
+	DWORD attr = GetFileAttributesA(fullpath.c_str());
 	if (attr == INVALID_FILE_ATTRIBUTES)
 	{
 		switch (GetLastError()) {
@@ -73,6 +78,27 @@ void SubutaiLauncher::FileSystem::removeFile(const std::string& filename) {
 	}
 }
 
+void SubutaiLauncher::FileSystem::createDirectory(const std::string& dir)
+{
+    std::string fullpath(_path);
+	fullpath.append(DELIM);
+	fullpath.append(dir);
+#if LAUNCHER_LINUX
+    if (mkdir(fullpath.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0) {
+        Log::instance()->logger()->fatal() << "Failed to create directory " << fullpath << ". Errorno: " << errno << std::endl;
+        throw SubutaiException("Failed to create directory");
+    }
+#elif LAUNCHER_WINDOWS
+	if (CreateDirectoryA(fullpath.c_str(), 0) == 0)
+	{
+		Log::instance()->logger()->fatal() << "Failed to create directory " << fullpath << std::endl;
+		throw SubutaiException("Failed to create directory");
+	}
+#elif LAUNCHER_MACOS
+#error Not Implemented for this platform
+#endif
+}
+
 #if LAUNCHER_LINUX
 void SubutaiLauncher::FileSystem::copyFile(const std::string& src, const std::string& dst)
 {
@@ -83,7 +109,7 @@ void SubutaiLauncher::FileSystem::copyFile(const std::string& src, const std::st
 }
 #elif LAUNCHER_WINDOWS
 void SubutaiLauncher::FileSystem::copyFile(LPCSTR in_file, LPCSTR out_file) {
-	if (!CopyFile(in_file, out_file, true))
+	if (!CopyFileA(in_file, out_file, true))
 	{
 		throw SubutaiException("Failed to copy file");
 	}

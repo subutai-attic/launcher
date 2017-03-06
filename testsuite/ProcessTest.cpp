@@ -1,3 +1,4 @@
+/*
 #include <iostream>
 #include <cstdio>
 #include <string>
@@ -62,3 +63,4 @@ void SubutaiProcessTest::testBadCommand()
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(SubutaiProcessTest);
+*/

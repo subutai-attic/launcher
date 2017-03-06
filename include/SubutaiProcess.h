@@ -4,8 +4,10 @@
 #include "Vars.h"
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
+#include <string.h>
 #if LAUNCHER_LINUX
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -16,8 +18,8 @@
 #include <errno.h>
 
 #include "SubutaiException.h"
-
-
+#include "SubutaiString.h"
+#include "SubutaiLog.h"
 
 namespace SubutaiLauncher {
 #ifdef LAUNCHER_WINDOWS
@@ -25,13 +27,14 @@ namespace SubutaiLauncher {
 #endif
     class SubutaiProcess {
         public:
-			SubutaiProcess();
+	    SubutaiProcess();
             ~SubutaiProcess();
             void runBasic(const std::string& command, std::vector<std::string> args);
             pid_t launch(const std::string& cmd, std::vector<std::string> args, const std::string& dir = "");
             int wait();
             std::string getOutputBuffer();
             std::string getErrorBuffer();
+	    std::string execute(const std::string& command, const std::string& cargs);
         protected:
             void setupFds();
             void closeFds();

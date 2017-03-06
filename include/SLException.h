@@ -2,7 +2,7 @@
 #define __SL_EXCEPTION_H__
 
 #include "SubutaiException.h"
-
+#include "SubutaiLog.h"
 namespace SubutaiLauncher {
 
     class SLException : public SubutaiException {
