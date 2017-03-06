@@ -27,6 +27,7 @@ Author:  crioto
 #include "Session.h"
 #include "SubutaiProcess.h"
 
+/*
 typedef enum {
     INTRO,
     SYSTEM_CHECK,
@@ -39,10 +40,25 @@ typedef enum {
     FINISHED,
     UNINSTALL
 } InstallStep;
+*/
+
+typedef enum {
+    INTRO,
+    SYSTEM_CHECK,
+    COMPONENT_CHOOSER,
+    SYSTEM_CONFIGURE,
+    INSTALL,
+    FINISHED,
+} InstallStep;
+
 
 class LibrarySystemCheck;
 class LibrarySystemConfigure;
 class LibraryDownload;
+//class LibraryPreinstall;
+class LibraryInstall;
+
+//bool instEnabled;
 
 //==============================================================================
 
@@ -67,7 +83,7 @@ class LibraryItem : public juce::Component
     private:
         std::string _title;
         std::string _desc;
-        std::string _installScript;
+	std::string _installScript;
         std::string _updateScript;
         std::string _removeScript;
         juce::Label _titleLabel;
@@ -97,6 +113,8 @@ class LibraryComponent : public juce::Component, public juce::ButtonListener
         void drawProgressButtons(bool next = true, bool back = true, bool cancel = true);
         void nextStep();
         void previousStep();
+	void appsInstalled(std::map <std::string, std::string> &mapTmp);
+
     private:
         std::thread waitDownloadComplete();
         void waitDownloadCompleteImpl();
@@ -106,6 +124,8 @@ class LibraryComponent : public juce::Component, public juce::ButtonListener
         LibrarySystemCheck* _systemCheck;
         LibrarySystemConfigure* _systemConfigure;
         LibraryDownload* _download;
+	//LibraryPreinstall* _preinstall;
+	LibraryInstall* _install;
         InstallStep _step;
         juce::TextButton _installButton;
         juce::TextButton _nextButton;
@@ -125,7 +145,24 @@ class LibrarySystemCheck : public juce::Component {
         ~LibrarySystemCheck();
         void paint(juce::Graphics& g) override;
         void resized();
-        void addLine(juce::Label* field, juce::Label* value, juce::Label* hint, std::string text, std::string hintText);
+        void addLine(juce::Label* field, juce::Label* value, juce::Label* hint, std::string text,
+		     std::string hintText, bool inst);
+	struct Current{
+	    std::string s_os;
+	    bool b_os;
+	    std::string s_arch;
+	    bool b_arch;
+	    int i_cores;
+	    bool b_cores;
+	    long l_ram;
+	    bool b_ram;
+	    std::string s_vtx;
+	    bool b_vtx;
+	    std::string s_vbox;
+	    bool b_vbox;
+	} envCurrent;
+	bool checkSystem();
+
     private:
         
 	juce::Label _osField;
@@ -167,23 +204,27 @@ class LibrarySystemCheck : public juce::Component {
 
 // ============================================================================
 
-class LibrarySystemConfigure : public juce::Component {
+class LibrarySystemConfigure : public juce::Component, public juce::ButtonListener    {
+//class LibrarySystemConfigure : public juce::Component    {
     public:
         LibrarySystemConfigure();
         ~LibrarySystemConfigure();
+	void buttonClicked(juce::Button *button);
         void paint(juce::Graphics& g) override;
         void resized() override;
         bool isPeerInstallChecked();
     private:
         // Install with peer
-        juce::Label _installVmField;
+        juce::Label _installConfField;
         juce::ToggleButton* _installTray;
         juce::ToggleButton* _installVm;
 
         // Install master or dev
         juce::Label _installTypeField;
-        juce::ToggleButton* _installMaster;
+        juce::ToggleButton* _installProd;
+	juce::ToggleButton* _installMaster;
         juce::ToggleButton* _installDev;
+	
         std::vector<juce::ToggleButton*> _installTypes;
 
         // Installation path
@@ -193,6 +234,14 @@ class LibrarySystemConfigure : public juce::Component {
         // Tmp directory
         juce::Label _installTmpField;
         juce::TextEditor _installTmpValue;
+
+        // vmCores
+        juce::Label _installCoresField;
+        juce::TextEditor _installCoresValue;
+
+        // vmRAM
+        juce::Label _installRamField;
+        juce::TextEditor _installRamValue;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LibrarySystemConfigure)
 };
@@ -232,7 +281,62 @@ class LibraryDownload : public juce::Component {
 
 // ============================================================================
 
-class LibraryInstall : public juce::Component {
+class LibraryPreinstall : public juce::Component {
+    public:
+        LibraryPreinstall();
+        ~LibraryPreinstall();
+        void paint(juce::Graphics& g) override;
+        //void resized() override;
+        //int calculateTotalSize();
+        //void updateProgress(long p);
+        //std::thread preinstall();
+        //void preinstallImpl();
+        //void start();
+        //bool isComplete();
+        //bool isCanceled();
+        //void setWithPeer(bool withPeer);
+
+    private:
+	juce::Label _lstep;
+        juce::Label _currentAction;
+        juce::Label _sizeProgress;
+        juce::Slider* _progressBar;
+        //SubutaiLauncher::Preinstaller* _preinstaller;
+        //bool _withPeer;
+        //bool _inProgress;
+        //bool _isPreinstallComplete;
+        //bool _isCanceled;
+        //int _totalSize;
+        //long _progress;
+
+        std::vector<std::string> _componentList;
+
+        //JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LibraryPreinstall)
+
+};
+
+// ============================================================================
+
+class LibraryInstall : public juce::Component, public juce::ButtonListener{
+    public:
+        LibraryInstall();
+        ~LibraryInstall();
+        void paint(juce::Graphics& g) override;
+	void addLine(juce::Label* field, juce::Label* value, juce::Label* hint, std::string text,
+		     std::string hintText, bool inst);
+	void installComponents();
+        void buttonClicked(juce::Button* button);
+    private:
+        // Install with peer
+        juce::Label _lstep;
+        juce::Label _lField;
+	juce::Label _lValue;
+        juce::Label _lHint;
+	juce::TextButton _confirmButton;
+
+	int _numLines;
+
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LibraryInstall)
 
 };
 

@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <string>
+#include "SubutaiLog.h"
 
 namespace SubutaiLauncher {
 

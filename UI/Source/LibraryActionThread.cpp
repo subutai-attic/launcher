@@ -1,6 +1,6 @@
 #include "LibraryActionThread.h"
 
-LibraryActionThread::LibraryActionThread(const std::string& process, const std::string& component, const std::string& title) :
+LibraryActionThread::LibraryActionThread(const std::string& process, const std::string& component, std::string& title) :
     _process(process),
     _component(component),
     _title(title),
@@ -96,6 +96,7 @@ void LibraryActionThread::run()
     auto configs = conf->getConfigs();
     SubutaiLauncher::InstallConfig config;
     bool found = false;
+    
     for (auto it = configs.begin(); it != configs.end(); it++)
     {
         if ((*it).title == _component)
@@ -105,10 +106,36 @@ void LibraryActionThread::run()
             break;
         }
     }
+    
+    SubutaiLauncher::VirtualBox vbox;
+    auto peers = vbox.getPeers();
+    for (auto pt = peers.begin(); pt != peers.end(); pt++)
+    {
+	if ((*pt).name == _component)
+        {
+	    SubutaiLauncher::InstallConfig ic;
+	    ic.title = (*pt).name;
+	    ic.description = (*pt).id;
+	    ic.file = "peer_install_tt"; //should be changed to update/temove
+            config = ic;
+            found = true;
+            break;
+        }
+    }
+
+    if (_component == "Peer")
+    {
+        SubutaiLauncher::InstallConfig ic;
+        ic.title = _component;
+        ic.description = "VM";
+        ic.file = "peer_install_tt";
+        config = ic;
+        found = true;
+    }
 
     if (!found)
     {
-        l->error() << _component << " configuration was not found" << std::endl;
+        l->error() << "LAT: " << _component << " configuration was not found" << std::endl;
         _error = true;
         _running = false;
         return;
@@ -202,6 +229,7 @@ void LibraryActionThread::run()
     }
 
     setProgress (0.8);
+    setStatusMessage("Executing " + _process);
 
     if (t.joinable()){
 	t.join();
@@ -226,12 +254,13 @@ void LibraryActionThread::run()
 
     setProgress (0.9);
     setStatusMessage ("Finishing !");
+    if (_title == "Peer")
+	_title = "subutai"; 
     //wait (200);
     sleep(2000);
 
     setProgress (1.0);
     _running = false;
-
 }
 
 void LibraryActionThread::threadComplete (bool userPressedCancel)

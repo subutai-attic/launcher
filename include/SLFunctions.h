@@ -240,11 +240,48 @@ namespace SubutaiLauncher {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
 
-        Log::instance()->logger()->debug() << "VBox: " << sl_string << std::endl;
+        Log::instance()->logger()->debug() << "PyObject VBox: " << sl_string << std::endl;
 
         VirtualBox vb;
-        vb.execute(sl_string);
-        
+	std::string out = vb.execute(sl_string);
+	int found = out.find("error");
+        if (found == std::string::npos)
+	    return Py_BuildValue("i", 1);
+	return Py_BuildValue("i", 0);
+    }
+
+    static PyObject* SL_cloneVM(PyObject* self, PyObject* args, PyObject* keywords) {
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
+            return NULL;
+
+        Log::instance()->logger()->debug() << "cloneVM " << sl_string << std::endl;
+
+        VirtualBox vb;
+        Log::instance()->logger()->debug() << "cloneVM  " << sl_string << std::endl;
+        vb.cloneVM(sl_string);
+        Log::instance()->logger()->debug() << "cloneVM  after run " << sl_string << std::endl;
+        return Py_BuildValue("i", 1);
+    }
+
+    static PyObject* SL_runScripts(PyObject* self, PyObject* args, PyObject* keywords) {
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
+            return NULL;
+
+        Log::instance()->logger()->debug() << "runScripts: " << sl_string << std::endl;
+
+        VirtualBox vb;
+        Log::instance()->logger()->debug() << "runScripts: vb " << sl_string << std::endl;
+        vb.runScripts(sl_string);
+        Log::instance()->logger()->debug() << "runScripts: after run " << sl_string << std::endl;
+        return Py_BuildValue("i", 1);
+    }
+
+    static PyObject* SL_runAutobuild(PyObject* self, PyObject* args) {
+        Log::instance()->logger()->debug() << "runAutobuild: " <<  std::endl;
+
+        VirtualBox vb;
+        vb.runAutobuild();
+        Log::instance()->logger()->debug() << "runAutobuild: after run "  << std::endl;
         return Py_BuildValue("i", 1);
     }
 
@@ -266,14 +303,17 @@ namespace SubutaiLauncher {
         {"debug", SL_Debug, METH_VARARGS, "Shows debug information about current launcher instance and environment"},
         {"version", SL_Version, METH_VARARGS, "Display launcher version"},
         {"CheckDirectories", SL_CheckDirectories, METH_VARARGS, "Display launcher version"},
-        {"RaiseError", (PyCFunction)SL_RaiseError, METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN"},
+        {"RaiseError", (PyCFunction)SL_RaiseError, METH_VARARGS | METH_KEYWORDS, "Raising error"},
         {"VBox", (PyCFunction)SL_VBox, METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something"},
-        {"RaiseWarning", (PyCFunction)SL_RaiseWarning, METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN"},
-        {"RaiseInfo", (PyCFunction)SL_RaiseInfo, METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN"},
+	{"cloneVM", (PyCFunction)SL_cloneVM, METH_VARARGS | METH_KEYWORDS, "clones VM"},
+        {"runScripts", (PyCFunction)SL_runScripts, METH_VARARGS | METH_KEYWORDS, "Upload files and run prepare-server.sh"},
+        {"RaiseWarning", (PyCFunction)SL_RaiseWarning, METH_VARARGS | METH_KEYWORDS, "Raising warning"},
+        {"RaiseInfo", (PyCFunction)SL_RaiseInfo, METH_VARARGS | METH_KEYWORDS, "Raising info"},
         {"Shutdown", SL_Shutdown, METH_VARARGS, "Finalizes the script"},
         {"GetMasterVersion", SL_GetMasterVersion, METH_VARARGS, "Returns master version of a product"},
         {"GetDevVersion", SL_GetDevVersion, METH_VARARGS, "Returns dev version of a product"},
         {"getDistro", SL_getDistro, METH_VARARGS, "Returns OS distro"},
+        {"runAutobuild", SL_runAutobuild, METH_VARARGS, "temporary - runs autobuild script"},
         {NULL, NULL, 0, NULL}
     };
 

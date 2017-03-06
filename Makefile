@@ -7,7 +7,15 @@ EXTRA_LIBS_DIR = third-party
 VB_DIR = third-party/xpcom
 VB = -I$(VB_DIR) -I$(VB_DIR)/xpcom -I$(VB_DIR)/nsprpub -I$(VB_DIR)/string -I$(VB_DIR)/ipcd
 INCLUDES = -Iinclude -I/usr/include/$(PYTHON_VER) $(VB) -Ithird-party/md5 -Ithird-party/json -I/usr/local/include
-LIBS = -g -ggdb -lm -lrt -l$(PYTHON_VER) -lcurl -lssh -L$(PYLIB_DIR) -lPocoFoundation -lPocoNet -lPocoNetSSL -lCppUnit
+#orig
+#LIBS = -g -ggdb -lm -lrt -l$(PYTHON_VER) -lcurl -lssh -L$(PYLIB_DIR) -lPocoFoundation -lPocoNet -lPocoNetSSL -lCppUnit
+#changed order
+LIBS = -g -ggdb -lm -lrt -l$(PYTHON_VER) -lcurl -lssh -L$(PYLIB_DIR)  -lPocoNet -lPocoNetSSL -lPocoFoundation -lCppUnit
+#static
+#LIBS = -g -ggdb -lm -lrt -l$(PYTHON_VER) -lcurl -lssh -L$(PYLIB_DIR)  -Wl,-Bstatic -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation 
+#-lCppUn
+#LIBS = -g -ggdb -lm -lrt -l$(PYTHON_VER) -lcurl -lssh -L$(PYLIB_DIR) -L /usr/local/lib -Wl, -Bstatic -lPocoFoundation -Wl, -Bstatic -lPocoNet -Wl, -Bstatic -lPocoNetSSL
+#-lCppUnit
 CFLAGS = -L/lib/x86_64-linux-gnu $(INCLUDES) $(LIBS) -std=c++11 -DRT_OS_LINUX
 
 SRC_DIR = src
@@ -57,16 +65,18 @@ $(BUILD_DIR)/third-party/md5/%.o: third-party/md5/%.cpp $(HEADERS)
 	$(CC) -fPIC $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/$(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC)   $(CFLAGS) -c $< -o $@
 
 $(OUTPUT_DIR)/$(DYNAMIC_LIB_TARGET): $(OBJECTS)
-	$(CC) -shared $(OBJECTS) $(LIBS) -o $@
+	$(CC) -shared  $(OBJECTS) $(LIBS) -o $@
+#	$(CC) -shared  $(OBJECTS) $(LIBS) -o $@
 
 $(OUTPUT_DIR)/$(STATIC_LIB_TARGET): $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(OUTPUT_DIR)/$(DYNAMIC_LIB_TARGET)-test: $(T_OBJECTS)
 	$(CC) $(T_OBJECTS) -Wall $(LIBS) -lCppUnit -L$(OUTPUT_DIR) -lsubutai-launcher -o $@
+
 
 directories:
 	@mkdir -p $(OUTPUT_DIR)

@@ -73,14 +73,14 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo()
     std::string output;
     Poco::StreamCopier::copyToString(rs, output);
 
-    l->debug() << "Before JSon(change to Poco!): responce: " << output << std::endl;
+    //l->debug() << "Before JSon(change to Poco!): responce: " << output << std::endl;
 
     // TODO: Replace JSON lib with Poco
     Json::Value root;
     std::istringstream str(output);
     str >> root;
 
-    l->debug() << "JSon(change to Poco!): root copied: " << std::endl;
+    //l->debug() << "JSon(change to Poco!): root copied: " << std::endl;
     
     const Json::Value owners = root["owner"];
     for (unsigned int i = 0; i < owners.size(); ++i) {

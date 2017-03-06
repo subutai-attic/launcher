@@ -130,16 +130,16 @@ void SubutaiLauncher::SL::execute()
 
     l->debug() << "SL::execute _name " << _name << std::endl;
 
-    if (_name == NULL)
+    if (_name == NULL  )
     {
         ncenter->stop();
-	l->error() << "SL::execute _module name zero: exception Empty module name, 12 " << _module << std::endl;
+	l->error() << "SL::execute module name zero: exception Empty module name, 12 " << _module << std::endl;
         PyErr_Print();
 	throw SLException("Empty module name", 12);
     }
     PyObject* sysPath = PySys_GetObject((char*)"path");
-    //l->debug() << "SL::execute   sysPath " << sysPath << std::endl;
-    l->debug() << "SL::execute   sysPath " << std::endl;
+    l->debug() << "SL::execute   sysPath " << sysPath << " _dir: " << _dir  << std::endl;
+    //l->debug() << "SL::execute   sysPath " << std::endl;
 
 #if PY_MAJOR_VERSION >= 3
     PyObject* tmpPath = PyUnicode_FromString(_dir.c_str());
@@ -150,19 +150,34 @@ void SubutaiLauncher::SL::execute()
     PyList_Append(sysPath, tmpPath);
 
     //l->debug() << "SL::execute sysPath " << sysPath  << "     tmpPath " << tmpPath << " _dir " << _dir  << std::endl;
-    l->debug() << "SL::execute sysPath     tmpPath     _dir "  << std::endl;
-
+    //l->debug() << "SL::execute sysPath     tmpPath     _dir before import "  << std::endl;
     try 
     {
+	l->debug() << "SL::execute  PyImport_Import(_name) before "  << std::endl;
         _module = PyImport_Import(_name);
-	Py_DECREF(_name);
+	if (!_module){
+	    l->error() << "SL::execute module name zero: exception Empty module name, 12 " << _module << std::endl;
+    	    PyErr_Print();
+	    throw SLException("Cannot find specified module", 7);
+	}
+        l->debug() << "SL::execute Py_DECREF(_name) before "  << std::endl;
+	Py_XDECREF(_name);
+        l->debug() << "SL::execute Py_DECREF(_name) after "  << std::endl;
     }
     catch (std::exception const &exc)
     {
-        std::cerr << "Exception caught " << exc.what() << "\n";
+        l->error() << "SL::execute() Exception caught: " <<  exc.what()  << std::endl;
+	PyErr_Print();
+	//std::cerr << "Exception caught " << exc.what() << "\n";
     }
-    
-    l->error() << "SL::execute module tryed , 7 " << std::endl;
+    catch (...)
+    {
+        std::exception_ptr p = std::current_exception();
+	l->error() << "SL::execute() Unknown exception caught: " <<  (p ? p.__cxa_exception_type()->name() : "null")  << std::endl;
+	PyErr_Print();
+        //std::clog <<(p ? p.__cxa_exception_type()->name() : "null") << std::endl;
+    }
+    l->debug() << "SL::execute module tryed , 7 " << std::endl;
 
     if (_module == NULL || _module == 0){
 //    if (_module == nullptr){

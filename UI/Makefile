@@ -1,9 +1,15 @@
-CC=g++
+CC = g++ 
+#-print-search-dirs 
 TARGET = subutai-launcher
 EXTRA_LIB_DIR = ../third-party
 INCLUDES = -Iinclude -I/usr/include/$(PYTHON_VER) -I../include -I../third-party/md5 -I../third-party/json
-LIBS = -L/lib/x86_64-linux-gnu -L../bin -L$(PYLIB_DIR) -g -ggdb -lm -lrt -l$(PYTHON_VER) -lcurl -lssh -lPocoNet -lsubutai-launcher -L/usr/X11R6/lib -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread 
-CFLAGS = -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 $(INCLUDES) -I/usr/include -I/usr/include/freetype2 -IJuceLibraryCode -IJuceLibraryCode/modules -std=c++11
+#static subutai
+#LIBS = -L/lib/x86_64-linux-gnu   -L$(PYLIB_DIR) -g -ggdb -lm -lrt -l$(PYTHON_VER) -lcurl -lssh -L/usr/X11R6/lib -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread  -Wl, -Bdynamic -lgcc_s -L/usr/local/lib -Wl, -Bstatic -lPocoNet  -L../bin -Wl,-Bstatic -lsubutai-launcher
+#static
+#LIBS = -L/lib/x86_64-linux-gnu  -L$(PYLIB_DIR) -g -ggdb -lm -lrt -l$(PYTHON_VER) -lcurl -lssh -Wl,-Bstatic -L/usr/local/lib  -lPocoNet -Wl,-Bdynamic -L/usr/X11R6/lib -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -Wl,-Bstatic -L../bin -lsubutai-launcher
+#shared
+LIBS =  -L/usr/lib/x86_64-linux-gnu -L$(PYLIB_DIR) -g -ggdb -lm -lrt -l$(PYTHON_VER) -lcurl -lssh  -lPocoNet  -L/usr/X11R6/lib -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -lsubutai-launcher
+CFLAGS =-DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 $(INCLUDES) -I/usr/include -I/usr/include/freetype2 -IJuceLibraryCode -IJuceLibraryCode/modules -std=c++11
 
 JUCE=JuceLibraryCode
 
@@ -23,26 +29,26 @@ JUCE_OBJECTS = $(BUILD_DIR)/juce_core.o \
 
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
-	$(CC) -Wall $(CFLAGS) -c $< -o $@
+	$(CC)  -Wall $(CFLAGS) -c $< -o $@
 
 $(OUTPUT_DIR)/$(TARGET): $(OBJECTS) $(JUCE_OBJECTS)
-	$(CC) $(OBJECTS) $(JUCE_OBJECTS) -Wall $(LIBS) -o $@
+	$(CC)  $(OBJECTS) $(JUCE_OBJECTS) -Wall $(LIBS) -o $@
 	
 $(BUILD_DIR)/juce_core.o: $(JUCE)/juce_core.cpp
-	$(CC) -Wall $(CFLAGS) -c $< -o $@
+	$(CC)  -Wall $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/juce_data_structures.o: $(JUCE)/juce_data_structures.cpp
-	$(CC) -Wall $(CFLAGS) -c $< -o $@
+	$(CC)  -Wall $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/juce_events.o: $(JUCE)/juce_events.cpp
-	$(CC) -Wall $(CFLAGS) -c $< -o $@
+	$(CC)  -Wall $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/juce_graphics.o: $(JUCE)/juce_graphics.cpp
-	$(CC) -Wall $(CFLAGS) -c $< -o $@
+	$(CC)  -Wall $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/juce_gui_basics.o: $(JUCE)/juce_gui_basics.cpp
-	$(CC) -Wall $(CFLAGS) -c $< -o $@
+	$(CC)  -Wall $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/juce_gui_extra.o: $(JUCE)/juce_gui_extra.cpp
-	$(CC) -Wall $(CFLAGS) -c $< -o $@
+	$(CC)  -Wall $(CFLAGS) -c $< -o $@
 
