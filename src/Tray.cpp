@@ -39,9 +39,11 @@ bool SubutaiLauncher::Tray::findInstallation()
 
 std::string SubutaiLauncher::Tray::extractVersion()
 {
-    if (_version != "" &&_version != "NA") {
-	return _version;
-    }
+//    if (_version != "") {
+//	return _version;
+//    }
+
+    auto l = Log::instance()->logger();
 
     std::vector<std::string> args;
     args.push_back("-v");
@@ -51,12 +53,23 @@ std::string SubutaiLauncher::Tray::extractVersion()
     if (pid < 0)
         return "NA";
     std::string res;
+    std::string res1;
     std::vector<std::string> vres;
     if (p.wait() == 0) {
         res = p.getOutputBuffer();
+        l->debug() << "SubutaiLauncher::Tray version output res: " << res << "/ "<< std ::endl;
+        res1 = p.getErrorBuffer();
+        l->debug() << "SubutaiLauncher::Tray version error res1: " << res1 << "/" <<std::endl;
+
         SubutaiString st(res);
-        vres = st.ssplit("\n");
-        _version = vres.back();
+	int found = std::string::npos;
+	found = res.find("error");
+	if (found != std::string::npos) {
+	    _version = "not defined";
+	} else {
+    	    vres = st.ssplit("\n");
+    	    _version = vres.back();
+	}
         return _version;
     }
     return "";

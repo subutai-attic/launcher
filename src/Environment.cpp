@@ -178,7 +178,18 @@ std::string SubutaiLauncher::Environment::distroOS(std::string ar)
 	out = sp.getOutputBuffer();
 	err = sp.getErrorBuffer();
     }
-
+    int found = out.find("Error");
+    if (found != std::string::npos) {
+	sleep(5);
+	out = "";
+	err = "";
+	sp.launch("lsb_release", args, "/usr/bin");
+	if (sp.wait() == 0) 
+	{
+	    out = sp.getOutputBuffer();
+	    err = sp.getErrorBuffer();
+	}
+    }
     SubutaiString sstr(out);
     std::vector<std::string> splitted = sstr.ssplit("\t");
     out = splitted.back();

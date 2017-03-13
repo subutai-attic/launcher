@@ -250,16 +250,10 @@ namespace SubutaiLauncher {
 	return Py_BuildValue("i", 0);
     }
 
-    static PyObject* SL_cloneVM(PyObject* self, PyObject* args, PyObject* keywords) {
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
-            return NULL;
-
-        Log::instance()->logger()->debug() << "cloneVM " << sl_string << std::endl;
+    static PyObject* SL_cloneVM(PyObject* self, PyObject* args) {
 
         VirtualBox vb;
-        Log::instance()->logger()->debug() << "cloneVM  " << sl_string << std::endl;
-        vb.cloneVM(sl_string);
-        Log::instance()->logger()->debug() << "cloneVM  after run " << sl_string << std::endl;
+        vb.cloneVM();
         return Py_BuildValue("i", 1);
     }
 

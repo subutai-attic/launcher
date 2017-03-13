@@ -11,6 +11,9 @@ Author:  crioto
 #ifndef MAIN_H_INCLUDED
 #define MAIN_H_INCLUDED
 
+#include <unistd.h>
+#include <sys/types.h>
+
 #include "MainWindow.h"
 #include <Python.h>
 
@@ -31,6 +34,10 @@ class UIApplication  : public juce::JUCEApplication
             // This method is where you should put your application's initialisation code..
             //
             //
+	    //uid_t cuser = getuid();
+	    //if (cuser !=0) {
+		
+	    //}
             _core = new SubutaiLauncher::Core(std::vector<std::string>());
             _core->run();
 

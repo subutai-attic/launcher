@@ -14,6 +14,7 @@
 #include "Session.h"
 #include "Environment.h"
 #include "SubutaiLog.h"
+#include "Browser.h"
 
 namespace SubutaiLauncher 
 {

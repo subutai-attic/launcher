@@ -171,10 +171,10 @@ std::string SubutaiLauncher::VirtualBox::sysExecute(const std::string& command, 
     return out;
 }
 
-std::string SubutaiLauncher::VirtualBox::cloneVM(const std::string& cName){
+std::string SubutaiLauncher::VirtualBox::cloneVM(){
 
     std::string ovaName = "core";
-    Log::instance()->logger()->debug() << "VirtualBox::cloneVM start" << cName << std::endl;
+    Log::instance()->logger()->debug() << "VirtualBox::cloneVM start" << std::endl;
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
 
@@ -231,7 +231,7 @@ bool SubutaiLauncher::VirtualBox::cleanKnownHosts(std::string sport){
 }
 
 
-bool SubutaiLauncher::VirtualBox::runScripts(std::string snapFile)
+bool SubutaiLauncher::VirtualBox::runScripts(std::string instVersion)
 {
     sleep(20);
     //waiting for ssh - waitForSnapd
@@ -257,7 +257,7 @@ bool SubutaiLauncher::VirtualBox::runScripts(std::string snapFile)
     l->debug() << "VirtualBox::runScript cloneName " << cloneName << " connected: " << ssh.isConnected() << std::endl;
 
     //SUBUTAI - get branch
-    std::string subutaiBranch = getBranch();
+    std::string subutaiBranch = getBranch(instVersion);
 
     //Install snap from store
 
@@ -354,7 +354,9 @@ bool SubutaiLauncher::VirtualBox::runScripts(std::string snapFile)
 	return false;
     };
 */
-    importManagement();
+
+    //if MH!
+    //importManagement();
     return true;
 }
 
@@ -401,8 +403,14 @@ bool SubutaiLauncher::VirtualBox::runAutobuild(){
     return true;
 }
 
-std::string SubutaiLauncher::VirtualBox::getBranch() {
-    return "subutai-dev";
+std::string SubutaiLauncher::VirtualBox::getBranch(std::string instVersion) {
+
+    if (instVersion == "STAGE") {
+	return "subutai-master";
+    } else if (instVersion == "DEV") {
+	return "subutai-dev";
+    }
+    return "subutai";
 }
 
 

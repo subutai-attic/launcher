@@ -13,9 +13,26 @@ Author:  crioto
 
 
 bool instEnabled = true;
+long minCores = 2;
+long minRAM = 3600;
+
 std::map <std::string, std::string> mapInstalled;
-std::vector <std::string> vComponents2Install;
+std::map <std::string, std::string> map2Install;
 std::string vboxVersion;
+std::vector <std::string> vComponents = {"Browser Plugin", "VBox", "Subutai Client", "Peer"};
+std::map <int, std::string> mapInstallConfig = { {RH_ONLY, "RH only"}, {RH_CLIENT, "RH+Client"}, {MH_FULL, "RH+MH+Client"}, {CLIENT_ONLY, "Client only"} };
+std::map <int, std::string> mapInstallVersion = { {PROD,"Current release version"}, {STAGE, "Stage snapshot"}, {DEV, "Dev snapshot"} };
+
+
+struct {
+    int instConfig = MH_FULL;
+    int instVersion = DEV;
+    std::string instDir = "/opt/subutai";
+    std::string instTmpDir = "/tmp/subutai";
+    long instCores = 2;
+    long instRAM = 2048;
+
+} instData;
 
 LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, const std::string& is, const std::string& us, const std::string& rs) : 
     _title(title),
@@ -62,7 +79,6 @@ LibraryItem::LibraryItem(const  std::string& title, const std::string& desc, con
     _version.setBounds(0, HEIGHT-40, WIDTH, 40);
     _version.setFont(verFont);
     _version.setJustificationType(Justification::bottomLeft);
-    //_version.setBorderSize(1,1);
     addAndMakeVisible(_version);
 
     drawVersion();
@@ -82,7 +98,6 @@ void LibraryItem::drawVersion()
     _version.setBounds(0, HEIGHT-40, WIDTH, 40);
     _version.setFont(verFont);
     _version.setJustificationType(Justification::bottomLeft);
-//    _version.setBorderSize(1,1);
     addAndMakeVisible(_version);
     std::string vText = findVersion(_title);
     if (vText != "") {
@@ -93,7 +108,6 @@ void LibraryItem::drawVersion()
 	_version.setVisible(false);
     }
 }
-
 
 
 std::string LibraryItem::findVersion(std::string cname)
@@ -127,7 +141,15 @@ std::string LibraryItem::findVersion(std::string cname)
     }
     else if (cname == "Browser Plugin")
     {
-	v = "Version: Hello";
+	SubutaiLauncher::Browser brw;
+        brw.findInstallation();
+	l->debug() << "LibraryComponent::LibraryItem browser is installed: " << brw.findInstallation() << " is installed: " << brw.isInstalled() << std::endl;
+        if (brw.isInstalled()) {
+	//if (tray.findInstallation()) {
+	    //l->debug() << "LibraryComponent::constructor tray version: " << tray.extractVersion() << std::endl;
+            v = brw.extractVersion();
+	    v += "\nE2E";
+        }
     }
     else if (cname == "VBox")
     {
@@ -195,7 +217,7 @@ void LibraryItem::mouseUp(const juce::MouseEvent& e)
     juce::PopupMenu menu;
 
     menu.addItem(1, "Install");
-    menu.addItem(2, "Update");
+//    menu.addItem(2, "Update");
     menu.addItem(3, "Remove");    
 
     const int res = menu.show();
@@ -254,6 +276,7 @@ void LibraryItem::mouseUp(const juce::MouseEvent& e)
     }
     
     drawVersion();
+    LibrarySystemCheck::appsInstalled();
 }
 
 // ============================================================================
@@ -272,15 +295,23 @@ LibraryComponent::LibraryComponent() :
     _nextButton.addListener(this);
     _backButton.addListener(this);
     _cancelButton.addListener(this);
+
     _systemCheck = new LibrarySystemCheck();
+    _systemCheck->setComponentID("SystemCheck");
     _systemConfigure = new LibrarySystemConfigure();
-    _download = new LibraryDownload(false);
+    _systemConfigure->setComponentID("SystemConfigure");
+    //_download = new LibraryDownload(false);
     _install = new LibraryInstall();
+    _install->setComponentID("SystemInstall");
+    //_install->addListener(this);
     //_preinstall = new LibraryPreinstall();
     addAndMakeVisible(_systemCheck);
+    //_systemCheck->addListener(this);
     addAndMakeVisible(_systemConfigure);
-    addAndMakeVisible(_download);
+    //_systemConfigure->addListener(this);
+    //addAndMakeVisible(_download);
     addAndMakeVisible(_install);
+    //_install->addListener(this);    
 
     addChildComponent(_nextButton);
     addChildComponent(_backButton);
@@ -292,7 +323,7 @@ LibraryComponent::LibraryComponent() :
 LibraryComponent::~LibraryComponent() {
     delete(_systemCheck);
     delete(_systemConfigure);
-    delete(_download);
+    //delete(_download);
     delete(_install);
 }
 
@@ -323,6 +354,8 @@ void LibraryComponent::resized() {
             drawSystemConfigure();
             break;
         case INSTALL:
+	    collectInstallData();
+	    //showChangedInfo();
             drawInstall();
             break;
         case FINISHED:
@@ -358,6 +391,7 @@ void LibraryComponent::buttonClicked(Button* button) {
     if (button == &_installButton) {
         std::printf("Install button\n");
         _step = SYSTEM_CHECK;
+	LibrarySystemCheck::appsInstalled();
         /*  
             _installButton.setEnabled(false);
             auto dialog = new InstallationDialog("Subutai Installation", Colours::blue, DocumentWindow::allButtons);
@@ -377,6 +411,43 @@ void LibraryComponent::buttonClicked(Button* button) {
     }
     resized();
 }
+
+
+void LibraryComponent::componentVisibilityChanged(Component* component){
+
+
+    NativeMessageBox::showMessageBox(AlertWindow::AlertIconType::InfoIcon, "LibraryInstall::componentVisibilityChanged", 
+	mapInstallConfig[instData.instConfig], nullptr);
+}
+
+/*
+void LibrarySystemConfigure::textEditorTextChanged(TextEditor &teditor) {
+
+    auto l = SubutaiLauncher::Log::instance()->logger();
+
+    //teditor->setColour(TextEditor::backgroundColourId, Colours::yellow);
+
+    //juce::String tname = teditor->getName();
+    //l->debug() << "LibrarySystemConfigure::textEditorTextChanged " << tname  << std::endl;
+
+}
+
+*/
+void LibraryComponent::textEditorFocusLost(TextEditor &teditor) {
+
+    NativeMessageBox::showMessageBox(AlertWindow::AlertIconType::InfoIcon, "LibrarySystemConfigure::textEditorFocusLost", 
+	"hhhhhhhhhhhhhhhhh", nullptr);
+//teditor->getName()
+    auto l = SubutaiLauncher::Log::instance()->logger();
+
+    //teditor->setColour(TextEditor::backgroundColourId, Colours::green);
+    //juce::String tname = teditor->getName();
+    //l->debug() << "LibraryComponent::textEditorFocusLost " << tname  << std::endl;
+
+}
+
+
+
 
 void LibraryComponent::drawIntro() {
 
@@ -495,13 +566,13 @@ void LibraryComponent::drawSystemCheck() {
     drawProgressButtons(true, false, true);
     _systemConfigure->setVisible(false);
 
-    _download->setVisible(false);
+    //_download->setVisible(false);
 }
 
 void LibraryComponent::drawSystemConfigure() {
     drawProgressButtons(true, true, true);
     _systemCheck->setVisible(false);
-    _download->setVisible(false);
+    //_download->setVisible(false);
     _install->setVisible(false);
     _systemConfigure->setVisible(true);
     _systemConfigure->setBounds(20, 20, 1024-250-40, 768 - 60 - 40);
@@ -556,13 +627,13 @@ void LibraryComponent::drawPreinstall() {
 #endif
     _systemCheck->setVisible(false);
     _systemConfigure->setVisible(false);
-    _download->setWithPeer(_systemConfigure->isPeerInstallChecked());
-    _download->setWithPeer(false);
-    _download->setVisible(false);
+    //_download->setWithPeer(_systemConfigure->isPeerInstallChecked());
+    //_download->setWithPeer(false);
+    //_download->setVisible(false);
     _install->setVisible(false);
     //_preinstall->setVisible(true);
-    _download->setBounds(20, 20, 1024-250-40, 768 - 60 - 40);
-    _download->start();
+    //_download->setBounds(20, 20, 1024-250-40, 768 - 60 - 40);
+    //_download->start();
     drawProgressButtons(false, false, true);
     //auto t = waitDownloadComplete();
     //t.detach();
@@ -572,12 +643,12 @@ void LibraryComponent::drawInstall() {
 
     drawProgressButtons(true, true, true);
     _systemCheck->setVisible(false);
-    _download->setVisible(false);
+    //_download->setVisible(false);
     _systemConfigure->setVisible(false);
     _install->setBounds(20, 20, 1024-250-40, 768 - 60 - 40);
     _install->setVisible(true);
     drawProgressButtons(true, true, true);
-
+    //LibraryInstall::showChangedInfo();
 }
 
 void LibraryComponent::drawPostInstall() {
@@ -593,7 +664,7 @@ void LibraryComponent::onStepChange() {
     _installButton.setVisible(false);
     _systemCheck->setVisible(false);
     _systemConfigure->setVisible(false);
-    _download->setVisible(false);
+    //_download->setVisible(false);
     _install->setVisible(false);
 }
 
@@ -690,28 +761,44 @@ std::thread LibraryComponent::waitDownloadComplete() {
 }
 
 void LibraryComponent::waitDownloadCompleteImpl() {
-    while (!_download->isComplete()) {
+    //while (!_download->isComplete()) {
 #if LAUNCHER_LINUX
-        sleep(1);
+    //    sleep(1);
 #elif LAUNCHER_WINDOWS
-		Sleep(1000);
+	//	Sleep(1000);
 #endif
-        if (_download->isCanceled()) {
-            return;
-        }
-    }
-    drawProgressButtons(true, false, true);	
+        //if (_download->isCanceled()) {
+        //    return;
+        //}
+    //}
+    //drawProgressButtons(true, false, true);	
 }
+
+void LibraryComponent::collectInstallData() {
+
+    auto l = SubutaiLauncher::Log::instance()->logger();
+    l->debug()<< "LibraryComponent::collectInstallData() " << std::endl;
+
+//    instData.instDir = LibrarySystemConfigure::_installPathValue->getText();
+//    instData.instTmpDir =  LibrarySystemConfigure::_installTmpValue.getText();
+//    instData.instCores =  LibrarySystemConfigure::_installCoresValue.getText();
+//    instData.instRAM =  LibrarySystemConfigure::_installRamValue.getText();
+
+    l->debug()<< "LibraryComponent::collectInstallData() instConfig: " << instData.instConfig << std::endl;
+    l->debug()<< "LibraryComponent::collectInstallData() instVersion: " << instData.instVersion <<  std::endl;
+    l->debug()<< "LibraryComponent::collectInstallData() instdDir: " << instData.instDir << std::endl;
+    l->debug()<< "LibraryComponent::collectInstallData() instTmpDir: " << instData.instTmpDir << std::endl;
+    l->debug()<< "LibraryComponent::collectInstallData() instCores: " << instData.instCores << std::endl;
+    l->debug()<< "LibraryComponent::collectInstallData() instRAM: " << instData.instRAM << std::endl;
+
+}
+
 
 // ============================================================================
 
 LibrarySystemCheck::LibrarySystemCheck() : _numLines(1) {
 
     auto l = SubutaiLauncher::Log::instance()->logger();
-
-    l->debug() << "LibrarySystemCheck()  map size before: " << mapInstalled.size() << std::endl;
-    appsInstalled();
-    l->debug() << "LibrarySystemCheck()  map size after: " << mapInstalled.size() << std::endl;
 
     int fieldFont = 20;
     SubutaiLauncher::Environment env;
@@ -727,7 +814,8 @@ LibrarySystemCheck::LibrarySystemCheck() : _numLines(1) {
     envCurrent.s_vtx = env.vtxEnabled();
     envCurrent.b_vtx = true;
 
-    envCurrent.s_vbox = LibraryItem::findVersion("VBox");
+    //envCurrent.s_vbox = LibraryItem::findVersion("VBox");
+    envCurrent.s_vbox = mapInstalled["VBox"];
    
 /*
     SubutaiLauncher::VirtualBox vbox;
@@ -775,7 +863,8 @@ LibrarySystemCheck::LibrarySystemCheck() : _numLines(1) {
     addAndMakeVisible(_maxMemoryHint);
     _maxMemoryValue.setText(std::to_string(envCurrent.l_ram), dontSendNotification);
     addLine(&_maxMemoryField, &_maxMemoryValue, &_maxMemoryHint, "Total System Memory", 
-	"4GB will be taken to each peer's virtual machine", envCurrent.b_ram);
+	"2GB will be taken to each peer's virtual machine", envCurrent.b_ram);
+//	"4GB will be taken to each peer's virtual machine", envCurrent.b_ram);
 
     addAndMakeVisible(_vtxField);
     addAndMakeVisible(_vtxValue);
@@ -828,45 +917,58 @@ LibrarySystemCheck::~LibrarySystemCheck() {
 
 void LibrarySystemCheck::appsInstalled(){
     std::string v = "";
-    //std::map <std::string, std::string> mapTmp;
-
+    std::string v1 = "";
+    mapInstalled.clear();
     auto l = SubutaiLauncher::Log::instance()->logger();
     //P2P 
     SubutaiLauncher::P2P p2p;
-    //if (p2p.isInstalled()) {
-    if (p2p.findInstallation()) {
-        v =  p2p.extractVersion();
-	mapInstalled["P2P"] =  v;
-	l->debug() << "LibraryComponent::appsInstalled p2p map: " << mapInstalled["P2P"] << std::endl;
-    }
-
     SubutaiLauncher::Tray tray;
-    //l->debug() << "LibraryComponent::constructor tray is installed: " << tray.findInstallation() << std::endl;
-    //if (tray.isInstalled()) {
-    if (tray.findInstallation()) {
-        v = tray.extractVersion();
-	mapInstalled["Tray"] = v;
-	l->debug() << "LibraryComponent::appsInstalled tray map: " << mapInstalled["Tray"] << std::endl;
+
+    //if (p2p.findInstallation()){
+    if (p2p.findInstallation() && tray.findInstallation()) {
+        v = p2p.extractVersion();
+	SubutaiLauncher::SubutaiString st(v);
+	v = st.remove("\n", "");
+        l->debug() << "LibrarySystemCheck::appsInstalled p2p version v: " << v << "/ " << std::endl;
+	//if (tray.findInstallation()){
+    	v1 = tray.extractVersion();
+    	l->debug() << "LibrarySystemCheck::appsInstalled tray version v1: " << v1 << "/ extract: " << tray.extractVersion()  << std::endl;
+	//}
+	if (v != "") {
+	    v.append(";");
+	    if (v1 != "")
+		v.append(v1);
+	    mapInstalled["Subutai Client"] =  v;
+	    l->debug() << "LibrarySystemCheck::appsInstalled p2p and tray map: " << mapInstalled["Subutai Client"] << std::endl;
+	}
     }
 
-    v = "Version: Chrome";
-    mapInstalled["Chrome"] = v;
-    l->debug() << "LibraryComponent::appsInstalled chrome map: " << mapInstalled["Chrome"] << std::endl;
+    SubutaiLauncher::Browser brw;
+    if (brw.findInstallation()) {
+        v = brw.extractVersion();
 
-    v = "Version: Plugin";
-    mapInstalled["E2E"] = v;
-    l->debug() << "LibraryComponent::appsInstalled e2e map: " << mapInstalled["E2E"] << std::endl;
+	v += "\nE2E: Plugin";
+	//mapInstalled["E2E"] = v;
+	if (v != "")
+	    mapInstalled["Browser Plugin"] = v;
+	l->debug() << "LibrarySystemCheck::appsInstalled version: " << v << std::endl;
+	l->debug() << "LibrarySystemCheck::appsInstalled browser map: " << mapInstalled["Browser Plugin"] << std::endl;
+    }
 
     SubutaiLauncher::VirtualBox vbox;
     //l->debug() << "LibraryComponent::constructor vbox is installed: " << vbox.findInstallation() << std::endl;
     //if (vbox.isInstalled()) {
     if (vbox.findInstallation()) {
 	v = vbox.extractVersion();
-	l->debug() << "LibraryComponent::appsInstalled vbox map: " << mapInstalled.size() << std::endl;
-	mapInstalled["VBox"] = v;
-	l->debug() << "LibraryComponent::appsInstalled vbox map: " << mapInstalled["VBox"] << std::endl;
-    }else {
-	mapInstalled["VBox"] = "Not installed";
+	l->debug() << "LibrarySystemCheck::appsInstalled vbox map: " << mapInstalled.size() << std::endl;
+	if (v != "")
+	    mapInstalled["VBox"] = v;
+	l->debug() << "LibrarySystemCheck::appsInstalled vbox map: " << mapInstalled["VBox"] << std::endl;
+    }
+
+    auto peerList = vbox.getPeers();
+    if (peerList.size() > 0) {
+	mapInstalled["Peer"] = "Peer installed";
     }
 }
 
@@ -889,12 +991,12 @@ bool LibrarySystemCheck::checkSystem(){
 	instEnabled = false;
     }
 
-    if (envCurrent.i_cores < 10){
+    if (envCurrent.i_cores < minCores){
 	envCurrent.b_cores = false;
 	instEnabled = false;
     }
 
-    if (envCurrent.l_ram < 20000){
+    if (envCurrent.l_ram < minRAM){
 	envCurrent.b_ram = false;
 	instEnabled = false;
     }
@@ -905,7 +1007,10 @@ bool LibrarySystemCheck::checkSystem(){
 	instEnabled = false;
     }
 
+
+    envCurrent.s_vbox = mapInstalled["VBox"];
     found = envCurrent.s_vbox.find("5.1", 0);
+
     if (found == std::string::npos){
 	envCurrent.b_vbox = false;
 	instEnabled = false;
@@ -954,14 +1059,23 @@ void LibrarySystemCheck::paint(Graphics& g) {
 }
 
 void LibrarySystemCheck::resized() {
+    appsInstalled();
+    envCurrent.s_vbox = mapInstalled["VBox"];//LibraryItem::findVersion("VBox");
+    envCurrent.b_vbox = true;
+    _vboxValue.setText(mapInstalled["VBox"], dontSendNotification);
+    checkSystem();
+
 }
 
 // ============================================================================
 
 LibrarySystemConfigure::LibrarySystemConfigure() {
 
+    auto l = SubutaiLauncher::Log::instance()->logger();
+    l->debug()<< "LibrarySystemConfigure constructor start"  << std::endl;
+
     int fieldFont = 20;
-//Installation Configuration section
+    //Installation Configuration section
     int offConf = 50;
     int offLeft = 400;
     _installConfField.setText("Choose Installation Configuration", dontSendNotification);
@@ -1018,7 +1132,7 @@ LibrarySystemConfigure::LibrarySystemConfigure() {
     _installProd->setClickingTogglesState(true);
     //_installProd->triggerClick();
 
-    _installMaster = new ToggleButton("Install stage snapshot");
+    _installMaster = new ToggleButton("stage: Install stage snapshot");
     _installMaster->setRadioGroupId(22);
     _installMaster->setBounds(offLeft, offVersion + 30 , 200, 30);
     //_installMaster->setColour(ToggleButton::textColourId, Colours::white);
@@ -1028,7 +1142,7 @@ LibrarySystemConfigure::LibrarySystemConfigure() {
     _installMaster->setClickingTogglesState(true);
     //_installMaster->triggerClick();
 
-    _installDev = new ToggleButton("Install current development snapshot");
+    _installDev = new ToggleButton("dev: Install current development snapshot");
     _installDev->setRadioGroupId(22);
     _installDev->setBounds(offLeft,  offVersion + 60, 300, 30);
     //_installDev->setColour(ToggleButton::textColourId, Colours::white);
@@ -1038,6 +1152,8 @@ LibrarySystemConfigure::LibrarySystemConfigure() {
     _installDev->setClickingTogglesState (true);
     _installDev->triggerClick();
 
+
+    l->debug()<< "LibrarySystemConfigure text section  start"  << std::endl;
 //Installation directories section
 // Path
     int offPath = 350;
@@ -1048,12 +1164,18 @@ LibrarySystemConfigure::LibrarySystemConfigure() {
     _installPathField.setBounds(0, offPath + 5, 290, 30);
     _installPathField.setFont(fieldFont);
     _installPathField.setJustificationType(Justification::top);
-    _installPathValue.setText("/opt/subutai");
+
+    l->debug()<< "LibrarySystemConfigure value set text before start"  << std::endl;
+    _installPathValue = new TextEditor("");
+    _installPathValue->setText("/opt/subutai");
     //_installPathValue.setBounds(300,  hoff + 140, 200, 25);
-    _installPathValue.setBounds(offLeft, offPath, 200, 25);
+    _installPathValue->setBounds(offLeft, offPath, 200, 25);
+    _installPathValue->setComponentID("Path");
+    _installPathValue->addListener(this);
 
     // Tmp
     //
+
     _installTmpField.setText("Temporary directory", dontSendNotification);
     _installTmpField.setColour(Label::textColourId, Colours::white);
     _installTmpField.setColour(TextEditor::backgroundColourId, Colour(230,230,230));
@@ -1062,10 +1184,18 @@ LibrarySystemConfigure::LibrarySystemConfigure() {
     _installTmpField.setBounds(0, offPath + 35, 500, 30);
     _installTmpField.setFont(fieldFont);
     _installTmpField.setJustificationType(Justification::top);
-    _installTmpValue.setText("/tmp/subutai");
-    _installTmpValue.setBounds(offLeft, offPath + 30, 200, 25);
+
+    _installTmpValue = new TextEditor();
+    _installTmpValue->setText("/tmp/subutai");
+    _installTmpValue->setBounds(offLeft, offPath + 30, 200, 25);
+    _installTmpValue->setComponentID("Tmp");
+    _installTmpValue->addListener(this);
 
     //Cores
+
+    int maxTextLength = 2;
+    juce::String allowedCharacters = "0123456789";
+    
     int offCores = 420;
     _installCoresField.setText("Cores to share", dontSendNotification);
     _installCoresField.setColour(Label::textColourId, Colours::white);
@@ -1075,9 +1205,15 @@ LibrarySystemConfigure::LibrarySystemConfigure() {
     _installCoresField.setFont(fieldFont);
     _installCoresField.setJustificationType(Justification::top);
 
-    _installCoresValue.setText("2");
+    _installCoresValue = new TextEditor();
+    _installCoresValue->setText("2");
     //_installPathValue.setBounds(300,  hoff + 140, 200, 25);
-    _installCoresValue.setBounds(offLeft, offCores, 200, 25);
+    _installCoresValue->setBounds(offLeft, offCores, 200, 25);
+    _installCoresValue->setComponentID("Cores");
+
+    maxTextLength = 6;
+    _installCoresValue->setInputRestrictions(maxTextLength, "0123456789");
+    _installCoresValue->addListener(this);
 
     // RAM
     _installRamField.setText("RAM to share, MB", dontSendNotification);
@@ -1088,8 +1224,13 @@ LibrarySystemConfigure::LibrarySystemConfigure() {
     _installRamField.setBounds(0, offCores + 35, 500, 30);
     _installRamField.setFont(fieldFont);
     _installRamField.setJustificationType(Justification::top);
-    _installRamValue.setText("2048");
-    _installRamValue.setBounds(offLeft, offCores + 30, 200, 25);
+
+    _installRamValue = new TextEditor();
+    _installRamValue->setText("2048");
+    _installRamValue->setBounds(offLeft, offCores + 30, 200, 25);
+    _installRamValue->setComponentID("Ram");
+    //_installRamValue->setInputRestrictions(maxTextLength, allowedCharacters);
+    _installRamValue->addListener(this);
 
 
     addAndMakeVisible(_installTypeField);
@@ -1097,7 +1238,7 @@ LibrarySystemConfigure::LibrarySystemConfigure() {
     addAndMakeVisible(_installMaster);
     addAndMakeVisible(_installDev);
     addAndMakeVisible(_installConfField);
-    addAndMakeVisible(_installVm);
+    //addAndMakeVisible(_installVm);
     addAndMakeVisible(_installTray);
     addAndMakeVisible(_installPathField);
     addAndMakeVisible(_installPathValue);
@@ -1108,12 +1249,11 @@ LibrarySystemConfigure::LibrarySystemConfigure() {
     addAndMakeVisible(_installRamField);
     addAndMakeVisible(_installRamValue);
     
-
 }
 
 LibrarySystemConfigure::~LibrarySystemConfigure() {
     delete(_installTray);
-    delete(_installVm);
+    //delete(_installVm);
     for (auto it = _installTypes.begin(); it != _installTypes.end(); it++) {
         delete (*it);
     }
@@ -1127,31 +1267,171 @@ void LibrarySystemConfigure::paint(Graphics& g) {
     g.setColour(Colour(200,200,200));
 }
 
-
 void LibrarySystemConfigure::buttonClicked(Button *button) {
 
-
-    //g.fillAll (Colour (0xff222222));
-    //g.setFont (Font (16.0f));
-    //g.setFont (Font (20.0f));
-    //g.setColour (Colours::white);
     if (button->getToggleState()){
 	button->setColour(TextButton::buttonColourId, Colour(7,141,208));
 	button->setColour(ToggleButton::textColourId, Colour(7,141,208));
+	setConfigVersion(button);
+
     } else {
 	button->setColour(TextButton::buttonColourId, Colour(200,200,200));
 	button->setColour(ToggleButton::textColourId, Colour(200,200,200));
     }
 }
 
+void LibrarySystemConfigure::setConfigVersion(Button *button) {
 
+    auto l = SubutaiLauncher::Log::instance()->logger();
+    juce::String btext = button->getButtonText();
+
+    l->debug() << "Library SystemConfigure setConfigVersion" << btext << std::endl;
+
+
+    if (btext == "RH only")
+    {
+	instData.instConfig = RH_ONLY;
+    }  else if (btext == "RH + Client"){
+	instData.instConfig = RH_CLIENT;
+    } else if (btext == "MH: RH+MH+Client"){
+    	instData.instConfig = MH_FULL;
+    } else if (btext == "Subutai Client only"){
+    	instData.instConfig = CLIENT_ONLY;
+    } else if (btext == "Install latest stable release"){
+	instData.instVersion = PROD;
+    } else if (btext == "stage: Install stage snapshot"){
+	instData.instVersion = STAGE;
+    } else if (btext == "dev: Install current development snapshot"){
+	instData.instVersion = DEV;
+    }
+
+    l->debug() << "Library SystemConfigure setConfigVersion instConfig=" << instData.instConfig << " instVersion=" << instData.instVersion << std::endl;
+
+}
+
+
+void LibrarySystemConfigure::textEditorTextChanged(TextEditor &teditor) {
+/*
+    NativeMessageBox::showMessageBox(AlertWindow::AlertIconType::InfoIcon, "LibrarySystemConfigure::textTextChanged", 
+	teditor.getText(), nullptr);
+
+    teditor.setColour(TextEditor::backgroundColourId, Colours::yellow);
+
+    juce::String tname = teditor.getName();
+*/
+}
+
+
+void LibrarySystemConfigure::textEditorFocusLost(TextEditor &teditor)  {
+
+//    NativeMessageBox::showMessageBox(AlertWindow::AlertIconType::InfoIcon, "LibrarySystemConfigure::textEditorFocusLost", 
+//	teditor.getText(), nullptr);
+
+
+/*    
+int instConfig = MH_FULL;
+    int instVersion = DEV;
+    std::string instDir = "/opt/subutai";
+    std::string instTmpDir = "/tmp/subutai";
+    long instCores = 2;
+    long instRAM = 2048;
+
+} instData;
+*/
+
+}
+
+void LibrarySystemConfigure::textEditorReturnKeyPressed(TextEditor &teditor) {
+
+    teditor.setColour(TextEditor::backgroundColourId, Colours::green);
+    
+    std::string s1, s2;
+    juce::String jname = teditor.getComponentID();
+
+    if (jname.compare("Path") == 0)
+	instData.instDir = teditor.getText().toStdString();
+    else if (jname.compare("Tmp") == 0)
+	 instData.instTmpDir = teditor.getText().toStdString();
+
+    else if (jname.compare("Cores") == 0)
+	s1 = (std::string)teditor.getText().toStdString();
+    else if (jname.compare("Ram") == 0)
+	s2 =  (std::string)teditor.getText().toStdString();
+
+
+    NativeMessageBox::showMessageBox(AlertWindow::AlertIconType::InfoIcon, "LibrarySystemConfigure::textEditorRturnKeyPressed", 
+	teditor.getText(), nullptr);
+
+}
+
+
+void LibrarySystemConfigure::fillInstallList() {
+
+    auto l = SubutaiLauncher::Log::instance()->logger();
+    l->debug() << "LibrarySystemConfigure::setInstallList "  << std::endl;
+
+    map2Install.clear();
+    switch (instData.instConfig) {
+	case RH_ONLY:
+		    l->debug() << "LibrarySystemConfigure::setInstallList " << instData.instConfig  << std::endl;
+	            map2Install["VBox"] = "Oracle VirtualBox";
+    		    map2Install["Peer"] = "Core16)";
+		    break;
+
+	case RH_CLIENT:
+		    l->debug() << "LibrarySystemConfigure::setInstallList " << instData.instConfig  << std::endl;
+	            map2Install["VBox"] = "Oracle VirtualBox";
+    		    map2Install["Peer"] = "Core16";
+	            map2Install["Subutai Client"] = "Tray, P2P";
+	            map2Install["Browser Plugin"] = "Chrome, E2E";
+		    break;
+	case MH_FULL:
+		    l->debug() << "LibrarySystemConfigure::setInstallList " << instData.instConfig  << std::endl;
+	            map2Install["VBox"] = "Oracle VirtualBox";
+    		    map2Install["Peer"] = "Core16";
+		    map2Install["MH"] = "Import management template";
+	            map2Install["Subutai Client"] = "Tray, P2P";
+	            map2Install["Browser Plugin"] = "Chrome, E2E";
+		    break;
+	case CLIENT_ONLY:
+		    l->debug() << "LibrarySystemConfigure::setInstallList " << instData.instConfig  << std::endl;
+	            map2Install["Subutai Client"] = "Tray, P2P";
+	            map2Install["Browser Plugin"] = "Chrome, E2E";
+		    break;
+	default: 
+		    l->debug() << "LibrarySystemConfigure::setInstallList default"  << std::endl;
+	            map2Install["VBox"] = "Oracle VirtualBox";
+    		    map2Install["Peer"] = "Core16";
+		    map2Install["MH"] = "Import management template";
+	            map2Install["Subutai Client"] = "Tray, P2P";
+	            map2Install["Browser Plugin"] = "Chrome, E2E";
+		    break;
+
+    }
+
+//    instData.instDir = _installPathValue->getText();
+//    l->debug() << "LibrarySystemConfigure::setInstallList instDir: " << instData.instDir  << std::endl;
+
+}
 
 void LibrarySystemConfigure::resized() {
+
+//    NativeMessageBox::showMessageBox(AlertWindow::AlertIconType::InfoIcon, "LibrarySystemConfigure::resized()", 
+//	    "resized", nullptr);
+
+    auto l = SubutaiLauncher::Log::instance()->logger();
+    l->debug() << "LibrarySystemConfigure::resized start  "  << std::endl;
+    fillInstallList();
+    //instData.instDir = _installPathValue->getText();
+    //instData.instTmpDir =  _installTmpValue->getText();
+    //instData.instCores =  _installCoresValue->getText();
+    //instData.instRAM =  _installRamValue->getText();
+
 
 }
 
 bool LibrarySystemConfigure::isPeerInstallChecked() {
-    return _installVm->getToggleState();
+    //return _installVm->getToggleState();
 }
 
 // ============================================================================
@@ -1479,18 +1759,21 @@ bool LibraryPreinstall::isCanceled() {
 //}
 // ======================================================================
 
-LibraryInstall::LibraryInstall() : 
-	    _numLines(2),
-	    _confirmButton("Confirm")
-
+LibraryInstall::LibraryInstall() :  _numLines(2),  _confirmButton("Confirm")
 {
-
-    auto fieldFont = Font(20);
-
     auto l = SubutaiLauncher::Log::instance()->logger();
+    auto fieldFont = Font(24);
+
+    //l->debug() << "LibraryInstall constructor: map2Install.size() " << map2Install.size() << std::endl;
+    //for (auto it = map2Install.begin(); it != map2Install.end(); it++) {
+//	//l->debug() << "LibrarySystemConfigure::setInstallList element: " << it->first  << std::endl;
+//	addLine(it->first, it->second, "Need to install", true);
+//    }
+
     l->debug() << "LibraryInstall start" << std::endl;
-    _lstep.setText("Components to be Installed", dontSendNotification);
-    _lstep.setColour(Label::textColourId, Colours::yellow);
+
+    _lstep.setText("Components to be Installed: ", dontSendNotification);
+    _lstep.setColour(Label::textColourId, Colours::white);
     _lstep.setBounds(0, 10, 1024-250-40-500, 30);
     _lstep.setJustificationType(Justification::left);
     _lstep.setFont(fieldFont);
@@ -1504,12 +1787,6 @@ LibraryInstall::LibraryInstall() :
     addAndMakeVisible(_confirmButton);
     //_confirmButton.setVisible(true);
 
-    addAndMakeVisible(_lField);
-    addAndMakeVisible(_lValue);
-    addAndMakeVisible(_lHint);
-
-    addLine(&_lField, &_lValue, &_lHint, "Browser Plugin",
-	 "Browser Plugin", false);
 
     l->debug() << "LibraryInstall all elements" << std::endl;
 }
@@ -1519,61 +1796,116 @@ LibraryInstall::~LibraryInstall() {
 }
 
 void LibraryInstall::paint(Graphics& g) {
+
     g.fillAll (Colour (0xff222222));
     //g.setFont (Font (16.0f));
     g.setFont (Font (20.0f));
     //g.setColour (Colours::white);
     g.setColour(Colour(200,200,200));
+
+    //showChangedInfo();
+
 }
 
-void LibraryInstall::addLine(Label* field, Label* value, Label* hint, std::string text,
-		 std::string hintText, bool inst) {
+void LibraryInstall::addLine(std::string fieldText, std::string valueText, std::string hintText, bool inst) {
     auto font = Font(18);
     auto fieldFont = Font(20);
     int offLeft = 350;
 
-    field->setText(text, dontSendNotification);
+    auto field = new Label();
+    field->setText(fieldText, dontSendNotification);
     field->setColour(Label::textColourId, Colours::white);
     field->setBounds(0, _numLines * 50, 300, 50);
     field->setFont(fieldFont);
     field->setJustificationType(Justification::top);
 
-    //value->setText("Checking...", dontSendNotification);
-    if (inst) 
-	value->setColour(Label::textColourId, Colours::white);
-    else 
-	value->setColour(Label::textColourId, Colours::green);
-    //value->setBounds(320, _numLines * 50, 800, 50);
+    auto value = new Label();
+    value->setText(valueText, dontSendNotification);
+    field->setColour(Label::textColourId, Colours::white);
     value->setBounds(offLeft, _numLines * 50, 800, 50);
     value->setFont(font);
     value->setJustificationType(Justification::top);
 
-    hint->setText(hintText, dontSendNotification);
+    auto hint = new Label();
+
+    if (inst) { 
+	value->setColour(Label::textColourId, Colours::white);
+	hint->setText(hintText, dontSendNotification);
+    }  else {
+	value->setColour(Label::textColourId, Colours::green);
+	hint->setText(hintText, dontSendNotification);
+    }
+
     hint->setColour(Label::textColourId, Colours::grey);
     //hint->setBounds(320, _numLines * 50 + 20, 800, 50);
     hint->setBounds(offLeft, _numLines * 50 + 20, 800, 50);
     hint->setFont(font);
     hint->setJustificationType(Justification::top);
 
+    addAndMakeVisible((*field));
+    addAndMakeVisible((*value));
+    addAndMakeVisible((*hint));
+
     _numLines++;
 }
 
 
 void LibraryInstall::installComponents() {
+    
+    auto l =  SubutaiLauncher::Log::instance()->logger();
+    for(auto it = vComponents.begin(); it != vComponents.end(); it++) {
+	l->debug() << "LibraryInstall checking: " << (*it)  << std::endl;
+	l->debug() << "LibraryInstall map2Install[" << (*it) << "]: " << map2Install[(*it)] << "/"  << std::endl;
+	l->debug() << "LibraryInstall mapInstalled[" << (*it) << "]:: " << mapInstalled[(*it)] << "/" << std::endl;
+	if (map2Install.find((*it)) != map2Install.end() && 
+		(mapInstalled.find((*it)) == mapInstalled.end() || mapInstalled[(*it)] == "")){
+	    std::string cName = (*it);
+	    auto t = new LibraryActionThread("install", cName, cName);
+	    l->debug() << "LibraryInstall::installComponents() before run: " << cName <<std::endl;
+	    //_currentAction.setText("Installing components:", dontSendNotification);
+	    //t->launchThread();
+	    if (!t->runThread()){
+	        l->debug() << "LibraryComponent::InstallComponents() cancelled " <<std::endl;
+	    }//run and wait thread, log if no
+	    if ((*it) == "Peer") {
+		installPeer();
+	    }
+	resized();
+	}
+    }
+}
 
-//	addLine(&_lField, &_lValue, &_lHint, "Browser Plugin",
-//		 "Browser Plugin", false);
-    std::string cName("Browser Plugin");
 
-    auto t = new LibraryActionThread("install", cName, cName);
-    SubutaiLauncher::Log::instance()->logger()->debug() << "LibraryPreinstall::preinstallImpl() before run " <<std::endl;
-    //_currentAction.setText("Installing components:", dontSendNotification);
-    //t->launchThread();
-    if (!t->runThread()){
-	SubutaiLauncher::Log::instance()->logger()->debug() << "LibraryComponent::preinstallImpl() cancelled " <<std::endl;
-	return;
+
+void LibraryInstall::installPeer() {
+    SubutaiLauncher::VirtualBox vbox;
+    vbox.cloneVM();
+    std::string sarg = "";
+
+    switch (instData.instConfig)	{
+	case 0:	sarg = "PROD";
+		break;
+	case 1:	sarg = "STAGE";
+		break;
+	case 2:	sarg = "DEV";
+		break;    
+	default: sarg = "DEV";
+		break;    
     }
 
+    NativeMessageBox::showMessageBox(AlertWindow::AlertIconType::InfoIcon, "LibraryInstall::InstallPeer", 
+	sarg, nullptr);
+    
+    //Need to run this in thread with progress
+    #std::thread pi = ([=] {execute vbox.runScripts(sarg)}); 
+
+    vbox.runScripts(sarg);
+
+
+
+    if (instData.instConfig == MH_FULL){
+	vbox.importManagement();
+    }
 }
 
 void LibraryInstall::buttonClicked(Button* button) {
@@ -1592,3 +1924,86 @@ void LibraryInstall::buttonClicked(Button* button) {
     }
     //resized();
 }
+
+void LibraryInstall::componentVisibilityChanged(Component &component){
+
+    NativeMessageBox::showMessageBox(AlertWindow::AlertIconType::InfoIcon, "LibraryInstall::componentVisibilityChanged", 
+	mapInstallConfig[instData.instConfig], nullptr);
+}
+
+void LibraryInstall::showChangedInfo() {
+
+    auto l = SubutaiLauncher::Log::instance()->logger();
+    for(auto it = map2Install.begin(); it != map2Install.end(); it++) {
+	l->debug() << "LibraryInstall::showChangedInfo element: " << it->first  << std::endl;
+	bool needInstall = true;
+	std::string hintText;
+	if (mapInstalled.find(it->first) != mapInstalled.end() && mapInstalled[it->first] != ""){
+	    l->debug() << "LibraryInstall showChangedInfo: mapInstall[it->first] " << mapInstalled[it->first] << std::endl;
+	    needInstall = false;
+	    hintText = "Already installed: " + mapInstalled[it->first];
+	} else {
+	    needInstall = true;
+	    hintText = "Will be installed";
+	}
+	addLine(it->first, it->second, hintText, needInstall);
+    }
+    _numLines++;
+
+    std::string tmp = mapInstallConfig[instData.instConfig];
+    NativeMessageBox::showMessageBox(AlertWindow::AlertIconType::InfoIcon, "LibrarySystemConfigure::changedInfo()", 
+	    tmp, nullptr);
+    addLine("Configuration", tmp,  "", false);
+
+    tmp = mapInstallVersion[instData.instVersion];
+    NativeMessageBox::showMessageBox(AlertWindow::AlertIconType::InfoIcon, "LibrarySystemConfigure::changedInfo()", 
+	    tmp, nullptr);
+
+    addLine("Version", tmp, "", false);
+    addLine("Inst Dir", instData.instDir, "", false);
+    addLine("Tmp Dir",  instData.instTmpDir, "", false);
+    //addLine("Cores", std::to_string(instData.instCores, "", false);
+    //addLine("RAM, MB", std::to_string(instData.instRAM), "", false);
+
+}
+
+
+void LibraryInstall::resized() {
+
+    auto l = SubutaiLauncher::Log::instance()->logger();
+    l->debug() << "LibraryInstall::resized start  "  << std::endl;
+    l->debug() << "LibraryInstall resized: map2Install.size() " << map2Install.size() << std::endl;
+
+    //typedef std::map<std::string, std::string>::iterator it_type;
+/*    
+    for(auto it = map2Install.begin(); it != map2Install.end(); it++) {
+	l->debug() << "LibraryInstall::resized element: " << it->first  << std::endl;
+	bool needInstall = true;
+	std::string hintText;
+	if (mapInstalled.find(it->first) != mapInstalled.end() && mapInstalled[it->first] != ""){
+	    l->debug() << "LibraryInstall resized: mapInstall[it->first] " << mapInstalled[it->first] << std::endl;
+	    needInstall = false;
+	    hintText = "Already installed: " + mapInstalled[it->first];
+	} else {
+	    needInstall = true;
+	    hintText = "Will be installed";
+	}
+	addLine(it->first, it->second, hintText, needInstall);
+    }
+    _numLines++;
+*/
+
+
+    showChangedInfo();
+/*
+    std::string tmp = mapInstallConfig[instData.instConfig];
+    addLine("Configuration", tmp,  "", false);
+    tmp = mapInstallVersion[instData.instVersion];
+    addLine("Version", tmp, "", false);
+    addLine("Inst Dir", instData.instDir, "", false);
+    addLine("Tmp Dir",  instData.instTmpDir, "", false);
+    //addLine("Cores", std::to_string(instData.instCores, "", false);
+    //addLine("RAM, MB", std::to_string(instData.instRAM), "", false);
+*/
+}
+

@@ -12,6 +12,7 @@
 //==============================================================================
 MainContentComponent::MainContentComponent() 
 {
+
     _menuItems.push_back("Subutai");
     _menuItems.push_back("Library");
     _menuItems.push_back("Templates");

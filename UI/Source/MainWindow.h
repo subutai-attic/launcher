@@ -20,15 +20,16 @@ class MainWindow : public juce::DocumentWindow
         MainWindow (juce::String name)  : juce::DocumentWindow (name,
                 juce::Colours::lightgrey,
                 juce::DocumentWindow::allButtons)
-    {
-        setUsingNativeTitleBar (false);
-        setTitleBarHeight(0);
-        MainContentComponent* mainComponent = new MainContentComponent();
-        setContentOwned (mainComponent, true);
+	{
+    	    setUsingNativeTitleBar (false);
+    	    setTitleBarHeight(0);
+    	    MainContentComponent* mainComponent = new MainContentComponent();
+    	    setContentOwned (mainComponent, true);
 
-        centreWithSize (getWidth(), getHeight());
-        setVisible (true);
-    }
+    	    centreWithSize (getWidth(), getHeight());
+	    setDraggable(true);
+    	    setVisible (true);
+        }
 
         void closeButtonPressed() override
         {
