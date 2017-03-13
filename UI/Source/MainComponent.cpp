@@ -77,7 +77,7 @@ void MainContentComponent::paint (Graphics& g)
 void MainContentComponent::resized()
 {
     juce::Rectangle<int> r (getLocalBounds().reduced (0));
-    _mainMenu.setBounds (0, 120, MENU_WIDTH, 728);
+    _mainMenu.setBounds (0, 120, MENU_WIDTH, 500);
     _logo.setBounds(0, 20, MENU_WIDTH, 100);
     _header.setBounds(r.withSize(1024, HEADER_HEIGHT));
     repaint();
@@ -99,10 +99,11 @@ void MainContentComponent::paintListBoxItem(int rowNumber, Graphics& g, int widt
         t.setColour(Colour(200, 200, 200));
     } else {
         //t.setColour(Colour(176, 224, 230));
-	t.setColour(Colour(7, 141, 208));
+	    t.setColour(Colour(7, 141, 208));
     }
     t.setLineSpacing(40);
     t.setJustification(Justification::left);
+
     Font f;
     f.setHeight(30);
     t.setFont(f);
