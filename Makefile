@@ -85,11 +85,12 @@ clean:
 	@rm -rf bin/*
 	@rm -rf build/*
 	$(MAKE) -C ./CLI clean
-	$(MAKE) -C ./UI/Builds/LinuxMakefile clean
+	$(MAKE) -C ./UI/Makefile clean
 
 mrproper:
 	@rm -rf bin
 	@rm -rf build
 	$(MAKE) -C ./CLI mrproper
+	$(MAKE) -C ./UI mrproper
 	@rm -f config.make
 
