@@ -9,8 +9,10 @@
 */
 
 #include "Sidebar.h"
+#include "MainComponent.h"
 
-SidebarComponent::SidebarComponent() {
+SidebarComponent::SidebarComponent()
+{
     _social = new SocialMediaIcons();
     addAndMakeVisible(_social);
     _social->setBounds(0, 768-20-40, 250, 40);
@@ -30,3 +32,4 @@ void SidebarComponent::paint(Graphics& g) {
 void SidebarComponent::resized() {
 
 }
+
