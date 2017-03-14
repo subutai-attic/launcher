@@ -189,7 +189,7 @@ std::string LibraryItem::findVersion(std::string cname)
         if (peerList.size() == 0) {
 	    v = "";
 	}
-	int i = 0;
+	int i = 0;
 	for (auto pt = peerList.begin(); pt != peerList.end(); pt++) {
 	    i = cname.find((*pt).name, 0);
 	    if (i != std::string::npos) {
@@ -261,7 +261,7 @@ void LibraryItem::mouseUp(const juce::MouseEvent& e)
     } 
     else if (res == 3)
     {
-	std::string windowTitle = "Removing ";
+	std::string windowTitle = "Removing ";
         windowTitle.append(_title);
         auto t = new LibraryActionThread("uninstall", _title, windowTitle);
         /*
@@ -466,7 +466,7 @@ void LibraryComponent::drawIntro() {
     _peersSectionLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_peersSectionLabel);
 
-  auto l = SubutaiLauncher::Log::instance()->logger();
+  auto l = SubutaiLauncher::Log::instance()->logger();
     auto conf = SubutaiLauncher::Session::instance()->getConfManager();
 
     auto configs = conf->getConfigs();
@@ -545,7 +545,7 @@ void LibraryComponent::hideIntro() {
 	(**c).setVisible(false);
         ++i;
     }
-  
+  
     i = 0;
     for (auto p = _peers.begin(); p != _peers.end(); p++) 
     {
@@ -771,7 +771,7 @@ void LibraryComponent::waitDownloadCompleteImpl() {
         //    return;
         //}
     //}
-    //drawProgressButtons(true, false, true);	
+    //drawProgressButtons(true, false, true);	
 }
 
 void LibraryComponent::collectInstallData() {
@@ -891,7 +891,7 @@ LibrarySystemCheck::LibrarySystemCheck() : _numLines(1) {
     _sshValue.setText( env.versionSSH(), dontSendNotification);
     addLine(&_sshField, &_sshValue, &_sshHint, "SSH client version", "SSH client is used to configure peer during installation");
 */
- 
+ 
     auto font = Font(18);
 
     if (instEnabled){
@@ -2008,4 +2008,4 @@ void LibraryInstall::resized() {
     //addLine("RAM, MB", std::to_string(instData.instRAM), "", false);
 */
 }
-
+
