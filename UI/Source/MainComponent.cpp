@@ -19,22 +19,23 @@ MainContentComponent::MainContentComponent()
     _menuItems.push_back("Community");
 
     addAndMakeVisible(_sidebar);
-    _sidebar.setBounds(0, 20, 250, 768-20);
+    _sidebar.setBounds(0, 0, 250, getParentHeight());
     _sidebar.toFront(false);
 
     // TODO: Add screen detection size and relative value at startup
-    setSize (1024, 768);
+    setSize(1024, 768);
 
     addAndMakeVisible(_logo);
 
     _mainMenu.setModel(this);
-    _mainMenu.setColour (ListBox::backgroundColourId, Colour(0x00000000));
+    _mainMenu.setColour(ListBox::backgroundColourId, Colour(0x00000000));
     _mainMenu.selectRow(0);
     _mainMenu.setRowHeight(40);
     addAndMakeVisible(_mainMenu);
 
     _header.setColour(Toolbar::backgroundColourId, Colour::greyLevel (0.2f));
-    addAndMakeVisible(_header);
+    // --- Using native bar
+    //addAndMakeVisible(_header);
 
     // Close button
     _closeButton = new ImageButton("Close");
@@ -42,14 +43,15 @@ MainContentComponent::MainContentComponent()
     Image closeImg(ImageCache::getFromFile(File("close_window.png")));
     _closeButton->setImages(true, true, true, closeImg, 1.0, Colour(), closeImg, 0.6, Colour(), closeImg, 0.6, Colour());
     _closeButton->addListener(this);
-    addAndMakeVisible(_closeButton);
+    //addAndMakeVisible(_closeButton);
 
     _minimizeButton = new ImageButton("Minimize");
     _minimizeButton->setBounds(970, 13, 990, 20);
     Image minimizeImg(ImageCache::getFromFile(File("minimize_window.png")));
     _minimizeButton->setImages(true, true, true, minimizeImg, 1.0, Colour(), minimizeImg, 0.6, Colour(), minimizeImg, 0.6, Colour());
     _minimizeButton->addListener(this);
-    addAndMakeVisible(_minimizeButton);
+    //addAndMakeVisible(_minimizeButton);
+    // --- Using native bar
 
 }
 
@@ -80,7 +82,7 @@ void MainContentComponent::resized()
     juce::Rectangle<int> r (getLocalBounds().reduced (0));
     _mainMenu.setBounds (0, 120, MENU_WIDTH, 500);
     _logo.setBounds(0, 20, MENU_WIDTH, 100);
-    _header.setBounds(r.withSize(1024, HEADER_HEIGHT));
+    //_header.setBounds(r.withSize(1024, HEADER_HEIGHT));
     repaint();
 }
 
@@ -113,35 +115,34 @@ void MainContentComponent::paintListBoxItem(int rowNumber, Graphics& g, int widt
 
 void MainContentComponent::selectedRowsChanged(int row) {
     auto item = _menuItems.at(row);
-	juce::Rectangle<int> r (MENU_WIDTH, HEADER_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT - HEADER_HEIGHT);
     if (item == "Library") {
         _community.setVisible(false);
         _hub.setVisible(false);
         _library.setVisible(false);
         _marketplace.setVisible(false);
         addAndMakeVisible(_library);
-        _library.setBounds(r.withSize(WINDOW_WIDTH - MENU_WIDTH, WINDOW_HEIGHT - HEADER_HEIGHT));
+        _library.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
     } else if (item == "Subutai") {
         _community.setVisible(false);
         _hub.setVisible(false);
         _library.setVisible(false);
         _marketplace.setVisible(false);
         addAndMakeVisible(_community);
-        _community.setBounds(r.withSize(WINDOW_WIDTH - MENU_WIDTH, WINDOW_HEIGHT - HEADER_HEIGHT));
+        _community.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
     } else if (item == "Templates") {
         _community.setVisible(false);
         _hub.setVisible(false);
         _library.setVisible(false);
         _marketplace.setVisible(false);
         addAndMakeVisible(_marketplace);
-        _marketplace.setBounds(r.withSize(WINDOW_WIDTH - MENU_WIDTH, WINDOW_HEIGHT - HEADER_HEIGHT));
+        _marketplace.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
     } else if (item == "Community") {
         _community.setVisible(false);
         _hub.setVisible(false);
         _library.setVisible(false);
         _marketplace.setVisible(false);
         addAndMakeVisible(_hub);
-        _hub.setBounds(r.withSize(WINDOW_WIDTH - MENU_WIDTH, WINDOW_HEIGHT - HEADER_HEIGHT));
+        _hub.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
     }
 }
 

@@ -1,5 +1,6 @@
 *.ropeproject
 *ycm_extra_conf*
+compile_commands.json
 bin
 build
 CLI/bin
@@ -19,6 +20,7 @@ kurjun/*
 *.swo
 config.make
 UI/Builds/LinuxMakefile/build
+deploy.sh
 
 # windows build
 *.sdf

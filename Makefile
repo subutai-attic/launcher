@@ -24,28 +24,52 @@ T_OBJECTS = $(patsubst %,$(BUILD_DIR)/$(TEST_DIR)/%.o, $(subst $(TEST_DIR)/,,$(s
 
 .PHONE: lib all clean
 
-all: lib cli ui files test
+all: lib cli 
+ifdef SHARED_BUILD
+all: ui-shared
+endif
+ifdef STATIC_BUILD
+all: ui-static
+endif
+all: files
+ifdef BUILD_TESTS
+all: test
+endif
 
-lib: directories dynamic static
+lib: directories 
+ifdef SHARED_BUILD
+lib: shared 
 
-dynamic: directories
-dynamic: $(OUTPUT_DIR)/$(DYNAMIC_LIB_TARGET)
+shared: directories
+shared: $(OUTPUT_DIR)/$(DYNAMIC_LIB_TARGET)
+endif
+ifdef STATIC_BUILD
+lib: static
 
 static: directories
 static: $(OUTPUT_DIR)/$(STATIC_LIB_TARGET)
+endif
 
+ifdef BUILD_TESTS
 test: directories
 test: lib
 test: $(OUTPUT_DIR)/$(DYNAMIC_LIB_TARGET)-test
+endif
 
 cli: lib
 	$(MAKE) -C ./CLI
 
-#ui: lib
-#	$(MAKE) -C ./UI/Builds/LinuxMakefile
-
-ui: static
+ifdef STATIC_BUILD
+ui: ui-static
+ui-static: static
 	$(MAKE) -C ./UI
+endif
+
+ifdef SHARED_BUILD 
+ui: ui-shared
+ui-shared: shared
+	$(MAKE) -C ./UI
+endif
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
 	$(CC) -fPIC $(CFLAGS) -c $< -o $@
@@ -61,7 +85,6 @@ $(BUILD_DIR)/$(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
 
 $(OUTPUT_DIR)/$(DYNAMIC_LIB_TARGET): $(OBJECTS)
 	$(CC) -shared  $(OBJECTS) $(LIBS) -o $@
-#	$(CC) -shared  $(OBJECTS) $(LIBS) -o $@
 
 $(OUTPUT_DIR)/$(STATIC_LIB_TARGET): $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $^
@@ -85,7 +108,7 @@ clean:
 	@rm -rf bin/*
 	@rm -rf build/*
 	$(MAKE) -C ./CLI clean
-	$(MAKE) -C ./UI/Makefile clean
+	$(MAKE) -C ./UI clean
 
 mrproper:
 	@rm -rf bin

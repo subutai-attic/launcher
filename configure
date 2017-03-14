@@ -71,6 +71,10 @@ while [ $# -ge 1 ]; do
             shared=1
             ;;
 
+        --no-tests)
+            tests=0
+            ;;
+
         --help)
             helpmessage ;;
         *)
@@ -99,9 +103,13 @@ else
         echo "STATIC_BUILD = 1" >> config.make
     fi
 fi
+if [ $tests -eq 1 ]; then
+    echo "BUILD_TESTS = 1" >> config.make
+fi
 cat <<__EOF__ >>config.make
 export PYTHON_VER
 export PYLIB_DIR
 export STATIC_BUILD
 export SHARED_BUILD
+export BUILD_TESTS
 __EOF__
