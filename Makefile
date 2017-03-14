@@ -60,11 +60,13 @@ cli: lib
 	$(MAKE) -C ./CLI
 
 ifdef STATIC_BUILD
+ui: ui-static
 ui-static: static
 	$(MAKE) -C ./UI
 endif
 
 ifdef SHARED_BUILD 
+ui: ui-shared
 ui-shared: shared
 	$(MAKE) -C ./UI
 endif

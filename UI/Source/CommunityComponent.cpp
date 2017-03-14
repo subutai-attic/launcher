@@ -37,6 +37,24 @@ CommunityComponent::CommunityComponent() {
     }
     delete sl;
 
+    // TODO: Make this not hard coded
+    // Right now we only know that we have 4 images
+    
+    std::vector<std::string> images;
+    images.push_back("/tmp/subutai/launcher-ad-1.png");
+    images.push_back("/tmp/subutai/launcher-ad-2.png");
+    images.push_back("/tmp/subutai/launcher-ad-3.png");
+    images.push_back("/tmp/subutai/launcher-ad-4.png");
+
+    for (auto it = images.begin(); it != images.end(); it++) {
+        auto b = new FrontBanner();
+        b->Create(ImageCache::getFromFile(File((*it))), "Some random text for test how it works");
+        addAndMakeVisible(b);
+        _imgs.push_back(b);
+    }
+
+    return;
+
     auto mainFont = new Font(30.0);
     auto secFont = new Font(24.0);
 

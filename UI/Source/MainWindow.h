@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    MainWindow.h
-    Created: 18 Aug 2016 7:00:48pm
-    Author:  crioto
-
-  ==============================================================================
-*/
-
 #ifndef MAINWINDOW_H_INCLUDED
 #define MAINWINDOW_H_INCLUDED
 
@@ -17,19 +7,23 @@
 class MainWindow : public juce::DocumentWindow
 {
     public:
-        MainWindow (juce::String name)  : juce::DocumentWindow (name,
+        MainWindow(juce::String name) : juce::DocumentWindow (
+                name,
                 juce::Colours::lightgrey,
-                juce::DocumentWindow::allButtons)
-	{
-    	    setUsingNativeTitleBar (false);
-    	    setTitleBarHeight(0);
-    	    MainContentComponent* mainComponent = new MainContentComponent();
-    	    setContentOwned (mainComponent, true);
+                juce::DocumentWindow::allButtons
+                )
+    {
+        //setUsingNativeTitleBar (false);
+        setUsingNativeTitleBar(true);
+        //setTitleBarHeight(0);
+        MainContentComponent* mainComponent = new MainContentComponent();
+        setContentOwned(mainComponent, true);
 
-    	    centreWithSize (getWidth(), getHeight());
-	    setDraggable(true);
-    	    setVisible (true);
-        }
+        centreWithSize(getWidth(), getHeight());
+        setDraggable(true);
+        setVisible(true);
+        setResizable(true, false);
+    }
 
         void closeButtonPressed() override
         {

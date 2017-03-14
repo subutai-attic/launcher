@@ -20,6 +20,7 @@ kurjun/*
 *.swo
 config.make
 UI/Builds/LinuxMakefile/build
+deploy.sh
 
 # windows build
 *.sdf

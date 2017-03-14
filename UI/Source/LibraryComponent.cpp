@@ -974,7 +974,6 @@ void LibrarySystemCheck::appsInstalled(){
 
 
 bool LibrarySystemCheck::checkSystem(){
-
     auto l = SubutaiLauncher::Log::instance()->logger();
 
     instEnabled = true;
