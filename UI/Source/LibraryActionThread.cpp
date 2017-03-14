@@ -7,7 +7,7 @@ LibraryActionThread::LibraryActionThread(const std::string& process, const std::
     _running(false),
     ThreadWithProgressWindow (title, true, true) //with progress bar and cancel button, timeout can be added
 {
-    //setStatusMessage ("Getting ready...");
+    setStatusMessage ("Getting ready...");
     //setProgress (0.05);
     //run();
 
@@ -132,6 +132,17 @@ void LibraryActionThread::run()
         config = ic;
         found = true;
     }
+
+    if (_component == "PeerW")
+    {
+        SubutaiLauncher::InstallConfig ic;
+        ic.title = _component;
+        ic.description = "VM";
+        ic.file = "peer_ova_tt";
+        config = ic;
+        found = true;
+    }
+
 
     if (!found)
     {
@@ -260,6 +271,7 @@ void LibraryActionThread::run()
     sleep(2000);
 
     setProgress (1.0);
+
     _running = false;
 }
 
@@ -300,13 +312,17 @@ void LibraryActionThread::threadComplete (bool userPressedCancel)
     }
     else
     {
-	l->debug() << "LAT::threadComplete normal " << std::endl;
 	// thread finished normally..
 	n = _process.find("uninstall", 0);
 	switch (pn){
 	    case 1: 
-		strcpy(m1, "Installation has been completed\0");
-		strcpy(m2, "Component is installed!\0");
+		if (_component == "Peer"){
+		    strcpy(m1, ".ova download has been completed\0");
+		    strcpy(m2, ".ova  is downloaded\0");
+		} else { 
+		    strcpy(m1, "Installation has been completed\0");
+		    strcpy(m2, "Component is installed!\0");
+		}
 		break;
 	    case 2: 
 		strcpy(m1, "Update process has been completed\0");

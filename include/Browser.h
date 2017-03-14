@@ -1,5 +1,5 @@
-#ifndef __SL_VIRTUAL_BOX_H__
-#define __SL_VIRTUAL_BOX_H__
+#ifndef __SL_BROWSER_H__
+#define __SL_BROWSER_H__
 
 #include "Vars.h"
 
@@ -21,44 +21,19 @@
 #include "Session.h"
 
 namespace SubutaiLauncher {
-
-    struct SubutaiVM {
-        std::string name;
-        std::string id;
-    };
-
-    class VirtualBox {
+    class Browser {
         public:
             static const std::string BIN;
-	    static std::string cloneName;
-	    static std::string subutaiBranch;
-            VirtualBox();
-            ~VirtualBox();
+            Browser();
+            ~Browser();
 	    bool findInstallation();
             bool isInstalled();
             bool isRunning();
             bool isUpdateRequired();
             std::string extractVersion();
-            void getVms();
-            std::vector<SubutaiVM> parseVms(const std::string& buffer);
-            std::vector<SubutaiVM> getPeers();
-            void addVm(SubutaiVM vm);
             std::string execute(const std::string& command);
 	    std::string sysExecute(const std::string& command, const std::string& cargs);
 	    std::string sysExecute(const std::string& command, const std::vector<std::string>& cargs);
-	    std::string cloneVM();
-	    bool cleanKnownHosts(std::string sport);
-	    bool runScripts(std::string instVersion, std::string isMH);
-	    bool setAutobuildIP(SSH &s_ssh);
-	    bool stopVM();
-	    bool restoreNet();
-	    bool startVM();
-	    bool waitingSSH(SSH &s_ssh, std::string sport);
-	    bool connectSSH(SSH &s_ssh);
-	    bool waitPeerIP();
-	    bool runAutobuild();
-	    bool importManagement();
-	    std::string getBranch( std::string  instVersion);
 
         protected:
         private:
@@ -68,9 +43,6 @@ namespace SubutaiLauncher {
             bool _installed;
             bool _running;
             bool _updateRequired;
-            std::vector<SubutaiVM> _vms;
-
-
     };
 
 }
