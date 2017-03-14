@@ -231,7 +231,7 @@ bool SubutaiLauncher::VirtualBox::cleanKnownHosts(std::string sport){
 }
 
 
-bool SubutaiLauncher::VirtualBox::runScripts(std::string instVersion)
+bool SubutaiLauncher::VirtualBox::runScripts(std::string instVersion, std::string isMH)
 {
     sleep(20);
     //waiting for ssh - waitForSnapd
@@ -354,9 +354,10 @@ bool SubutaiLauncher::VirtualBox::runScripts(std::string instVersion)
 	return false;
     };
 */
-
-    //if MH!
-    //importManagement();
+    
+    //std::string isMH = "1";
+    if (isMH == "1")
+	importManagement();
     return true;
 }
 

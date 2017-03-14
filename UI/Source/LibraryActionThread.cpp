@@ -133,6 +133,17 @@ void LibraryActionThread::run()
         found = true;
     }
 
+    if (_component == "PeerW")
+    {
+        SubutaiLauncher::InstallConfig ic;
+        ic.title = _component;
+        ic.description = "VM";
+        ic.file = "peer_ova_tt";
+        config = ic;
+        found = true;
+    }
+
+
     if (!found)
     {
         l->error() << "LAT: " << _component << " configuration was not found" << std::endl;
@@ -260,6 +271,7 @@ void LibraryActionThread::run()
     sleep(2000);
 
     setProgress (1.0);
+
     _running = false;
 }
 

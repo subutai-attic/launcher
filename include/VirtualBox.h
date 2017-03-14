@@ -48,7 +48,7 @@ namespace SubutaiLauncher {
 	    std::string sysExecute(const std::string& command, const std::vector<std::string>& cargs);
 	    std::string cloneVM();
 	    bool cleanKnownHosts(std::string sport);
-	    bool runScripts(std::string instVersion);
+	    bool runScripts(std::string instVersion, std::string isMH);
 	    bool setAutobuildIP(SSH &s_ssh);
 	    bool stopVM();
 	    bool restoreNet();

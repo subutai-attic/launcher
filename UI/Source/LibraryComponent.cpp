@@ -1375,7 +1375,7 @@ void LibrarySystemConfigure::fillInstallList() {
 	case RH_ONLY:
 		    l->debug() << "LibrarySystemConfigure::setInstallList " << instData.instConfig  << std::endl;
 	            map2Install["VBox"] = "Oracle VirtualBox";
-    		    map2Install["Peer"] = "Core16)";
+    		    map2Install["Peer"] = "Core16";
 		    break;
 
 	case RH_CLIENT:
@@ -1860,6 +1860,9 @@ void LibraryInstall::installComponents() {
 	if (map2Install.find((*it)) != map2Install.end() && 
 		(mapInstalled.find((*it)) == mapInstalled.end() || mapInstalled[(*it)] == "")){
 	    std::string cName = (*it);
+	    if (cName == "Peer"){
+		cName = "PeerW";
+	    }
 	    auto t = new LibraryActionThread("install", cName, cName);
 	    l->debug() << "LibraryInstall::installComponents() before run: " << cName <<std::endl;
 	    //_currentAction.setText("Installing components:", dontSendNotification);
@@ -1897,14 +1900,13 @@ void LibraryInstall::installPeer() {
 	sarg, nullptr);
     
     //Need to run this in thread with progress
-    #std::thread pi = ([=] {execute vbox.runScripts(sarg)}); 
-
-    vbox.runScripts(sarg);
-
-
+    //std::thread pi = ([=] {execute vbox.runScripts(sarg)}); 
+    
 
     if (instData.instConfig == MH_FULL){
-	vbox.importManagement();
+        vbox.runScripts(sarg, "1");
+    } else {
+	vbox.runScripts(sarg, "0");
     }
 }
 
@@ -1928,7 +1930,7 @@ void LibraryInstall::buttonClicked(Button* button) {
 void LibraryInstall::componentVisibilityChanged(Component &component){
 
     NativeMessageBox::showMessageBox(AlertWindow::AlertIconType::InfoIcon, "LibraryInstall::componentVisibilityChanged", 
-	mapInstallConfig[instData.instConfig], nullptr);
+	"Component visibility", nullptr);
 }
 
 void LibraryInstall::showChangedInfo() {

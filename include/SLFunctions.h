@@ -18,11 +18,15 @@ namespace SubutaiLauncher {
     static char const* sl_string = "";
     static char const* sl_desc = "";
     static char const* sl_destination = "";
+    static char const* sl_type = "";
+    static char const* sl_mh = "";
+
 
 
     static char* download_keywords[] = {(char*)"filename", NULL};
     static char* tmpdir_keywords[] = {(char*)"tmpdir", NULL};
     static char* string_keywords[] = {(char*)"string", NULL};
+    static char* vb_keywords[] = {(char*)"type", (char*)"mh", NULL};
     static char* desc_keywords[] = {(char*)"string", (char*)"desc", NULL};
 
     static PyObject* SL_HelloWorld(PyObject* self, PyObject* args) {
@@ -38,11 +42,11 @@ namespace SubutaiLauncher {
     }
 
     static PyObject* SL_GetMasterVersion(PyObject* self, PyObject* args) {
-        return Py_BuildValue("s", "4.0.5");
+        return Py_BuildValue("s", "4.0.15");
     }
 
     static PyObject* SL_GetDevVersion(PyObject* self, PyObject* args) {
-        return Py_BuildValue("s", "4.0.6");
+        return Py_BuildValue("s", "4.0.16");
     }
 
     static PyObject* SL_getDistro(PyObject* self, PyObject* args) {
@@ -258,15 +262,22 @@ namespace SubutaiLauncher {
     }
 
     static PyObject* SL_runScripts(PyObject* self, PyObject* args, PyObject* keywords) {
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
+        
+    //	if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", vb_keywords, &sl_type, &sl_mh))
+    //        return NULL;
+
+    	if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", desc_keywords, &sl_string, &sl_desc))
             return NULL;
 
-        Log::instance()->logger()->debug() << "runScripts: " << sl_string << std::endl;
+//	if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
+//            return NULL;
+
+        //Log::instance()->logger()->debug() << "runScripts: " << sl_type << " ifMH: " << sl_mh << std::endl;
 
         VirtualBox vb;
-        Log::instance()->logger()->debug() << "runScripts: vb " << sl_string << std::endl;
-        vb.runScripts(sl_string);
-        Log::instance()->logger()->debug() << "runScripts: after run " << sl_string << std::endl;
+        //Log::instance()->logger()->debug() << "runScripts: vb " << sl_type << std::endl;
+        vb.runScripts(sl_string, sl_desc);
+        //Log::instance()->logger()->debug() << "runScripts: after run " << sl_desc << std::endl;
         return Py_BuildValue("i", 1);
     }
 
@@ -298,11 +309,11 @@ namespace SubutaiLauncher {
         {"version", SL_Version, METH_VARARGS, "Display launcher version"},
         {"CheckDirectories", SL_CheckDirectories, METH_VARARGS, "Display launcher version"},
         {"RaiseError", (PyCFunction)SL_RaiseError, METH_VARARGS | METH_KEYWORDS, "Raising error"},
-        {"VBox", (PyCFunction)SL_VBox, METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something"},
-	{"cloneVM", (PyCFunction)SL_cloneVM, METH_VARARGS | METH_KEYWORDS, "clones VM"},
-        {"runScripts", (PyCFunction)SL_runScripts, METH_VARARGS | METH_KEYWORDS, "Upload files and run prepare-server.sh"},
         {"RaiseWarning", (PyCFunction)SL_RaiseWarning, METH_VARARGS | METH_KEYWORDS, "Raising warning"},
         {"RaiseInfo", (PyCFunction)SL_RaiseInfo, METH_VARARGS | METH_KEYWORDS, "Raising info"},
+        {"VBox", (PyCFunction)SL_VBox, METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something"},
+	{"cloneVM", (PyCFunction)SL_cloneVM, METH_VARARGS | METH_KEYWORDS, "clones VM"},
+        {"runScripts", (PyCFunction)SL_runScripts, METH_VARARGS | METH_KEYWORDS, "Configure peer"},
         {"Shutdown", SL_Shutdown, METH_VARARGS, "Finalizes the script"},
         {"GetMasterVersion", SL_GetMasterVersion, METH_VARARGS, "Returns master version of a product"},
         {"GetDevVersion", SL_GetDevVersion, METH_VARARGS, "Returns dev version of a product"},
