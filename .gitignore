@@ -1,5 +1,6 @@
 *.ropeproject
 *ycm_extra_conf*
+compile_commands.json
 bin
 build
 CLI/bin

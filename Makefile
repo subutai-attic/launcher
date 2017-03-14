@@ -106,7 +106,7 @@ clean:
 	@rm -rf bin/*
 	@rm -rf build/*
 	$(MAKE) -C ./CLI clean
-	$(MAKE) -C ./UI/Makefile clean
+	$(MAKE) -C ./UI clean
 
 mrproper:
 	@rm -rf bin

@@ -56,8 +56,7 @@ $(BUILD_DIR)/juce_gui_extra.o: $(JUCE)/juce_gui_extra.cpp
 	$(CC) -Wall $(CFLAGS) -c $< -o $@
 
 clean:
-	@rm $(BUILD_DIR)/*.o
-	@rm $(OUTPUT_DIR)/$(TARGET)
-	@rm $(OUTPUT_DIR)/$(TARGET)-static
+	-rm $(OUTPUT_DIR)/$(TARGET)
+	-rm $(OUTPUT_DIR)/$(TARGET)-static
 
 mrproper: clean
