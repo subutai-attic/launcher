@@ -4,6 +4,7 @@ CC=g++
 DYNAMIC_LIB_TARGET = libsubutai-launcher.so
 STATIC_LIB_TARGET = libsubutai-launcher.a
 EXTRA_LIBS_DIR = third-party
+TEST_TARGET=testsuite
 VB_DIR = third-party/xpcom
 VB = -I$(VB_DIR) -I$(VB_DIR)/xpcom -I$(VB_DIR)/nsprpub -I$(VB_DIR)/string -I$(VB_DIR)/ipcd
 INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) $(VB) -Ithird-party/md5 -Ithird-party/json -I/usr/local/include
@@ -53,7 +54,7 @@ endif
 ifdef BUILD_TESTS
 test: directories
 test: lib
-test: $(OUTPUT_DIR)/$(DYNAMIC_LIB_TARGET)-test
+test: $(OUTPUT_DIR)/$(TEST_TARGET)
 endif
 
 cli: lib
@@ -89,9 +90,8 @@ $(OUTPUT_DIR)/$(DYNAMIC_LIB_TARGET): $(OBJECTS)
 $(OUTPUT_DIR)/$(STATIC_LIB_TARGET): $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $^
 
-$(OUTPUT_DIR)/$(DYNAMIC_LIB_TARGET)-test: $(T_OBJECTS)
-	$(CC) $(T_OBJECTS) -Wall $(LIBS) -lCppUnit -L$(OUTPUT_DIR) -lsubutai-launcher -o $@
-
+$(OUTPUT_DIR)/$(TEST_TARGET): $(T_OBJECTS)
+	$(CC) $(T_OBJECTS) -Wall $(LIBS) -lPocoCppUnit -L$(OUTPUT_DIR) -lsubutai-launcher -o $@
 
 directories:
 	@mkdir -p $(OUTPUT_DIR)
