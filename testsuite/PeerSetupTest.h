@@ -1,5 +1,5 @@
-#ifndef __LOG_TEST_H__
-#define __LOG_TEST_H__
+#ifndef __PEER_SETUP_TEST_H__
+#define __PEER_SETUP_TEST_H__
 
 #include <Poco/CppUnit/TestCase.h>
 
@@ -11,6 +11,8 @@ public:
 
 	void setUp();
 	void tearDown();
+
+    void runPeerSetup();
 
 	static CppUnit::Test* suite();
 };

@@ -16,23 +16,23 @@ unsigned SubutaiLauncher::Environment::processorNum()
     auto l = Log::instance()->logger();
 #if LAUNCHER_LINUX
 #if defined _SC_NPROCESSORS_ONLN
-	auto count = sysconf(_SC_NPROCESSORS_ONLN);
-	//int count = sysconf(_SC_NPROCESSORS_CONF);
-	if (count <= 0) count = 1;
-	
-	l->debug() << "Environment::processorNum: " << count << std::endl;
+    auto count = sysconf(_SC_NPROCESSORS_ONLN);
+    //int count = sysconf(_SC_NPROCESSORS_CONF);
+    if (count <= 0) count = 1;
 
-	//return static_cast<int>(count);
-	return count;
+    l->debug() << "Environment::processorNum: " << count << std::endl;
+
+    //return static_cast<int>(count);
+    return count;
 #endif
 #elif LAUNCHER_WINDOWS
-	SYSTEM_INFO si;
-	GetSystemInfo(&si);
-	return si.dwNumberOfProcessors;
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+    return si.dwNumberOfProcessors;
 #elif LAUNCHER_MACOS
 
 #endif
-	return 1;
+    return 1;
 }
 
 unsigned SubutaiLauncher::Environment::is64() 
@@ -45,18 +45,18 @@ unsigned SubutaiLauncher::Environment::is64()
 #endif 
 
 #ifdef BUILD_64
-	return 1;
+    return 1;
 #else 
-	return 0;
+    return 0;
 #endif
 #elif LAUNCHER_WINDOWS
-	SYSTEM_INFO si;
-	GetSystemInfo(&si);
-	return 0; //Change 4Win! 
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+    return 0; //Change 4Win! 
 #elif LAUNCHER_MACOS
 
 #endif
-	return 0;
+    return 0;
 }
 
 unsigned long SubutaiLauncher::Environment::ramSize() 
@@ -65,28 +65,28 @@ unsigned long SubutaiLauncher::Environment::ramSize()
 #if LAUNCHER_LINUX
 #if defined _SC_PHYS_PAGES
 #if defined _SC_PAGESIZE
-	int pages = sysconf(_SC_PHYS_PAGES);
-	if (pages <= 0)  pages = 1;
-	
-	int pageSize = sysconf(_SC_PAGESIZE);
-	if (pageSize <= 0) {
-	    pageSize = 1;
-	} else {
-	    pageSize = pageSize / 1024;
-	}
-	l->debug() << "Environment::ramSize: " << pages * pageSize / 1024 << std::endl;
+    int pages = sysconf(_SC_PHYS_PAGES);
+    if (pages <= 0)  pages = 1;
 
-	//return static_cast<int>(count);
-	return pages * pageSize / 1024;
+    int pageSize = sysconf(_SC_PAGESIZE);
+    if (pageSize <= 0) {
+        pageSize = 1;
+    } else {
+        pageSize = pageSize / 1024;
+    }
+    l->debug() << "Environment::ramSize: " << pages * pageSize / 1024 << std::endl;
+
+    //return static_cast<int>(count);
+    return pages * pageSize / 1024;
 #endif
 #endif
 #elif LAUNCHER_WINDOWS
-	SYSTEM_INFO si;
-	GetSystemInfo(&si);
-	return si.dwNumberOfProcessors;
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+    return si.dwNumberOfProcessors;
 #elif LAUNCHER_MACOS
 #endif
-	return 1;
+    return 1;
 }
 
 unsigned SubutaiLauncher::Environment::versionVBox() 
@@ -99,18 +99,18 @@ unsigned SubutaiLauncher::Environment::versionVBox()
 #endif 
 
 #ifdef BUILD_64
-	return 1;
+    return 1;
 #else 
-	return 0;
+    return 0;
 #endif
 #elif LAUNCHER_WINDOWS
-	SYSTEM_INFO si;
-	GetSystemInfo(&si);
-	return 0; //Change 4Win! 
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+    return 0; //Change 4Win! 
 #elif LAUNCHER_MACOS
 
 #endif
-	return 0;
+    return 0;
 }
 
 std::string SubutaiLauncher::Environment::vtxEnabled() 
@@ -125,10 +125,10 @@ std::string SubutaiLauncher::Environment::vtxEnabled()
     sp.launch("bash", args, "/usr/bin");
     if (sp.wait() == 0) 
     {
-	out = sp.getOutputBuffer();
-	err = sp.getErrorBuffer();
+        out = sp.getOutputBuffer();
+        err = sp.getErrorBuffer();
     }
-    
+
     SubutaiString sstr(out);
     std::string::size_type n = 0;
     std::string s = "Virtualization:";
@@ -137,11 +137,11 @@ std::string SubutaiLauncher::Environment::vtxEnabled()
     SubutaiString sstr1(out);
     out = sstr1.remove(" ", "");
 #elif LAUNCHER_WINDOWS
-	return "win"; //Change 4Win! 
+    return "win"; //Change 4Win! 
 #elif LAUNCHER_MACOS
 
 #endif
-	return out;
+    return out;
 }
 
 std::string SubutaiLauncher::Environment::versionOS() 
@@ -158,7 +158,7 @@ std::string SubutaiLauncher::Environment::versionOS()
     os = Poco::Environment::osDisplayName() + " " + Poco::Environment::osVersion();
     return os;
 #endif
-return "Can not define OS";
+    return "Can not define OS";
 }
 
 std::string SubutaiLauncher::Environment::distroOS(std::string ar) 
@@ -175,20 +175,20 @@ std::string SubutaiLauncher::Environment::distroOS(std::string ar)
     sp.launch("lsb_release", args, "/usr/bin");
     if (sp.wait() == 0) 
     {
-	out = sp.getOutputBuffer();
-	err = sp.getErrorBuffer();
+        out = sp.getOutputBuffer();
+        err = sp.getErrorBuffer();
     }
     int found = out.find("Error");
     if (found != std::string::npos) {
-	sleep(5);
-	out = "";
-	err = "";
-	sp.launch("lsb_release", args, "/usr/bin");
-	if (sp.wait() == 0) 
-	{
-	    out = sp.getOutputBuffer();
-	    err = sp.getErrorBuffer();
-	}
+        sleep(5);
+        out = "";
+        err = "";
+        sp.launch("lsb_release", args, "/usr/bin");
+        if (sp.wait() == 0) 
+        {
+            out = sp.getOutputBuffer();
+            err = sp.getErrorBuffer();
+        }
     }
     SubutaiString sstr(out);
     std::vector<std::string> splitted = sstr.ssplit("\t");
@@ -232,13 +232,13 @@ std::string SubutaiLauncher::Environment::versionSSH()
     args.push_back("localhost");
 
     auto l = Log::instance()->logger();
-    
+
 #if LAUNCHER_LINUX
     sp.launch("ssh", args, "/usr/bin");
     if (sp.wait() == 0) 
     {
-	out = sp.getOutputBuffer();
-	err = sp.getErrorBuffer();
+        out = sp.getOutputBuffer();
+        err = sp.getErrorBuffer();
     }
     l->debug() << "SubutaiLauncher::Environment::versionSSH " << out  << std::endl;
     SubutaiString sstr(out);
@@ -248,43 +248,78 @@ std::string SubutaiLauncher::Environment::versionSSH()
     l->debug() << "SubutaiLauncher::Environment::versionSSH " << out  << std::endl;
 
 #elif LAUNCHER_WINDOWS
-	return "win"; //Change 4Win! 
+    return "win"; //Change 4Win! 
 #elif LAUNCHER_MACOS
 
 #endif
-	return out;
+    return out;
 }
 
 
 std::string SubutaiLauncher::Environment::getVar(const std::string& name, const std::string& defaultValue) 
 {
 #if LAUNCHER_LINUX
-	const char* value = getenv(name.c_str());
-	if (value) {
-		return std::string(value);
-	}
+    const char* value = getenv(name.c_str());
+    if (value) {
+        return std::string(value);
+    }
 #elif LAUNCHER_WINDOWS
-	DWORD len = GetEnvironmentVariableA(name.c_str(), 0, 0);
-	if (len == 0) throw SubutaiException("Environment variable was not found");
-	char* buffer = new char[len];
-	GetEnvironmentVariableA(name.c_str(), buffer, len);
-	std::string res(buffer);
-	delete[] buffer;
-	return res;
+    DWORD len = GetEnvironmentVariableA(name.c_str(), 0, 0);
+    if (len == 0) throw SubutaiException("Environment variable was not found");
+    char* buffer = new char[len];
+    GetEnvironmentVariableA(name.c_str(), buffer, len);
+    std::string res(buffer);
+    delete[] buffer;
+    return res;
 #elif LAUNCHER_MACOS
 #error Not implemented on this platform
 #endif
-	return defaultValue;
+    return defaultValue;
 }
 
 std::string SubutaiLauncher::Environment::setVar(const std::string& name, const std::string& value)
 {
 #if LAUNCHER_WINDOWS
-	if (SetEnvironmentVariableA(name.c_str(), value.c_str()) == 0)
-	{
-		throw SubutaiException("Failed to set environment variable");
-	}
+    if (SetEnvironmentVariableA(name.c_str(), value.c_str()) == 0)
+    {
+        throw SubutaiException("Failed to set environment variable");
+    }
 #else
-	setenv(name.c_str(), value.c_str(), 1);
+    setenv(name.c_str(), value.c_str(), 1);
+#endif
+}
+
+std::string SubutaiLauncher::Environment::getDefaultGateway()
+{
+#if LAUNCHER_LINUX
+    std::vector<std::string> pargs;
+    pargs.push_back("-rn");
+    pargs.push_back("|");
+    SubutaiProcess p;
+    p.launch("/bin/netstat", pargs, "");
+    p.wait();
+    auto netstat = p.getOutputBuffer();
+
+    Poco::StringTokenizer lines(netstat, "\n", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+    bool isDefault = false;
+    for (auto line = lines.begin(); line != lines.end(); line++) {
+        Poco::StringTokenizer elements((*line), " ", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+        int i = 0;
+        for (auto el = elements.begin(); el != elements.end(); el++) {
+            i++;
+            if ((*el) == "0.0.0.0") {
+                isDefault = true;
+            }
+            if (isDefault && i == 8) {
+                return (*el);
+            }
+        }
+    }
+    return "unknown";
+
+
+    //return p.getOutputBuffer();
+#else
+#error Not implemented on this platform
 #endif
 }

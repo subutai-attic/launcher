@@ -10,6 +10,7 @@
 #include "Install.h"
 #include "NotificationCenter.h"
 #include "Environment.h"
+#include "VirtualBox.h"
 
 namespace SubutaiLauncher {
 
@@ -50,7 +51,7 @@ namespace SubutaiLauncher {
     }
 
     static PyObject* SL_getDistro(PyObject* self, PyObject* args) {
-	Environment e;
+        Environment e;
         std::string distro = e.distroOS("-c");
         return Py_BuildValue("s", distro);
     }
@@ -105,7 +106,7 @@ namespace SubutaiLauncher {
             return NULL;
         std::printf("Requested download of a file: %s\n", sl_filename);
         auto downloader = Session::instance()->getDownloader();
-	PyErr_Print();
+        PyErr_Print();
         downloader->setFilename(sl_filename);
         if (!downloader->retrieveFileInfo()) {
             std::printf("Failed to retrieve file data");
@@ -210,7 +211,7 @@ namespace SubutaiLauncher {
         i.setFilename(sl_filename);
         try {
             i.unInstall();
-            } catch (SubutaiException &e) {
+        } catch (SubutaiException &e) {
             return Py_BuildValue("i", 1);
 
         }
@@ -247,11 +248,11 @@ namespace SubutaiLauncher {
         Log::instance()->logger()->debug() << "PyObject VBox: " << sl_string << std::endl;
 
         VirtualBox vb;
-	std::string out = vb.execute(sl_string);
-	int found = out.find("error");
+        std::string out = vb.execute(sl_string);
+        int found = out.find("error");
         if (found == std::string::npos)
-	    return Py_BuildValue("i", 1);
-	return Py_BuildValue("i", 0);
+            return Py_BuildValue("i", 1);
+        return Py_BuildValue("i", 0);
     }
 
     static PyObject* SL_cloneVM(PyObject* self, PyObject* args) {
@@ -262,15 +263,15 @@ namespace SubutaiLauncher {
     }
 
     static PyObject* SL_runScripts(PyObject* self, PyObject* args, PyObject* keywords) {
-        
-    //	if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", vb_keywords, &sl_type, &sl_mh))
-    //        return NULL;
 
-    	if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", desc_keywords, &sl_string, &sl_desc))
+        //	if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", vb_keywords, &sl_type, &sl_mh))
+        //        return NULL;
+
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", desc_keywords, &sl_string, &sl_desc))
             return NULL;
 
-//	if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
-//            return NULL;
+        //	if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
+        //            return NULL;
 
         //Log::instance()->logger()->debug() << "runScripts: " << sl_type << " ifMH: " << sl_mh << std::endl;
 
@@ -288,6 +289,24 @@ namespace SubutaiLauncher {
         vb.runAutobuild();
         Log::instance()->logger()->debug() << "runAutobuild: after run "  << std::endl;
         return Py_BuildValue("i", 1);
+    }
+
+    static PyObject* SL_GetDefaultRoutingInterface(PyObject* self, PyObject* args) {
+        Log::instance()->logger()->debug() << "SL_GetDefaultRoutingInterface" << std::endl;
+
+        Environment env;
+
+        return Py_BuildValue("s", env.getDefaultGateway().c_str());
+    }
+
+    static PyObject* SL_GetVBoxBridgedInterface(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
+        Log::instance()->logger()->debug() << "SL_GetVBoxBridgedInterface" << std::endl;
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
+            return NULL;
+        VirtualBox vb;
+
+        return Py_BuildValue("s", vb.getBridgedInterface(sl_string).c_str());
     }
 
     // Module bindings
@@ -312,13 +331,18 @@ namespace SubutaiLauncher {
         {"RaiseWarning", (PyCFunction)SL_RaiseWarning, METH_VARARGS | METH_KEYWORDS, "Raising warning"},
         {"RaiseInfo", (PyCFunction)SL_RaiseInfo, METH_VARARGS | METH_KEYWORDS, "Raising info"},
         {"VBox", (PyCFunction)SL_VBox, METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something"},
-	{"cloneVM", (PyCFunction)SL_cloneVM, METH_VARARGS | METH_KEYWORDS, "clones VM"},
+        {"VBoxS", (PyCFunction)SL_VBoxS, METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something and returns status"},
+        {"cloneVM", (PyCFunction)SL_cloneVM, METH_VARARGS | METH_KEYWORDS, "clones VM"},
         {"runScripts", (PyCFunction)SL_runScripts, METH_VARARGS | METH_KEYWORDS, "Configure peer"},
         {"Shutdown", SL_Shutdown, METH_VARARGS, "Finalizes the script"},
         {"GetMasterVersion", SL_GetMasterVersion, METH_VARARGS, "Returns master version of a product"},
         {"GetDevVersion", SL_GetDevVersion, METH_VARARGS, "Returns dev version of a product"},
         {"getDistro", SL_getDistro, METH_VARARGS, "Returns OS distro"},
         {"runAutobuild", SL_runAutobuild, METH_VARARGS, "temporary - runs autobuild script"},
+        // New version
+        //{"ImportVirtualMachine", SL_importVirtualMachine, METH_VARARGS | METH_KEYWORDS, "Import a virtual machine into VB"},
+        {"GetDefaultRoutingInterface", SL_GetDefaultRoutingInterface, METH_VARARGS, "Returns name of default network interface"},
+        {"GetVBoxBridgedInterface", (PyCFunction)SL_GetVBoxBridgedInterface, METH_VARARGS | METH_KEYWORDS, "Returns name of default network interface"},
         {NULL, NULL, 0, NULL}
     };
 

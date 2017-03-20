@@ -55,6 +55,8 @@ ifdef BUILD_TESTS
 test: directories
 test: lib
 test: $(OUTPUT_DIR)/$(TEST_TARGET)
+test:
+	@cp testsuite/*.py bin/
 endif
 
 cli: lib
