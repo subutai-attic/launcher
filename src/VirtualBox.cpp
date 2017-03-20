@@ -150,6 +150,12 @@ std::string SubutaiLauncher::VirtualBox::execute(const std::string& command, int
     auto status = p.wait();
     exitStatus = status;
     std::string out = p.getOutputBuffer();
+    std::string err = p.getErrorBuffer();
+    if (status != 0) {
+    Log::instance()->logger()->debug() << "==========================================================" << std::endl;
+    Log::instance()->logger()->debug() << err << std::endl;
+    Log::instance()->logger()->debug() << "==========================================================" << std::endl;
+    }
     Log::instance()->logger()->debug() << "VirtualBox::execute " << command << ": "<< out << "\n Status: " << status << std::endl;
     int i = 0;
     return out;
@@ -680,6 +686,49 @@ std::string SubutaiLauncher::VirtualBox::getBridgedInterface(const std::string& 
 
     //Poco::StringTokenizer lines(out, "\n", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
     return iface;
+}
+
+std::string SubutaiLauncher::VirtualBox::getMachineInfo(const std::string& name) 
+{
+    std::vector<std::string> args;
+    args.push_back("showvminfo");
+    args.push_back(name);
+    SubutaiProcess p;
+    p.launch(BIN, args, _location);
+    p.wait();
+    return p.getOutputBuffer();
+}
+
+bool SubutaiLauncher::VirtualBox::isMachineExists(const std::string& name)
+{
+    auto list = getPeers();
+    for (auto it = list.begin(); it != list.end(); it++) {
+        if ((*it).name == name) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool SubutaiLauncher::VirtualBox::isMachineRunning(const std::string& name)
+{
+    auto list = getPeers();
+    for (auto it = list.begin(); it != list.end(); it++) {
+        if ((*it).name == name) {
+            auto info = getMachineInfo(name);
+            Poco::StringTokenizer lines(info, "\n", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+            for (auto line = lines.begin(); line != lines.end(); line++) {
+                if ((*line).substr(0, 6) == "State:") {
+                    auto p = (*line).find("running", 0);
+                    if (p != std::string::npos) {
+                        return true;
+                    } 
+                    return false;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 /*  std::string VirtualBox::importVirtualMachine(const std::string& fileName, const std:string& targetName) const

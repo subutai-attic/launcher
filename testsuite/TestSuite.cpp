@@ -4,6 +4,7 @@
 #include "LogTest.h"
 #include "DownloaderTest.h"
 #include "PeerSetupTest.h"
+#include "SSHTest.h"
 
 class SubutaiLauncherTestSuite
 {
@@ -15,6 +16,7 @@ public:
 		pSuite->addTest(LogTest::suite());
 		pSuite->addTest(DownloaderTest::suite());
         pSuite->addTest(PeerSetupTest::suite());
+        pSuite->addTest(SSHTest::suite());
 
 		return pSuite;
 	}

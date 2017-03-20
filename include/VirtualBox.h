@@ -66,6 +66,9 @@ namespace SubutaiLauncher {
             // New version
             std::string importVirtualMachine(const std::string& fileName, const std::string& targetName) const;
             std::string getBridgedInterface(const std::string& iface);
+            std::string getMachineInfo(const std::string& name);
+            bool isMachineExists(const std::string& name);
+            bool isMachineRunning(const std::string& name);
 
         private:
             std::string _version;
