@@ -140,7 +140,7 @@ std::string SubutaiLauncher::VirtualBox::execute(const std::string& command)
     return out;
 }
 
-std::string SubutaiLauncher::VirtualBox::execute(const std::string& command, int *exitStatus)
+std::string SubutaiLauncher::VirtualBox::execute(const std::string& command, int &exitStatus)
 {
     SubutaiString str(command);
     std::vector<std::string> args;
@@ -148,9 +148,9 @@ std::string SubutaiLauncher::VirtualBox::execute(const std::string& command, int
     SubutaiProcess p;
     p.launch(BIN, args, _location);
     auto status = p.wait();
-    exitStatus = (&status);
+    exitStatus = status;
     std::string out = p.getOutputBuffer();
-    Log::instance()->logger()->debug() << "VirtualBox::execute " << command << ": "<< out << std::endl;
+    Log::instance()->logger()->debug() << "VirtualBox::execute " << command << ": "<< out << "\n Status: " << status << std::endl;
     int i = 0;
     return out;
 }

@@ -46,7 +46,7 @@ namespace SubutaiLauncher {
             std::vector<SubutaiVM> getPeers();
             void addVm(SubutaiVM vm);
             std::string execute(const std::string& command);
-            std::string execute(const std::string& command, int *exitStatus);
+            std::string execute(const std::string& command, int &exitStatus);
             std::string sysExecute(const std::string& command, const std::string& cargs);
             std::string sysExecute(const std::string& command, const std::vector<std::string>& cargs);
             std::string cloneVM();
@@ -67,7 +67,6 @@ namespace SubutaiLauncher {
             std::string importVirtualMachine(const std::string& fileName, const std::string& targetName) const;
             std::string getBridgedInterface(const std::string& iface);
 
-        protected:
         private:
             std::string _version;
             std::string _path;

@@ -255,6 +255,18 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", 0);
     }
 
+    static PyObject* SL_VBoxS(PyObject* self, PyObject* args, PyObject* keywords) {
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
+            return NULL;
+
+        Log::instance()->logger()->debug() << "PyObject VBox: " << sl_string << std::endl;
+
+        VirtualBox vb;
+        int exitStatus = 0;
+        std::string out = vb.execute(sl_string, exitStatus);
+        return Py_BuildValue("i", exitStatus);
+    }
+
     static PyObject* SL_cloneVM(PyObject* self, PyObject* args) {
 
         VirtualBox vb;
