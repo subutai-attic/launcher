@@ -1,16 +1,15 @@
-sinclude config.make
+include config.make
 
 CC=g++
-TARGET = libsubutai-launcher.so
-STARGET = libsubutai-launcher.a
+DYNAMIC_LIB_TARGET = libsubutai-launcher.so
+STATIC_LIB_TARGET = libsubutai-launcher.a
 EXTRA_LIBS_DIR = third-party
+TEST_TARGET=testsuite
 VB_DIR = third-party/xpcom
 VB = -I$(VB_DIR) -I$(VB_DIR)/xpcom -I$(VB_DIR)/nsprpub -I$(VB_DIR)/string -I$(VB_DIR)/ipcd
-INCLUDES = -Iinclude -I/usr/include/$(PYTHON_VER) $(VB) -Ithird-party/md5 -Ithird-party/json
-LIBS = -g -ggdb -lm -lrt -l$(PYTHON_VER) -Wl,-Bstatic -lcurl -Wl,-Bdynamic -lssh -L$(PYLIB_DIR)
-#INCLUDES = -Iinclude -I/usr/include/python3.5 $(VB) -Ithird-party/md5 -Ithird-party/json
-#LIBS = -g -ggdb -lm -lrt -lpython3.5 -lcurl -lssh
-CFLAGS = -L/lib/x86_64-linux-gnu -Wno-write-strings $(INCLUDES) $(LIBS) -std=c++11 -DRT_OS_LINUX -DCURL_LIBSTATIC
+INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) $(VB) -Ithird-party/md5 -Ithird-party/json -I/usr/local/include
+LIBS = -g -ggdb -lm -lrt -l$(PYTHON_VER) -lcurl -lssh -L$(PYLIB_DIR)  -lPocoNet -lPocoNetSSL -lPocoFoundation
+CFLAGS = -L/lib/x86_64-linux-gnu $(INCLUDES) $(LIBS) -std=c++11 -DRT_OS_LINUX
 
 SRC_DIR = src
 INCLUDE_DIR = include
@@ -26,25 +25,54 @@ T_OBJECTS = $(patsubst %,$(BUILD_DIR)/$(TEST_DIR)/%.o, $(subst $(TEST_DIR)/,,$(s
 
 .PHONE: lib all clean
 
-all: lib cli ui files test
+all: lib cli 
+ifdef SHARED_BUILD
+all: ui-shared
+endif
+ifdef STATIC_BUILD
+all: ui-static
+endif
+all: files
+ifdef BUILD_TESTS
+all: test
+endif
 
-lib: directories dynamic static
+lib: directories 
+ifdef SHARED_BUILD
+lib: shared 
 
-dynamic: directories
-dynamic: $(OUTPUT_DIR)/$(TARGET)
+shared: directories
+shared: $(OUTPUT_DIR)/$(DYNAMIC_LIB_TARGET)
+endif
+ifdef STATIC_BUILD
+lib: static
 
 static: directories
-static: $(OUTPUT_DIR)/$(STARGET)
+static: $(OUTPUT_DIR)/$(STATIC_LIB_TARGET)
+endif
 
+ifdef BUILD_TESTS
 test: directories
 test: lib
-test: $(OUTPUT_DIR)/$(TARGET)-test
+test: $(OUTPUT_DIR)/$(TEST_TARGET)
+test:
+	@cp testsuite/*.py bin/
+endif
 
 cli: lib
 	$(MAKE) -C ./CLI
 
-ui: lib
-	$(MAKE) -C ./UI/Builds/LinuxMakefile
+ifdef STATIC_BUILD
+ui: ui-static
+ui-static: static
+	$(MAKE) -C ./UI
+endif
+
+ifdef SHARED_BUILD 
+ui: ui-shared
+ui-shared: shared
+	$(MAKE) -C ./UI
+endif
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
 	$(CC) -fPIC $(CFLAGS) -c $< -o $@
@@ -56,16 +84,16 @@ $(BUILD_DIR)/third-party/md5/%.o: third-party/md5/%.cpp $(HEADERS)
 	$(CC) -fPIC $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/$(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC)   $(CFLAGS) -c $< -o $@
 
-$(OUTPUT_DIR)/$(TARGET): $(OBJECTS)
-	$(CC) -shared $(OBJECTS) $(LIBS) -o $@
+$(OUTPUT_DIR)/$(DYNAMIC_LIB_TARGET): $(OBJECTS)
+	$(CC) -shared  $(OBJECTS) $(LIBS) -o $@
 
-$(OUTPUT_DIR)/$(STARGET): $(OBJECTS)
+$(OUTPUT_DIR)/$(STATIC_LIB_TARGET): $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $^
 
-$(OUTPUT_DIR)/$(TARGET)-test: $(T_OBJECTS)
-	$(CC) $(T_OBJECTS) -Wall $(LIBS) -lcppunit -L$(OUTPUT_DIR) -lsubutai-launcher -o $@
+$(OUTPUT_DIR)/$(TEST_TARGET): $(T_OBJECTS)
+	$(CC) $(T_OBJECTS) -Wall $(LIBS) -lPocoCppUnit -L$(OUTPUT_DIR) -lsubutai-launcher -o $@
 
 directories:
 	@mkdir -p $(OUTPUT_DIR)
@@ -73,7 +101,7 @@ directories:
 	@mkdir -p $(BUILD_DIR)/third-party/json
 	@mkdir -p $(BUILD_DIR)/third-party/md5
 	@mkdir -p $(BUILD_DIR)/$(TEST_DIR)
-	@mkdir -p $(BUILD_DIR)/UI
+	@mkdir -p $(BUILD_DIR)/ui
 
 files:
 	@cp assets/* bin/
@@ -82,13 +110,12 @@ clean:
 	@rm -rf bin/*
 	@rm -rf build/*
 	$(MAKE) -C ./CLI clean
-	$(MAKE) -C ./UI/Builds/LinuxMakefile clean
+	$(MAKE) -C ./UI clean
 
 mrproper:
 	@rm -rf bin
 	@rm -rf build
 	$(MAKE) -C ./CLI mrproper
+	$(MAKE) -C ./UI mrproper
 	@rm -f config.make
-
-newui:
 

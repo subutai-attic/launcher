@@ -9,6 +9,7 @@
 #include "SLException.h"
 #include "FileSystem.h"
 #include "SubutaiLog.h"
+#include "Session.h"
 
 #if LAUNCHER_LINUX
 #include <sys/stat.h>
@@ -29,6 +30,8 @@ namespace SubutaiLauncher {
             void open(const std::string& path);
             void execute();
             void execute(std::string module);
+            std::thread executeInThread();
+            std::thread executeInThread(const std::string& module);
             long exitCode();
         private:
             PyObject* _name;

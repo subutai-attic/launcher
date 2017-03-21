@@ -6,14 +6,23 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#include <Poco/FileStream.h>
+#include <Poco/StreamCopier.h>
+
 #if LAUNCHER_WINDOWS
 #include <io.h>
 #endif
 #include <libssh/libssh.h>
+#include <libssh/sftp.h>
 #include "Environment.h"
 #include "SubutaiProcess.h"
 #include "FileSystem.h"
 #include "SubutaiString.h"
+#include "SubutaiLog.h"
 
 namespace SubutaiLauncher {
     class SSH {
@@ -26,12 +35,15 @@ namespace SubutaiLauncher {
             void setHost(const std::string& host, long port = 22);
             std::string run(const std::string& command) const;
             void connect();
+            void disconnect();
             void authenticate();
             int verifyHost();
-            void execute(const std::string& command);
+            std::string execute(const std::string& command);
             bool isConnected();
             bool isAuthenticated();
-
+            long scpWrite(const std::string& src);
+            long sftpWrite(const std::string& src);
+            static std::string getPublicKey();
         private:
             ssh_session _ssh;
             std::string _path;

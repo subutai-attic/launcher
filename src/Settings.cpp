@@ -2,7 +2,7 @@
 
 const std::string SubutaiLauncher::Settings::CONFIG_FILE = "lnchr.conf";
 const std::string SubutaiLauncher::Settings::DEFAULT_PATH = "/opt/subutai";
-const std::string SubutaiLauncher::Settings::DEFAULT_TMP = "/tmp";
+const std::string SubutaiLauncher::Settings::DEFAULT_TMP = "/tmp/subutai";
 
 SubutaiLauncher::Settings::Settings() {
 	FileSystem fs(".");

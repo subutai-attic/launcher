@@ -61,23 +61,38 @@ SocialMediaIcons::SocialMediaIcons() {
     addAndMakeVisible(_linkedin);
     addAndMakeVisible(_github);
 
-    /*  
     addAndMakeVisible(_facebookLink);
+    addAndMakeVisible(_twitterLink);
+    addAndMakeVisible(_linkedinLink);
+    addAndMakeVisible(_githubLink);
+
     _facebookLink.setBounds(-1, -1, 1, 1);
     _facebookLink.setURL(URL("https://www.facebook.com"));
-    */
+    _twitterLink.setBounds(-1, -1, 1, 1);
+    _twitterLink.setURL(URL("https://www.twitter.com"));
+    _linkedinLink.setBounds(-1, -1, 1, 1);
+    _linkedinLink.setURL(URL("https://www.linkedin.com"));
+    _githubLink.setBounds(-1, -1, 1, 1);
+    _githubLink.setURL(URL("https://www.github.com"));
 
 }
 
 SocialMediaIcons::~SocialMediaIcons() {
-
+    delete _facebook;
+    delete _twitter;
+    delete _linkedin;
+    delete _github;
 }
 
 void SocialMediaIcons::buttonClicked(Button* button) {
-    std::printf("!!!!!!!!!1\n");
     if (button == _facebook) {
-        std::printf("fb\n");
         _facebookLink.triggerClick();
+    } else if (button == _twitter) {
+        _twitterLink.triggerClick();
+    } else if (button == _linkedin) {
+        _linkedinLink.triggerClick();
+    } else if (button == _github) {
+        _githubLink.triggerClick();
     }
 }
 

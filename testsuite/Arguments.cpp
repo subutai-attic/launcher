@@ -1,3 +1,4 @@
+/*
 #include "Arguments.h"
 
 Arguments* Arguments::_instance = NULL;
@@ -39,3 +40,5 @@ bool Arguments::find(const std::string& arg)
     }
     return false;
 }
+
+*/

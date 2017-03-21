@@ -10,6 +10,23 @@
 #include <curl/curl.h>
 #include <json/json.h>
 #include <thread>
+#include <memory>
+
+#include <Poco/URIStreamOpener.h>
+#include <Poco/StreamCopier.h>
+#include <Poco/Path.h>
+#include <Poco/Exception.h>
+#include <Poco/Net/HTTPStreamFactory.h>
+#include <Poco/Net/FTPStreamFactory.h>
+#include <Poco/Net/HTTPClientSession.h>
+#include <Poco/Net/HTTPSClientSession.h>
+#include <Poco/Net/HTTPStreamFactory.h>
+#include <Poco/Net/HTTPSStreamFactory.h>
+#include <Poco/Net/HTTPRequest.h>
+#include <Poco/Net/HTMLForm.h>
+#include <Poco/Net/HTTPResponse.h>
+#include <Poco/URI.h>
+#include <Poco/URIStreamOpener.h>
 
 #include "FileSystem.h"
 #include "MD5.h"
@@ -31,6 +48,8 @@ namespace SubutaiLauncher
         public:
             static const std::string URL;
             static const std::string REST;
+            static const std::string HOST;
+            static const int PORT = 8338;
 
             Downloader();
             ~Downloader();
@@ -42,8 +61,6 @@ namespace SubutaiLauncher
             void downloadImpl();
             bool isDone();
             int getPercent();
-            static size_t handleInfo(char* data, size_t size, size_t nmemb, void *p);
-            size_t handleInfoImpl(char* data, size_t size, size_t nmemb);
             static size_t handleFile(char* data, size_t size, size_t nmemb, void *p);
             size_t handleFileImpl(char* data, size_t size, size_t nmemb);
             bool verifyDownload();
