@@ -23,10 +23,18 @@ namespace SubutaiLauncher {
     static char const* sl_mh = "";
 
     // SSH
-    static char const* ssh_user;
-    static char const* ssh_host;
-    static int const* ssh_port;
-    static char* ssh_keywords[] = {(char*)"user", (char*)"host", (char*)"port", NULL};
+    static char const* ssh_user;        // SSH User
+    static char const* ssh_host;        // SSH Host
+    static int const* ssh_port;         // SSH Port
+    static char const* ssh_cmd;         // SSH Command
+    static int const* ssh_hostcheck;    // SSH Hostcheck
+    static char* ssh_keywords[] = {
+        (char*)"user", 
+        (char*)"host", 
+        (char*)"port", 
+        (char*)"cmd", 
+        (char*)"hostcheck", 
+        NULL};
 
 
     // ========================================================================
@@ -400,7 +408,16 @@ namespace SubutaiLauncher {
     {
         // Attempt to establish SSH connection
         Log::instance()->logger()->debug() << "SL_TestSSH" << std::endl;
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "ssi", ssh_keywords, &ssh_user, &ssh_host, &ssh_port))
+        if (!PyArg_ParseTupleAndKeywords(
+                    args, 
+                    keywords, 
+                    "ssi|si", 
+                    ssh_keywords, 
+                    &ssh_user, 
+                    &ssh_host, 
+                    &ssh_port, 
+                    &ssh_cmd, 
+                    &ssh_hostcheck))
             return NULL;
 
         SSH *p = new SubutaiLauncher::SSH();
@@ -417,7 +434,16 @@ namespace SubutaiLauncher {
     {
         // Attempt to establish SSH connection
         Log::instance()->logger()->debug() << "SL_InstallSSHKey" << std::endl;
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "ssi", ssh_keywords, &ssh_user, &ssh_host, &ssh_port))
+        if (!PyArg_ParseTupleAndKeywords(
+                    args, 
+                    keywords, 
+                    "ssi|si", 
+                    ssh_keywords, 
+                    &ssh_user, 
+                    &ssh_host, 
+                    &ssh_port, 
+                    &ssh_cmd, 
+                    &ssh_hostcheck))
             return NULL;
 
         SSH *p = new SubutaiLauncher::SSH();
@@ -436,6 +462,32 @@ namespace SubutaiLauncher {
         cmd.append(key);
         cmd.append("' >> /home/ubuntu/.ssh/authorized_keys");
         p->execute(cmd);
+
+        return Py_BuildValue("i", 0);
+    }
+
+    // ========================================================================
+
+    static PyObject* SL_SSHRun(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
+        Log::instance()->logger()->debug() << "SL_SSHRun" << std::endl;
+        if (!PyArg_ParseTupleAndKeywords(
+                    args, 
+                    keywords, 
+                    "ssisi", 
+                    ssh_keywords, 
+                    &ssh_user, 
+                    &ssh_host, 
+                    &ssh_port, 
+                    &ssh_cmd, 
+                    &ssh_hostcheck))
+            return NULL;
+
+        SSH *p = new SubutaiLauncher::SSH();
+        p->setHost(ssh_host, (long)ssh_port);
+        p->setUsername(ssh_user, "ubuntu");
+        p->connect();
+        p->execute(ssh_cmd);
 
         return Py_BuildValue("i", 0);
     }
@@ -508,6 +560,7 @@ namespace SubutaiLauncher {
         {"GetVBoxBridgedInterface", (PyCFunction)SL_GetVBoxBridgedInterface, METH_VARARGS | METH_KEYWORDS, "Returns name of default network interface"},
         {"TestSSH", (PyCFunction)SL_TestSSH, METH_VARARGS | METH_KEYWORDS, "Test if SSH connection is alive"},
         {"InstallSSHKey", (PyCFunction)SL_InstallSSHKey, METH_VARARGS | METH_KEYWORDS, "Install SSH public key"},
+        {"SSHRun", (PyCFunction)SL_SSHRun, METH_VARARGS | METH_KEYWORDS, "Run command over SSH"},
         {"CheckVMExists", (PyCFunction)SL_CheckVMExists, METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name exists"},
         {"CheckVMRunning", (PyCFunction)SL_CheckVMRunning, METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name running"},
         {NULL, NULL, 0, NULL}
