@@ -16,6 +16,7 @@
 #include "SubutaiProcess.h"
 #include "SubutaiString.h"
 #include <Poco/Environment.h>
+#include <Poco/StringTokenizer.h>
 
 namespace SubutaiLauncher {
 
@@ -23,18 +24,19 @@ namespace SubutaiLauncher {
         public:
             Environment();
             ~Environment();
-	    std::string versionOS();
-	    std::string distroOS(std::string ar);
-	    std::string cpuArch();
-	    unsigned cpuNum();
+            std::string versionOS();
+            std::string distroOS(std::string ar);
+            std::string cpuArch();
+            unsigned cpuNum();
             unsigned processorNum();
-	    unsigned is64();
-	    unsigned long ramSize();
-	    unsigned versionVBox();
-	    std::string versionSSH();
-	    std::string vtxEnabled();
+            unsigned is64();
+            unsigned long ramSize();
+            unsigned versionVBox();
+            std::string versionSSH();
+            std::string vtxEnabled();
             std::string getVar(const std::string& name, const std::string& defaultValue);
             std::string setVar(const std::string& name, const std::string& value);
+            std::string getDefaultGateway();
     };
 
 }

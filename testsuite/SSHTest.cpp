@@ -1,102 +1,74 @@
-/*
-#include <iostream>
-#include <cstdio>
-#include <string>
-#include <vector>
-#include <cppunit/TestCase.h>
-#include <cppunit/TestFixture.h>
-#include <cppunit/ui/text/TextTestRunner.h>
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/XmlOutputter.h>
+#include "SSHTest.h"
+#include "SubutaiLauncher.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 
-#include "Arguments.h"
-#include "SSH.h"
-
-using namespace CppUnit;
-
-class SSHTest : public CppUnit::TestFixture
-{
-    CPPUNIT_TEST_SUITE(SSHTest);
-    CPPUNIT_TEST(testFindInstallation);
-    CPPUNIT_TEST(testConnect);
-    CPPUNIT_TEST(testAuthenticate);
-    CPPUNIT_TEST(testCommand);
-    CPPUNIT_TEST_SUITE_END();
-    public:
-    void setUp(void);
-    void tearDown(void);
-    protected:
-    void testFindInstallation(void);
-    void testConnect(void);
-    void testAuthenticate(void);
-    void testCommand(void);
-};
-
-void SSHTest::setUp(void)
+SSHTest::SSHTest(const std::string& name) : CppUnit::TestCase(name)
 {
 
 }
 
-void SSHTest::tearDown(void)
+SSHTest::~SSHTest()
 {
 
+}
+
+void SSHTest::setUp()
+{
+}
+
+void SSHTest::tearDown()
+{
 }
 
 void SSHTest::testFindInstallation()
 {
     SubutaiLauncher::SSH p;
-    CPPUNIT_ASSERT(p.findInstallation());
+    assert(p.findInstallation());
 }
 
 void SSHTest::testConnect()
 {
-    if (!Arguments::instance()->find("--ssh-host"))
-    {
-        std::printf(": Skipping SSH");
-        return;
-    }
-    SubutaiLauncher::SSH p;
-    p.setHost("127.0.0.1", 22);
-    p.connect();
-    CPPUNIT_ASSERT(p.isConnected());
+    SubutaiLauncher::SSH *p = new SubutaiLauncher::SSH();
+    p->setHost("127.0.0.1", 22);
+    p->connect();
+    auto connected = p->isConnected();
+    delete p;
+    assert(connected);
 }
 
 void SSHTest::testAuthenticate()
 {
-    if (!Arguments::instance()->find("--ssh-host"))
-    {
-        std::printf(": Skipping SSH");
-        return;
-    }
+    return;
     SubutaiLauncher::SSH p;
     p.setHost("127.0.0.1", 22);
     p.setUsername("ubuntu", "ubuntu");
     p.connect();
     p.authenticate();
-    CPPUNIT_ASSERT(p.isAuthenticated());
+    assert(p.isAuthenticated());
 }
 
 void SSHTest::testCommand()
 {
-    if (!Arguments::instance()->find("--ssh-host"))
-    {
-        std::printf(": Skipping SSH");
-        return;
-    }
+    return;
     SubutaiLauncher::SSH p;
     p.setHost("127.0.0.1", 22);
     p.setUsername("ubuntu", "ubuntu");
     p.connect();
     p.authenticate();
-    CPPUNIT_ASSERT(p.isAuthenticated());
+    assert(p.isAuthenticated());
     p.execute("touch /tmp/ssh-test");
 }
 
-CPPUNIT_TEST_SUITE_REGISTRATION(SSHTest);
-*/
+CppUnit::Test * SSHTest::suite()
+{
+	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SSHTest");
+
+    CppUnit_addTest(pSuite, SSHTest, testFindInstallation);
+    CppUnit_addTest(pSuite, SSHTest, testConnect);
+    CppUnit_addTest(pSuite, SSHTest, testAuthenticate);
+    CppUnit_addTest(pSuite, SSHTest, testCommand);
+
+	return pSuite;
+}
+

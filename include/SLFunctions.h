@@ -10,6 +10,7 @@
 #include "Install.h"
 #include "NotificationCenter.h"
 #include "Environment.h"
+#include "VirtualBox.h"
 
 namespace SubutaiLauncher {
 
@@ -21,7 +22,22 @@ namespace SubutaiLauncher {
     static char const* sl_type = "";
     static char const* sl_mh = "";
 
+    // SSH
+    static char const* ssh_user;        // SSH User
+    static char const* ssh_host;        // SSH Host
+    static int const* ssh_port;         // SSH Port
+    static char const* ssh_cmd;         // SSH Command
+    static int const* ssh_hostcheck;    // SSH Hostcheck
+    static char* ssh_keywords[] = {
+        (char*)"user", 
+        (char*)"host", 
+        (char*)"port", 
+        (char*)"cmd", 
+        (char*)"hostcheck", 
+        NULL};
 
+
+    // ========================================================================
 
     static char* download_keywords[] = {(char*)"filename", NULL};
     static char* tmpdir_keywords[] = {(char*)"tmpdir", NULL};
@@ -29,36 +45,52 @@ namespace SubutaiLauncher {
     static char* vb_keywords[] = {(char*)"type", (char*)"mh", NULL};
     static char* desc_keywords[] = {(char*)"string", (char*)"desc", NULL};
 
+    // ========================================================================
+
     static PyObject* SL_HelloWorld(PyObject* self, PyObject* args) {
         return Py_BuildValue("s", "Hello, World!");
     }
+
+    // ========================================================================
 
     static PyObject* SL_Debug(PyObject* self, PyObject* args) {
         return Py_BuildValue("s", "Debug");
     }
 
+    // ========================================================================
+
     static PyObject* SL_Version(PyObject* self, PyObject* args) {
         return Py_BuildValue("s", "Version: 0.1.0");
     }
+
+    // ========================================================================
 
     static PyObject* SL_GetMasterVersion(PyObject* self, PyObject* args) {
         return Py_BuildValue("s", "4.0.15");
     }
 
+    // ========================================================================
+
     static PyObject* SL_GetDevVersion(PyObject* self, PyObject* args) {
         return Py_BuildValue("s", "4.0.16");
     }
 
+    // ========================================================================
+
     static PyObject* SL_getDistro(PyObject* self, PyObject* args) {
-	Environment e;
+        Environment e;
         std::string distro = e.distroOS("-c");
         return Py_BuildValue("s", distro);
     }
+
+    // ========================================================================
 
     static PyObject* SL_Shutdown(PyObject* self, PyObject* args) {
         Session::instance()->getNotificationCenter()->add(SCRIPT_FINISHED);
         return Py_BuildValue("i", 1);
     }
+
+    // ========================================================================
 
     static PyObject* SL_CheckDirectories(PyObject* self, PyObject* args) {
         auto settings = Session::instance()->getSettings();
@@ -100,12 +132,14 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", 1);
     }
 
+    // ========================================================================
+
     static PyObject* SL_Download(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", download_keywords, &sl_filename))
             return NULL;
         std::printf("Requested download of a file: %s\n", sl_filename);
         auto downloader = Session::instance()->getDownloader();
-	PyErr_Print();
+        PyErr_Print();
         downloader->setFilename(sl_filename);
         if (!downloader->retrieveFileInfo()) {
             std::printf("Failed to retrieve file data");
@@ -117,6 +151,8 @@ namespace SubutaiLauncher {
         }
         return Py_BuildValue("s", sl_filename);
     }
+
+    // ========================================================================
 
     static PyObject* SL_IsDownloaded(PyObject* self, PyObject* args) {
         auto downloader = Session::instance()->getDownloader();
@@ -131,11 +167,15 @@ namespace SubutaiLauncher {
         }
     }
 
+    // ========================================================================
+
     static PyObject* SL_GetProgress(PyObject* self, PyObject* args) {
         auto downloader = Session::instance()->getDownloader();
         auto percent = downloader->getPercent();
         return Py_BuildValue("i", percent);
     }
+
+    // ========================================================================
 
     static PyObject* SL_GetTmpDir(PyObject* self, PyObject* args) {
         auto settings = Session::instance()->getSettings();
@@ -143,11 +183,15 @@ namespace SubutaiLauncher {
         return Py_BuildValue("s", path);
     }
 
+    // ========================================================================
+
     static PyObject* SL_GetInstallDir(PyObject* self, PyObject* args) {
         auto settings = Session::instance()->getSettings();
         auto path = settings->getInstallationPath().c_str();
         return Py_BuildValue("s", path);
     }
+
+    // ========================================================================
 
     static PyObject* SL_SetTmpDir(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", tmpdir_keywords, &sl_tmpdir))
@@ -156,12 +200,16 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", 1);
     }
 
+    // ========================================================================
+
     static PyObject* SL_NewConfiguration(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
         Session::instance()->getConfManager()->addConfig(sl_string);
         return Py_BuildValue("i", 1);
     }
+
+    // ========================================================================
 
     static PyObject* SL_SetConfigurationDesc(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", desc_keywords, &sl_string, &sl_desc))
@@ -170,6 +218,8 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", 1);
     }
 
+    // ========================================================================
+
     static PyObject* SL_SetConfigurationFile(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", desc_keywords, &sl_string, &sl_desc))
             return NULL;
@@ -177,12 +227,16 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", 1);
     }
 
+    // ========================================================================
+
     static PyObject* SL_SSHPeer(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
         Session::instance()->getConfManager()->addConfig(sl_string);
         return Py_BuildValue("i", 1);
     }
+
+    // ========================================================================
 
     static PyObject* SL_Install(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", string_keywords, &sl_filename, &sl_destination))
@@ -203,6 +257,8 @@ namespace SubutaiLauncher {
     }
 
 
+    // ========================================================================
+
     static PyObject* SL_UnInstall(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", string_keywords, &sl_filename, &sl_destination))
             return NULL;
@@ -210,14 +266,18 @@ namespace SubutaiLauncher {
         i.setFilename(sl_filename);
         try {
             i.unInstall();
-            } catch (SubutaiException &e) {
+        } catch (SubutaiException &e) {
             return Py_BuildValue("i", 1);
 
         }
         return Py_BuildValue("i", 0);
     }
 
+    // ========================================================================
+
     // Notification messages
+
+    // ========================================================================
 
     static PyObject* SL_RaiseError(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
@@ -226,12 +286,16 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", 1);
     }
 
+    // ========================================================================
+
     static PyObject* SL_RaiseWarning(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
         Session::instance()->getNotificationCenter()->notificationRaised(N_WARNING, sl_string);
         return Py_BuildValue("i", 1);
     }
+
+    // ========================================================================
 
     static PyObject* SL_RaiseInfo(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
@@ -240,6 +304,8 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", 1);
     }
 
+    // ========================================================================
+
     static PyObject* SL_VBox(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
@@ -247,12 +313,28 @@ namespace SubutaiLauncher {
         Log::instance()->logger()->debug() << "PyObject VBox: " << sl_string << std::endl;
 
         VirtualBox vb;
-	std::string out = vb.execute(sl_string);
-	int found = out.find("error");
+        std::string out = vb.execute(sl_string);
+        int found = out.find("error");
         if (found == std::string::npos)
-	    return Py_BuildValue("i", 1);
-	return Py_BuildValue("i", 0);
+            return Py_BuildValue("i", 1);
+        return Py_BuildValue("i", 0);
     }
+
+    // ========================================================================
+
+    static PyObject* SL_VBoxS(PyObject* self, PyObject* args, PyObject* keywords) {
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
+            return NULL;
+
+        Log::instance()->logger()->debug() << "PyObject VBox: " << sl_string << std::endl;
+
+        VirtualBox vb;
+        int exitStatus = 0;
+        std::string out = vb.execute(sl_string, exitStatus);
+        return Py_BuildValue("i", exitStatus);
+    }
+
+    // ========================================================================
 
     static PyObject* SL_cloneVM(PyObject* self, PyObject* args) {
 
@@ -261,16 +343,18 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", 1);
     }
 
-    static PyObject* SL_runScripts(PyObject* self, PyObject* args, PyObject* keywords) {
-        
-    //	if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", vb_keywords, &sl_type, &sl_mh))
-    //        return NULL;
+    // ========================================================================
 
-    	if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", desc_keywords, &sl_string, &sl_desc))
+    static PyObject* SL_runScripts(PyObject* self, PyObject* args, PyObject* keywords) {
+
+        //	if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", vb_keywords, &sl_type, &sl_mh))
+        //        return NULL;
+
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", desc_keywords, &sl_string, &sl_desc))
             return NULL;
 
-//	if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
-//            return NULL;
+        //	if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
+        //            return NULL;
 
         //Log::instance()->logger()->debug() << "runScripts: " << sl_type << " ifMH: " << sl_mh << std::endl;
 
@@ -281,6 +365,8 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", 1);
     }
 
+    // ========================================================================
+
     static PyObject* SL_runAutobuild(PyObject* self, PyObject* args) {
         Log::instance()->logger()->debug() << "runAutobuild: " <<  std::endl;
 
@@ -290,7 +376,155 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", 1);
     }
 
+    // ========================================================================
+
+    static PyObject* SL_GetDefaultRoutingInterface(PyObject* self, PyObject* args) {
+        Log::instance()->logger()->debug() << "SL_GetDefaultRoutingInterface" << std::endl;
+
+        Environment env;
+
+        return Py_BuildValue("s", env.getDefaultGateway().c_str());
+    }
+
+    // ========================================================================
+
+    static PyObject* SL_GetVBoxBridgedInterface(
+            PyObject* self, 
+            PyObject* args, 
+            PyObject* keywords
+            ) 
+    {
+        Log::instance()->logger()->debug() << "SL_GetVBoxBridgedInterface" << std::endl;
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
+            return NULL;
+        VirtualBox vb;
+
+        return Py_BuildValue("s", vb.getBridgedInterface(sl_string).c_str());
+    }
+
+    // ========================================================================
+
+    static PyObject* SL_TestSSH(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
+        // Attempt to establish SSH connection
+        Log::instance()->logger()->debug() << "SL_TestSSH" << std::endl;
+        if (!PyArg_ParseTupleAndKeywords(
+                    args, 
+                    keywords, 
+                    "ssi|si", 
+                    ssh_keywords, 
+                    &ssh_user, 
+                    &ssh_host, 
+                    &ssh_port, 
+                    &ssh_cmd, 
+                    &ssh_hostcheck))
+            return NULL;
+
+        SSH *p = new SubutaiLauncher::SSH();
+        p->setHost(ssh_host, (long)ssh_port);
+        p->connect();
+        if (p->isConnected())
+            return Py_BuildValue("i", 0);
+        return Py_BuildValue("i", 1);
+    }
+
+    // ========================================================================
+
+    static PyObject* SL_InstallSSHKey(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
+        // Attempt to establish SSH connection
+        Log::instance()->logger()->debug() << "SL_InstallSSHKey" << std::endl;
+        if (!PyArg_ParseTupleAndKeywords(
+                    args, 
+                    keywords, 
+                    "ssi|si", 
+                    ssh_keywords, 
+                    &ssh_user, 
+                    &ssh_host, 
+                    &ssh_port, 
+                    &ssh_cmd, 
+                    &ssh_hostcheck))
+            return NULL;
+
+        SSH *p = new SubutaiLauncher::SSH();
+        p->setHost(ssh_host, (long)ssh_port);
+        p->setUsername("ubuntu", "ubuntu");
+        p->connect();
+        if (!p->isConnected()) return Py_BuildValue("i", 1);
+        p->authenticate();
+        if (!p->isAuthenticated()) return Py_BuildValue("i", 1);
+
+        auto key = SSH::getPublicKey();
+        if (key == "") {
+            return Py_BuildValue("i", 1);
+        }
+        std::string cmd = "echo '";
+        cmd.append(key);
+        cmd.append("' >> /home/ubuntu/.ssh/authorized_keys");
+        p->execute(cmd);
+
+        return Py_BuildValue("i", 0);
+    }
+
+    // ========================================================================
+
+    static PyObject* SL_SSHRun(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
+        Log::instance()->logger()->debug() << "SL_SSHRun" << std::endl;
+        if (!PyArg_ParseTupleAndKeywords(
+                    args, 
+                    keywords, 
+                    "ssisi", 
+                    ssh_keywords, 
+                    &ssh_user, 
+                    &ssh_host, 
+                    &ssh_port, 
+                    &ssh_cmd, 
+                    &ssh_hostcheck))
+            return NULL;
+
+        SSH *p = new SubutaiLauncher::SSH();
+        p->setHost(ssh_host, (long)ssh_port);
+        p->setUsername(ssh_user, "ubuntu");
+        p->connect();
+        p->execute(ssh_cmd);
+
+        return Py_BuildValue("i", 0);
+    }
+
+    // ========================================================================
+    // VM
+    // ========================================================================
+    
+    static PyObject* SL_CheckVMExists(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
+        Log::instance()->logger()->debug() << "SL_CheckVMExists" << std::endl;
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+            return NULL;
+
+        VirtualBox vb;
+
+        if (vb.isMachineExists(sl_string))
+            return Py_BuildValue("i", 0);
+        return Py_BuildValue("i", 1);
+    }
+
+    static PyObject* SL_CheckVMRunning(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
+        Log::instance()->logger()->debug() << "SL_CheckVMRunning" << std::endl;
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+            return NULL;
+
+        VirtualBox vb;
+
+        if (vb.isMachineRunning(sl_string))
+            return Py_BuildValue("i", 0);
+        return Py_BuildValue("i", 1);
+    }
+
+    // ========================================================================
     // Module bindings
+    // ========================================================================
 
     static PyMethodDef SubutaiSLMethods[] = {
         {"download", (PyCFunction)SL_Download, METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN"},
@@ -312,13 +546,23 @@ namespace SubutaiLauncher {
         {"RaiseWarning", (PyCFunction)SL_RaiseWarning, METH_VARARGS | METH_KEYWORDS, "Raising warning"},
         {"RaiseInfo", (PyCFunction)SL_RaiseInfo, METH_VARARGS | METH_KEYWORDS, "Raising info"},
         {"VBox", (PyCFunction)SL_VBox, METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something"},
-	{"cloneVM", (PyCFunction)SL_cloneVM, METH_VARARGS | METH_KEYWORDS, "clones VM"},
+        {"VBoxS", (PyCFunction)SL_VBoxS, METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something and returns status"},
+        {"cloneVM", (PyCFunction)SL_cloneVM, METH_VARARGS | METH_KEYWORDS, "clones VM"},
         {"runScripts", (PyCFunction)SL_runScripts, METH_VARARGS | METH_KEYWORDS, "Configure peer"},
         {"Shutdown", SL_Shutdown, METH_VARARGS, "Finalizes the script"},
         {"GetMasterVersion", SL_GetMasterVersion, METH_VARARGS, "Returns master version of a product"},
         {"GetDevVersion", SL_GetDevVersion, METH_VARARGS, "Returns dev version of a product"},
         {"getDistro", SL_getDistro, METH_VARARGS, "Returns OS distro"},
         {"runAutobuild", SL_runAutobuild, METH_VARARGS, "temporary - runs autobuild script"},
+        // New version
+        //{"ImportVirtualMachine", SL_importVirtualMachine, METH_VARARGS | METH_KEYWORDS, "Import a virtual machine into VB"},
+        {"GetDefaultRoutingInterface", SL_GetDefaultRoutingInterface, METH_VARARGS, "Returns name of default network interface"},
+        {"GetVBoxBridgedInterface", (PyCFunction)SL_GetVBoxBridgedInterface, METH_VARARGS | METH_KEYWORDS, "Returns name of default network interface"},
+        {"TestSSH", (PyCFunction)SL_TestSSH, METH_VARARGS | METH_KEYWORDS, "Test if SSH connection is alive"},
+        {"InstallSSHKey", (PyCFunction)SL_InstallSSHKey, METH_VARARGS | METH_KEYWORDS, "Install SSH public key"},
+        {"SSHRun", (PyCFunction)SL_SSHRun, METH_VARARGS | METH_KEYWORDS, "Run command over SSH"},
+        {"CheckVMExists", (PyCFunction)SL_CheckVMExists, METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name exists"},
+        {"CheckVMRunning", (PyCFunction)SL_CheckVMRunning, METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name running"},
         {NULL, NULL, 0, NULL}
     };
 

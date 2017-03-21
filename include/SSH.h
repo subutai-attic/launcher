@@ -10,6 +10,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include <Poco/FileStream.h>
+#include <Poco/StreamCopier.h>
+
 #if LAUNCHER_WINDOWS
 #include <io.h>
 #endif
@@ -38,8 +41,9 @@ namespace SubutaiLauncher {
             std::string execute(const std::string& command);
             bool isConnected();
             bool isAuthenticated();
-	    long scpWrite(const std::string& src);
-	    long sftpWrite(const std::string& src);
+            long scpWrite(const std::string& src);
+            long sftpWrite(const std::string& src);
+            static std::string getPublicKey();
         private:
             ssh_session _ssh;
             std::string _path;

@@ -7,7 +7,7 @@ std::string SubutaiLauncher::VirtualBox::subutaiBranch = "subutai-dev";
 
 SubutaiLauncher::VirtualBox::VirtualBox()
 {
-     _version = ""; 
+    _version = ""; 
 }
 
 SubutaiLauncher::VirtualBox::~VirtualBox() 
@@ -36,15 +36,15 @@ bool SubutaiLauncher::VirtualBox::findInstallation()
     str.split(':', path);
     FileSystem fs;
     for (auto it = path.begin(); it != path.end(); it++) {
-    	fs.setPath((*it));
-	if (fs.isFileExists(BIN)) {
-	    _installed = true;
-	    _path = (*it);
-	    _location = _path;
-	    _path.append(FileSystem::DELIM);
-	    _path.append(BIN);
-	    return true;
-	}
+        fs.setPath((*it));
+        if (fs.isFileExists(BIN)) {
+            _installed = true;
+            _path = (*it);
+            _location = _path;
+            _path.append(FileSystem::DELIM);
+            _path.append(BIN);
+            return true;
+        }
     }
     return false;
 }
@@ -106,22 +106,22 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::parseVms(co
     std::vector<std::string> lines;
     buf.split('\n', lines);
     for (auto it = lines.begin(); it != lines.end(); it++) {
-	if ((*it).empty() || (*it).length() < 10) continue;
-	    const char* line = const_cast<char*>((*it).c_str());
+        if ((*it).empty() || (*it).length() < 10) continue;
+        const char* line = const_cast<char*>((*it).c_str());
 #if LAUNCHER_LINUX
-	    sscanf(line, "\"%[^\"]\" {%s}", vmname, vmid);
+        sscanf(line, "\"%[^\"]\" {%s}", vmname, vmid);
 #elif LAUNCHER_WINDOWS
-	    sscanf_s(line, "\"%s\" {%s}", vmname, bsize, vmid, bsize);
+        sscanf_s(line, "\"%s\" {%s}", vmname, bsize, vmid, bsize);
 #elif LAUNCHER_MACOS
 #error Not Implemented on this platform
 #endif
-	SubutaiVM v;
-	v.name = std::string(vmname);
-	v.id = std::string(vmid);
-	int i = v.name.find("subutai",0);
-	if (i != std::string::npos){
-	    vms.push_back(v);
-	}
+        SubutaiVM v;
+        v.name = std::string(vmname);
+        v.id = std::string(vmid);
+        int i = v.name.find("subutai",0);
+        if (i != std::string::npos){
+            vms.push_back(v);
+        }
     }
     return vms;
 }
@@ -140,6 +140,27 @@ std::string SubutaiLauncher::VirtualBox::execute(const std::string& command)
     return out;
 }
 
+std::string SubutaiLauncher::VirtualBox::execute(const std::string& command, int &exitStatus)
+{
+    SubutaiString str(command);
+    std::vector<std::string> args;
+    str.split(' ', args);
+    SubutaiProcess p;
+    p.launch(BIN, args, _location);
+    auto status = p.wait();
+    exitStatus = status;
+    std::string out = p.getOutputBuffer();
+    std::string err = p.getErrorBuffer();
+    if (status != 0) {
+    Log::instance()->logger()->debug() << "==========================================================" << std::endl;
+    Log::instance()->logger()->debug() << err << std::endl;
+    Log::instance()->logger()->debug() << "==========================================================" << std::endl;
+    }
+    Log::instance()->logger()->debug() << "VirtualBox::execute " << command << ": "<< out << "\n Status: " << status << std::endl;
+    int i = 0;
+    return out;
+}
+
 std::string SubutaiLauncher::VirtualBox::sysExecute(const std::string& command, const std::string& cargs)
 {
     SubutaiString str(cargs);
@@ -147,10 +168,10 @@ std::string SubutaiLauncher::VirtualBox::sysExecute(const std::string& command, 
     str.split(' ', args);
     SubutaiProcess p;
     if (p.launch(command, args, "/usr/bin") < 0) {
-	return "Error: can not start process";
+        return "Error: can not start process";
     }
     if (p.wait() < 0) {
-	return "Error: can not wait process";;
+        return "Error: can not wait process";;
     }
     std::string out = p.getOutputBuffer();
     Log::instance()->logger()->debug() << "VirtualBox::sysExecute " << command << " args: " << cargs << " output: " << out << std::endl;
@@ -161,10 +182,10 @@ std::string SubutaiLauncher::VirtualBox::sysExecute(const std::string& command, 
 {
     SubutaiProcess p;
     if (p.launch(command, args, "/usr/bin") < 0) {
-	return "Error: can not start process";
+        return "Error: can not start process";
     }
     if (p.wait() < 0) {
-	return "Error: can not wait process";
+        return "Error: can not wait process";
     }
     std::string out = p.getOutputBuffer();
     Log::instance()->logger()->debug() << "VirtualBox::sysExecute " << command << " output: " << out << std::endl;
@@ -243,16 +264,16 @@ bool SubutaiLauncher::VirtualBox::runScripts(std::string instVersion, std::strin
 
     cleanKnownHosts("5567");
     if (!waitingSSH(ssh, "5567")) {
-	//try to restart VM and try once more
-	execute("restartvm " + cloneName );
-	sleep(20);
-	if (!waitingSSH(ssh, "5567")) {
-	    l->error() << "VirtualBox::runScript can not connect to  " << cloneName << ", check VM status " << ssh.isConnected() << std::endl;
-	    throw SubutaiException("Can not connect to VM, probqably VM can not start", 15);
-	    return false;
-	}
+        //try to restart VM and try once more
+        execute("restartvm " + cloneName );
+        sleep(20);
+        if (!waitingSSH(ssh, "5567")) {
+            l->error() << "VirtualBox::runScript can not connect to  " << cloneName << ", check VM status " << ssh.isConnected() << std::endl;
+            throw SubutaiException("Can not connect to VM, probqably VM can not start", 15);
+            return false;
+        }
     }
-;
+    ;
     connectSSH(ssh);
     l->debug() << "VirtualBox::runScript cloneName " << cloneName << " connected: " << ssh.isConnected() << std::endl;
 
@@ -279,17 +300,17 @@ bool SubutaiLauncher::VirtualBox::runScripts(std::string instVersion, std::strin
     sshCommand.append("'");
     sout = ssh.execute(sshCommand);
     l->debug() << "VirtualBox::runScript waitForSubutai command: " << sshCommand << "sout = /" << sout << "/"<<std::endl;
-    
+
     //while (sout != "0") {
-/*
-    while (found == std::string::npos){
-        //sout = ssh.execute(sshCommand);
-        sout = ssh.execute(sshCommand);
-	found = sout.find(subutaiBranch,0);
-	l->debug() << "VirtualBox::runScript waitForSubutai " << subutaiBranch << "  sout = " << sout << " found = " << found << std::endl;
-	sleep(10);
+    /*
+       while (found == std::string::npos){
+    //sout = ssh.execute(sshCommand);
+    sout = ssh.execute(sshCommand);
+    found = sout.find(subutaiBranch,0);
+    l->debug() << "VirtualBox::runScript waitForSubutai " << subutaiBranch << "  sout = " << sout << " found = " << found << std::endl;
+    sleep(10);
     } 
-*/
+    */
 
     sleep (20);
     sout = ssh.execute("sudo install -D /dev/null /writable/system-data/var/lib/console-conf/complete");
@@ -321,11 +342,11 @@ bool SubutaiLauncher::VirtualBox::runScripts(std::string instVersion, std::strin
     l->debug() << "VirtualBox::runScript ssh-add after: "<< out << std::endl;
     if (out != "") {
         sshCommand = "sudo bash -c 'echo ";
-	sshCommand.append(out);
-	sshCommand.append(">>/root/.ssh/authorized_keys'");
-	sout = ssh.execute(sshCommand);
-	l->debug() << "VirtualBox::runScript adding key: " << sshCommand << " out = /" << sout << "/" <<std::endl;
-	//"sudo bash -c 'echo " + out + " >> /root/.ssh/authorized_keys'"
+        sshCommand.append(out);
+        sshCommand.append(">>/root/.ssh/authorized_keys'");
+        sout = ssh.execute(sshCommand);
+        l->debug() << "VirtualBox::runScript adding key: " << sshCommand << " out = /" << sout << "/" <<std::endl;
+        //"sudo bash -c 'echo " + out + " >> /root/.ssh/authorized_keys'"
     }
     cleanKnownHosts("5567");
     l->debug() << "VirtualBox::runScript ssh-keygen after: "<< out << std::endl;
@@ -348,16 +369,16 @@ bool SubutaiLauncher::VirtualBox::runScripts(std::string instVersion, std::strin
     //"Starting vm"
     startVM();
 
-/*    if (!startVM()) {
-	l->error() << "VirtualBox::runScript start error: " << " out = /" << "/" <<std::endl;
-	throw SubutaiException("Can not establish ssh session to VM");
-	return false;
-    };
-*/
-    
+    /*    if (!startVM()) {
+          l->error() << "VirtualBox::runScript start error: " << " out = /" << "/" <<std::endl;
+          throw SubutaiException("Can not establish ssh session to VM");
+          return false;
+          };
+          */
+
     //std::string isMH = "1";
     if (isMH == "1")
-	importManagement();
+        importManagement();
     return true;
 }
 
@@ -370,14 +391,14 @@ bool SubutaiLauncher::VirtualBox::importManagement(){
     cleanKnownHosts("4567");
 
     if (!waitingSSH(ssh1, "4567")) {
-	//try to restrt VM and try once more
-	execute("restartvm " + cloneName );
-	sleep(20);
-	if (!waitingSSH(ssh1, "4567")) {
-	    l->error() << "VirtualBox::runScript can not connect to  " << cloneName << ", check VM status " << ssh1.isConnected() << std::endl;
-	    throw SubutaiException("Can not connect to VM, probqably VM can not start", 15);
-	    return false;
-	}
+        //try to restrt VM and try once more
+        execute("restartvm " + cloneName );
+        sleep(20);
+        if (!waitingSSH(ssh1, "4567")) {
+            l->error() << "VirtualBox::runScript can not connect to  " << cloneName << ", check VM status " << ssh1.isConnected() << std::endl;
+            throw SubutaiException("Can not connect to VM, probqably VM can not start", 15);
+            return false;
+        }
     }    
 
     connectSSH(ssh1);
@@ -407,9 +428,9 @@ bool SubutaiLauncher::VirtualBox::runAutobuild(){
 std::string SubutaiLauncher::VirtualBox::getBranch(std::string instVersion) {
 
     if (instVersion == "STAGE") {
-	return "subutai-master";
+        return "subutai-master";
     } else if (instVersion == "DEV") {
-	return "subutai-dev";
+        return "subutai-dev";
     }
     return "subutai";
 }
@@ -456,22 +477,22 @@ bool SubutaiLauncher::VirtualBox::waitingSSH(SSH &s_ssh, std::string sport) {
 
     int c = out.find("0", 0);
     while (c == std::string::npos){
-	if (i < 15 ){
-	    out = sysExecute("bash", args);
-	    c = out.find("0", 0);
-    	    l->debug() << "VirtualBox::waitingSSH: /"  << "/ out: " << out << std::endl;
-    	    sleep(10);
-	    i++;
-	}
+        if (i < 15 ){
+            out = sysExecute("bash", args);
+            c = out.find("0", 0);
+            l->debug() << "VirtualBox::waitingSSH: /"  << "/ out: " << out << std::endl;
+            sleep(10);
+            i++;
+        }
     }
     if (c == std::string::npos){
-	return false;
+        return false;
     }
 
     while (!s_ssh.isConnected()){
         l->debug() << "VirtualBox::runScript before connect " << s_ssh.isConnected() << std::endl;
-	s_ssh.connect();
-	sleep(10);
+        s_ssh.connect();
+        sleep(10);
     }
     //sleep(30);
     l->debug() << "VirtualBox::startVM after" << s_ssh.isConnected() << std::endl;
@@ -484,8 +505,8 @@ bool SubutaiLauncher::VirtualBox::connectSSH(SSH &s_ssh) {
 
     while (!s_ssh.isConnected()){
         l->debug() << "VirtualBox::connectSSH before connect " << s_ssh.isConnected() << std::endl;
-	s_ssh.connect();
-	sleep(10);
+        s_ssh.connect();
+        sleep(10);
     }
 
     l->debug() << "VirtualBox::connectSSH after connect " << s_ssh.isConnected() << std::endl;
@@ -495,15 +516,15 @@ bool SubutaiLauncher::VirtualBox::connectSSH(SSH &s_ssh) {
     l->debug() << "VirtualBox::connectSSH after host verified first authenticated " << s_ssh.isConnected() << std::endl;
 
     if (!s_ssh.isAuthenticated()){
-	l->debug() << "VirtualBox::connectSSH before authenticate " << s_ssh.isAuthenticated() << std::endl;
-	s_ssh.authenticate();
+        l->debug() << "VirtualBox::connectSSH before authenticate " << s_ssh.isAuthenticated() << std::endl;
+        s_ssh.authenticate();
         l->debug() << "VirtualBox::connectSSH after authenticate " << s_ssh.isAuthenticated() << std::endl;
     } else 
-	return true;
+        return true;
     while (!s_ssh.isAuthenticated()){
-	l->debug() << "VirtualBox::connectSSH before authenticate " << s_ssh.isAuthenticated() << std::endl;
-	s_ssh.authenticate();
-	sleep(10);
+        l->debug() << "VirtualBox::connectSSH before authenticate " << s_ssh.isAuthenticated() << std::endl;
+        s_ssh.authenticate();
+        sleep(10);
         l->debug() << "VirtualBox::connectSSH after authenticate " << s_ssh.isAuthenticated() << std::endl;
     }
     return true;
@@ -526,8 +547,8 @@ bool SubutaiLauncher::VirtualBox::restoreNet(){
     out = sysExecute("bash", args);
     l->debug() << "VirtualBox::restoreNet : vboxnet0" << out << std::endl;
     if (out == "0"){
-	vout = execute("hostonlyif create");
-	l->debug() << "VirtualBox::restoreNet hostonlyif create: " << vout << std::endl;
+        vout = execute("hostonlyif create");
+        l->debug() << "VirtualBox::restoreNet hostonlyif create: " << vout << std::endl;
     }
 
     vout = execute("hostonlyif ipconfig vboxnet0 --ip 192.168.56.1");
@@ -540,8 +561,8 @@ bool SubutaiLauncher::VirtualBox::restoreNet(){
     out = sysExecute("bash", args);
     l->debug() << "VirtualBox::restoreNet  list dhcpservers: " << out << std::endl;
     if (out == "0"){
-	vout == execute("dhcpserver add --ifname vboxnet0 --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200");
-	l->debug() << "VirtualBox::restoreNet dhcpserver add --ifname vboxnet0 --ip 192.168.56.1  : " << vout << std::endl;
+        vout == execute("dhcpserver add --ifname vboxnet0 --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200");
+        l->debug() << "VirtualBox::restoreNet dhcpserver add --ifname vboxnet0 --ip 192.168.56.1  : " << vout << std::endl;
     }
 
     vout = execute("dhcpserver modify --ifname vboxnet0 --enable");
@@ -658,3 +679,60 @@ bool SubutaiLauncher::VirtualBox::waitPeerIP() {
     //timeout 300 echo -e "*******\\nPlease use following command to access your resource host:\\nssh root@$ip\\nor login \"subutai\" with password \"ubuntai\"\\n*******"
     return true;
 }
+
+std::string SubutaiLauncher::VirtualBox::getBridgedInterface(const std::string& iface) 
+{
+    auto out = this->execute("list bridgedifs");
+
+    //Poco::StringTokenizer lines(out, "\n", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+    return iface;
+}
+
+std::string SubutaiLauncher::VirtualBox::getMachineInfo(const std::string& name) 
+{
+    std::vector<std::string> args;
+    args.push_back("showvminfo");
+    args.push_back(name);
+    SubutaiProcess p;
+    p.launch(BIN, args, _location);
+    p.wait();
+    return p.getOutputBuffer();
+}
+
+bool SubutaiLauncher::VirtualBox::isMachineExists(const std::string& name)
+{
+    auto list = getPeers();
+    for (auto it = list.begin(); it != list.end(); it++) {
+        if ((*it).name == name) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool SubutaiLauncher::VirtualBox::isMachineRunning(const std::string& name)
+{
+    auto list = getPeers();
+    for (auto it = list.begin(); it != list.end(); it++) {
+        if ((*it).name == name) {
+            auto info = getMachineInfo(name);
+            Poco::StringTokenizer lines(info, "\n", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+            for (auto line = lines.begin(); line != lines.end(); line++) {
+                if ((*line).substr(0, 6) == "State:") {
+                    auto p = (*line).find("running", 0);
+                    if (p != std::string::npos) {
+                        return true;
+                    } 
+                    return false;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+/*  std::string VirtualBox::importVirtualMachine(const std::string& fileName, const std:string& targetName) const
+    {
+
+    }
+    */
