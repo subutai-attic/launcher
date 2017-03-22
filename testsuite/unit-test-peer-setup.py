@@ -52,25 +52,25 @@ def installManagement():
             return
 
     print("Importing management")
-    subutai.SSHRun("sudo subutai import management")
+    subutai.SSHRun("sudo subutai -d import management")
 
     return;
 
 def installSnapFromStore():
     print("Installing snap from store")
-    subutai.SSHRun("sudo snap install --beta --devmode subutai")
+    subutai.SSHRun("sudo snap install --beta --devmode subutai-dev")
 
     return;
 
 def initBtrfs():
     print("Initializing btrfs")
-    subutai.SSHRun("sudo subutai.btrfsinit /dev/sdb")
+    subutai.SSHRun("sudo subutai-dev.btrfsinit /dev/sdb")
 
     return;
 
 def setAlias():
     print("Setting alias")
-    subutai.SSHRun("sudo bash -c 'snap alias subutai subutai'")
+    subutai.SSHRun("sudo bash -c 'snap alias subutai-dev subutai'")
 
     return
 
@@ -86,7 +86,7 @@ def setupSSH():
             return
 
     print("SSH Session is running")
-    subutai.SSHRun()
+    subutai.SSHRun("mkdir -p /home/subutai/.ssh")
     subutai.InstallSSHKey()
 
     return;
@@ -103,7 +103,7 @@ def setupVm( machineName ):
         subutai.download("core.ova")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
-        subutai.download("subutai_4.0.14_amd64.snap")
+        subutai.download("subutai_4.0.15_amd64-dev.snap")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
         subutai.VBox("import /tmp/subutai/core.ova")
@@ -124,7 +124,7 @@ def installSubutai( snapFile, user, host, port ):
         sleep(0.05)
 
     call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/launcher-prepare-server', 'ubuntu@localhost:~/prepare-server'])
-    call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/subutai_4.0.14_amd64.snap', 'ubuntu@localhost:~/subutai_latest.snap'])
+    call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/subutai_4.0.15_amd64-dev.snap', 'ubuntu@localhost:~/subutai_latest.snap'])
 
     subutai.SSHRun("sudo chmod +x /home/ubuntu/prepare-server")
     subutai.SSHRun("sudo /home/ubuntu/prepare-server")

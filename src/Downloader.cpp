@@ -1,8 +1,8 @@
 #include "Downloader.h"
 
-const std::string SubutaiLauncher::Downloader::URL = "https://cdn.subut.ai:8338";
+const std::string SubutaiLauncher::Downloader::URL = "https://devcdn.subut.ai:8338";
 const std::string SubutaiLauncher::Downloader::REST = "/kurjun/rest/raw";
-const std::string SubutaiLauncher::Downloader::HOST = "cdn.subut.ai";
+const std::string SubutaiLauncher::Downloader::HOST = "devcdn.subut.ai";
 
 SubutaiLauncher::Downloader::Downloader() : 
     _content(""),

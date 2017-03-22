@@ -513,7 +513,7 @@ namespace SubutaiLauncher {
         p->setUsername(s->getSSHUser(), s->getSSHPass());
         p->connect();
         p->authenticate();
-        auto ret = p->execute(ssh_cmd);
+        auto ret = p->execute(sl_string);
         p->disconnect();
         delete p;
         Log::instance()->logger()->info() << "SL_SSHRun: " << ret << std::endl;
