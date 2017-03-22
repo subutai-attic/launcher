@@ -18,9 +18,9 @@ MainContentComponent::MainContentComponent()
     _menuItems.push_back("Templates");
     _menuItems.push_back("Community");
 
-    addAndMakeVisible(_sidebar);
     _sidebar.setBounds(0, 0, 250, getParentHeight());
     _sidebar.toFront(false);
+    addAndMakeVisible(_sidebar);
 
     // TODO: Add screen detection size and relative value at startup
     setSize(1024, 768);
@@ -31,6 +31,7 @@ MainContentComponent::MainContentComponent()
     _mainMenu.setColour(ListBox::backgroundColourId, Colour(0x00000000));
     _mainMenu.selectRow(0);
     _mainMenu.setRowHeight(40);
+    _mainMenu.setBounds (0, 120, MENU_WIDTH, 500);
     addAndMakeVisible(_mainMenu);
 
     _header.setColour(Toolbar::backgroundColourId, Colour::greyLevel (0.2f));
@@ -52,7 +53,7 @@ MainContentComponent::MainContentComponent()
     _minimizeButton->addListener(this);
     //addAndMakeVisible(_minimizeButton);
     // --- Using native bar
-
+    resized();
 }
 
 
@@ -82,6 +83,7 @@ void MainContentComponent::resized()
     juce::Rectangle<int> r (getLocalBounds().reduced (0));
     _mainMenu.setBounds (0, 120, MENU_WIDTH, 500);
     _logo.setBounds(0, 20, MENU_WIDTH, 100);
+    _sidebar.setBounds(0, 0, 250, getParentHeight());
     //_header.setBounds(r.withSize(1024, HEADER_HEIGHT));
     repaint();
 }

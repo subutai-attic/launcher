@@ -28,6 +28,8 @@ Author:  crioto
 #include "Vars.h"
 #include "Session.h"
 #include "SubutaiProcess.h"
+#include "LibraryItem.h"
+#include "LibrarySystemCheck.h"
 
 /*
 typedef enum {
@@ -53,21 +55,7 @@ typedef enum {
     FINISHED,
 } InstallStep;
 
-typedef enum {
-    RH_ONLY,
-    RH_CLIENT,
-    MH_FULL,
-    CLIENT_ONLY,
-} InstallConfig;
-
-typedef enum {
-    PROD,
-    STAGE,
-    DEV,
-} InstallVersion;
-
-
-class LibrarySystemCheck;
+//class LibrarySystemCheck;
 class LibrarySystemConfigure;
 class LibraryDownload;
 //class LibraryPreinstall;
@@ -76,36 +64,6 @@ class LibraryInstall;
 //bool instEnabled;
 
 //==============================================================================
-
-class LibraryItem : public juce::Component
-                    //, public juce::MouseListener
-{
-    public:
-        static const int WIDTH = 180;
-        static const int HEIGHT = 200;
-        LibraryItem(
-                const std::string& title, 
-                const std::string& desc, 
-                const std::string& installScript = "", 
-                const std::string& updateScript = "", 
-                const std::string& removeScript = "");
-        ~LibraryItem();
-        void paint(juce::Graphics& g) override;
-        void resized() override;
-        void mouseUp(const juce::MouseEvent& e) override;
-	void drawVersion();
-	static std::string findVersion(std::string cname);
-    private:
-        std::string _title;
-        std::string _desc;
-	std::string _installScript;
-        std::string _updateScript;
-        std::string _removeScript;
-        juce::Label _titleLabel;
-        juce::Label _plusLabel;
-        juce::Label _version;
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LibraryItem)
-};
 
 class LibraryComponent : public juce::Component, 
 			public juce::ComponentListener,
@@ -169,69 +127,6 @@ class LibraryComponent : public juce::Component,
 
 // ============================================================================
 
-class LibrarySystemCheck : public juce::Component, public juce::ComponentListener {
-    public:
-        LibrarySystemCheck();
-        ~LibrarySystemCheck();
-        void paint(juce::Graphics& g) override;
-        void resized();
-        void addLine(juce::Label* field, juce::Label* value, juce::Label* hint, std::string text,
-		     std::string hintText, bool inst);
-	struct Current{
-	    std::string s_os;
-	    bool b_os;
-	    std::string s_arch;
-	    bool b_arch;
-	    int i_cores;
-	    bool b_cores;
-	    long l_ram;
-	    bool b_ram;
-	    std::string s_vtx;
-	    bool b_vtx;
-	    std::string s_vbox;
-	    bool b_vbox;
-	} envCurrent;
-	static void appsInstalled();
-	bool checkSystem();
-
-    private:
-        
-	juce::Label _osField;
-        juce::Label _osValue;
-        juce::Label _osHint;
-
-        juce::Label _if64Field;
-        juce::Label _if64Value;
-        juce::Label _if64Hint;
-
-        juce::Label _numCpuField;
-        juce::Label _numCpuValue;
-        juce::Label _numCpuHint;
-
-        juce::Label _maxMemoryField;
-        juce::Label _maxMemoryValue;
-        juce::Label _maxMemoryHint;
-
-        juce::Label _vboxField;
-        juce::Label _vboxValue;
-        juce::Label _vboxHint;
-
-        juce::Label _vtxField;
-        juce::Label _vtxValue;
-        juce::Label _vtxHint;
-
-        juce::Label _sshField;
-        juce::Label _sshValue;
-        juce::Label _sshHint;
-
-        juce::Label _info;
-
-        int _numLines;
-
-        //TextButton _nextButton;
-
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LibrarySystemCheck)
-};
 
 // ============================================================================
 

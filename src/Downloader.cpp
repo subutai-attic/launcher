@@ -83,15 +83,24 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo()
     std::istringstream str(output);
     str >> root;
 
+    Json::Value el;
+    if (root.isArray()) {
+        l->debug() << "JSON root is array" << std::endl;
+        el = root[0];
+    } else {
+        l->debug() << "JSON root is not array" << std::endl;
+        el = root;
+    }
+
     //l->debug() << "JSon(change to Poco!): root copied: " << std::endl;
     try { 
-        const Json::Value owners = root[0]["owner"];
+        const Json::Value owners = el["owner"];
         for (unsigned int i = 0; i < owners.size(); ++i) {
             _file.owner = owners[i].asString();
         }
-        _file.name = root[0].get("name", "").asString();
-        _file.id = root[0].get("id", "").asString();
-        _file.size = root[0].get("size", "").asLargestInt();
+        _file.name = el.get("name", "").asString();
+        _file.id = el.get("id", "").asString();
+        _file.size = el.get("size", "").asLargestInt();
     } catch (Json::RuntimeError e) {
         l->error() << "Failed to parse JSON: " << e.what() << std::endl;
         return false;

@@ -20,12 +20,21 @@ namespace SubutaiLauncher
             Settings* getSettings();
             ConfigurationManager* getConfManager();
             NotificationCenter* getNotificationCenter();
+            void setSSHCredentials(const std::string& user, const std::string& pass, const std::string& hostname, long port);
+            std::string getSSHUser();
+            std::string getSSHPass();
+            std::string getSSHHostname();
+            long getSSHPort();
         private:
             //SubutaiLauncher::VirtualBox* _virtualBox;
             Downloader* _downloader;
             Settings* _settings;
             ConfigurationManager* _confManager;
             NotificationCenter* _notificationCenter;
+            std::string _sshUser;
+            std::string _sshPass;
+            std::string _sshHostname;
+            long _sshPort;
         protected:
             static Session *_instance;
             Session();

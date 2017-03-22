@@ -100,7 +100,10 @@ void SocialMediaIcons::paint(Graphics& g) {
 }
 
 void SocialMediaIcons::resized() {
-
+    _facebook->setBounds(55, 5, 30, 30);
+    _twitter->setBounds(90, 5, 30, 30);
+    _linkedin->setBounds(130, 5, 30, 30);
+    _github->setBounds(170, 5, 30, 30);
 }
 
 Path SocialMediaIcons::getFacebook() {

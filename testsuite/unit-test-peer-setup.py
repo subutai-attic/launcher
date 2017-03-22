@@ -6,35 +6,79 @@ def subutaistart():
 
     machineName = "subutai-unit-test-1"
 
+    call(['ssh-keygen', '-R', '[localhost]:4567'])
+
+    subutai.SetSSHCredentials("subutai", "ubuntai", "localhost", 4567)
+
     setupVm(machineName)
     startVm(machineName)
-    setupSSH()
-    installSubutai("", "", "", 0)
+    waitSSH()
+    sleep(60)
+    installSnapFromStore()
+    sleep(60)
+    initBtrfs()
+    sleep(60)
+    setAlias()
+    sleep(60)
+    #installSubutai("", "", "", 0)
     reconfigureNic(machineName)
+    sleep(60)
     installManagement()
+    sleep(60)
+    setupSSH()
 
+    return;
+
+def waitSSH():
+    print("Waiting for machine to bring up SSH")
+    attempts = 0
+    while subutai.TestSSH() != 0:
+        sleep(1)
+        attempts = attempts + 1
+        if attempts == 30:
+            print("SSH timeout for 30 seconds")
+            return
+    print("SSH Connected")
     return;
 
 def installManagement():
     print("Waiting for machine to bring up SSH")
     attempts = 0
-    while subutai.TestSSH("ubuntu", "localhost", 4567) != 0:
+    while subutai.TestSSH() != 0:
         sleep(1)
         attempts = attempts + 1
         if attempts == 30:
             print("SSH timeout for 30 seconds")
             return
 
-    subutai.SSHRun("ubuntu", "localhost", 4567, "sudo subutai import management", 1)
+    print("Importing management")
+    subutai.SSHRun("sudo subutai import management")
 
     return;
 
+def installSnapFromStore():
+    print("Installing snap from store")
+    subutai.SSHRun("sudo snap install --beta --devmode subutai")
+
+    return;
+
+def initBtrfs():
+    print("Initializing btrfs")
+    subutai.SSHRun("sudo subutai.btrfsinit /dev/sdb")
+
+    return;
+
+def setAlias():
+    print("Setting alias")
+    subutai.SSHRun("sudo bash -c 'snap alias subutai subutai'")
+
+    return
 
 def setupSSH():
 
     print("Waiting for machine to bring up SSH")
     attempts = 0
-    while subutai.TestSSH("ubuntu", "localhost", 4567) != 0:
+    while subutai.TestSSH() != 0:
         sleep(1)
         attempts = attempts + 1
         if attempts == 30:
@@ -42,7 +86,8 @@ def setupSSH():
             return
 
     print("SSH Session is running")
-    subutai.InstallSSHKey("ubuntu", "localhost", 4567)
+    subutai.SSHRun()
+    subutai.InstallSSHKey()
 
     return;
 
@@ -55,19 +100,19 @@ def startVm( machineName ):
 
 def setupVm( machineName ):
     if subutai.CheckVMExists(machineName) != 0:
-        subutai.download("snappy.ova")
+        subutai.download("core.ova")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
         subutai.download("subutai_4.0.14_amd64.snap")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
-        subutai.VBox("import /tmp/subutai/snappy.ova")
-        subutai.VBox("modifyvm snappy --cpus 2")
-        subutai.VBox("modifyvm snappy --nic1 nat")
-        subutai.VBox("modifyvm snappy --cableconnected1 on")
-        subutai.VBox("modifyvm snappy --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
-        subutai.VBox("modifyvm snappy --rtcuseutc on")
-        ret = subutai.VBoxS("modifyvm snappy --name " + machineName)
+        subutai.VBox("import /tmp/subutai/core.ova")
+        subutai.VBox("modifyvm core --cpus 2")
+        subutai.VBox("modifyvm core --nic1 nat")
+        subutai.VBox("modifyvm core --cableconnected1 on")
+        subutai.VBox("modifyvm core --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
+        subutai.VBox("modifyvm core --rtcuseutc on")
+        ret = subutai.VBoxS("modifyvm core --name " + machineName)
         if ret != 0:
             print(machineName + " is already exists")
 
@@ -81,8 +126,8 @@ def installSubutai( snapFile, user, host, port ):
     call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/launcher-prepare-server', 'ubuntu@localhost:~/prepare-server'])
     call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/subutai_4.0.14_amd64.snap', 'ubuntu@localhost:~/subutai_latest.snap'])
 
-    subutai.SSHRun("ubuntu", "localhost", 4567, "sudo chmod +x /home/ubuntu/prepare-server", 1)
-    subutai.SSHRun("ubuntu", "localhost", 4567, "sudo /home/ubuntu/prepare-server", 1)
+    subutai.SSHRun("sudo chmod +x /home/ubuntu/prepare-server")
+    subutai.SSHRun("sudo /home/ubuntu/prepare-server")
 
     return;
 
@@ -100,7 +145,7 @@ def reconfigureNic( machineName ):
     subutai.VBox("modifyvm " + machineName + ' --nic1 bridged --bridgeadapter1 ' + bridged)
     subutai.VBox("modifyvm " + machineName + " --nic2 nat")
     subutai.VBox("modifyvm " + machineName + " --cableconnected2 on")
-    subutai.VBox("modifyvm " + machineName + ' --natpf2 ssh-fwd,tcp,,4568,,22 --natpf2 https-fwd,tcp,,9999,,8443')
+    subutai.VBox("modifyvm " + machineName + ' --natpf2 ssh-fwd,tcp,,4567,,22 --natpf2 https-fwd,tcp,,9999,,8443')
 
     ret = subutai.VBoxS("hostonlyif ipconfig vboxnet0 --ip 192.168.56.1")
     print("hostonlyif: " + str(ret))
