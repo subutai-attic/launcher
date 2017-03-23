@@ -53,6 +53,11 @@ namespace SubutaiLauncher {
         return Py_BuildValue("s", "Hello, World!");
     }
 
+    static PyObject* SL_GetScheme(PyObject* self, PyObject* args) {
+        std::printf("GetScheme: %s\n", BUILD_SCHEME);
+        return Py_BuildValue("s", "Hello, World!");
+    }
+
     // ========================================================================
 
     static PyObject* SL_Debug(PyObject* self, PyObject* args) {
@@ -593,6 +598,7 @@ namespace SubutaiLauncher {
         {"SSHRun", (PyCFunction)SL_SSHRun, METH_VARARGS | METH_KEYWORDS, "Run command over SSH"},
         {"CheckVMExists", (PyCFunction)SL_CheckVMExists, METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name exists"},
         {"CheckVMRunning", (PyCFunction)SL_CheckVMRunning, METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name running"},
+        {"GetScheme", SL_GetScheme, METH_VARARGS, "Returns current scheme: production, master, dev"},
         {NULL, NULL, 0, NULL}
     };
 

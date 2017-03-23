@@ -13,7 +13,6 @@ def subutaistart():
     setupVm(machineName)
     startVm(machineName)
     waitSSH()
-    sleep(60)
     installSnapFromStore()
     sleep(60)
     initBtrfs()
