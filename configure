@@ -39,18 +39,36 @@ exit
 tests=1
 static=0
 shared=0
-python="python2.7"
+python="2.7"
 pylib=""
 py_header=""
 scheme="production"
+lib_ext=""
+
+os=$(uname)
+
+echo "Configuring for $os"
+if [ "$os" == "Linux" ]; then
+    lib_ext="so"
+    top_lib_dir=/usr/lib
+    top_include_dir=/usr/include
+elif [ "$os" == "Darwin" ]; then
+    lib_ext="dylib"
+    top_lib_dir=/usr/local
+    top_include_dir=/usr/local
+else
+    echo "$os unsupported platform"
+    exit
+fi
 
 check_python()
 {
-    echo -n "Looking for libpython$1.so library path... "
+    echo -n "Looking for libpython$1.$lib_ext library path... "
 
-    pypath=`find /usr/lib -name "libpython$1.so"`
+    pypath=`find $top_lib_dir -name "libpython$1.$lib_ext" | grep -v Permission | head -1`
     if [[ ( $? != 0 ) || ( -z "$pypath" ) ]]; then
         echo "ERROR: Failed to find path to python library"
+        exit
     else
         pylib=`dirname $pypath`
         echo "OK [$pylib]"
@@ -61,20 +79,25 @@ check_python_header()
 {
     echo -n "Looking for Python.h... "
 
-    local py_header_dir=`find /usr/include -name "python$1" -type d`
-    if [ $? != 0 ]; then
+    local py_header_dir=`find $top_include_dir -name "python$1" -type d | grep -v Permission`
+    if [[ ( $? != 0 ) || ( -z "$py_header_dir" ) ]]; then
         echo -e "FAIL"
         echo -e "Couldn't find python$1 directory under /usr/include"
         exit
     fi
-    local py_header_path=`find $py_header_dir -name 'Python.h'`
-    if [ $? != 0 ]; then
-        echo -e "FAIL"
-        echo -e "Couldn't find Python.h in $py_header_dir"
-        exit
-    fi
-    py_header=`dirname $py_header_path`
-    echo -e "OK [$py_header]"
+    while read -r line; do
+        echo -e "Using directory: $line"
+        local py_header_path=`find $line -name 'Python.h'`
+        if [[ ( $? != 0 ) || ( -z "$py_header_path" ) ]]; then
+            continue
+        fi
+        py_header=`dirname $py_header_path`
+        echo -e "OK [$py_header]"
+        return
+    done <<< $py_header_dir
+    echo -e "FAIL"
+    echo -e "Couldn't find Python.h in:\n $py_header_dir"
+    exit
 }
 
 while [ $# -ge 1 ]; do
