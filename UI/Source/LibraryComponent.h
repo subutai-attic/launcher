@@ -28,21 +28,25 @@ Author:  crioto
 #include "Vars.h"
 #include "Session.h"
 #include "SubutaiProcess.h"
+#include "LibraryItem.h"
+#include "LibraryItemTab.h"
+#include "LibrarySystemCheck.h"
+#include "WizardWindow.h"
 
 /*
-typedef enum {
-    INTRO,
-    SYSTEM_CHECK,
-    COMPONENT_CHOOSER,
-    SYSTEM_CONFIGURE,
-    DOWNLOAD,
-    PREINSTALL,
-    INSTALL,
-    POSTINSTALL,
-    FINISHED,
-    UNINSTALL
-} InstallStep;
-*/
+   typedef enum {
+   INTRO,
+   SYSTEM_CHECK,
+   COMPONENT_CHOOSER,
+   SYSTEM_CONFIGURE,
+   DOWNLOAD,
+   PREINSTALL,
+   INSTALL,
+   POSTINSTALL,
+   FINISHED,
+   UNINSTALL
+   } InstallStep;
+   */
 
 typedef enum {
     INTRO,
@@ -53,21 +57,7 @@ typedef enum {
     FINISHED,
 } InstallStep;
 
-typedef enum {
-    RH_ONLY,
-    RH_CLIENT,
-    MH_FULL,
-    CLIENT_ONLY,
-} InstallConfig;
-
-typedef enum {
-    PROD,
-    STAGE,
-    DEV,
-} InstallVersion;
-
-
-class LibrarySystemCheck;
+//class LibrarySystemCheck;
 class LibrarySystemConfigure;
 class LibraryDownload;
 //class LibraryPreinstall;
@@ -77,50 +67,23 @@ class LibraryInstall;
 
 //==============================================================================
 
-class LibraryItem : public juce::Component
-                    //, public juce::MouseListener
-{
-    public:
-        static const int WIDTH = 180;
-        static const int HEIGHT = 200;
-        LibraryItem(
-                const std::string& title, 
-                const std::string& desc, 
-                const std::string& installScript = "", 
-                const std::string& updateScript = "", 
-                const std::string& removeScript = "");
-        ~LibraryItem();
-        void paint(juce::Graphics& g) override;
-        void resized() override;
-        void mouseUp(const juce::MouseEvent& e) override;
-	void drawVersion();
-	static std::string findVersion(std::string cname);
-    private:
-        std::string _title;
-        std::string _desc;
-	std::string _installScript;
-        std::string _updateScript;
-        std::string _removeScript;
-        juce::Label _titleLabel;
-        juce::Label _plusLabel;
-        juce::Label _version;
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LibraryItem)
-};
-
 class LibraryComponent : public juce::Component, 
-			public juce::ComponentListener,
-			public juce::ButtonListener, 
-			public juce::TextEditorListener {
+    public juce::ComponentListener,
+    public juce::ButtonListener, 
+    public juce::TextEditorListener 
+{
     public:
         LibraryComponent();
         ~LibraryComponent();
         void paint (juce::Graphics&) override;
         void resized() override;
         void buttonClicked(juce::Button* button);
+        void tabClick(const std::string& tabTitle);
 
-	void componentVisibilityChanged(juce::Component *component);
-	void textEditorFocusLost(juce::TextEditor &teditor);
-	//void textEditorTextChanged(juce::TextEditor &teditor);
+        /*  
+        void componentVisibilityChanged(juce::Component *component);
+        void textEditorFocusLost(juce::TextEditor &teditor);
+        //void textEditorTextChanged(juce::TextEditor &teditor);
 
         void drawSystemCheck();
         void drawSystemConfigure();
@@ -130,18 +93,19 @@ class LibraryComponent : public juce::Component,
         void drawPostInstall();
         void drawFinished();
         void drawIntro();
-	void hideIntro();
+        void hideIntro();
         void onStepChange();
         void drawProgressButtons(bool next = true, bool back = true, bool cancel = true);
         void nextStep();
         void previousStep();
-	void collectInstallData();
+        void collectInstallData();
 
         LibrarySystemCheck* _systemCheck;
         LibrarySystemConfigure* _systemConfigure;
         LibraryDownload* _download;
-	//LibraryPreinstall* _preinstall;
-	LibraryInstall* _install;
+        //LibraryPreinstall* _preinstall;
+        LibraryInstall* _install;
+        */
 
     private:
         std::thread waitDownloadComplete();
@@ -149,19 +113,23 @@ class LibraryComponent : public juce::Component,
     private:
         juce::Label _componentsSectionLabel;
         juce::Label _peersSectionLabel;
-/*
-        LibrarySystemCheck* _systemCheck;
-        LibrarySystemConfigure* _systemConfigure;
-        LibraryDownload* _download;
-	//LibraryPreinstall* _preinstall;
-	LibraryInstall* _install;
-*/
+        /*
+           LibrarySystemCheck* _systemCheck;
+           LibrarySystemConfigure* _systemConfigure;
+           LibraryDownload* _download;
+        //LibraryPreinstall* _preinstall;
+        LibraryInstall* _install;
+        */
+        /*  
         InstallStep _step;
         juce::TextButton _installButton;
         juce::TextButton _nextButton;
         juce::TextButton _backButton;
         juce::TextButton _cancelButton;
+        */
+        juce::TextButton _installButton;
         std::vector<LibraryItem*> _components;
+        std::vector<LibraryItemTab*> _componentTabs;
         std::vector<LibraryItem*> _peers;
         LibraryItem* _tb;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LibraryComponent)
@@ -169,88 +137,25 @@ class LibraryComponent : public juce::Component,
 
 // ============================================================================
 
-class LibrarySystemCheck : public juce::Component, public juce::ComponentListener {
-    public:
-        LibrarySystemCheck();
-        ~LibrarySystemCheck();
-        void paint(juce::Graphics& g) override;
-        void resized();
-        void addLine(juce::Label* field, juce::Label* value, juce::Label* hint, std::string text,
-		     std::string hintText, bool inst);
-	struct Current{
-	    std::string s_os;
-	    bool b_os;
-	    std::string s_arch;
-	    bool b_arch;
-	    int i_cores;
-	    bool b_cores;
-	    long l_ram;
-	    bool b_ram;
-	    std::string s_vtx;
-	    bool b_vtx;
-	    std::string s_vbox;
-	    bool b_vbox;
-	} envCurrent;
-	static void appsInstalled();
-	bool checkSystem();
-
-    private:
-        
-	juce::Label _osField;
-        juce::Label _osValue;
-        juce::Label _osHint;
-
-        juce::Label _if64Field;
-        juce::Label _if64Value;
-        juce::Label _if64Hint;
-
-        juce::Label _numCpuField;
-        juce::Label _numCpuValue;
-        juce::Label _numCpuHint;
-
-        juce::Label _maxMemoryField;
-        juce::Label _maxMemoryValue;
-        juce::Label _maxMemoryHint;
-
-        juce::Label _vboxField;
-        juce::Label _vboxValue;
-        juce::Label _vboxHint;
-
-        juce::Label _vtxField;
-        juce::Label _vtxValue;
-        juce::Label _vtxHint;
-
-        juce::Label _sshField;
-        juce::Label _sshValue;
-        juce::Label _sshHint;
-
-        juce::Label _info;
-
-        int _numLines;
-
-        //TextButton _nextButton;
-
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LibrarySystemCheck)
-};
 
 // ============================================================================
 
 class LibrarySystemConfigure : public juce::Component, public juce::ComponentListener, 
-			    public juce::ButtonListener, public juce::TextEditorListener
+    public juce::ButtonListener, public juce::TextEditorListener
 {
-//class LibrarySystemConfigure : public juce::Component    {
+    //class LibrarySystemConfigure : public juce::Component    {
     public:
         LibrarySystemConfigure();
         ~LibrarySystemConfigure();
-	void buttonClicked(juce::Button *button);
+        void buttonClicked(juce::Button *button);
         void paint(juce::Graphics& g) override;
         void resized() override;
         bool isPeerInstallChecked();
-	void setConfigVersion(juce::Button *button);
-	void textEditorFocusLost(juce::TextEditor &teditor);
-	void textEditorReturnKeyPressed(juce::TextEditor &teditor) ;
-	void textEditorTextChanged(juce::TextEditor &teditor);
-	void fillInstallList();
+        void setConfigVersion(juce::Button *button);
+        void textEditorFocusLost(juce::TextEditor &teditor);
+        void textEditorReturnKeyPressed(juce::TextEditor &teditor) ;
+        void textEditorTextChanged(juce::TextEditor &teditor);
+        void fillInstallList();
 
     private:
         // Install with peer
@@ -260,9 +165,9 @@ class LibrarySystemConfigure : public juce::Component, public juce::ComponentLis
         // Install master or dev
         juce::Label _installTypeField;
         juce::ToggleButton* _installProd;
-	juce::ToggleButton* _installMaster;
+        juce::ToggleButton* _installMaster;
         juce::ToggleButton* _installDev;
-	
+
         std::vector<juce::ToggleButton*> _installTypes;
 
         // Installation path
@@ -335,7 +240,7 @@ class LibraryPreinstall : public juce::Component {
         //void setWithPeer(bool withPeer);
 
     private:
-	juce::Label _lstep;
+        juce::Label _lstep;
         juce::Label _currentAction;
         juce::Label _sizeProgress;
         juce::Slider* _progressBar;
@@ -356,34 +261,34 @@ class LibraryPreinstall : public juce::Component {
 // ============================================================================
 
 class LibraryInstall : 	public juce::Component, 
-			public juce::ComponentListener,
-			public juce::ButtonListener,
-			public juce::TextEditorListener {
-    public:
-        LibraryInstall();
-        ~LibraryInstall();
-        void paint(juce::Graphics& g) override;
-	void addLine(std::string fieldText, std::string valueText, std::string hintText, bool inst);
-	void installComponents();
-	void installPeer();
-        void buttonClicked(juce::Button* button);
-	void showChangedInfo();
-	void componentVisibilityChanged(juce::Component &component);
-        void resized() override;
+    public juce::ComponentListener,
+    public juce::ButtonListener,
+    public juce::TextEditorListener {
+        public:
+            LibraryInstall();
+            ~LibraryInstall();
+            void paint(juce::Graphics& g) override;
+            void addLine(std::string fieldText, std::string valueText, std::string hintText, bool inst);
+            void installComponents();
+            void installPeer();
+            void buttonClicked(juce::Button* button);
+            void showChangedInfo();
+            void componentVisibilityChanged(juce::Component &component);
+            void resized() override;
 
-    private:
-        // Install with peer
-        juce::Label _lstep;
-        juce::Label _lField;
-	juce::Label _lValue;
-        juce::Label _lHint;
-	juce::TextButton _confirmButton;
+        private:
+            // Install with peer
+            juce::Label _lstep;
+            juce::Label _lField;
+            juce::Label _lValue;
+            juce::Label _lHint;
+            juce::TextButton _confirmButton;
 
-	int _numLines;
+            int _numLines;
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LibraryInstall)
+            JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LibraryInstall)
 
-};
+    };
 
 // ============================================================================
 

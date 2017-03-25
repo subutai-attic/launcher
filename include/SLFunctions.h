@@ -19,17 +19,17 @@ namespace SubutaiLauncher {
     static char const* sl_string = "";
     static char const* sl_desc = "";
     static char const* sl_destination = "";
-    static char const* sl_type = "";
-    static char const* sl_mh = "";
 
     // SSH
     static char const* ssh_user;        // SSH User
+    static char const* ssh_pass;        // SSH Password
     static char const* ssh_host;        // SSH Host
     static int const* ssh_port;         // SSH Port
     static char const* ssh_cmd;         // SSH Command
     static int const* ssh_hostcheck;    // SSH Hostcheck
     static char* ssh_keywords[] = {
         (char*)"user", 
+        (char*)"pass", 
         (char*)"host", 
         (char*)"port", 
         (char*)"cmd", 
@@ -42,12 +42,16 @@ namespace SubutaiLauncher {
     static char* download_keywords[] = {(char*)"filename", NULL};
     static char* tmpdir_keywords[] = {(char*)"tmpdir", NULL};
     static char* string_keywords[] = {(char*)"string", NULL};
-    static char* vb_keywords[] = {(char*)"type", (char*)"mh", NULL};
     static char* desc_keywords[] = {(char*)"string", (char*)"desc", NULL};
 
     // ========================================================================
 
     static PyObject* SL_HelloWorld(PyObject* self, PyObject* args) {
+        return Py_BuildValue("s", "Hello, World!");
+    }
+
+    static PyObject* SL_GetScheme(PyObject* self, PyObject* args) {
+        std::printf("GetScheme: %s\n", BUILD_SCHEME);
         return Py_BuildValue("s", "Hello, World!");
     }
 
@@ -229,15 +233,6 @@ namespace SubutaiLauncher {
 
     // ========================================================================
 
-    static PyObject* SL_SSHPeer(PyObject* self, PyObject* args, PyObject* keywords) {
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
-            return NULL;
-        Session::instance()->getConfManager()->addConfig(sl_string);
-        return Py_BuildValue("i", 1);
-    }
-
-    // ========================================================================
-
     static PyObject* SL_Install(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", string_keywords, &sl_filename, &sl_destination))
             return NULL;
@@ -314,7 +309,7 @@ namespace SubutaiLauncher {
 
         VirtualBox vb;
         std::string out = vb.execute(sl_string);
-        int found = out.find("error");
+        size_t found = out.find("error");
         if (found == std::string::npos)
             return Py_BuildValue("i", 1);
         return Py_BuildValue("i", 0);
@@ -404,64 +399,88 @@ namespace SubutaiLauncher {
 
     // ========================================================================
 
-    static PyObject* SL_TestSSH(PyObject* self, PyObject* args, PyObject* keywords) 
+    static PyObject* SL_SetSSHCredentials(
+            PyObject* self, 
+            PyObject* args, 
+            PyObject* keywords
+            ) 
     {
-        // Attempt to establish SSH connection
-        Log::instance()->logger()->debug() << "SL_TestSSH" << std::endl;
         if (!PyArg_ParseTupleAndKeywords(
                     args, 
                     keywords, 
-                    "ssi|si", 
+                    "sssi|si", 
                     ssh_keywords, 
                     &ssh_user, 
+                    &ssh_pass,
                     &ssh_host, 
                     &ssh_port, 
                     &ssh_cmd, 
                     &ssh_hostcheck))
             return NULL;
 
-        SSH *p = new SubutaiLauncher::SSH();
-        p->setHost(ssh_host, (long)ssh_port);
-        p->connect();
-        if (p->isConnected())
-            return Py_BuildValue("i", 0);
-        return Py_BuildValue("i", 1);
+        Session::instance()->setSSHCredentials(ssh_user, ssh_pass, ssh_host, (long)ssh_port);
+        return Py_BuildValue("i", 0);
     }
 
     // ========================================================================
 
-    static PyObject* SL_InstallSSHKey(PyObject* self, PyObject* args, PyObject* keywords) 
+    static PyObject* SL_TestSSH(PyObject* self, PyObject* args) 
+    {
+        // Attempt to establish SSH connection
+        Log::instance()->logger()->debug() << "SL_TestSSH" << std::endl;
+
+        SSH *p = new SubutaiLauncher::SSH();
+        auto s = Session::instance();
+        p->setHost(s->getSSHHostname(), s->getSSHPort());
+        p->connect();
+        int ret = 1;
+        if (p->isConnected())
+            ret = 0;
+
+        p->disconnect();
+        delete p;
+
+        return Py_BuildValue("i", ret);
+    }
+
+    // ========================================================================
+
+    static PyObject* SL_InstallSSHKey(PyObject* self, PyObject* args) 
     {
         // Attempt to establish SSH connection
         Log::instance()->logger()->debug() << "SL_InstallSSHKey" << std::endl;
-        if (!PyArg_ParseTupleAndKeywords(
-                    args, 
-                    keywords, 
-                    "ssi|si", 
-                    ssh_keywords, 
-                    &ssh_user, 
-                    &ssh_host, 
-                    &ssh_port, 
-                    &ssh_cmd, 
-                    &ssh_hostcheck))
-            return NULL;
+
+        auto s = Session::instance();
 
         SSH *p = new SubutaiLauncher::SSH();
-        p->setHost(ssh_host, (long)ssh_port);
-        p->setUsername("ubuntu", "ubuntu");
+        p->setHost(s->getSSHHostname(), s->getSSHPort());
+        p->setUsername(s->getSSHUser(), s->getSSHPass());
         p->connect();
-        if (!p->isConnected()) return Py_BuildValue("i", 1);
+        if (!p->isConnected()) {
+            p->disconnect();
+            delete p;
+            return Py_BuildValue("i", 1);
+        }
         p->authenticate();
-        if (!p->isAuthenticated()) return Py_BuildValue("i", 1);
+        if (!p->isAuthenticated()) {
+            p->disconnect();
+            delete p;
+            return Py_BuildValue("i", 1);
+        }
 
         auto key = SSH::getPublicKey();
         if (key == "") {
+            p->disconnect();
+            delete p;
             return Py_BuildValue("i", 1);
         }
         std::string cmd = "echo '";
         cmd.append(key);
-        cmd.append("' >> /home/ubuntu/.ssh/authorized_keys");
-        p->execute(cmd);
+        cmd.append("' >> /home/subutai/.ssh/authorized_keys");
+        auto output = p->execute(cmd);
+        Log::instance()->logger()->debug() << "SL_InstallSSHKey: " << output << std::endl;
+        p->disconnect();
+        delete p;
 
         return Py_BuildValue("i", 0);
     }
@@ -474,28 +493,49 @@ namespace SubutaiLauncher {
         if (!PyArg_ParseTupleAndKeywords(
                     args, 
                     keywords, 
-                    "ssisi", 
-                    ssh_keywords, 
-                    &ssh_user, 
-                    &ssh_host, 
-                    &ssh_port, 
-                    &ssh_cmd, 
-                    &ssh_hostcheck))
+                    "s", 
+                    string_keywords, 
+                    &sl_string 
+                    ))
             return NULL;
 
-        SSH *p = new SubutaiLauncher::SSH();
-        p->setHost(ssh_host, (long)ssh_port);
-        p->setUsername(ssh_user, "ubuntu");
-        p->connect();
-        p->execute(ssh_cmd);
+        auto s = Session::instance();
 
+        SSH *p = new SubutaiLauncher::SSH();
+        p->setHost(s->getSSHHostname(), s->getSSHPort());
+        p->setUsername(s->getSSHUser(), s->getSSHPass());
+        p->connect();
+        p->authenticate();
+        auto ret = p->execute(sl_string);
+        p->disconnect();
+        delete p;
+        Log::instance()->logger()->info() << "SL_SSHRun: " << ret << std::endl;
+
+        return Py_BuildValue("i", 0);
+    }
+
+    // ========================================================================
+
+    static PyObject* SL_StartProcedure(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
+        Log::instance()->logger()->info() << "Starting procedure" << std::endl;
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+            return NULL;
+        return Py_BuildValue("i", 0);
+    }
+
+    // ========================================================================
+
+    static PyObject* SL_StopProcedure(PyObject* self, PyObject* args) 
+    {
+        Log::instance()->logger()->info() << "Stoping procedure" << std::endl;
         return Py_BuildValue("i", 0);
     }
 
     // ========================================================================
     // VM
     // ========================================================================
-    
+
     static PyObject* SL_CheckVMExists(PyObject* self, PyObject* args, PyObject* keywords) 
     {
         Log::instance()->logger()->debug() << "SL_CheckVMExists" << std::endl;
@@ -558,11 +598,15 @@ namespace SubutaiLauncher {
         //{"ImportVirtualMachine", SL_importVirtualMachine, METH_VARARGS | METH_KEYWORDS, "Import a virtual machine into VB"},
         {"GetDefaultRoutingInterface", SL_GetDefaultRoutingInterface, METH_VARARGS, "Returns name of default network interface"},
         {"GetVBoxBridgedInterface", (PyCFunction)SL_GetVBoxBridgedInterface, METH_VARARGS | METH_KEYWORDS, "Returns name of default network interface"},
-        {"TestSSH", (PyCFunction)SL_TestSSH, METH_VARARGS | METH_KEYWORDS, "Test if SSH connection is alive"},
-        {"InstallSSHKey", (PyCFunction)SL_InstallSSHKey, METH_VARARGS | METH_KEYWORDS, "Install SSH public key"},
+        {"SetSSHCredentials", (PyCFunction)SL_SetSSHCredentials, METH_VARARGS | METH_KEYWORDS, "Set SSH Connection credentials"},
+        {"TestSSH", (PyCFunction)SL_TestSSH, METH_VARARGS, "Test if SSH connection is alive"},
+        {"InstallSSHKey", (PyCFunction)SL_InstallSSHKey, METH_VARARGS, "Install SSH public key"},
         {"SSHRun", (PyCFunction)SL_SSHRun, METH_VARARGS | METH_KEYWORDS, "Run command over SSH"},
         {"CheckVMExists", (PyCFunction)SL_CheckVMExists, METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name exists"},
         {"CheckVMRunning", (PyCFunction)SL_CheckVMRunning, METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name running"},
+        {"GetScheme", SL_GetScheme, METH_VARARGS, "Returns current scheme: production, master, dev"},
+        {"StartProcedure", (PyCFunction)SL_StartProcedure, METH_VARARGS | METH_KEYWORDS, "Starts install/update/remove procedure"},
+        {"StopProcedure", SL_StopProcedure, METH_VARARGS, "Stops install/update/remove procedure"},
         {NULL, NULL, 0, NULL}
     };
 

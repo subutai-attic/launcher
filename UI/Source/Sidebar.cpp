@@ -14,9 +14,10 @@
 SidebarComponent::SidebarComponent()
 {
     _social = new SocialMediaIcons();
-    addAndMakeVisible(_social);
-    _social->setBounds(0, getParentHeight()-20-40, 250, 40);
+    _social->setBounds(0, getParentHeight()-20-40, getParentWidth(), 40);
     _social->toFront(false);
+    addAndMakeVisible(_social);
+    resized();
 }
 
 SidebarComponent::~SidebarComponent() {
@@ -30,6 +31,6 @@ void SidebarComponent::paint(Graphics& g) {
 }
 
 void SidebarComponent::resized() {
-
+    _social->setBounds(0, getParentHeight()-20-40, getParentWidth(), 40);
 }
 
