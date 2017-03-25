@@ -3,11 +3,11 @@
 
 
 #if LAUNCHER_LINUX
-const std::string SubutaiLauncher::ConfigurationManager::CONFIG_FILE = "install_config_linux_tt";
+const std::string SubutaiLauncher::ConfigurationManager::CONFIG_FILE = "launcher-install-config-linux";
 #elif LAUNCHER_WINDOWS
-const std::string SubutaiLauncher::ConfigurationManager::CONFIG_FILE = "install_config_windows";
+const std::string SubutaiLauncher::ConfigurationManager::CONFIG_FILE = "launcher-install-config-windows";
 #elif LAUNCHER_MACOS
-const std::string SubutaiLauncher::ConfigurationManager::CONFIG_FILE = "install_config_macos";
+const std::string SubutaiLauncher::ConfigurationManager::CONFIG_FILE = "launcher-install-config-darwin";
 #else
 #error Unknown Platform
 #endif

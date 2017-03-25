@@ -1,8 +1,8 @@
 #include "Downloader.h"
 
-const std::string SubutaiLauncher::Downloader::URL = "https://cdn.subut.ai:8338";
+const std::string SubutaiLauncher::Downloader::URL = "https://devcdn.subut.ai:8338";
 const std::string SubutaiLauncher::Downloader::REST = "/kurjun/rest/raw";
-const std::string SubutaiLauncher::Downloader::HOST = "cdn.subut.ai";
+const std::string SubutaiLauncher::Downloader::HOST = "devcdn.subut.ai";
 
 SubutaiLauncher::Downloader::Downloader() : 
     _content(""),
@@ -80,18 +80,27 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo()
 
     // TODO: Replace JSON lib with Poco
     Json::Value root;
-    std::istringstream str(output);
-    str >> root;
 
     //l->debug() << "JSon(change to Poco!): root copied: " << std::endl;
     try { 
-        const Json::Value owners = root[0]["owner"];
+        std::istringstream str(output);
+        str >> root;
+
+        Json::Value el;
+        if (root.isArray()) {
+            l->debug() << "JSON root is array" << std::endl;
+            el = root[0];
+        } else {
+            l->debug() << "JSON root is not array" << std::endl;
+            el = root;
+        }
+        const Json::Value owners = el["owner"];
         for (unsigned int i = 0; i < owners.size(); ++i) {
             _file.owner = owners[i].asString();
         }
-        _file.name = root[0].get("name", "").asString();
-        _file.id = root[0].get("id", "").asString();
-        _file.size = root[0].get("size", "").asLargestInt();
+        _file.name = el.get("name", "").asString();
+        _file.id = el.get("id", "").asString();
+        _file.size = el.get("size", "").asLargestInt();
     } catch (Json::RuntimeError e) {
         l->error() << "Failed to parse JSON: " << e.what() << std::endl;
         return false;
