@@ -19,8 +19,6 @@ namespace SubutaiLauncher {
     static char const* sl_string = "";
     static char const* sl_desc = "";
     static char const* sl_destination = "";
-    static char const* sl_type = "";
-    static char const* sl_mh = "";
 
     // SSH
     static char const* ssh_user;        // SSH User
@@ -44,7 +42,6 @@ namespace SubutaiLauncher {
     static char* download_keywords[] = {(char*)"filename", NULL};
     static char* tmpdir_keywords[] = {(char*)"tmpdir", NULL};
     static char* string_keywords[] = {(char*)"string", NULL};
-    static char* vb_keywords[] = {(char*)"type", (char*)"mh", NULL};
     static char* desc_keywords[] = {(char*)"string", (char*)"desc", NULL};
 
     // ========================================================================
@@ -236,15 +233,6 @@ namespace SubutaiLauncher {
 
     // ========================================================================
 
-    static PyObject* SL_SSHPeer(PyObject* self, PyObject* args, PyObject* keywords) {
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
-            return NULL;
-        Session::instance()->getConfManager()->addConfig(sl_string);
-        return Py_BuildValue("i", 1);
-    }
-
-    // ========================================================================
-
     static PyObject* SL_Install(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", string_keywords, &sl_filename, &sl_destination))
             return NULL;
@@ -321,7 +309,7 @@ namespace SubutaiLauncher {
 
         VirtualBox vb;
         std::string out = vb.execute(sl_string);
-        int found = out.find("error");
+        size_t found = out.find("error");
         if (found == std::string::npos)
             return Py_BuildValue("i", 1);
         return Py_BuildValue("i", 0);
@@ -527,6 +515,24 @@ namespace SubutaiLauncher {
     }
 
     // ========================================================================
+
+    static PyObject* SL_StartProcedure(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
+        Log::instance()->logger()->info() << "Starting procedure" << std::endl;
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+            return NULL;
+        return Py_BuildValue("i", 0);
+    }
+
+    // ========================================================================
+
+    static PyObject* SL_StopProcedure(PyObject* self, PyObject* args) 
+    {
+        Log::instance()->logger()->info() << "Stoping procedure" << std::endl;
+        return Py_BuildValue("i", 0);
+    }
+
+    // ========================================================================
     // VM
     // ========================================================================
 
@@ -599,6 +605,8 @@ namespace SubutaiLauncher {
         {"CheckVMExists", (PyCFunction)SL_CheckVMExists, METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name exists"},
         {"CheckVMRunning", (PyCFunction)SL_CheckVMRunning, METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name running"},
         {"GetScheme", SL_GetScheme, METH_VARARGS, "Returns current scheme: production, master, dev"},
+        {"StartProcedure", (PyCFunction)SL_StartProcedure, METH_VARARGS | METH_KEYWORDS, "Starts install/update/remove procedure"},
+        {"StopProcedure", SL_StopProcedure, METH_VARARGS, "Stops install/update/remove procedure"},
         {NULL, NULL, 0, NULL}
     };
 

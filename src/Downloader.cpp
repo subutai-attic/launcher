@@ -80,20 +80,20 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo()
 
     // TODO: Replace JSON lib with Poco
     Json::Value root;
-    std::istringstream str(output);
-    str >> root;
-
-    Json::Value el;
-    if (root.isArray()) {
-        l->debug() << "JSON root is array" << std::endl;
-        el = root[0];
-    } else {
-        l->debug() << "JSON root is not array" << std::endl;
-        el = root;
-    }
 
     //l->debug() << "JSon(change to Poco!): root copied: " << std::endl;
     try { 
+        std::istringstream str(output);
+        str >> root;
+
+        Json::Value el;
+        if (root.isArray()) {
+            l->debug() << "JSON root is array" << std::endl;
+            el = root[0];
+        } else {
+            l->debug() << "JSON root is not array" << std::endl;
+            el = root;
+        }
         const Json::Value owners = el["owner"];
         for (unsigned int i = 0; i < owners.size(); ++i) {
             _file.owner = owners[i].asString();

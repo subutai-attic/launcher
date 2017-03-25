@@ -61,9 +61,9 @@ MainContentComponent::~MainContentComponent()
 {
     delete(_minimizeButton);
     delete(_closeButton);
-//_login->deleteAndZero();
-//_login->removeFromDesktop();
-//delete(_login);
+    //_login->deleteAndZero();
+    //_login->removeFromDesktop();
+    //delete(_login);
 }
 
 
@@ -85,6 +85,10 @@ void MainContentComponent::resized()
     _logo.setBounds(0, 20, MENU_WIDTH, 100);
     _sidebar.setBounds(0, 0, 250, getParentHeight());
     //_header.setBounds(r.withSize(1024, HEADER_HEIGHT));
+    _library.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
+    _community.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
+    _marketplace.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
+    _hub.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
     repaint();
 }
 
@@ -104,7 +108,7 @@ void MainContentComponent::paintListBoxItem(int rowNumber, Graphics& g, int widt
         t.setColour(Colour(200, 200, 200));
     } else {
         //t.setColour(Colour(176, 224, 230));
-	    t.setColour(Colour(7, 141, 208));
+        t.setColour(Colour(7, 141, 208));
     }
     t.setLineSpacing(40);
     t.setJustification(Justification::left);

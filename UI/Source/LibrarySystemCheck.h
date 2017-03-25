@@ -24,27 +24,10 @@ class LibrarySystemCheck : public juce::Component, public juce::ComponentListene
         void paint(juce::Graphics& g) override;
         void resized();
         void addLine(juce::Label* field, juce::Label* value, juce::Label* hint, std::string text,
-		     std::string hintText, bool inst);
-	struct Current{
-	    std::string s_os;
-	    bool b_os;
-	    std::string s_arch;
-	    bool b_arch;
-	    int i_cores;
-	    bool b_cores;
-	    long l_ram;
-	    bool b_ram;
-	    std::string s_vtx;
-	    bool b_vtx;
-	    std::string s_vbox;
-	    bool b_vbox;
-	} envCurrent;
-	static void appsInstalled();
-	bool checkSystem();
-
+                std::string hintText, bool inst);
     private:
-        
-	juce::Label _osField;
+
+        juce::Label _osField;
         juce::Label _osValue;
         juce::Label _osHint;
 

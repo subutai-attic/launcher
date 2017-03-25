@@ -203,5 +203,4 @@ void LibraryItem::mouseUp(const juce::MouseEvent& e)
     }
 
     drawVersion();
-    LibrarySystemCheck::appsInstalled();
 }

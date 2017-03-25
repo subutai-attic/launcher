@@ -41,7 +41,9 @@ class UIApplication  : public juce::JUCEApplication
             _core = new SubutaiLauncher::Core(std::vector<std::string>());
             _core->run();
 
-            mainWindow = new MainWindow (getApplicationName());
+            mainWindow = new MainWindow ("Subutai Launcher [" \
+                    BUILD_SCHEME \
+                    "]");
         }
 
         void shutdown() override

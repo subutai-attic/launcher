@@ -160,3 +160,7 @@ def reconfigureNic( machineName ):
     subutai.VBox("startvm --type headless " + machineName)
 
     return;
+
+def waitSnap():
+
+    return;
