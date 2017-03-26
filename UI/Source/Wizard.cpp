@@ -45,6 +45,8 @@ Wizard::Wizard() :
     addAndMakeVisible(_stepInstall);
     addAndMakeVisible(_stepFinal);
 
+    // Installation step pages
+
     _introPage = new WizardIntro();
     _introPage->setBounds(300, 0, 500, 600);
     addAndMakeVisible(_introPage);
@@ -52,6 +54,28 @@ Wizard::Wizard() :
     _systemCheckPage = new SystemCheck();
     _systemCheckPage->setBounds(300, 0, 500, 600);
     addChildComponent(_systemCheckPage);
+
+    _componentChooserPage = new ComponentChooser();
+    _componentChooserPage->setBounds(300, 0, 500, 600);
+    addChildComponent(_componentChooserPage);
+
+    _ptpInstall = new WizardInstall();
+    _ptpInstall->setBounds(300, 0, 500, 600);
+    addChildComponent(_ptpInstall);
+
+    _trayInstall = new WizardInstall();
+    _trayInstall->setBounds(300, 0, 500, 600);
+    addChildComponent(_trayInstall);
+
+    _eteInstall = new WizardInstall();
+    _eteInstall->setBounds(300, 0, 500, 600);
+    addChildComponent(_eteInstall);
+
+    _peerInstall = new WizardInstall();
+    _peerInstall = new WizardInstall();
+    addChildComponent(_peerInstall);
+
+    // Progression buttons
 
     _next.setBounds(202, 560, 86, 25);
     _next.addListener(this);
@@ -70,7 +94,10 @@ Wizard::Wizard() :
 
 Wizard::~Wizard()
 {
-
+    delete _introPage;
+    delete _systemCheckPage;
+    delete _componentChooserPage;
+    delete _ptpInstall;
 }
 
 void Wizard::paint(juce::Graphics& g)
@@ -94,7 +121,23 @@ void Wizard::buttonClicked(juce::Button* button)
                 _stepIntro.setColour(Label::textColourId, Colours::white);
                 _stepSystemCheck.setColour(Label::textColourId, juce::Colour(7, 141, 208));
                 _back.setEnabled(true);
-                _step++;
+                _step = 2;
+                break;
+            case 2:
+                _systemCheckPage->setVisible(false);
+                _componentChooserPage->setVisible(true);
+                _stepSystemCheck.setColour(Label::textColourId, Colours::white);
+                _stepComponentChooser.setColour(Label::textColourId, juce::Colour(7, 141, 208));
+                _step = 3;
+                break;
+            case 3:
+                _componentChooserPage->setVisible(false);
+                _ptpInstall->setVisible(true);
+                _stepComponentChooser.setColour(Label::textColourId, Colours::white);
+                _stepInstall.setColour(Label::textColourId, juce::Colour(7, 141, 208));
+                _step = 4;
+                _back.setEnabled(false);
+                runInstall();
                 break;
             default:
                 _introPage->setVisible(true);
@@ -113,10 +156,27 @@ void Wizard::buttonClicked(juce::Button* button)
                 _introPage->setVisible(true);
                 _stepIntro.setColour(Label::textColourId, juce::Colour(7, 141, 208));
                 _stepSystemCheck.setColour(Label::textColourId, Colours::grey);
+                _step = 1;
+                break;
+            case 3:
+                _componentChooserPage->setVisible(false);
+                _systemCheckPage->setVisible(true);
+                _stepSystemCheck.setColour(Label::textColourId, juce::Colour(7, 141, 208));
+                _stepComponentChooser.setColour(Label::textColourId, Colours::grey);
+                _step = 2;
+                break;
             default:
                 break;
         }
     } else if (button == &_cancel) {
 
+    }
+}
+
+void Wizard::runInstall()
+{
+    auto c = _componentChooserPage->getComponents();
+    if (c.ptp) {
+        _ptpInstall->start();
     }
 }

@@ -4,7 +4,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Wizard.h"
 
-class WizardWindow : public juce::DocumentWindow
+class WizardWindow : public juce::DialogWindow
 {
     public:
         WizardWindow();

@@ -1,9 +1,9 @@
 #include "WizardWindow.h"
 
-WizardWindow::WizardWindow() : DocumentWindow(
+WizardWindow::WizardWindow() : DialogWindow(
         "Installation Wizard", 
         juce::Colours::lightgrey,
-        juce::DocumentWindow::closeButton)
+        false, true)
 {
     setSize(640, 480);
     centreWithSize(getWidth(), getHeight());

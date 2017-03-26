@@ -137,9 +137,10 @@ std::string SubutaiLauncher::Environment::vtxEnabled()
     SubutaiString sstr1(out);
     out = sstr1.remove(" ", "");
 #elif LAUNCHER_WINDOWS
+    #error Not implemented on this platform
     return "win"; //Change 4Win! 
 #elif LAUNCHER_MACOS
-
+    #error Not implemented on this platform
 #endif
     return out;
 }
