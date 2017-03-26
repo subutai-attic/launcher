@@ -18,6 +18,7 @@ class WizardInstall : public juce::Component
         juce::Label* _title;
         double _progress;
         std::vector<juce::Label> _lines; // Lines contains report strings
+        std::string _script;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WizardInstall)
 };

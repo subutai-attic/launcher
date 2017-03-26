@@ -42,5 +42,13 @@ void WizardInstall::start(const std::string& name)
     addAndMakeVisible(_pb);
 
     // Converting component name to a script
-
+    if (name == "P2P") {
+        _script = "launcher-p2p-install";
+    } else if (name == "Tray") {
+        _script = "launcher-tray-install";
+    } else if (name == "Browser Plugin") {
+        _script = "launcher-e2e-install";
+    } else if (name == "Peer") {
+        _script = "launcher-peer-install";
+    }
 }
