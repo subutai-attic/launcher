@@ -25,6 +25,8 @@ namespace SubutaiLauncher
             std::string getSSHPass();
             std::string getSSHHostname();
             long getSSHPort();
+            void addStatus(const std::string& text);
+            std::string getStatus();
         private:
             //SubutaiLauncher::VirtualBox* _virtualBox;
             Downloader* _downloader;
@@ -35,6 +37,7 @@ namespace SubutaiLauncher
             std::string _sshPass;
             std::string _sshHostname;
             long _sshPort;
+            std::vector<std::string> _statusPool;
         protected:
             static Session *_instance;
             Session();

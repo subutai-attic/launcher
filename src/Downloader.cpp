@@ -159,6 +159,7 @@ void SubutaiLauncher::Downloader::downloadImpl()
     std::string path(_outputDir);
     path.append(PATH_DELIM);
     path.append(_filename.c_str());
+    _rfile = path;
     l->info() << "DownloadImpl  path _file.name.c_str() " << path << std::endl;
 
     FileSystem fs(_outputDir);
@@ -253,9 +254,11 @@ bool SubutaiLauncher::Downloader::isDone()
     return _done;
 }
 
-int SubutaiLauncher::Downloader::getPercent()
+double SubutaiLauncher::Downloader::getPercent()
 {
-    return (int)(_progress / (_file.size / 100));
+    Poco::File f(_rfile);
+    if (!f.exists()) return 0.0;
+    return (double)(f.getSize() / _file.size * 100);
 }
 
 bool SubutaiLauncher::Downloader::verifyDownload()

@@ -12,13 +12,17 @@ class WizardInstall : public juce::Component
         void resized() override;
         void start(const std::string& name);
         void wait();
+        std::thread run();
     private:
-        void addLine(const std::string& text);
+        bool _running;
+        void runImpl();
+        void addLine(const std::string& text, bool error = false);
         juce::ProgressBar* _pb;
         juce::Label* _title;
         double _progress;
-        std::vector<juce::Label> _lines; // Lines contains report strings
+        std::vector<juce::Label*> _lines; // Lines contains report strings
         std::string _script;
+        std::string _name;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WizardInstall)
 };

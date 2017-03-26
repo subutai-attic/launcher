@@ -27,6 +27,7 @@
 #include <Poco/Net/HTTPResponse.h>
 #include <Poco/URI.h>
 #include <Poco/URIStreamOpener.h>
+#include <Poco/File.h>
 
 #include "FileSystem.h"
 #include "MD5.h"
@@ -60,7 +61,7 @@ namespace SubutaiLauncher
             std::thread download();
             void downloadImpl();
             bool isDone();
-            int getPercent();
+            double getPercent();
             static size_t handleFile(char* data, size_t size, size_t nmemb, void *p);
             size_t handleFileImpl(char* data, size_t size, size_t nmemb);
             bool verifyDownload();
@@ -73,6 +74,7 @@ namespace SubutaiLauncher
             std::string _filename;
             std::string _content;
             std::string _outputDir;
+            std::string _rfile; // output file
             SubutaiFile _file;
             long _progress;
             bool _done;

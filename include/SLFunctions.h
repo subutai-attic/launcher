@@ -11,6 +11,7 @@
 #include "NotificationCenter.h"
 #include "Environment.h"
 #include "VirtualBox.h"
+#include "RootProcess.h"
 
 namespace SubutaiLauncher {
 
@@ -562,6 +563,33 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", 1);
     }
 
+    static PyObject* SL_AddStatus(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+            return NULL;
+
+        Session::instance()->addStatus(sl_string);
+        return Py_BuildValue("i", 0);
+    }
+
+    static PyObject* SL_MakeLink(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
+            return NULL;
+
+        RootProcess* rp = new RootProcess();
+
+        char cmd[1024];
+        std::sprintf(cmd, "ln -s %s %s", sl_string, sl_desc);
+
+        rp->addCommand(std::string(cmd));
+        rp->execute("Install executable");
+
+        delete rp;
+        
+        return Py_BuildValue("i", 0);
+    }
+
     // ========================================================================
     // Module bindings
     // ========================================================================
@@ -607,6 +635,9 @@ namespace SubutaiLauncher {
         {"GetScheme", SL_GetScheme, METH_VARARGS, "Returns current scheme: production, master, dev"},
         {"StartProcedure", (PyCFunction)SL_StartProcedure, METH_VARARGS | METH_KEYWORDS, "Starts install/update/remove procedure"},
         {"StopProcedure", SL_StopProcedure, METH_VARARGS, "Stops install/update/remove procedure"},
+        {"AddStatus", (PyCFunction)SL_AddStatus, METH_VARARGS | METH_KEYWORDS, "Add status"},
+        //{"RootCommand", (PyCFunction)SL_RootCommand, METH_VARARGS | METH_KEYWORDS, "Executes root command"},
+        {"MakeLink", (PyCFunction)SL_MakeLink, METH_VARARGS | METH_KEYWORDS, "Executes ln -s on root behalf"},
         {NULL, NULL, 0, NULL}
     };
 

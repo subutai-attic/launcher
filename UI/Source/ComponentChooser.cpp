@@ -2,7 +2,11 @@
 
 ComponentChooser::ComponentChooser() :
     _cpu(2),
-    _mem(2)
+    _mem(2),
+    _ptp(true),
+    _tray(true),
+    _ete(true),
+    _peer(true)
 {
     auto font = juce::Font(15);
     auto font2 = juce::Font(13);

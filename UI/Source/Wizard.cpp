@@ -6,6 +6,22 @@ Wizard::Wizard() :
     _cancel("Cancel"),
     _step(1)
 {
+#if LAUNCHER_LINUX
+    SubutaiLauncher::RootProcess* rp = new SubutaiLauncher::RootProcess();
+    rp->addCommand("mkdir -p /opt/subutai");
+    rp->addCommand("mkdir -p /opt/subutai/bin");
+    rp->addCommand("mkdir -p /opt/subutai/etc");
+    rp->addCommand("mkdir -p /opt/subutai/resources");
+    std::string chown("chown -R ");
+    chown.append(Poco::Environment::get("USER"));
+    chown.append(" /opt/subutai");
+    rp->addCommand(chown);
+    rp->execute("Creating installation directories requires root privileges");
+    delete rp;
+#else
+#error Not Implemented on this platform
+#endif
+
     setSize(800, 600);
     auto font = juce::Font(15);
 
@@ -72,8 +88,12 @@ Wizard::Wizard() :
     addChildComponent(_eteInstall);
 
     _peerInstall = new WizardInstall();
-    _peerInstall = new WizardInstall();
+    _peerInstall->setBounds(300, 0, 500, 600);
     addChildComponent(_peerInstall);
+
+    _finishPage = new WizardFinish();
+    _finishPage->setBounds(300, 0, 500, 600);
+    addChildComponent(_finishPage);
 
     // Progression buttons
 
@@ -137,6 +157,7 @@ void Wizard::buttonClicked(juce::Button* button)
                 _stepInstall.setColour(Label::textColourId, juce::Colour(7, 141, 208));
                 _step = 4;
                 _back.setEnabled(false);
+                _next.setEnabled(false);
                 runInstall();
                 break;
             default:
@@ -175,8 +196,72 @@ void Wizard::buttonClicked(juce::Button* button)
 
 void Wizard::runInstall()
 {
+    SubutaiLauncher::Log::instance()->logger()->debug() << "Collecting choosen components" << std::endl;
     auto c = _componentChooserPage->getComponents();
-    if (c.ptp) {
-        _ptpInstall->start();
+    if (c.ptp && !_ptpInstalled) {
+        _ptpInstall->setVisible(true);
+        SubutaiLauncher::Log::instance()->logger()->debug() << "P2P Component has been chosen" << std::endl;
+        _ptpInstall->start("P2P");
+        auto t = _ptpInstall->run();
+        t.detach();
+        return;
     }
+    if (c.tray && !_trayInstalled) {
+        SubutaiLauncher::Log::instance()->logger()->debug() << "Tray Component has been chosen" << std::endl;
+        _trayInstall->start("Tray");
+        auto t = _trayInstall->run();
+        t.detach();
+        return;
+    }
+    if (c.ete && !_eteInstalled) {
+        SubutaiLauncher::Log::instance()->logger()->debug() << "Browser Plugin Component has been chosen" << std::endl;
+        _eteInstall->start("Browser Plugin");
+        auto t = _eteInstall->run();
+        t.detach();
+        return;
+    }
+    if (c.peer && !_peerInstalled) {
+        SubutaiLauncher::Log::instance()->logger()->debug() << "Peer Component has been chosen" << std::endl;
+        _peerInstall->start("Peer");
+        auto t = _peerInstall->run();
+        t.detach();
+        return;
+    }
+}
+
+void Wizard::stepCompleted(const std::string& name)
+{
+    if (name == "P2P")
+    {
+        _ptpInstalled = true;
+        _ptpInstall->setVisible(false);
+    }
+    else if (name == "Tray")
+    {
+        _trayInstalled = true;
+        _trayInstall->setVisible(false);
+    }
+    else if (name == "Browser Plugin")
+    {
+        _eteInstalled = true;
+        _eteInstall->setVisible(false);
+    }
+    else if (name == "Peer")
+    {
+        _peerInstalled = true;
+        _peerInstall->setVisible(false);
+    }
+
+    // Determine if we need to install something else
+    auto c = _componentChooserPage->getComponents();
+    if ((c.ptp && !_ptpInstalled) || (c.tray && !_trayInstalled) || (c.ete && !_eteInstalled) || (c.peer && !_peerInstalled))
+    {
+        runInstall();
+        return;
+    } 
+    // Show final page
+    _cancel.setEnabled(false);
+    _next.setEnabled(false);
+    _back.setEnabled(false);
+    _finishPage->setVisible(true);
 }
