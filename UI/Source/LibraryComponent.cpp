@@ -1059,14 +1059,10 @@ void LibraryDownload::downloadImpl() {
         t.detach();
         while (!_downloader->isDone()) {
             updateProgress(_downloader->currentProgress());
-#if LAUNCHER_LINUX
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
             usleep(1000);
 #elif LAUNCHER_WINDOWS
             Sleep(1000);
-#elif LAUNCHER_MACOS
-#error Not Implemented for this platform
-#else
-#error Unknown Platform
 #endif
         }
         _progress += _downloader->currentProgress();

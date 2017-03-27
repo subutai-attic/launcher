@@ -1,7 +1,7 @@
 include config.make
 
 CC=g++
-DYNAMIC_LIB_TARGET = libsubutai-launcher.so
+DYNAMIC_LIB_TARGET = libsubutai-launcher.$(LIB_EXT)
 STATIC_LIB_TARGET = libsubutai-launcher.a
 EXTRA_LIBS_DIR = third-party
 TEST_TARGET=testsuite

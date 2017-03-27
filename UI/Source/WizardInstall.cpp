@@ -109,7 +109,7 @@ void WizardInstall::runImpl() {
 
         repaint();
 
-#if LAUNCHER_LINUX
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
         usleep(100);
 #else
 #error Not implemented on this platform

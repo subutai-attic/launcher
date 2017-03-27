@@ -46,6 +46,7 @@ scheme="production"
 lib_ext=""
 openssl_dir=""
 os_libs=""
+defines=
 
 os=$(uname)
 
@@ -55,11 +56,13 @@ if [ "$os" == "Linux" ]; then
     top_lib_dir=/usr/lib
     top_include_dir=/usr/include
     os_libs="-lrt"
+    defines="-DLINUX=1"
 elif [ "$os" == "Darwin" ]; then
     lib_ext="dylib"
     top_lib_dir=/usr/local
     top_include_dir=/usr/local
     s_libs=""
+    defines=
 else
     echo "$os unsupported platform"
     exit
@@ -165,6 +168,8 @@ echo "BUILD_SCHEME = $scheme" >> config.make
 echo "OPENSSL_DIR = $openssl_dir" >> config.make
 echo "OS = $os" >> config.make
 echo "SYSLIBS = $os_libs" >> config.make
+echo "LIB_EXT = $lib_ext" >> config.make
+echo "EXTRA_DEFINES = $defines" >> config.make
 if [ $shared -eq 0 ]; then
     if [ $static -eq 1 ]; then
         echo "STATIC_BUILD = 1" >> config.make
@@ -191,4 +196,6 @@ export SHARED_BUILD
 export BUILD_TESTS
 export OS
 export SYSLIBS
+export LIB_EXT
+export EXTRA_DEFINES
 __EOF__

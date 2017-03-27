@@ -18,8 +18,6 @@ Wizard::Wizard() :
     rp->addCommand(chown);
     rp->execute("Creating installation directories requires root privileges");
     delete rp;
-#else
-#error Not Implemented on this platform
 #endif
 
     setSize(800, 600);
