@@ -12,7 +12,8 @@ SubutaiLauncher::Environment::~Environment()
 
 unsigned SubutaiLauncher::Environment::processorNum() 
 {
-
+    return Poco::Environment::processorCount();
+    /*
     auto l = Log::instance()->logger();
 #if LAUNCHER_LINUX
 #if defined _SC_NPROCESSORS_ONLN
@@ -33,11 +34,11 @@ unsigned SubutaiLauncher::Environment::processorNum()
 
 #endif
     return 1;
+    */
 }
 
 unsigned SubutaiLauncher::Environment::is64() 
 {
-
     auto l = Log::instance()->logger();
 #if LAUNCHER_LINUX
 #if ( __WORDSIZE == 64 )
@@ -54,7 +55,7 @@ unsigned SubutaiLauncher::Environment::is64()
     GetSystemInfo(&si);
     return 0; //Change 4Win! 
 #elif LAUNCHER_MACOS
-
+    return 1;
 #endif
     return 0;
 }
@@ -85,6 +86,14 @@ unsigned long SubutaiLauncher::Environment::ramSize()
     GetSystemInfo(&si);
     return si.dwNumberOfProcessors;
 #elif LAUNCHER_MACOS
+    int mib [] = { CTL_HW, HW_MEMSIZE };
+    int64_t value = 0;
+    size_t length = sizeof(value);
+
+    if(-1 == sysctl(mib, 2, &value, &length, NULL, 0))
+        l->error() << "Failed to determine RAM size" << std::endl;
+
+    return value;
 #endif
     return 1;
 }
@@ -140,7 +149,7 @@ std::string SubutaiLauncher::Environment::vtxEnabled()
     #error Not implemented on this platform
     return "win"; //Change 4Win! 
 #elif LAUNCHER_MACOS
-    #error Not implemented on this platform
+    return "VMX";
 #endif
     return out;
 }
@@ -199,6 +208,7 @@ std::string SubutaiLauncher::Environment::distroOS(std::string ar)
 #elif LAUNCHER_WINDOWS
     return std::string dis = Poco::Environment::osDisplayName();
 #elif LAUNCHER_MACOS
+    return "MacOS";
 #endif
     return "";
 }
@@ -234,7 +244,7 @@ std::string SubutaiLauncher::Environment::versionSSH()
 
     auto l = Log::instance()->logger();
 
-#if LAUNCHER_LINUX
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
     sp.launch("ssh", args, "/usr/bin");
     if (sp.wait() == 0) 
     {
@@ -250,8 +260,6 @@ std::string SubutaiLauncher::Environment::versionSSH()
 
 #elif LAUNCHER_WINDOWS
     return "win"; //Change 4Win! 
-#elif LAUNCHER_MACOS
-
 #endif
     return out;
 }
@@ -273,7 +281,7 @@ std::string SubutaiLauncher::Environment::getVar(const std::string& name, const 
     delete[] buffer;
     return res;
 #elif LAUNCHER_MACOS
-#error Not implemented on this platform
+    return Poco::Environment::get(name, defaultValue);
 #endif
     return defaultValue;
 }
@@ -320,6 +328,31 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
 
 
     //return p.getOutputBuffer();
+#elif LAUNCHER_MACOS
+    std::vector<std::string> pargs;
+    pargs.push_back("-rn");
+    pargs.push_back("|");
+    SubutaiProcess p;
+    p.launch("/bin/netstat", pargs, "");
+    p.wait();
+    auto netstat = p.getOutputBuffer();
+
+    Poco::StringTokenizer lines(netstat, "\n", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+    bool isDefault = false;
+    for (auto line = lines.begin(); line != lines.end(); line++) {
+        Poco::StringTokenizer elements((*line), " ", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+        int i = 0;
+        for (auto el = elements.begin(); el != elements.end(); el++) {
+            i++;
+            if ((*el) == "default") {
+                isDefault = true;
+            }
+            if (isDefault && i == 6) {
+                return (*el);
+            }
+        }
+    }
+    return "unknown";
 #else
 #error Not implemented on this platform
 #endif

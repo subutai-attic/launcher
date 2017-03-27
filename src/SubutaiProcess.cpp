@@ -15,7 +15,7 @@ void SubutaiLauncher::SubutaiProcess::runBasic(const std::string& command, std::
 
 }
 
-#if LAUNCHER_LINUX
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
 pid_t SubutaiLauncher::SubutaiProcess::launch(const std::string& cmd, std::vector<std::string> args, const std::string& dir)
 {
     std::vector<char> env;
@@ -140,7 +140,7 @@ SubutaiLauncher::pid_t SubutaiLauncher::SubutaiProcess::launch(const std::string
 }
 
 #elif LAUNCHER_MACOS
-#error Not implemented on this platform
+//#error Not implemented on this platform
 #endif
 
 int SubutaiLauncher::SubutaiProcess::wait()
@@ -164,7 +164,7 @@ int SubutaiLauncher::SubutaiProcess::wait()
 
     return exitCode;
 #elif LAUNCHER_MACOS
-#error Not implemented on this platform
+//#error Not implemented on this platform
 #endif
 }
 
@@ -196,7 +196,7 @@ std::string SubutaiLauncher::SubutaiProcess::getOutputBuffer()
 	//throw SubutaiException("Read: Anonymous pipe");
 	return "Error: Read: Anonymous pipe";
 #elif LAUNCHER_MACOS
-#error Not implemented on this platform
+//#error hot implemented on this platform
 #endif
 }
 
@@ -228,7 +228,7 @@ std::string SubutaiLauncher::SubutaiProcess::getErrorBuffer()
 	//throw SubutaiException("Read: Anonymous pipe");
 	return "Error: Read: Anonymous pipe";
 #elif LAUNCHER_MACOS
-#error Not implemented on this platform
+//#error Not implemented on this platform
 #endif
 }
 
@@ -333,7 +333,7 @@ void SubutaiLauncher::SubutaiProcess::closeFds()
 		_errWrite = INVALID_HANDLE_VALUE;
 	}
 #elif LAUNCHER_MACOS
-#error Not implemented on this platform
+//#error Not implemented on this platform
 #endif
 }
 

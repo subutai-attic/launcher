@@ -45,6 +45,7 @@ py_header=""
 scheme="production"
 lib_ext=""
 openssl_dir=""
+os_libs=""
 
 os=$(uname)
 
@@ -53,10 +54,12 @@ if [ "$os" == "Linux" ]; then
     lib_ext="so"
     top_lib_dir=/usr/lib
     top_include_dir=/usr/include
+    os_libs="-lrt"
 elif [ "$os" == "Darwin" ]; then
     lib_ext="dylib"
     top_lib_dir=/usr/local
     top_include_dir=/usr/local
+    s_libs=""
 else
     echo "$os unsupported platform"
     exit
@@ -160,6 +163,8 @@ echo "PYLIB_DIR = $pylib" >> config.make
 echo "PYLIB_HEADER_DIR = $py_header" >> config.make
 echo "BUILD_SCHEME = $scheme" >> config.make
 echo "OPENSSL_DIR = $openssl_dir" >> config.make
+echo "OS = $os" >> config.make
+echo "SYSLIBS = $os_libs" >> config.make
 if [ $shared -eq 0 ]; then
     if [ $static -eq 1 ]; then
         echo "STATIC_BUILD = 1" >> config.make
@@ -184,4 +189,6 @@ export OPENSSL_DIR
 export STATIC_BUILD
 export SHARED_BUILD
 export BUILD_TESTS
+export OS
+export SYSLIBS
 __EOF__

@@ -108,12 +108,10 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::parseVms(co
     for (auto it = lines.begin(); it != lines.end(); it++) {
         if ((*it).empty() || (*it).length() < 10) continue;
         const char* line = const_cast<char*>((*it).c_str());
-#if LAUNCHER_LINUX
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
         sscanf(line, "\"%[^\"]\" {%s}", vmname, vmid);
 #elif LAUNCHER_WINDOWS
         sscanf_s(line, "\"%s\" {%s}", vmname, bsize, vmid, bsize);
-#elif LAUNCHER_MACOS
-#error Not Implemented on this platform
 #endif
         SubutaiVM v;
         v.name = std::string(vmname);

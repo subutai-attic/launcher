@@ -85,7 +85,7 @@ namespace SubutaiLauncher {
     static PyObject* SL_getDistro(PyObject* self, PyObject* args) {
         Environment e;
         std::string distro = e.distroOS("-c");
-        return Py_BuildValue("s", distro);
+        return Py_BuildValue("s", distro.c_str());
     }
 
     // ========================================================================

@@ -9,6 +9,8 @@
 #include <limits.h>
 #if LAUNCHER_WINDOWS
 #include <windows.h>
+#elif LAUNCHER_MACOS
+#include <sys/sysctl.h>
 #endif
 
 #include "SubutaiException.h"
