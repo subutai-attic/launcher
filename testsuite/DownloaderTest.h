@@ -2,6 +2,12 @@
 #define __DOWNLOADER_TEST_H__
 
 #include "Poco/CppUnit/TestCase.h"
+#include "Poco/MD5Engine.h"
+#include "Poco/DigestStream.h"
+#include "Poco/DigestEngine.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/FileStream.h"
+#include "Poco/File.h"
 
 class DownloaderTest : public CppUnit::TestCase
 {
@@ -14,6 +20,7 @@ public:
 
     void testRetrieveFileInfo();
     void testDownload();
+    void testVerifyDownload();
 
 	static CppUnit::Test* suite();
 };

@@ -36,7 +36,7 @@ void SubutaiLauncher::FileSystem::removeFile(const std::string& filename) {
 	fullpath.append(DELIM);
 	fullpath.append(filename);
     Poco::File f(fullpath);
-    f.remove();
+    if (f.exists()) f.remove();
 }
 
 void SubutaiLauncher::FileSystem::createDirectory(const std::string& dir)

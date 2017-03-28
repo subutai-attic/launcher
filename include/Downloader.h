@@ -16,6 +16,7 @@
 #include <Poco/StreamCopier.h>
 #include <Poco/Path.h>
 #include <Poco/Exception.h>
+#include <Poco/Net/NetException.h>
 #include <Poco/Net/HTTPStreamFactory.h>
 #include <Poco/Net/FTPStreamFactory.h>
 #include <Poco/Net/HTTPClientSession.h>
@@ -28,9 +29,11 @@
 #include <Poco/URI.h>
 #include <Poco/URIStreamOpener.h>
 #include <Poco/File.h>
+#include <Poco/DigestStream.h>
+#include <Poco/MD5Engine.h>
+#include <Poco/FileStream.h>
 
 #include "FileSystem.h"
-#include "MD5.h"
 #include "SubutaiLog.h"
 
 namespace SubutaiLauncher 

@@ -155,32 +155,37 @@ void SubutaiLauncher::Downloader::downloadImpl()
     Poco::URI uri(buildRequest("get", "name", _filename));
     l->info() << "DownloadImpl  Poco::URI uri " << buildRequest("get", "name", _filename)  << std::endl;
 
-    std::auto_ptr<std::istream> pStr(Poco::URIStreamOpener::defaultOpener().open(uri));
-    std::string path(_outputDir);
-    path.append(PATH_DELIM);
-    path.append(_filename.c_str());
-    _rfile = path;
-    l->info() << "DownloadImpl  path _file.name.c_str() " << path << std::endl;
+    std::string path;
+    try {
+        std::auto_ptr<std::istream> pStr(Poco::URIStreamOpener::defaultOpener().open(uri));
+        path.append(_outputDir);
+        path.append(PATH_DELIM);
+        path.append(_filename.c_str());
+        _rfile = path;
+        l->info() << "DownloadImpl  path _file.name.c_str() " << path << std::endl;
+        FileSystem fs(_outputDir);
+        if (fs.isFileExists(_filename)) {
+            l->info() << "DownloadImpl  _file.name " << _file.name << " already exists. Validating checksum" << std::endl;
+            if (verifyDownload()) {
+                l->info() << "DownloadImpl file " << _file.name << " is in actual state" << std::endl;
+                _done = true;
+                _progress = _file.size;
+                return;
+            } else {
+                l->info() << "Removing outdated file" << std::endl;
+                fs.removeFile(_file.name);
+            }
+        }
+        l->debug() << "DownloadImpl Spawning downloader thread" << std::endl;
 
-    FileSystem fs(_outputDir);
-    if (fs.isFileExists(_filename)) {
-        l->info() << "DownloadImpl  _file.name " << _file.name << " already exists. Validating checksum" << std::endl;
-        if (verifyDownload()) {
-            l->info() << "DownloadImpl file " << _file.name << " is in actual state" << std::endl;
-            _done = true;
-            _progress = _file.size;
-            return;
-        }
-        else {
-            fs.removeFile(_file.name);
-        }
+        //downloading
+        std::ofstream out(path, std::fstream::app);
+        Poco::StreamCopier::copyStream(*pStr.get(), out);
+        //l->info() << "DownloadImpl Downloading " << _filename << std::endl;
+    } catch (Poco::Net::HTTPException e) {
+        l->error() << e.displayText() << std::endl;
     }
-    l->debug() << "DownloadImpl Spawning downloader thread" << std::endl;
 
-    //downloading
-    std::ofstream out(path, std::fstream::app);
-    Poco::StreamCopier::copyStream(*pStr.get(), out);
-    //l->info() << "DownloadImpl Downloading " << _filename << std::endl;
 
     _done = true;
     return;
@@ -267,22 +272,21 @@ bool SubutaiLauncher::Downloader::verifyDownload()
     path.append(PATH_DELIM);
     path.append(_file.name);
 
-    std::ifstream file(path.c_str());
-    std::string buffer;
-    file.seekg(0, std::ios::end);
-    buffer.reserve(file.tellg());
-    file.seekg(0, std::ios::beg);
-
-    buffer.assign((std::istreambuf_iterator<char>(file)),
-            std::istreambuf_iterator<char>());
-
-    auto sum = md5sum(buffer.c_str(), buffer.length());
-    Log::instance()->logger()->debug() << "Local: " << sum << ". Remote: " << _file.id << std::endl;
-    if (sum == _file.id) {
-        return true;
+    Poco::MD5Engine md5;
+    try {
+    Poco::DigestOutputStream ostr(md5);
+    Poco::FileInputStream fs(path);
+    Poco::StreamCopier::copyStream(fs, ostr);
+    ostr.close();
+    fs.close();
+    } catch (Poco::FileNotFoundException e) {
+        Log::instance()->logger()->error() << "Couldn't verify file: Not found" << std::endl;
+    } catch (std::exception e) {
+        Log::instance()->logger()->error() << "Undefined exception" << std::endl;
     }
 
-    return false;
+    std::string hash = Poco::DigestEngine::digestToHex(md5.digest());
+    return (hash == _file.id);
 }
 
 SubutaiLauncher::SubutaiFile SubutaiLauncher::Downloader::info()
