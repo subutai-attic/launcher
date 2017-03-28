@@ -32,9 +32,13 @@
 #include <Poco/DigestStream.h>
 #include <Poco/MD5Engine.h>
 #include <Poco/FileStream.h>
+#include <Poco/Logger.h>
+#include <Poco/LogStream.h>
 
 #include "FileSystem.h"
-#include "SubutaiLog.h"
+
+using Poco::Logger;
+using Poco::LogStream;
 
 namespace SubutaiLauncher 
 {
@@ -81,6 +85,7 @@ namespace SubutaiLauncher
             SubutaiFile _file;
             long _progress;
             bool _done;
+            Poco::Logger* _logger;
 	};
 
 }

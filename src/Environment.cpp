@@ -13,33 +13,10 @@ SubutaiLauncher::Environment::~Environment()
 unsigned SubutaiLauncher::Environment::processorNum() 
 {
     return Poco::Environment::processorCount();
-    /*
-    auto l = Log::instance()->logger();
-#if LAUNCHER_LINUX
-#if defined _SC_NPROCESSORS_ONLN
-    auto count = sysconf(_SC_NPROCESSORS_ONLN);
-    //int count = sysconf(_SC_NPROCESSORS_CONF);
-    if (count <= 0) count = 1;
-
-    l->debug() << "Environment::processorNum: " << count << std::endl;
-
-    //return static_cast<int>(count);
-    return count;
-#endif
-#elif LAUNCHER_WINDOWS
-    SYSTEM_INFO si;
-    GetSystemInfo(&si);
-    return si.dwNumberOfProcessors;
-#elif LAUNCHER_MACOS
-
-#endif
-    return 1;
-    */
 }
 
 unsigned SubutaiLauncher::Environment::is64() 
 {
-    auto l = Log::instance()->logger();
 #if LAUNCHER_LINUX
 #if ( __WORDSIZE == 64 )
 #define BUILD_64 1
@@ -62,7 +39,6 @@ unsigned SubutaiLauncher::Environment::is64()
 
 unsigned long SubutaiLauncher::Environment::ramSize() 
 {
-    auto l = Log::instance()->logger();
 #if LAUNCHER_LINUX
 #if defined _SC_PHYS_PAGES
 #if defined _SC_PAGESIZE
@@ -75,7 +51,6 @@ unsigned long SubutaiLauncher::Environment::ramSize()
     } else {
         pageSize = pageSize / 1024;
     }
-    l->debug() << "Environment::ramSize: " << pages * pageSize / 1024 << std::endl;
 
     //return static_cast<int>(count);
     return pages * pageSize / 1024;
@@ -91,7 +66,7 @@ unsigned long SubutaiLauncher::Environment::ramSize()
     size_t length = sizeof(value);
 
     if(-1 == sysctl(mib, 2, &value, &length, NULL, 0))
-        l->error() << "Failed to determine RAM size" << std::endl;
+        Poco::Logger::get("subutai").error("Failed to determine RAM size");
 
     return value;
 #endif
@@ -101,7 +76,6 @@ unsigned long SubutaiLauncher::Environment::ramSize()
 unsigned SubutaiLauncher::Environment::versionVBox() 
 {
 
-    auto l = Log::instance()->logger();
 #if LAUNCHER_LINUX
 #if ( __WORDSIZE == 64 )
 #define BUILD_64 1
@@ -124,13 +98,13 @@ unsigned SubutaiLauncher::Environment::versionVBox()
 
 std::string SubutaiLauncher::Environment::vtxEnabled() 
 {
+#if LAUNCHER_LINUX
     SubutaiProcess sp;
     std::string out;
     std::string err;
     std::vector<std::string> args;
     args.push_back("-c");
     args.push_back("lscpu|grep Virtualization:");
-#if LAUNCHER_LINUX
     sp.launch("bash", args, "/usr/bin");
     if (sp.wait() == 0) 
     {
@@ -145,13 +119,13 @@ std::string SubutaiLauncher::Environment::vtxEnabled()
 
     SubutaiString sstr1(out);
     out = sstr1.remove(" ", "");
+    return out;
 #elif LAUNCHER_WINDOWS
     #error Not implemented on this platform
     return "win"; //Change 4Win! 
 #elif LAUNCHER_MACOS
     return "VMX";
 #endif
-    return out;
 }
 
 std::string SubutaiLauncher::Environment::versionOS() 
@@ -173,8 +147,6 @@ std::string SubutaiLauncher::Environment::versionOS()
 
 std::string SubutaiLauncher::Environment::distroOS(std::string ar) 
 {
-    auto l = Log::instance()->logger();
-
     SubutaiProcess sp;
     std::string out;
     std::string err;
@@ -203,7 +175,6 @@ std::string SubutaiLauncher::Environment::distroOS(std::string ar)
     SubutaiString sstr(out);
     std::vector<std::string> splitted = sstr.ssplit("\t");
     out = splitted.back();
-    l->debug() << "Environment::distroOS output " << out  << std::endl;
     return out;
 #elif LAUNCHER_WINDOWS
     return std::string dis = Poco::Environment::osDisplayName();
@@ -217,17 +188,13 @@ std::string SubutaiLauncher::Environment::distroOS(std::string ar)
 
 std::string SubutaiLauncher::Environment::cpuArch() 
 {
-    auto l = Log::instance()->logger();
     std::string ar = Poco::Environment::osArchitecture();
-    //l->debug() << "SubutaiLAuncher::Environment: arch=" << ar << std::endl;
     return ar;
 }
 
 unsigned SubutaiLauncher::Environment::cpuNum() 
 {
-    auto l = Log::instance()->logger();
     unsigned pr = Poco::Environment::processorCount();
-    //l->debug() << "SubutaiLAuncher::Environment: cpuNum=" << pr << std::endl;
     return pr;
 }
 
@@ -242,8 +209,6 @@ std::string SubutaiLauncher::Environment::versionSSH()
     args.push_back("-v");
     args.push_back("localhost");
 
-    auto l = Log::instance()->logger();
-
 #if LAUNCHER_LINUX || LAUNCHER_MACOS
     sp.launch("ssh", args, "/usr/bin");
     if (sp.wait() == 0) 
@@ -251,13 +216,9 @@ std::string SubutaiLauncher::Environment::versionSSH()
         out = sp.getOutputBuffer();
         err = sp.getErrorBuffer();
     }
-    l->debug() << "SubutaiLauncher::Environment::versionSSH " << out  << std::endl;
     SubutaiString sstr(out);
     std::vector<std::string> splitted = sstr.ssplit("\n");
-    l->debug() << "SubutaiLauncher::Environment::versionSSH " << out  << std::endl;
     out = splitted.front();
-    l->debug() << "SubutaiLauncher::Environment::versionSSH " << out  << std::endl;
-
 #elif LAUNCHER_WINDOWS
     return "win"; //Change 4Win! 
 #endif

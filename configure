@@ -211,6 +211,13 @@ echo "LIB_EXT = $lib_ext" >> config.make
 echo "EXTRA_DEFINES = $extra_defines" >> config.make
 echo "CODE_EXT = $code_extension" >> config.make
 echo "EXTRA_LIBS = $extra_libraries" >> config.make
+if [ "$scheme" == "production" ]; then
+    echo "BUILD_PRODUCTION = 1" >> config.make
+elif [ "$sheme" == "master" ]; then
+    echo "BUILD_MASTER = 1" >> config.make
+else
+    echo "BUILD_DEV = 1" >> config.make
+fi
 if [ $shared -eq 0 ]; then
     if [ $static -eq 1 ]; then
         echo "STATIC_BUILD = 1" >> config.make
@@ -241,4 +248,7 @@ export LIB_EXT
 export EXTRA_DEFINES
 export CODE_EXT
 export EXTRA_LIBS
+export BUILD_PRODUCTION
+export BUILD_MASTER
+export BUILD_DEV
 __EOF__

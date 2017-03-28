@@ -4,7 +4,8 @@ namespace SubutaiLauncher
 {
     NotificationCenter::NotificationCenter() : _running(false)
     {
-        Log::instance()->logger()->info() << "Starting notification center" << std::endl;
+        _logger = &Poco::Logger::get("subutai");
+        _logger->information("Starting notification center");
     }
 
     NotificationCenter::~NotificationCenter()
@@ -14,7 +15,7 @@ namespace SubutaiLauncher
 
     void NotificationCenter::add(ScriptAction action)
     {
-        Log::instance()->logger()->debug() << "Notification received " << action << std::endl;
+        _logger->debug("Notification received: %d", action);
         _pool.push_back(action);
     }
 
@@ -33,13 +34,13 @@ namespace SubutaiLauncher
 
     void NotificationCenter::start()
     {
-        Log::instance()->logger()->debug() << "Notification Center Locked" << std::endl;
+        _logger->debug("Notification Center locked");
         _running = true;
     }
 
     void NotificationCenter::stop()
     {
-        Log::instance()->logger()->debug() << "Notification Center Unlocked" << std::endl;
+        _logger->debug("Notification Center unlocked");
         _running = false;
     }
 
@@ -50,7 +51,7 @@ namespace SubutaiLauncher
 
     void NotificationCenter::notificationRaised(NotificationType t, const std::string& s)
     {
-        Log::instance()->logger()->debug() << "Notification Raised: " << s << std::endl;
+        _logger->debug("Notification raised: %s", s);
         NotificationMessage m;
         m.type = t;
         m.message = s;

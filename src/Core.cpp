@@ -4,7 +4,7 @@ SubutaiLauncher::Core::Core(std::vector<std::string> args) :
     _args(args),
     _running(false)
 {
-
+    setupLogger();
 }
 
 SubutaiLauncher::Core::~Core()
@@ -20,7 +20,7 @@ SubutaiLauncher::Core::~Core()
 
 void SubutaiLauncher::Core::initializePython()
 {
-    Log::instance()->logger()->info() << "Initializing Python v" << PY_MAJOR_VERSION << "." << PY_MINOR_VERSION << std::endl;
+    Poco::Logger::get("subutai").information("Initializing Python v%d.%d", PY_MAJOR_VERSION, PY_MINOR_VERSION);
     //Environment e;
     //e.setVar("PYTHONPATH", ".");
     //
@@ -36,11 +36,11 @@ void SubutaiLauncher::Core::initializePython()
 #endif
 
     /*  
-    char *path, *newpath; 
-    path = Py_GetPath(); 
-    newpath = new char[strlen(path)+4]; 
-    strcpy(newpath, path); 
-    strcat(newpath, ":."); 
+        char *path, *newpath; 
+        path = Py_GetPath(); 
+        newpath = new char[strlen(path)+4]; 
+        strcpy(newpath, path); 
+        strcat(newpath, ":."); 
     // ":." for unix, or ";." for windows 
     PySys_SetPath(newpath); 
     delete newpath;
@@ -52,15 +52,15 @@ void SubutaiLauncher::Core::run()
     FileSystem fs("/");
     try 
     {
-	if (! fs.isFileExists("/tmp/subutai"))
-	{
-	    //create /tmp/subutai
-	    fs.createDirectory("/tmp/subutai");
-	}
+        if (! fs.isFileExists("/tmp/subutai"))
+        {
+            //create /tmp/subutai
+            fs.createDirectory("/tmp/subutai");
+        }
     }
     catch(SubutaiException e) 
     {
-	return ;
+        return ;
     }
     _running = true;
     Log::instance();
@@ -79,6 +79,29 @@ void SubutaiLauncher::Core::parseArgs()
             handleTest();
         }
     }
+}
+
+void SubutaiLauncher::Core::setupLogger()
+{
+    Poco::AutoPtr<Poco::FileChannel>            pChannel(new Poco::FileChannel);
+    Poco::AutoPtr<Poco::ConsoleChannel>         cConsole(new Poco::ConsoleChannel);
+    Poco::AutoPtr<Poco::SplitterChannel>        pSplitter(new Poco::SplitterChannel);
+    Poco::AutoPtr<Poco::PatternFormatter>       pFormatter(new Poco::PatternFormatter);
+    pFormatter->setProperty("pattern", "%Y-%m-%d %H:%M:%S [%p]: %t");
+    pFormatter->setProperty("times", "local");
+    pSplitter->addChannel(pChannel);
+    pSplitter->addChannel(cConsole);
+    pChannel->setProperty("path", "subutai-launcher.log");
+    pChannel->setProperty("rotation", "5 M");
+    Poco::AutoPtr<Poco::FormattingChannel> pFormatChannel(new Poco::FormattingChannel(pFormatter, pSplitter));
+    Poco::Logger& log = Poco::Logger::get("subutai");
+#ifdef BUILD_PRODUCTION
+    log.setLevel("information");
+#else
+    log.setLevel("debug");
+#endif
+    log.setChannel(pFormatChannel);
+    log.information("Logging system initialized");
 }
 
 void SubutaiLauncher::Core::handleTest()

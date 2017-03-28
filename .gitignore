@@ -46,6 +46,9 @@ __pycache__
 
 # misc
 /deploy
+*.log
+p2p
+md5-*
 
 # runtime
 lnchr.conf

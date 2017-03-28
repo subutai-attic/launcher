@@ -19,6 +19,7 @@
 #include "SubutaiString.h"
 #include <Poco/Environment.h>
 #include <Poco/StringTokenizer.h>
+#include "Poco/Logger.h"
 
 namespace SubutaiLauncher {
 
