@@ -2,21 +2,24 @@
 
 SubutaiLauncher::Environment::Environment() 
 {
-
+    _logger = &Poco::Logger::get("subutai");
+    _logger->trace("Starting new Environment instance");
 }
 
 SubutaiLauncher::Environment::~Environment() 
 {
-
+    _logger->trace("Environment::~Environment");
 }
 
 unsigned SubutaiLauncher::Environment::processorNum() 
 {
+    _logger->trace("Environment: Get CPU number");
     return Poco::Environment::processorCount();
 }
 
 unsigned SubutaiLauncher::Environment::is64() 
 {
+    _logger->trace("Environment: Determining architecture");
 #if LAUNCHER_LINUX
 #if ( __WORDSIZE == 64 )
 #define BUILD_64 1
@@ -39,6 +42,7 @@ unsigned SubutaiLauncher::Environment::is64()
 
 unsigned long SubutaiLauncher::Environment::ramSize() 
 {
+    _logger->trace("Environment: Retrieving RAM size");
 #if LAUNCHER_LINUX
 #if defined _SC_PHYS_PAGES
 #if defined _SC_PAGESIZE
@@ -98,6 +102,7 @@ unsigned SubutaiLauncher::Environment::versionVBox()
 
 std::string SubutaiLauncher::Environment::vtxEnabled() 
 {
+    _logger->trace("Environment: Checking VT-x support");
 #if LAUNCHER_LINUX
     SubutaiProcess sp;
     std::string out;
@@ -130,6 +135,7 @@ std::string SubutaiLauncher::Environment::vtxEnabled()
 
 std::string SubutaiLauncher::Environment::versionOS() 
 {
+    _logger->trace("Environment: Getting operating system information");
     std::string os;
 #if LAUNCHER_LINUX
     os = distroOS("-d");
@@ -147,6 +153,7 @@ std::string SubutaiLauncher::Environment::versionOS()
 
 std::string SubutaiLauncher::Environment::distroOS(std::string ar) 
 {
+    _logger->trace("Environment: Getting OS distribution name");
     SubutaiProcess sp;
     std::string out;
     std::string err;
@@ -188,6 +195,7 @@ std::string SubutaiLauncher::Environment::distroOS(std::string ar)
 
 std::string SubutaiLauncher::Environment::cpuArch() 
 {
+    _logger->trace("Environment: Getting OS Architecture");
     std::string ar = Poco::Environment::osArchitecture();
     return ar;
 }

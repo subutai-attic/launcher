@@ -21,8 +21,9 @@ Author:  crioto
 #include <string>
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "LibraryActionThread.h"
 
+#include "Poco/Logger.h"
+#include "LibraryActionThread.h"
 #include "InstallationDialog.h"
 #include "ConfigurationManager.h"
 #include "Vars.h"
@@ -111,6 +112,7 @@ class LibraryComponent : public juce::Component,
         std::thread waitDownloadComplete();
         void waitDownloadCompleteImpl();
     private:
+        Poco::Logger* _logger;
         juce::Label _componentsSectionLabel;
         juce::Label _peersSectionLabel;
         /*

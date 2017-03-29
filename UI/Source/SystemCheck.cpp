@@ -2,6 +2,8 @@
 
 SystemCheck::SystemCheck()
 {
+    _logger = &Poco::Logger::get("subutai");
+    _logger->trace("Starting System Check UI Component");
     auto font = juce::Font(15);
     auto font2 = juce::Font(13);
 
@@ -56,10 +58,9 @@ SystemCheck::SystemCheck()
     _cpuLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_cpuLabel);
 
-    char c[4];
-    std::sprintf(c, "%d", env.cpuNum());
+    std::string cores = Poco::format("%lu", env.cpuNum());
 
-    _cpuValue.setText(c, dontSendNotification);
+    _cpuValue.setText(cores, dontSendNotification);
     _cpuValue.setColour(Label::textColourId, Colours::white);
     _cpuValue.setBounds(150, 95, 500, 40);
     _cpuValue.setFont(font);
@@ -80,10 +81,9 @@ SystemCheck::SystemCheck()
     _memLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_memLabel);
 
-    char m[8];
-    std::sprintf(m, "%lu MB", env.ramSize());
+    std::string memValue = Poco::format("%lu MB", env.ramSize());
 
-    _memValue.setText(m, dontSendNotification);
+    _memValue.setText(memValue, dontSendNotification);
     _memValue.setColour(Label::textColourId, Colours::white);
     _memValue.setBounds(150, 135, 500, 40);
     _memValue.setFont(font);
@@ -127,7 +127,6 @@ SystemCheck::SystemCheck()
 
     SubutaiLauncher::VirtualBox vb;
     vb.findInstallation();
-
     if (vb.isInstalled())
     {
         _vbValue.setText(vb.extractVersion(), dontSendNotification);
@@ -136,8 +135,7 @@ SystemCheck::SystemCheck()
     else 
     {
         _vbValue.setText("Not installed", dontSendNotification);
-        _vbValue.setColour(Label::textColourId, Colours::maroon);
-
+        _vbValue.setColour(Label::textColourId, Colours::red);
     }
     _vbValue.setBounds(150, 215, 500, 40);
     _vbValue.setFont(font);
@@ -150,19 +148,22 @@ SystemCheck::SystemCheck()
     _vbInfo.setFont(font2);
     _vbInfo.setJustificationType(Justification::top);
     addAndMakeVisible(_vbInfo);
+    _logger->trace("System Check UI Component created");
 }
 
 SystemCheck::~SystemCheck()
 {
-
+    _logger->trace("Destroying System Check UI Component");
 }
 
 void SystemCheck::paint(juce::Graphics& g)
 {
-    g.fillAll (Colour::greyLevel (0.2f));
+    g.fillAll(Colour::greyLevel (0.2f));
+    _logger->trace("SystemCheck::paint");
 }
 
 void SystemCheck::resized()
 {
+    _logger->trace("SystemCheck::resized");
 
 }

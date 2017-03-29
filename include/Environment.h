@@ -40,6 +40,8 @@ namespace SubutaiLauncher {
             std::string getVar(const std::string& name, const std::string& defaultValue);
             std::string setVar(const std::string& name, const std::string& value);
             std::string getDefaultGateway();
+        private:
+            Poco::Logger* _logger;
     };
 
 }

@@ -33,7 +33,8 @@ LibraryComponent::LibraryComponent() : _installButton("Install")
                                            _step(INTRO)
                                            */
 {
-
+    _logger = &Poco::Logger::get("subutai");
+    _logger->debug("Starting Library UI Component");
     _componentTabs.push_back(new LibraryItemTab("Peers", 0, true));
     _componentTabs.push_back(new LibraryItemTab("P2P", 1, false));
     _componentTabs.push_back(new LibraryItemTab("Tray", 2, false));
@@ -156,6 +157,7 @@ void LibraryComponent::resized() {
 void LibraryComponent::buttonClicked(Button* button) 
 {
     if (button == &_installButton) {
+        _logger->trace("Install button clicked");
         // Start Wizard here
         WizardWindow *wizard = new WizardWindow();
         wizard->setVisible(true);

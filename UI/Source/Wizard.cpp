@@ -6,6 +6,7 @@ Wizard::Wizard() :
     _cancel("Cancel"),
     _step(1)
 {
+    _logger = &Poco::Logger::get("subutai");
 #if LAUNCHER_LINUX
     SubutaiLauncher::RootProcess* rp = new SubutaiLauncher::RootProcess();
     rp->addCommand("mkdir -p /opt/subutai");
@@ -69,6 +70,7 @@ Wizard::Wizard() :
     _systemCheckPage->setBounds(300, 0, 500, 600);
     addChildComponent(_systemCheckPage);
 
+    _logger->trace("ComponentChooser::Pre");
     _componentChooserPage = new ComponentChooser();
     _componentChooserPage->setBounds(300, 0, 500, 600);
     addChildComponent(_componentChooserPage);

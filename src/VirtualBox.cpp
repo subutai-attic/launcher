@@ -8,12 +8,13 @@ std::string SubutaiLauncher::VirtualBox::subutaiBranch = "subutai-dev";
 SubutaiLauncher::VirtualBox::VirtualBox()
 {
     _logger = &Poco::Logger::get("subutai");
+    _logger->trace("Starting VirtualBox instance");
     _version = ""; 
 }
 
 SubutaiLauncher::VirtualBox::~VirtualBox() 
 {
-
+    _logger->trace("VirtualBox::~VirtualBox");
 }
 
 std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::getPeers() 
@@ -31,14 +32,16 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::getPeers()
 
 bool SubutaiLauncher::VirtualBox::findInstallation()
 {
-    auto env = new Environment();
-    SubutaiString str(env->getVar("PATH", ""));
-    std::vector<std::string> path;
-    str.split(':', path);
-    FileSystem fs;
-    for (auto it = path.begin(); it != path.end(); it++) {
-        fs.setPath((*it));
-        if (fs.isFileExists(BIN)) {
+    _logger->trace("Searching for VirtualBox installation in PATH");
+    Poco::StringTokenizer st(Poco::Environment::get("PATH", ""), ":",
+            Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
+    for (auto it = st.begin(); it != st.end(); it++)
+    {
+        std::string fp = (*it);
+        fp.append("/"+BIN);
+        Poco::File f(fp);
+        if (f.exists()) {
+            _logger->trace("VirtualBox installation found");
             _installed = true;
             _path = (*it);
             _location = _path;
@@ -47,6 +50,7 @@ bool SubutaiLauncher::VirtualBox::findInstallation()
             return true;
         }
     }
+    _logger->trace("VirtualBox installation was not found");
     return false;
 }
 

@@ -5,6 +5,8 @@ WizardWindow::WizardWindow() : DialogWindow(
         juce::Colours::lightgrey,
         false, true)
 {
+    _logger = &Poco::Logger::get("subutai");
+    _logger->trace("Creating Installation Wizard Window");
     setSize(640, 480);
     centreWithSize(getWidth(), getHeight());
     setDraggable(false);
@@ -16,11 +18,12 @@ WizardWindow::WizardWindow() : DialogWindow(
 
 WizardWindow::~WizardWindow()
 {
-
+    _logger->trace("Destroying Installation Wizard Window");
 }
 
 void WizardWindow::closeButtonPressed()
 {
+    _logger->trace("WizardWindow: Close Button Pressed");
     delete this;
 }
 

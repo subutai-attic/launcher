@@ -8,6 +8,9 @@ ComponentChooser::ComponentChooser() :
     _ete(true),
     _peer(true)
 {
+    _logger = &Poco::Logger::get("subutai");
+    _logger->trace("Creating Component Chooser UI Component");
+
     auto font = juce::Font(15);
     auto font2 = juce::Font(13);
 
@@ -238,11 +241,26 @@ ComponentChooser::ComponentChooser() :
     addAndMakeVisible(_memLabel);
     addAndMakeVisible(_memInfo);
 
+    _logger->trace("Component Chooser UI Component created");
 }
 
 ComponentChooser::~ComponentChooser()
 {
-
+    _logger->trace("Destroying Component Chooser UI Component");
+    delete _ptpNo;
+    delete _ptpYes;
+    delete _trayNo;
+    delete _trayYes;
+    delete _eteNo;
+    delete _eteYes;
+    delete _peerNo;
+    delete _peerYes;
+    delete _cpuNum;
+    delete _cpuPlus;
+    delete _cpuMinus;
+    delete _memPlus;
+    delete _memSize;
+    delete _memMinus;
 }
 
 void ComponentChooser::paint(juce::Graphics& g)

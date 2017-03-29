@@ -2,6 +2,8 @@
 #define __SYSTEM_CHECK_H__
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "Poco/Logger.h"
+#include "Poco/Format.h"
 
 class SystemCheck : public juce::Component 
 {
@@ -11,6 +13,7 @@ class SystemCheck : public juce::Component
         void paint (juce::Graphics&) override;
         void resized() override;
     private:
+        Poco::Logger* _logger;
         juce::Label _osLabel;
         juce::Label _osValue;
         juce::Label _osInfo;

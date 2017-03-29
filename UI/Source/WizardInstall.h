@@ -2,6 +2,7 @@
 #define __WIZARD_INSTALL_H__
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "Poco/Logger.h"
 
 class WizardInstall : public juce::Component 
 {
@@ -14,6 +15,7 @@ class WizardInstall : public juce::Component
         void wait();
         std::thread run();
     private:
+        Poco::Logger* _logger;
         bool _running;
         void runImpl();
         void addLine(const std::string& text, bool error = false);

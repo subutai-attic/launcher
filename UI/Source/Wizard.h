@@ -5,6 +5,7 @@
 #include <Poco/Process.h>
 #include <Poco/File.h>
 #include <Poco/Environment.h>
+#include "Poco/Logger.h"
 #include "WizardIntro.h"
 #include "SystemCheck.h"
 #include "ComponentChooser.h"
@@ -24,6 +25,7 @@ class Wizard : public juce::Component,
         void runInstall();
         void stepCompleted(const std::string& name);
     private:
+        Poco::Logger* _logger;
         int _step;
         juce::Label _stepIntro;
         juce::Label _stepSystemCheck;

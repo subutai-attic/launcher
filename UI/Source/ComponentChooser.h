@@ -2,6 +2,7 @@
 #define __COMPONENT_CHOOSER_H__
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "Poco/Logger.h"
 
 struct ChosenComponents
 {
@@ -24,6 +25,8 @@ class ComponentChooser : public juce::Component,
         void buttonClicked(juce::Button* button);
         ChosenComponents getComponents();
     private:
+        Poco::Logger *_logger;
+
         juce::Label _ptpLabel;
         juce::Label _ptpInfo;
         juce::Label _trayLabel;

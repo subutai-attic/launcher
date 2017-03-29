@@ -3,6 +3,8 @@
 
 WizardInstall::WizardInstall()
 {
+    _logger = &Poco::Logger::get("subutai");
+    _logger->trace("Creating Wizard Install UI Component");
     auto font = juce::Font(20);
     _title = new juce::Label();
     _title->setText("Initializing", dontSendNotification);
@@ -15,6 +17,7 @@ WizardInstall::WizardInstall()
 
 WizardInstall::~WizardInstall()
 {
+    _logger->trace("Destroying Wizard Install UI Component");
     delete _title;
     delete _pb;
 }
@@ -31,7 +34,7 @@ void WizardInstall::resized()
 
 void WizardInstall::start(const std::string& name)
 {
-    SubutaiLauncher::Log::instance()->logger()->debug() << "Starting " << name << " installation" << std::endl;
+    _logger->information("Starting %s installation", name);
     _name = name;
     if (_pb) {
         delete _pb;
@@ -67,7 +70,7 @@ std::thread WizardInstall::run()
 
 void WizardInstall::runImpl() {
     _running = true;
-    SubutaiLauncher::Log::instance()->logger()->debug() << _name << " installation started" << std::endl;
+    _logger->information("%s installation started", _name);
     // Download installation script
     auto downloader = SubutaiLauncher::Session::instance()->getDownloader();
     auto script = _script;
@@ -75,8 +78,10 @@ void WizardInstall::runImpl() {
     downloader->reset();
     downloader->setFilename(script);
     if (!downloader->retrieveFileInfo()) {
+        _logger->error("Failed to download %s installation script", script);
         addLine("Failed to download installation script", true);
     } else {
+        _logger->information("Downloaded %s installation script", script);
         addLine("Installation script downloaded");
     }
     auto td = downloader->download();
@@ -94,6 +99,7 @@ void WizardInstall::runImpl() {
         auto e = nc->dispatch();
         if (e == SubutaiLauncher::SCRIPT_FINISHED) {
             addLine("Script execution completed");
+            _logger->information("%s script execution completed", script);
             _progress = 100.0;
             _running = false;
         } else if (e == SubutaiLauncher::DOWNLOAD_STARTED) {
@@ -104,7 +110,6 @@ void WizardInstall::runImpl() {
 
         if (download) {
             _progress = (double)SubutaiLauncher::Session::instance()->getDownloader()->getPercent();
-            SubutaiLauncher::Log::instance()->logger()->debug() << _progress << "%" << std::endl;
         }
 
         repaint();

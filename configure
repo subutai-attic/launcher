@@ -212,11 +212,11 @@ echo "EXTRA_DEFINES = $extra_defines" >> config.make
 echo "CODE_EXT = $code_extension" >> config.make
 echo "EXTRA_LIBS = $extra_libraries" >> config.make
 if [ "$scheme" == "production" ]; then
-    echo "BUILD_PRODUCTION = 1" >> config.make
+    echo "BUILD_SCHEME_DEF = -DBUILD_SCHEME_PRODUCTION" >> config.make
 elif [ "$sheme" == "master" ]; then
-    echo "BUILD_MASTER = 1" >> config.make
+    echo "BUILD_SCHEME_DEF = -DBUILD_SCHEME_MASTER" >> config.make
 else
-    echo "BUILD_DEV = 1" >> config.make
+    echo "BUILD_SCHEME_DEF = -DBUILD_SCHEME_DEV" >> config.make
 fi
 if [ $shared -eq 0 ]; then
     if [ $static -eq 1 ]; then
@@ -238,6 +238,7 @@ export PYTHON_VER
 export PYLIB_DIR
 export PYLIB_HEADER_DIR
 export BUILD_SCHEME
+export BUILD_SCHEME_DEF
 export OPENSSL_DIR
 export STATIC_BUILD
 export SHARED_BUILD
@@ -248,7 +249,4 @@ export LIB_EXT
 export EXTRA_DEFINES
 export CODE_EXT
 export EXTRA_LIBS
-export BUILD_PRODUCTION
-export BUILD_MASTER
-export BUILD_DEV
 __EOF__

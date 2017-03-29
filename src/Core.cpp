@@ -95,10 +95,14 @@ void SubutaiLauncher::Core::setupLogger()
     pChannel->setProperty("rotation", "5 M");
     Poco::AutoPtr<Poco::FormattingChannel> pFormatChannel(new Poco::FormattingChannel(pFormatter, pSplitter));
     Poco::Logger& log = Poco::Logger::get("subutai");
-#ifdef BUILD_PRODUCTION
+#ifdef BUILD_SCHEME_PRODUCTION
     log.setLevel("information");
-#else
+#endif
+#ifdef BUILD_SCHEME_MASTER
     log.setLevel("debug");
+#endif
+#ifdef BUILD_SCHEME_DEV
+    log.setLevel("trace");
 #endif
     log.setChannel(pFormatChannel);
     log.information("Logging system initialized");
