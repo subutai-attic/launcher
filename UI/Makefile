@@ -6,7 +6,7 @@ INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(OPENSSL_DIR)/include -I../include
 LIBDIRS = -L/usr/lib/x86_64-linux-gnu -L$(PYLIB_DIR) -L../bin -L/usr/X11R6/lib -L/usr/local/lib -L/usr/lib -L$(OPENSSL_DIR)/lib
 ST_LIBS = -g -ggdb $(LIBDIRS) -Wl,-Bdynamic $(EXTRA_LIBS) -lm -l$(PYTHON_VER) -ldl -lpthread -Wl,-Bstatic -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -Wl,-Bstatic -lPocoFoundation -Wl,-Bdynamic $(SYSLIBS) -lssl -lcrypto -lcurl -lssh
 SH_LIBS = -g -ggdb $(LIBDIRS) $(EXTRA_LIBS) -lm -l$(PYTHON_VER) -ldl -lpthread -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation $(SYSLIBS) -lssl -lcrypto -lcurl -lssh
-CFLAGS = -framework Foundation -framework Carbon -framework Cocoa -framework IOKit -framework QuartzCore -framework WebKit -Wall $(EXTRA_DEFINES) -DDEBUG=1 -D_DEBUG=1 -DJUCE_APP_VERSION=1.0.0 -DBUILD_SCHEME="\"$(BUILD_SCHEME)\"" -DJUCE_APP_VERSION_HEX=0x10000 $(INCLUDES) -I/usr/include -I/usr/include/freetype2 -IJuceLibraryCode -IJuceLibraryCode/modules -std=gnu++11
+CFLAGS = -Wall $(EXTRA_DEFINES) -DDEBUG=1 -D_DEBUG=1 -DJUCE_APP_VERSION=1.0.0 -DBUILD_SCHEME="\"$(BUILD_SCHEME)\"" -DJUCE_APP_VERSION_HEX=0x10000 $(INCLUDES) -I/usr/include -I/usr/include/freetype2 -IJuceLibraryCode -IJuceLibraryCode/modules -std=gnu++11
 #-std=c++11
 
 JUCE=JuceLibraryCode

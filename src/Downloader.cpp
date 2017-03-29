@@ -74,41 +74,44 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo()
 
     Poco::Net::HTTPResponse response;
     std::istream& rs = s.receiveResponse(response);
+    if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_NOT_FOUND) {
+        _logger->error("Requested file not found: %s", _filename);
+        return false;
+    }
     std::string output;
     Poco::StreamCopier::copyToString(rs, output);
 
     _logger->debug("Received file info for %s: %s", path, output);
 
-    //l->debug() << "Before JSon(change to Poco!): responce: " << output << std::endl;
+    Poco::JSON::Parser parser;
+    Poco::Dynamic::Var result;
 
-    // TODO: Replace JSON lib with Poco
-    Json::Value root;
-
-    //l->debug() << "JSon(change to Poco!): root copied: " << std::endl;
-    try { 
-        std::istringstream str(output);
-        str >> root;
-
-        Json::Value el;
-        if (root.isArray()) {
-            el = root[0];
-        } else {
-            el = root;
-        }
-        const Json::Value owners = el["owner"];
-        for (unsigned int i = 0; i < owners.size(); ++i) {
-            _file.owner = owners[i].asString();
-        }
-        _file.name = el.get("name", "").asString();
-        _file.id = el.get("id", "").asString();
-        _file.size = el.get("size", "").asLargestInt();
-    } catch (Json::RuntimeError e) {
-        _logger->error("Failed to parse JSON: %s", e.what());
-        return false;
-    } catch (Json::LogicError e) {
-        _logger->error("Failed to parse JSON: %s", e.what());
+    try {
+        result = parser.parse(output);
+    } catch (Poco::JSON::JSONException e) {
+        _logger->error("Failed to parse JSON while getting information about remote file: %s", _filename);
+        _logger->debug("Failing JSON: %s", output);
         return false;
     }
+
+    if (result.isEmpty()) {
+        _logger->error("File info is empty after parsing JSON");
+        return false;
+    } 
+
+    Poco::JSON::Array::Ptr arr = result.extract<Poco::JSON::Array::Ptr>();
+    if (arr->size() == 0) {
+        _logger->error("JSON Array is empty");
+        return false;
+    }
+
+    // Get the first element
+    Poco::JSON::Object::Ptr obj = arr->getObject(0);
+    _file.id = obj->get("id").toString();
+    _file.name = obj->get("filename").toString();
+    _file.size = obj->get("size").extract<int>();
+    _file.owner = obj->get("owner").extract<Poco::JSON::Array::Ptr>()
+        ->get(0).extract<std::string>();
 
     _logger->debug("Owner: %s", _file.owner);
     _logger->debug("Name: %s", _file.name);

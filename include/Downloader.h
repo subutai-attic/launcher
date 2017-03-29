@@ -34,6 +34,10 @@
 #include <Poco/FileStream.h>
 #include <Poco/Logger.h>
 #include <Poco/LogStream.h>
+#include "Poco/JSON/Parser.h"
+#include "Poco/JSON/ParseHandler.h"
+#include "Poco/JSON/JSONException.h"
+#include "Poco/Dynamic/Var.h"
 
 #include "FileSystem.h"
 
