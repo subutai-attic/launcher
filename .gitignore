@@ -43,12 +43,15 @@ UI/Builds/VisualStudio2015/Debug/
 # python
 __pycache__
 *.pyc
+py-embed/*.c*
+py-embed/Makefile
 
 # misc
 /deploy
 *.log
 p2p
 md5-*
+*.zip
 
 # runtime
 lnchr.conf

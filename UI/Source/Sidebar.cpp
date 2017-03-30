@@ -15,7 +15,7 @@ SidebarComponent::SidebarComponent()
 {
     _social = new SocialMediaIcons();
     _social->setBounds(0, getParentHeight()-20-40, getParentWidth(), 40);
-    _social->toFront(false);
+    _social->toFront(true);
     addAndMakeVisible(_social);
     resized();
 }
