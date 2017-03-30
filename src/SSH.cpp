@@ -265,6 +265,7 @@ std::string SubutaiLauncher::SSH::execute(const std::string& command){
 
     long SubutaiLauncher::SSH::sftpWrite(const std::string& src)
     {
+#if LAUNCHER_LINUX
         Log::instance()->logger()->debug() << "SSH::sftpWrite start" << std::endl;
         char buffer[MAX_XFER_BUF_SIZE];
         sftp_session sftp;
@@ -363,6 +364,7 @@ std::string SubutaiLauncher::SSH::execute(const std::string& command){
         }
 
         sftp_free(sftp);
+#endif
         return SSH_OK;
     }
 

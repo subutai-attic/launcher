@@ -12,14 +12,17 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#elif LAUNCHER_WINDOWS
-#include <windows.h>
 #endif
+
 #include <errno.h>
 
 #include "SubutaiException.h"
 #include "SubutaiString.h"
 #include "SubutaiLog.h"
+
+#if LAUNCHER_WINDOWS
+#include <windows.h>
+#endif
 
 namespace SubutaiLauncher {
 #ifdef LAUNCHER_WINDOWS

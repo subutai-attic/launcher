@@ -126,7 +126,7 @@ std::string SubutaiLauncher::Environment::vtxEnabled()
     out = sstr1.remove(" ", "");
     return out;
 #elif LAUNCHER_WINDOWS
-    #error Not implemented on this platform
+    //#error Not implemented on this platform
     return "win"; //Change 4Win! 
 #elif LAUNCHER_MACOS
     return "VMX";
@@ -184,7 +184,8 @@ std::string SubutaiLauncher::Environment::distroOS(std::string ar)
     out = splitted.back();
     return out;
 #elif LAUNCHER_WINDOWS
-    return std::string dis = Poco::Environment::osDisplayName();
+    std::string dis = Poco::Environment::osDisplayName();
+	return dis;
 #elif LAUNCHER_MACOS
     return "MacOS";
 #endif
@@ -323,6 +324,7 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
     }
     return "unknown";
 #else
-#error Not implemented on this platform
+//#error Not implemented on this platform
+	return "Not Implemented";
 #endif
 }
