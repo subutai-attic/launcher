@@ -188,7 +188,7 @@ void LibraryItem::mouseUp(const juce::MouseEvent& e)
         auto t = new LibraryActionThread("update", _title, windowTitle);
         t->launchThread();
         while (t->isRunning()) {
-            sleep(1);
+            //sleep(1);
         }
 
     } 

@@ -28,6 +28,11 @@ deploy.sh
 *.filter*
 *.user
 *.opendb
+*.obj
+*.tlog
+*.lastbuildstate
+*.lib
+*.pdb
 subutai-launcher/Debug
 subutai-launcher/x64
 subutai-launcher/.vs
@@ -40,6 +45,8 @@ UI/Builds/VisualStudio2015/Debug/
 /x64
 /testsuite/Debug
 /testsuite/x64
+build/launcher-windows/subutai-launcher/x64/
+build/launcher-windows/UI/x64
 
 # python
 __pycache__

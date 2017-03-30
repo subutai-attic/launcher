@@ -11,8 +11,10 @@ Author:  crioto
 #ifndef MAIN_H_INCLUDED
 #define MAIN_H_INCLUDED
 
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
 #include <unistd.h>
 #include <sys/types.h>
+#endif
 
 #include "MainWindow.h"
 #include <Python.h>
