@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 #include <string.h>
-#if LAUNCHER_LINUX
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -39,7 +39,7 @@ namespace SubutaiLauncher {
             void setupFds();
             void closeFds();
         private:
-#if LAUNCHER_LINUX
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
             int _inRead;
             int _inWrite;
             int _outRead;
@@ -54,8 +54,6 @@ namespace SubutaiLauncher {
 			HANDLE _errRead;
 			HANDLE _errWrite;
 			HANDLE _process;
-#elif LAUNCHER_MACOS
-#error Not Implemented on this platform
 #endif
             pid_t _pid;
     };

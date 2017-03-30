@@ -6,7 +6,7 @@ const std::string SubutaiLauncher::FileSystem::DELIM = "/";
 #elif LAUNCHER_WINDOWS
 const std::string SubutaiLauncher::FileSystem::DELIM = "\\";
 #elif LAUNCHER_MACOS
-#error Not Implemented for this platform
+const std::string SubutaiLauncher::FileSystem::DELIM = "/";
 #else
 #error Unknown Platform
 #endif
@@ -24,58 +24,19 @@ void SubutaiLauncher::FileSystem::setPath(const std::string& path) {
 }
 
 bool SubutaiLauncher::FileSystem::isFileExists(const std::string& filename) {
-	auto l = Log::instance()->logger();
-	//l->debug() << "FileSysten::FileExists: _path " << _path << std::endl;
 	std::string fullpath(_path);
-	//l->debug() << "FileSysten::FileExists: fullpath " << fullpath << std::endl;
 	fullpath.append(DELIM);
-	//l->debug() << "FileSysten::FileExists: fullpath DELIM " << fullpath << std::endl;
 	fullpath.append(filename);
-	//l->debug() << "FileSysten::FileExists: fullpath append filename " << fullpath << std::endl;
-#if LAUNCHER_LINUX
-	struct stat st;
-	return stat(fullpath.c_str(), &st) == 0;
-#elif LAUNCHER_WINDOWS
-	DWORD attr = GetFileAttributesA(fullpath.c_str());
-	if (attr == INVALID_FILE_ATTRIBUTES)
-	{
-		switch (GetLastError()) {
-		case ERROR_FILE_NOT_FOUND:
-		case ERROR_PATH_NOT_FOUND:
-		case ERROR_NOT_READY:
-		case ERROR_INVALID_DRIVE:
-			return false;
-		default:
-			throw SubutaiException("Unknown windows file error");
-		};
-	}
-	return true;
-#elif LAUNCHER_MACOS
-#error Not Implemented for this platform
-#else
-#error Unknown Platform
-#endif
-
-	return false;
+    Poco::File f(fullpath);
+    return f.exists();
 }
 
 void SubutaiLauncher::FileSystem::removeFile(const std::string& filename) {
-	int rc;
 	std::string fullpath(_path);
 	fullpath.append(DELIM);
 	fullpath.append(filename);
-#if LAUNCHER_LINUX
-	rc = unlink(fullpath.c_str());
-#elif LAUNCHER_WINDOWS
-	rc = _unlink(fullpath.c_str());
-#elif LAUNCHER_MACOS
-#error Not Implemented for this platform
-#else
-#error Unknown Platform
-#endif
-	if (rc != 0) {
-		std::printf("Failed to remove %s\n", fullpath.c_str());
-	}
+    Poco::File f(fullpath);
+    if (f.exists()) f.remove();
 }
 
 void SubutaiLauncher::FileSystem::createDirectory(const std::string& dir)
@@ -83,37 +44,17 @@ void SubutaiLauncher::FileSystem::createDirectory(const std::string& dir)
     std::string fullpath(_path);
 	fullpath.append(DELIM);
 	fullpath.append(dir);
-#if LAUNCHER_LINUX
-    if (mkdir(fullpath.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0) {
-        Log::instance()->logger()->fatal() << "Failed to create directory " << fullpath << ". Errorno: " << errno << std::endl;
-        throw SubutaiException("Failed to create directory");
+    Poco::File f(fullpath);
+    if (!f.exists()) {
+        f.createDirectories();
     }
-#elif LAUNCHER_WINDOWS
-	if (CreateDirectoryA(fullpath.c_str(), 0) == 0)
-	{
-		Log::instance()->logger()->fatal() << "Failed to create directory " << fullpath << std::endl;
-		throw SubutaiException("Failed to create directory");
-	}
-#elif LAUNCHER_MACOS
-#error Not Implemented for this platform
-#endif
 }
 
-#if LAUNCHER_LINUX
 void SubutaiLauncher::FileSystem::copyFile(const std::string& src, const std::string& dst)
 {
-	std::ifstream s(src, std::ios::binary);
-	std::ofstream d(dst, std::ios::binary);
-
-	d << s.rdbuf();
+    std::string fullpath(_path);
+	fullpath.append(DELIM);
+	fullpath.append(src);
+    Poco::File f(fullpath);
+    f.copyTo(dst);
 }
-#elif LAUNCHER_WINDOWS
-void SubutaiLauncher::FileSystem::copyFile(LPCSTR in_file, LPCSTR out_file) {
-	if (!CopyFileA(in_file, out_file, true))
-	{
-		throw SubutaiException("Failed to copy file");
-	}
-}
-#elif LAUNCHER_MACOS
-#error Not Implemented for this platform
-#endif

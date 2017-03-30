@@ -7,6 +7,17 @@
 #include <Python.h>
 #include <curl/curl.h>
 
+#include <Poco/Message.h>
+#include <Poco/Channel.h>
+#include <Poco/ConsoleChannel.h>
+#include <Poco/FileChannel.h>
+#include <Poco/SplitterChannel.h>
+#include <Poco/FormattingChannel.h>
+#include <Poco/PatternFormatter.h>
+#include <Poco/Logger.h>
+#include <Poco/LogStream.h>
+#include <Poco/AutoPtr.h>
+
 #include "SL.h"
 #include "SLFunctions.h"
 #include "Hub.h"
@@ -27,6 +38,7 @@ namespace SubutaiLauncher
             void initializePython();
             void run();
             void parseArgs();
+            void setupLogger();
         private:
             std::vector<std::string> _args;
             bool _running;

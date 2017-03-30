@@ -9,6 +9,8 @@
 #include <limits.h>
 #if LAUNCHER_WINDOWS
 #include <windows.h>
+#elif LAUNCHER_MACOS
+#include <sys/sysctl.h>
 #endif
 
 #include "SubutaiException.h"
@@ -17,6 +19,7 @@
 #include "SubutaiString.h"
 #include <Poco/Environment.h>
 #include <Poco/StringTokenizer.h>
+#include "Poco/Logger.h"
 
 namespace SubutaiLauncher {
 
@@ -37,6 +40,8 @@ namespace SubutaiLauncher {
             std::string getVar(const std::string& name, const std::string& defaultValue);
             std::string setVar(const std::string& name, const std::string& value);
             std::string getDefaultGateway();
+        private:
+            Poco::Logger* _logger;
     };
 
 }

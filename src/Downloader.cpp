@@ -1,4 +1,5 @@
 #include "Downloader.h"
+#include "Session.h"
 
 const std::string SubutaiLauncher::Downloader::URL = "https://devcdn.subut.ai:8338";
 const std::string SubutaiLauncher::Downloader::REST = "/kurjun/rest/raw";
@@ -9,7 +10,10 @@ SubutaiLauncher::Downloader::Downloader() :
     _done(false),
     _outputDir(".")
 {
-    Log::instance()->logger()->debug() << "Starting Downloader instance" << std::endl;
+    //Log::instance()->logger()->debug() << "Starting Downloader instance" << std::endl;
+    //Session::instance()->logger().debug("Starting Downloader instance");
+    Poco::Logger::get("subutai").debug("Starting Downloader instance");
+    _logger = &Poco::Logger::get("subutai");
 }
 
 SubutaiLauncher::Downloader::~Downloader()
@@ -32,7 +36,7 @@ void SubutaiLauncher::Downloader::reset()
 void SubutaiLauncher::Downloader::setFilename(const std::string& filename)
 {
     _filename = filename;
-    Log::instance()->logger()->debug() << "Downloader::setFilename after" << _filename << std::endl;
+    _logger->debug("Downloader::setFilename %s", _filename);
 }
 
 std::string SubutaiLauncher::Downloader::buildRequest(std::string path, std::string key, std::string value)
@@ -52,17 +56,16 @@ std::string SubutaiLauncher::Downloader::buildRequest(std::string path, std::str
         std::sprintf(r, "%s%s/%s", URL.c_str(), REST.c_str(), path.c_str());
 #endif
     }
-    Log::instance()->logger()->debug() << "Requesting " << r << std::endl;
+    _logger->debug("Requesting %s", std::string(r));
     return std::string(r);
 }
 
 bool SubutaiLauncher::Downloader::retrieveFileInfo()
 {
-    auto l = Log::instance()->logger();
     Poco::Net::HTTPSClientSession s(HOST, PORT);
     std::string path(REST);
     path.append("/info");
-    l->debug() << "Requesting file info: " << path << std::endl;
+    _logger->debug("Requesting file info for %s", path);
     Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_GET, path);
     Poco::Net::HTMLForm form;
     form.add("name", _filename);
@@ -71,176 +74,114 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo()
 
     Poco::Net::HTTPResponse response;
     std::istream& rs = s.receiveResponse(response);
+    if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_NOT_FOUND) {
+        _logger->error("Requested file not found: %s", _filename);
+        return false;
+    }
     std::string output;
     Poco::StreamCopier::copyToString(rs, output);
 
-    l->debug() << "Received file info: " << output << std::endl;
+    _logger->debug("Received file info for %s: %s", path, output);
 
-    //l->debug() << "Before JSon(change to Poco!): responce: " << output << std::endl;
+    Poco::JSON::Parser parser;
+    Poco::Dynamic::Var result;
 
-    // TODO: Replace JSON lib with Poco
-    Json::Value root;
-
-    //l->debug() << "JSon(change to Poco!): root copied: " << std::endl;
-    try { 
-        std::istringstream str(output);
-        str >> root;
-
-        Json::Value el;
-        if (root.isArray()) {
-            l->debug() << "JSON root is array" << std::endl;
-            el = root[0];
-        } else {
-            l->debug() << "JSON root is not array" << std::endl;
-            el = root;
-        }
-        const Json::Value owners = el["owner"];
-        for (unsigned int i = 0; i < owners.size(); ++i) {
-            _file.owner = owners[i].asString();
-        }
-        _file.name = el.get("name", "").asString();
-        _file.id = el.get("id", "").asString();
-        _file.size = el.get("size", "").asLargestInt();
-    } catch (Json::RuntimeError e) {
-        l->error() << "Failed to parse JSON: " << e.what() << std::endl;
-        return false;
-    } catch (Json::LogicError e) {
-        l->error() << "Failed to parse JSON: " << e.what() << std::endl;
+    try {
+        result = parser.parse(output);
+    } catch (Poco::JSON::JSONException e) {
+        _logger->error("Failed to parse JSON while getting information about remote file: %s", _filename);
+        _logger->debug("Failing JSON: %s", output);
         return false;
     }
 
-    l->debug() << "Owner: " << _file.owner << std::endl;
-    l->debug() << "Name: " << _file.name << std::endl;
-    l->debug() << "ID: " << _file.id << std::endl;
-    l->debug() << "Size: " << _file.size << std::endl;
+    if (result.isEmpty()) {
+        _logger->error("File info is empty after parsing JSON");
+        return false;
+    } 
+
+    Poco::JSON::Array::Ptr arr = result.extract<Poco::JSON::Array::Ptr>();
+    if (arr->size() == 0) {
+        _logger->error("JSON Array is empty");
+        return false;
+    }
+
+    // Get the first element
+    Poco::JSON::Object::Ptr obj = arr->getObject(0);
+    _file.id = obj->get("id").toString();
+    _file.name = obj->get("filename").toString();
+    _file.size = obj->get("size").extract<int>();
+    _file.owner = obj->get("owner").extract<Poco::JSON::Array::Ptr>()
+        ->get(0).extract<std::string>();
+
+    _logger->debug("Owner: %s", _file.owner);
+    _logger->debug("Name: %s", _file.name);
+    _logger->debug("ID: %s", _file.id);
+    _logger->debug("Size: %lu", _file.size);
 
     return true;
 }
 
 std::thread SubutaiLauncher::Downloader::download()
 {
-    Log::instance()->logger()->info() << "Downloader::download() start of sub, file name: " << _filename << std::endl;
     info();
-    Log::instance()->logger()->info() << "Downloader::download() info received: " << _filename << std::endl;
     _progress = 0;
     _done = false;
-    Log::instance()->logger()->info() << "Downloader::download() Downloading before thread"  << std::endl;
     return std::thread([=] { downloadImpl(); });
-    Log::instance()->logger()->info() << "Downloader::download() after thread start"  << std::endl;
 }
 
 void SubutaiLauncher::Downloader::downloadImpl()
 {
-    auto l = Log::instance()->logger();
-    l->info() << "DownloadImpl start " << std::endl;
+    _logger->debug("Starting Download thread");
 
     try {
+        _logger->debug("Unregistering HTTP(S) Stream factory");
         Poco::Net::HTTPStreamFactory::unregisterFactory();
         Poco::Net::HTTPSStreamFactory::unregisterFactory();
-        l->info() << "DownloadImpl Downloading UNREGISTER " << _filename << std::endl;
     } catch (...) {
-        l->error() << "DownloadImpl Downloading UNREGISTER failed " << _filename << std::endl;
+        _logger->error("Failed to unregister HTTP(S) Stream factory");
     }
 
     try {
         Poco::Net::HTTPStreamFactory::registerFactory();
-        l->info() << "DownloadImpl Poco::Net::HTTPStreamFactory::registerFactory(); " << std::endl;
+        _logger->debug("Registering HTTP Stream Factory");
     }
     catch (...){
-        l->info() << "DownloadImpl Stream factory unknown error: "   << std::endl;
-        //std::cerr << e.what();
+        _logger->error("Failed to register HTTP Stream factory");
     }
+
     Poco::Net::HTTPSStreamFactory::registerFactory();
-    l->info() << "DownloadImpl  Poco::Net::HTTPSStreamFactory::registerFactory(); " << std::endl;
     Poco::URI uri(buildRequest("get", "name", _filename));
-    l->info() << "DownloadImpl  Poco::URI uri " << buildRequest("get", "name", _filename)  << std::endl;
 
-    std::auto_ptr<std::istream> pStr(Poco::URIStreamOpener::defaultOpener().open(uri));
-    std::string path(_outputDir);
-    path.append(PATH_DELIM);
-    path.append(_filename.c_str());
-    l->info() << "DownloadImpl  path _file.name.c_str() " << path << std::endl;
+    std::string path;
+    try {
+        std::auto_ptr<std::istream> pStr(Poco::URIStreamOpener::defaultOpener().open(uri));
+        path.append(_outputDir);
+        path.append(PATH_DELIM);
+        path.append(_filename.c_str());
+        _rfile = path;
+        Poco::File f(path);
 
-    FileSystem fs(_outputDir);
-    if (fs.isFileExists(_filename)) {
-        l->info() << "DownloadImpl  _file.name " << _file.name << " already exists. Validating checksum" << std::endl;
-        if (verifyDownload()) {
-            l->info() << "DownloadImpl file " << _file.name << " is in actual state" << std::endl;
-            _done = true;
-            _progress = _file.size;
-            return;
+        if (f.exists()) {
+            _logger->information("File %s already exists", _file.name);
+            if (verifyDownload()) {
+                _logger->information("File %s is up to date", _file.name);
+                _done = true;
+                _progress = _file.size;
+                return;
+            } else {
+                _logger->information("File %s is outdated. Removing it", _file.name);
+                f.remove();
+            }
         }
-        else {
-            fs.removeFile(_file.name);
-        }
+
+        _logger->information("Starting file downloads [%s]", _file.name);
+        std::ofstream out(path, std::fstream::app);
+        Poco::StreamCopier::copyStream(*pStr.get(), out);
+    } catch (Poco::Net::HTTPException e) {
+        _logger->error("File download failed: %s", e.displayText());
     }
-    l->debug() << "DownloadImpl Spawning downloader thread" << std::endl;
-
-    //downloading
-    std::ofstream out(path, std::fstream::app);
-    Poco::StreamCopier::copyStream(*pStr.get(), out);
-    //l->info() << "DownloadImpl Downloading " << _filename << std::endl;
 
     _done = true;
-    return;
-
-    /*
-       FileSystem fs(_outputDir);
-       if (fs.isFileExists(_file.name)) {
-       l->info() << "File " << _file.name << " is already exists. Validating checksum" << std::endl;
-       if (verifyDownload()) {
-       l->info() << "File " << _file.name << " is in actual state" << std::endl;
-       _done = true;
-       _progress = _file.size;
-       return;
-       }
-       else {
-       fs.removeFile(_file.name);
-       }
-       }
-       l->debug() << "Spawning downloader thread" << std::endl;
-       auto curl = curl_easy_init();
-       curl_easy_setopt(curl, CURLOPT_URL, buildRequest("get", "name", _filename).c_str());
-       curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
-       curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleFile);
-       auto result = curl_easy_perform(curl);
-       if (result == 0) {
-       l->info() << "Download completed" << std::endl;
-       }
-       else {
-       l->error() << "Failed to download " << _filename << std::endl;
-       }
-       _done = true;
-       */
-}
-
-size_t SubutaiLauncher::Downloader::handleFile(char *data, size_t size, size_t nmemb, void *p)
-{
-    return static_cast<Downloader*>(p)->handleFileImpl(data, size, nmemb);
-}
-
-size_t SubutaiLauncher::Downloader::handleFileImpl(char* data, size_t size, size_t nmemb)
-{
-    _content.clear();
-    _content.append(data, size * nmemb);
-
-    _progress += size * nmemb;
-
-    std::string path(_outputDir);
-    path.append(PATH_DELIM);
-    path.append(_file.name.c_str());
-
-    std::ofstream out(path, std::fstream::app);
-    if (!out) {
-        Log::instance()->logger()->error() << "Can't open " << path << " for writing" << std::endl;
-        _done = true;
-    }
-    else {
-        out << _content;
-        out.close();
-    }
-
-    return size * nmemb;
 }
 
 long SubutaiLauncher::Downloader::currentProgress()
@@ -253,33 +194,35 @@ bool SubutaiLauncher::Downloader::isDone()
     return _done;
 }
 
-int SubutaiLauncher::Downloader::getPercent()
+double SubutaiLauncher::Downloader::getPercent()
 {
-    return (int)(_progress / (_file.size / 100));
+    Poco::File f(_rfile);
+    if (!f.exists()) return 0.0;
+    return (double)(f.getSize() / _file.size * 100);
 }
 
 bool SubutaiLauncher::Downloader::verifyDownload()
 {
+    _logger->information("Verifying %s MD5 checksum", _rfile);
     std::string path(_outputDir);
     path.append(PATH_DELIM);
     path.append(_file.name);
 
-    std::ifstream file(path.c_str());
-    std::string buffer;
-    file.seekg(0, std::ios::end);
-    buffer.reserve(file.tellg());
-    file.seekg(0, std::ios::beg);
-
-    buffer.assign((std::istreambuf_iterator<char>(file)),
-            std::istreambuf_iterator<char>());
-
-    auto sum = md5sum(buffer.c_str(), buffer.length());
-    Log::instance()->logger()->debug() << "Local: " << sum << ". Remote: " << _file.id << std::endl;
-    if (sum == _file.id) {
-        return true;
+    Poco::MD5Engine md5;
+    try {
+        Poco::DigestOutputStream ostr(md5);
+        Poco::FileInputStream fs(path);
+        Poco::StreamCopier::copyStream(fs, ostr);
+        ostr.close();
+        fs.close();
+    } catch (Poco::FileNotFoundException e) {
+        _logger->error("File verification: File not found");
+    } catch (std::exception e) {
+        _logger->error("File verification: Unknown exception");
     }
 
-    return false;
+    std::string hash = Poco::DigestEngine::digestToHex(md5.digest());
+    return (hash == _file.id);
 }
 
 SubutaiLauncher::SubutaiFile SubutaiLauncher::Downloader::info()

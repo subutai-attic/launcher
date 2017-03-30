@@ -2,6 +2,8 @@
 
 WizardIntro::WizardIntro()
 {
+    _logger = &Poco::Logger::get("subutai");
+    _logger->trace("Creating Wizard Intro UI Component");
     auto font = juce::Font(15);
     _text.setText("Welcommmmmeeee");
     _text.setBounds(10, 10, 490, 400);
@@ -18,7 +20,7 @@ WizardIntro::WizardIntro()
 
 WizardIntro::~WizardIntro()
 {
-
+    _logger->trace("Destroying Wizard Intro UI Component");
 }
 
 void WizardIntro::paint(juce::Graphics& g)

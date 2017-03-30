@@ -1,15 +1,15 @@
 include config.make
 
 CC=g++
-DYNAMIC_LIB_TARGET = libsubutai-launcher.so
+DYNAMIC_LIB_TARGET = libsubutai-launcher.$(LIB_EXT)
 STATIC_LIB_TARGET = libsubutai-launcher.a
 EXTRA_LIBS_DIR = third-party
 TEST_TARGET=testsuite
 VB_DIR = third-party/xpcom
 VB = -I$(VB_DIR) -I$(VB_DIR)/xpcom -I$(VB_DIR)/nsprpub -I$(VB_DIR)/string -I$(VB_DIR)/ipcd
-INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) $(VB) -Ithird-party/md5 -Ithird-party/json -I/usr/local/include
-LIBS = -g -ggdb -lm -lrt -l$(PYTHON_VER) -lcurl -lssh -L$(PYLIB_DIR)  -lPocoNet -lPocoNetSSL -lPocoFoundation
-CFLAGS = -L/lib/x86_64-linux-gnu $(INCLUDES) $(LIBS) -std=c++11 -DRT_OS_LINUX -DBUILD_SCHEME="\"$(BUILD_SCHEME)\""
+INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(OPENSSL_DIR)/include $(VB) -Ithird-party/md5 -Ithird-party/json -I/usr/local/include
+LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -lcurl -lssh -L$(PYLIB_DIR) -lPocoNet -lPocoNetSSL -lPocoFoundation -lPocoJSON
+CFLAGS = -L/lib/x86_64-linux-gnu $(INCLUDES) $(LIBS) -std=c++11 -DRT_OS_LINUX -DBUILD_SCHEME="\"$(BUILD_SCHEME)\"" $(BUILD_SCHEME_DEF)
 
 SRC_DIR = src
 INCLUDE_DIR = include

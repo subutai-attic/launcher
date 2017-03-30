@@ -1,6 +1,5 @@
 #include "Session.h"
 
-
 SubutaiLauncher::Session* SubutaiLauncher::Session::_instance = NULL;
 
 SubutaiLauncher::Session::Session() :
@@ -78,4 +77,23 @@ std::string SubutaiLauncher::Session::getSSHHostname()
 long SubutaiLauncher::Session::getSSHPort()
 {
     return _sshPort;
+}
+
+void SubutaiLauncher::Session::addStatus(const std::string& text)
+{
+    _statusPool.push_back(text);
+}
+
+std::string SubutaiLauncher::Session::getStatus()
+{
+    if (_statusPool.empty()) return "";
+
+    auto elem = _statusPool.back();
+    _statusPool.pop_back();
+    return elem;
+}
+
+Poco::Logger& SubutaiLauncher::Session::logger()
+{
+    return Poco::Logger::get("SubutaiLogger");
 }

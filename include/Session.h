@@ -2,6 +2,9 @@
 #define __SESSION_H__
 
 #include <iostream>
+
+#include "Poco/Logger.h"
+
 #include "VirtualBox.h"
 #include "Downloader.h"
 #include "Settings.h"
@@ -25,6 +28,9 @@ namespace SubutaiLauncher
             std::string getSSHPass();
             std::string getSSHHostname();
             long getSSHPort();
+            void addStatus(const std::string& text);
+            std::string getStatus();
+            Poco::Logger& logger();
         private:
             //SubutaiLauncher::VirtualBox* _virtualBox;
             Downloader* _downloader;
@@ -35,6 +41,7 @@ namespace SubutaiLauncher
             std::string _sshPass;
             std::string _sshHostname;
             long _sshPort;
+            std::vector<std::string> _statusPool;
         protected:
             static Session *_instance;
             Session();
