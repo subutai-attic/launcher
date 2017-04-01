@@ -18,69 +18,10 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\ConfigurationManager.h" />
-    <ClInclude Include="include\Core.h" />
-    <ClInclude Include="include\Downloader.h" />
-    <ClInclude Include="include\E2E.h" />
-    <ClInclude Include="include\Environment.h" />
-    <ClInclude Include="include\FileSystem.h" />
-    <ClInclude Include="include\Hub.h" />
-    <ClInclude Include="include\Install.h" />
-    <ClInclude Include="include\InstallImpl_Base.h" />
-    <ClInclude Include="include\InstallImpl_Linux.h" />
-    <ClInclude Include="include\InstallImpl_Windows.h" />
-    <ClInclude Include="include\NotificationCenter.h" />
-    <ClInclude Include="include\Session.h" />
-    <ClInclude Include="include\Settings.h" />
-    <ClInclude Include="include\SL.h" />
-    <ClInclude Include="include\SLException.h" />
-    <ClInclude Include="include\SLFunctions.h" />
-    <ClInclude Include="include\SSH.h" />
-    <ClInclude Include="include\SubutaiException.h" />
-    <ClInclude Include="include\SubutaiLauncher.h" />
-    <ClInclude Include="include\SubutaiLog.h" />
-    <ClInclude Include="include\SubutaiP2P.h" />
-    <ClInclude Include="include\SubutaiProcess.h" />
-    <ClInclude Include="include\SubutaiString.h" />
-    <ClInclude Include="include\Tray.h" />
-    <ClInclude Include="include\Vars.h" />
-    <ClInclude Include="include\VBox.h" />
-    <ClInclude Include="include\VirtualBox.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\ConfigurationManager.cpp" />
-    <ClCompile Include="src\Core.cpp" />
-    <ClCompile Include="src\Downloader.cpp" />
-    <ClCompile Include="src\Environment.cpp" />
-    <ClCompile Include="src\FileSystem.cpp" />
-    <ClCompile Include="src\Hub.cpp" />
-    <ClCompile Include="src\InstalImpl_Windows.cpp" />
-    <ClCompile Include="src\Install.cpp" />
-    <ClCompile Include="src\InstallImpl_Base.cpp" />
-    <ClCompile Include="src\InstallImpl_Linux.cpp" />
-    <ClCompile Include="src\NotificationCenter.cpp" />
-    <ClCompile Include="src\P2P.cpp" />
-    <ClCompile Include="src\Session.cpp" />
-    <ClCompile Include="src\Settings.cpp" />
-    <ClCompile Include="src\SL.cpp" />
-    <ClCompile Include="src\SLException.cpp" />
-    <ClCompile Include="src\SLFunctions.cpp" />
-    <ClCompile Include="src\SSH.cpp" />
-    <ClCompile Include="src\SubutaiException.cpp" />
-    <ClCompile Include="src\SubutaiLog.cpp" />
-    <ClCompile Include="src\SubutaiProcess.cpp" />
-    <ClCompile Include="src\SubutaiString.cpp" />
-    <ClCompile Include="src\Tray.cpp" />
-    <ClCompile Include="src\VBox.cpp" />
-    <ClCompile Include="src\VirtualBox.cpp" />
-    <ClCompile Include="third-party\json\jsoncpp.cpp" />
-    <ClCompile Include="third-party\md5\MD5.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{308D82B9-9872-465A-B9E0-39929651ADD8}</ProjectGuid>
+    <ProjectGuid>{E8C8B802-D3FC-4EFC-9B78-4B2806B346D6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>launcher</RootNamespace>
+    <RootNamespace>subutailauncher</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -129,12 +70,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>include;third-party\curl\include;third-party\json;third-party\libssh\include;third-party\MD5;third-party\Python3\Include;third-party\Python3\PC;$(IncludePath)</IncludePath>
-    <OutDir>bin\</OutDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\include;$(POCO_ROOT)\Foundation\include;..\..\..\third-party\libssh\include;$(POCO_ROOT)\Net\include;$(POCO_ROOT)\NetSSL_OpenSSL\include;$(POCO_ROOT)\Crypto\include;$(POCO_ROOT)\JSON\include;..\..\..\third-party\openssl\include;$(POCO_ROOT)\openssl\include;$(PYTHON_ROOT)\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>include;third-party\curl\include;third-party\json;third-party\libssh\include;third-party\MD5;third-party\Python3\Include;third-party\Python3\PC;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <OutDir>.\bin\</OutDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\include;..\..\..\third-party\libssh\include;..\..\..\third-party\openssl\include;..\..\..\third-party\curl\include;..\..\..\third-party\json;$(PYTHON_ROOT)\include;$(POCO_ROOT)\Foundation\include;$(POCO_ROOT)\NetSSL_OpenSSL\include;$(POCO_ROOT)\Net\include;$(POCO_ROOT)\JSON\include;$(POCO_ROOT)\Crypto\include</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\include;..\..\..\third-party\libssh\include;..\..\..\third-party\openssl\include;..\..\..\third-party\curl\include;..\..\..\third-party\json;$(PYTHON_ROOT)\include;$(POCO_ROOT)\Foundation\include;$(POCO_ROOT)\NetSSL_OpenSSL\include;$(POCO_ROOT)\Net\include;$(POCO_ROOT)\JSON\include;$(POCO_ROOT)\Crypto\include</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -154,7 +96,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;BUILD_SCHEME="dev";-D_WINSOCK_=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -184,7 +126,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;BUILD_SCHEME="dev";-D_WINSOCK_=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -192,6 +134,60 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\Browser.cpp" />
+    <ClCompile Include="..\..\..\src\ConfigurationManager.cpp" />
+    <ClCompile Include="..\..\..\src\Core.cpp" />
+    <ClCompile Include="..\..\..\src\Downloader.cpp" />
+    <ClCompile Include="..\..\..\src\Environment.cpp" />
+    <ClCompile Include="..\..\..\src\FileSystem.cpp" />
+    <ClCompile Include="..\..\..\src\NotificationCenter.cpp" />
+    <ClCompile Include="..\..\..\src\P2P.cpp" />
+    <ClCompile Include="..\..\..\src\RootProcess.cpp" />
+    <ClCompile Include="..\..\..\src\Session.cpp" />
+    <ClCompile Include="..\..\..\src\Settings.cpp" />
+    <ClCompile Include="..\..\..\src\SL.cpp" />
+    <ClCompile Include="..\..\..\src\SLException.cpp" />
+    <ClCompile Include="..\..\..\src\SLFunctions.cpp" />
+    <ClCompile Include="..\..\..\src\SSH.cpp" />
+    <ClCompile Include="..\..\..\src\SubutaiException.cpp" />
+    <ClCompile Include="..\..\..\src\SubutaiLog.cpp" />
+    <ClCompile Include="..\..\..\src\SubutaiProcess.cpp" />
+    <ClCompile Include="..\..\..\src\SubutaiString.cpp" />
+    <ClCompile Include="..\..\..\src\Tray.cpp" />
+    <ClCompile Include="..\..\..\src\VBox.cpp" />
+    <ClCompile Include="..\..\..\src\VirtualBox.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\include\Browser.h" />
+    <ClInclude Include="..\..\..\include\ConfigurationManager.h" />
+    <ClInclude Include="..\..\..\include\Core.h" />
+    <ClInclude Include="..\..\..\include\Downloader.h" />
+    <ClInclude Include="..\..\..\include\E2E.h" />
+    <ClInclude Include="..\..\..\include\Environment.h" />
+    <ClInclude Include="..\..\..\include\FileSystem.h" />
+    <ClInclude Include="..\..\..\include\NotificationCenter.h" />
+    <ClInclude Include="..\..\..\include\RootProcess.h" />
+    <ClInclude Include="..\..\..\include\Session.h" />
+    <ClInclude Include="..\..\..\include\Settings.h" />
+    <ClInclude Include="..\..\..\include\SL.h" />
+    <ClInclude Include="..\..\..\include\SLException.h" />
+    <ClInclude Include="..\..\..\include\SLFunctions.h" />
+    <ClInclude Include="..\..\..\include\SSH.h" />
+    <ClInclude Include="..\..\..\include\SubutaiException.h" />
+    <ClInclude Include="..\..\..\include\SubutaiLauncher.h" />
+    <ClInclude Include="..\..\..\include\SubutaiLog.h" />
+    <ClInclude Include="..\..\..\include\SubutaiP2P.h" />
+    <ClInclude Include="..\..\..\include\SubutaiProcess.h" />
+    <ClInclude Include="..\..\..\include\SubutaiString.h" />
+    <ClInclude Include="..\..\..\include\Tray.h" />
+    <ClInclude Include="..\..\..\include\Vars.h" />
+    <ClInclude Include="..\..\..\include\VBox.h" />
+    <ClInclude Include="..\..\..\include\VirtualBox.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

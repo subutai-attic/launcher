@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include <Python.h>
-#include <curl/curl.h>
+
 
 #include <Poco/Message.h>
 #include <Poco/Channel.h>
@@ -26,6 +26,8 @@
 #include "Environment.h"
 #include "SubutaiLog.h"
 #include "Browser.h"
+
+#include <curl/curl.h>
 
 namespace SubutaiLauncher 
 {

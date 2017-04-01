@@ -17,7 +17,6 @@
 #include <io.h>
 #endif
 #include <libssh/libssh.h>
-#include <libssh/sftp.h>
 #include "Environment.h"
 #include "SubutaiProcess.h"
 #include "FileSystem.h"

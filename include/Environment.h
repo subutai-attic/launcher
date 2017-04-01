@@ -5,13 +5,11 @@
 
 #include <string>
 #include <cstdlib>
+#if LAUNCHER_LINUX
 #include <unistd.h>
-#include <limits.h>
-#if LAUNCHER_WINDOWS
-#include <windows.h>
-#elif LAUNCHER_MACOS
-#include <sys/sysctl.h>
 #endif
+#include <limits.h>
+
 
 #include "SubutaiException.h"
 #include "SubutaiLog.h"
@@ -20,6 +18,12 @@
 #include <Poco/Environment.h>
 #include <Poco/StringTokenizer.h>
 #include "Poco/Logger.h"
+
+#if LAUNCHER_WINDOWS
+//#include <windows.h>
+#elif LAUNCHER_MACOS
+#include <sys/sysctl.h>
+#endif
 
 namespace SubutaiLauncher {
 
