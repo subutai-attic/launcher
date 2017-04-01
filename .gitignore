@@ -9,6 +9,7 @@ CLI/build
 trash
 bui.sh
 kurjun/*
+python_src
 
 # extra libs
 /third-party/python*

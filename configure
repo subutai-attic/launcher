@@ -27,15 +27,19 @@ Options:
       Disable build of CLI client
 
     --static 
-      Build only static library (disables shared)
+      Build only static library 
 
     --shared 
-      Build only shared library (disabled static)
+      Build only shared library 
 
     --collect-static=<directory>
       Specify a directory where static libraries will be collected. When this option is enabled configure will create this directory and
       place all *.a files it find into it. This will allow linker to use static libraries over dynamic as a workaround for QA1393
       (For more details see: http://developer.apple.com/library/mac/#qa/qa2006/qa1393.html)
+      This will help developers to make static build for local use only. 
+      
+    --with-custom-python=<directory>
+      Specify directory to a custom Python installation. It should be compiled and installed Python, not just a source code.
 
     --scheme=<scheme>
       Build scheme for launcher. Possible values are: dev, master, production. Default: production
@@ -65,6 +69,7 @@ extra_defines=
 extra_libraries=
 # Code extension for Juce source files. On darwin we use 'mm'
 code_extension="cpp"
+custom_python=""
 
 os=$(uname)
 
@@ -121,13 +126,13 @@ find_openssl_directory()
 
 check_python()
 {
-    echo -n "Looking for libpython$1.$lib_ext library path... "
-
     if [ $static -eq 1 ]; then
         lext="a"
     else
         lext=$lib_ext
     fi
+
+    echo -n "Looking for libpython$1.$lext library path... "
 
     pypath=`find $python_dir -name "libpython$1.$lext" | grep -v Permission | head -1`
     if [[ ( $? != 0 ) || ( -z "$pypath" ) ]]; then
@@ -228,11 +233,17 @@ while [ $# -ge 1 ]; do
             echo "Specified Python directory: $python_dir"
             ;;
 
+        --with-custom-python=*)
+            custom_python="`echo ${1} | awk '{print substr($0,22)}' | tr ',;' '  '`" 
+            python_dir=$custom_python
+            ;;
+
         --scheme=*)
             scheme="`echo ${1} | awk '{print substr($0,10)}' | tr ',;' '  '`" 
             ;;
 
         --static)
+            echo "Enabling static build"
             static=1
             ;;
 
