@@ -4,6 +4,7 @@ from shutil import copyfile
 import os
 import stat
 
+
 def subutaistart():
     subutai.AddStatus("Download p2p binary")
 

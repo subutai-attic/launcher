@@ -2,7 +2,7 @@
 *ycm_extra_conf*
 compile_commands.json
 bin
-build/*.o
+*.o
 CLI/bin
 CLI/build
 *_back

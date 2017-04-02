@@ -148,7 +148,7 @@ check_python_header()
 {
     echo -n "Looking for Python.h... "
 
-    local py_header_dir=`find $python_dir -name "Python.h" | grep -v Permission`
+    local py_header_dir=`find $python_dir -name "Python.h" | grep $python | grep -v Permission`
     if [[ ( $? != 0 ) || ( -z "$py_header_dir" ) ]]; then
         echo -e "FAIL"
         echo -e "Couldn't find libpython$1 directory under $python_dir"
@@ -168,7 +168,7 @@ check_python_pyconfig()
 {
     echo -n "Looking for pyconfig.h... "
 
-    local py_header_dir=`find $python_dir -name "pyconfig.h" | grep -v PC | grep -v Permission`
+    local py_header_dir=`find $python_dir -name "pyconfig.h" | grep $python | grep -v PC | grep -v Permission`
     if [[ ( $? != 0 ) || ( -z "$py_header_dir" ) ]]; then
         echo -e "FAIL"
         echo -e "Couldn't find pyconfig.h directory under $python_dir"
@@ -318,7 +318,7 @@ elif [ "$os" == "Darwin" ]; then
     if [ "$collect_static" != "" ]; then
         stlibs="-L$collect_static"
     fi
-    echo "LIBDIRS = $stlibs -L$pylib -L../bin -L$openssl_directory/lib" >> config.make
+    echo "LIBDIRS = $stlibs -L/usr/local/lib -L$pylib -L../bin -L$openssl_directory/lib" >> config.make
 fi
 cat <<__EOF__ >>config.make
 export PYTHON_VER
