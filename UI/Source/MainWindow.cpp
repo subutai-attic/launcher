@@ -8,6 +8,7 @@ MainWindow::MainWindow(juce::String name) : juce::DocumentWindow(
 {
     //setUsingNativeTitleBar (false);
     //setTitleBarHeight(0);
+    setResizeLimits(800, 640, 0, 0);
     setUsingNativeTitleBar(true);
     MainContentComponent* mainComponent = new MainContentComponent();
     setContentOwned(mainComponent, true);
@@ -15,7 +16,7 @@ MainWindow::MainWindow(juce::String name) : juce::DocumentWindow(
     centreWithSize(getWidth(), getHeight());
     setDraggable(true);
     setVisible(true);
-    setResizable(true, false);
+    setResizable(true, true);
     toFront(true);
 }
 

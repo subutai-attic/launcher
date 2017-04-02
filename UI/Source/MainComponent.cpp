@@ -23,7 +23,7 @@ MainContentComponent::MainContentComponent()
     addAndMakeVisible(_sidebar);
 
     // TODO: Add screen detection size and relative value at startup
-    setSize(1024, 768);
+    //setSize(1024, 768);
 
     addAndMakeVisible(_logo);
 
