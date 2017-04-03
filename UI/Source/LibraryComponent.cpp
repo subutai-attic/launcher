@@ -1,28 +1,4 @@
-/*
-   ==============================================================================
-
-   LibraryComponent.cpp
-Created: 5 Aug 2016 5:58:23pm
-Author:  crioto
-
-==============================================================================
-*/
-
 #include "LibraryComponent.h"
-// ============================================================================
-
-struct {
-    int instConfig = MH_FULL;
-    int instVersion = DEV;
-    std::string instDir = "/opt/subutai";
-    std::string instTmpDir = "/tmp/subutai";
-    long instCores = 2;
-    long instRAM = 2048;
-
-} instData;
-
-
-// ============================================================================
 
 LibraryComponent::LibraryComponent() : _installButton("Install")
                                        /*  
@@ -52,7 +28,9 @@ LibraryComponent::LibraryComponent() : _installButton("Install")
     _installButton.addListener(this);
     _installButton.setColour(TextButton::buttonColourId, Colour(7,141,208));
     _installButton.toFront(true);
+    _installButton.setBounds(getParentWidth() - 110 - 250, 10, 100, 35);
     addAndMakeVisible(_installButton);
+    resized();
 
     /*  
         instEnabled = true;

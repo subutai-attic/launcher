@@ -23,7 +23,7 @@ MainContentComponent::MainContentComponent()
     addAndMakeVisible(_sidebar);
 
     // TODO: Add screen detection size and relative value at startup
-    //setSize(1024, 768);
+    setSize(getParentWidth(), getParentHeight());
 
     addAndMakeVisible(_logo);
 
@@ -35,35 +35,15 @@ MainContentComponent::MainContentComponent()
     addAndMakeVisible(_mainMenu);
 
     _header.setColour(Toolbar::backgroundColourId, Colour::greyLevel (0.2f));
-    // --- Using native bar
-    //addAndMakeVisible(_header);
-
-    // Close button
-    _closeButton = new ImageButton("Close");
-    _closeButton->setBounds(1000, 3, 1020, 20);
-    Image closeImg(ImageCache::getFromFile(File("close_window.png")));
-    _closeButton->setImages(true, true, true, closeImg, 1.0, Colour(), closeImg, 0.6, Colour(), closeImg, 0.6, Colour());
-    _closeButton->addListener(this);
-    //addAndMakeVisible(_closeButton);
-
-    _minimizeButton = new ImageButton("Minimize");
-    _minimizeButton->setBounds(970, 13, 990, 20);
-    Image minimizeImg(ImageCache::getFromFile(File("minimize_window.png")));
-    _minimizeButton->setImages(true, true, true, minimizeImg, 1.0, Colour(), minimizeImg, 0.6, Colour(), minimizeImg, 0.6, Colour());
-    _minimizeButton->addListener(this);
-    //addAndMakeVisible(_minimizeButton);
-    // --- Using native bar
-    resized();
+    addChildComponent(_library);
+    addChildComponent(_hub);
+    addChildComponent(_marketplace);
+    addChildComponent(_community);
 }
 
 
 MainContentComponent::~MainContentComponent()
 {
-    delete(_minimizeButton);
-    delete(_closeButton);
-    //_login->deleteAndZero();
-    //_login->removeFromDesktop();
-    //delete(_login);
 }
 
 
@@ -85,6 +65,7 @@ void MainContentComponent::resized()
     _logo.setBounds(0, 20, MENU_WIDTH, 100);
     _sidebar.setBounds(0, 0, 250, getParentHeight());
     //_header.setBounds(r.withSize(1024, HEADER_HEIGHT));
+    //_library.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
     _library.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
     _community.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
     _marketplace.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
@@ -124,30 +105,31 @@ void MainContentComponent::selectedRowsChanged(int row) {
     if (item == "Library") {
         _community.setVisible(false);
         _hub.setVisible(false);
-        _library.setVisible(false);
         _marketplace.setVisible(false);
-        addAndMakeVisible(_library);
+        _library.setVisible(true);
+        //addAndMakeVisible(_library);
+        //_library.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
         _library.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
     } else if (item == "Subutai") {
-        _community.setVisible(false);
         _hub.setVisible(false);
         _library.setVisible(false);
         _marketplace.setVisible(false);
-        addAndMakeVisible(_community);
+        _community.setVisible(true);
+        //addAndMakeVisible(_community);
         _community.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
     } else if (item == "Templates") {
         _community.setVisible(false);
         _hub.setVisible(false);
         _library.setVisible(false);
-        _marketplace.setVisible(false);
-        addAndMakeVisible(_marketplace);
+        _marketplace.setVisible(true);
+        //addAndMakeVisible(_marketplace);
         _marketplace.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
     } else if (item == "Community") {
-        _community.setVisible(false);
-        _hub.setVisible(false);
         _library.setVisible(false);
         _marketplace.setVisible(false);
-        addAndMakeVisible(_hub);
+        _community.setVisible(false);
+        _hub.setVisible(true);
+        //addAndMakeVisible(_hub);
         _hub.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
     }
 }
@@ -170,9 +152,5 @@ void MainContentComponent::showLoginScreen() {
 }
 
 void MainContentComponent::buttonClicked(Button* button) {
-    if (button == _closeButton) {
-        JUCEApplication::getInstance()->systemRequestedQuit();
-    } else {
-    }
 }
 

@@ -56,6 +56,7 @@ void WizardInstall::start(const std::string& name)
     if (_pb) {
         delete _pb;
     }
+    _logger->trace("Recreating progress bar");
     std::string nt("Installing ");
     nt.append(name);
     _title->setText(nt, dontSendNotification);

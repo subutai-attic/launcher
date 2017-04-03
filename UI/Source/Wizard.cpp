@@ -19,6 +19,11 @@ Wizard::Wizard() :
     rp->addCommand(chown);
     rp->execute("Creating installation directories requires root privileges");
     delete rp;
+#elif LAUNCHER_MACOS
+    Poco::File bin("/usr/local/share/subutai/bin");
+    bin.createDirectories();
+    bin = Poco::File("/usr/local/share/subutai/etc");
+    bin.createDirectories();
 #endif
 
     setSize(800, 600);
