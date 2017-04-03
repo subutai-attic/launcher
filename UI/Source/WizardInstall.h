@@ -7,6 +7,10 @@
 class WizardInstall : public juce::Component 
 {
     public:
+        static const std::string P2P_INSTALL;
+        static const std::string TRAY_INSTALL;
+        static const std::string E2E_INSTALL;
+        static const std::string PEER_INSTALL;
         WizardInstall();
         ~WizardInstall();
         void paint (juce::Graphics&) override;

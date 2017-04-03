@@ -1,9 +1,9 @@
 import subutai
 from time import sleep
-from shutil import copyfile
-from shutil import rmtree
-import os
-import stat
+# from shutil import copyfile
+# from shutil import rmtree
+#import os
+# import stat
 import tarfile
 
 def subutaistart():
@@ -12,6 +12,10 @@ def subutaistart():
     tray = "SubutaiTray_macos.tar.gz"
 
     subutai.download(tray)
+    while subutai.isDownloadComplete() != 1:
+        sleep(0.05)
+
+    subutai.download("libssh2-1.6.0-0_osx.pkg")
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
 

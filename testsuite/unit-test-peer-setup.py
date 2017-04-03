@@ -6,36 +6,7 @@ def subutaistart():
 
     machineName = "subutai-unit-test-1"
 
-    call(['ssh-keygen', '-R', '[localhost]:4567'])
-
-    subutai.SetSSHCredentials("subutai", "ubuntai", "localhost", 4567)
-
-    setupVm(machineName)
-    startVm(machineName)
-    waitSSH()
-    installSnapFromStore()
-    sleep(60)
-    initBtrfs()
-    sleep(60)
-    setAlias()
-    sleep(60)
-    #installSubutai("", "", "", 0)
-    reconfigureNic(machineName)
-    sleep(60)
-    installManagement()
-    sleep(60)
-    setupSSH()
-
-    return;
-
-def waitSSH():
-    print("Waiting for machine to bring up SSH")
-    attempts = 0
-    while subutai.TestSSH() != 0:
-        sleep(1)
-        attempts = attempts + 1
-        if attempts == 30:
-            print("SSH timeout for 30 seconds")
+    econds")
             return
     print("SSH Connected")
     return;

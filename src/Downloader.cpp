@@ -1,9 +1,19 @@
 #include "Downloader.h"
 #include "Session.h"
 
+#ifdef BUILD_SCHEME_DEV
 const std::string SubutaiLauncher::Downloader::URL = "https://devcdn.subut.ai:8338";
 const std::string SubutaiLauncher::Downloader::REST = "/kurjun/rest/raw";
 const std::string SubutaiLauncher::Downloader::HOST = "devcdn.subut.ai";
+#elif BUILD_SCHEME_MASTER
+const std::string SubutaiLauncher::Downloader::URL = "https://mastercdn.subut.ai:8338";
+const std::string SubutaiLauncher::Downloader::REST = "/kurjun/rest/raw";
+const std::string SubutaiLauncher::Downloader::HOST = "mastercdn.subut.ai";
+#else 
+const std::string SubutaiLauncher::Downloader::URL = "https://cdn.subut.ai:8338";
+const std::string SubutaiLauncher::Downloader::REST = "/kurjun/rest/raw";
+const std::string SubutaiLauncher::Downloader::HOST = "cdn.subut.ai";
+#endif
 
 SubutaiLauncher::Downloader::Downloader() : 
     _content(""),
