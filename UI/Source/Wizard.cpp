@@ -19,6 +19,11 @@ Wizard::Wizard() :
     rp->addCommand(chown);
     rp->execute("Creating installation directories requires root privileges");
     delete rp;
+#elif LAUNCHER_MACOS
+    Poco::File bin("/usr/local/share/subutai/bin");
+    bin.createDirectories();
+    bin = Poco::File("/usr/local/share/subutai/etc");
+    bin.createDirectories();
 #endif
 
     setSize(800, 600);
@@ -209,6 +214,7 @@ void Wizard::runInstall()
     if (c.tray && !_trayInstalled) {
         SubutaiLauncher::Log::instance()->logger()->debug() << "Tray Component has been chosen" << std::endl;
         _trayInstall->start("Tray");
+        _trayInstall->setVisible(true);
         auto t = _trayInstall->run();
         t.detach();
         return;
@@ -216,6 +222,7 @@ void Wizard::runInstall()
     if (c.ete && !_eteInstalled) {
         SubutaiLauncher::Log::instance()->logger()->debug() << "Browser Plugin Component has been chosen" << std::endl;
         _eteInstall->start("Browser Plugin");
+        _eteInstall->setVisible(true);
         auto t = _eteInstall->run();
         t.detach();
         return;
@@ -223,6 +230,7 @@ void Wizard::runInstall()
     if (c.peer && !_peerInstalled) {
         SubutaiLauncher::Log::instance()->logger()->debug() << "Peer Component has been chosen" << std::endl;
         _peerInstall->start("Peer");
+        _peerInstall->setVisible(true);
         auto t = _peerInstall->run();
         t.detach();
         return;
@@ -253,15 +261,20 @@ void Wizard::stepCompleted(const std::string& name)
     }
 
     // Determine if we need to install something else
+    _logger->debug("Looking for a next component");
     auto c = _componentChooserPage->getComponents();
     if ((c.ptp && !_ptpInstalled) || (c.tray && !_trayInstalled) || (c.ete && !_eteInstalled) || (c.peer && !_peerInstalled))
     {
+        _logger->debug("Next component found");
         runInstall();
         return;
     } 
     // Show final page
     _cancel.setEnabled(false);
+    _cancel.setVisible(false);
     _next.setEnabled(false);
+    _next.setVisible(false);
     _back.setEnabled(false);
+    _back.setVisible(false);
     _finishPage->setVisible(true);
 }

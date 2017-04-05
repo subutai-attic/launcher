@@ -91,7 +91,11 @@ void SubutaiLauncher::Core::setupLogger()
     pFormatter->setProperty("times", "local");
     pSplitter->addChannel(pChannel);
     pSplitter->addChannel(cConsole);
+#if LAUNCHER_MACOS
+    pChannel->setProperty("path", "/usr/local/share/subutai/log/subutai-launcher.log");
+#else
     pChannel->setProperty("path", "subutai-launcher.log");
+#endif
     pChannel->setProperty("rotation", "5 M");
     Poco::AutoPtr<Poco::FormattingChannel> pFormatChannel(new Poco::FormattingChannel(pFormatter, pSplitter));
     Poco::Logger& log = Poco::Logger::get("subutai");

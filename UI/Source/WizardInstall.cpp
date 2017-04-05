@@ -1,6 +1,23 @@
 #include "WizardInstall.h"
 #include "Wizard.h"
 
+#if LAUNCHER_LINUX
+const std::string WizardInstall::P2P_INSTALL = "launcher-p2p-install-linux";
+const std::string WizardInstall::TRAY_INSTALL = "launcher-tray-install-linux";
+const std::string WizardInstall::E2E_INSTALL = "launcher-chrome-e2e-install-linux";
+const std::string WizardInstall::PEER_INSTALL = "launcher-peer-install-linux";
+#elif LAUNCHER_WINDOWS
+const std::string WizardInstall::P2P_INSTALL = "launcher-p2p-install-windows";
+const std::string WizardInstall::TRAY_INSTALL = "launcher-tray-install-windows";
+const std::string WizardInstall::E2E_INSTALL = "launcher-chrome-e2e-install-windows";
+const std::string WizardInstall::PEER_INSTALL = "launcher-peer-install-windows";
+#else
+const std::string WizardInstall::P2P_INSTALL = "launcher-p2p-install-darwin";
+const std::string WizardInstall::TRAY_INSTALL = "launcher-tray-install-darwin";
+const std::string WizardInstall::E2E_INSTALL = "launcher-chrome-e2e-install-darwin";
+const std::string WizardInstall::PEER_INSTALL = "launcher-peer-install-darwin";
+#endif
+
 WizardInstall::WizardInstall()
 {
     _logger = &Poco::Logger::get("subutai");
@@ -39,6 +56,7 @@ void WizardInstall::start(const std::string& name)
     if (_pb) {
         delete _pb;
     }
+    _logger->trace("Recreating progress bar");
     std::string nt("Installing ");
     nt.append(name);
     _title->setText(nt, dontSendNotification);
@@ -49,13 +67,13 @@ void WizardInstall::start(const std::string& name)
 
     // Converting component name to a script
     if (name == "P2P") {
-        _script = "launcher-p2p-install";
+        _script = P2P_INSTALL;
     } else if (name == "Tray") {
-        _script = "launcher-tray-install";
+        _script = TRAY_INSTALL;
     } else if (name == "Browser Plugin") {
-        _script = "launcher-e2e-install";
+        _script = E2E_INSTALL;
     } else if (name == "Peer") {
-        _script = "launcher-peer-install";
+        _script = PEER_INSTALL;
     }
 }
 
@@ -121,9 +139,11 @@ void WizardInstall::runImpl() {
 #endif
     }
 
+    _logger->debug("Stopping installation process and notifying parent");
     _running = false;
     auto parent = (Wizard*)getParentComponent();
     parent->stepCompleted(_name);
+    _logger->trace("Parent notified");
 }
 
 void WizardInstall::addLine(const std::string& text, bool error)

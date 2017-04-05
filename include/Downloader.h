@@ -29,6 +29,8 @@
 #include "Poco/JSON/JSONException.h"
 #include "Poco/Dynamic/Var.h"
 #include <Poco/Net/NetException.h>
+#include <Poco/Net/SSLException.h>
+#include <Poco/Net/SSLManager.h>
 #include <Poco/Net/HTTPStreamFactory.h>
 #include <Poco/Net/FTPStreamFactory.h>
 #include <Poco/Net/HTTPClientSession.h>
@@ -38,6 +40,7 @@
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/Net/HTMLForm.h>
 #include <Poco/Net/HTTPResponse.h>
+#include <Poco/Net/AcceptCertificateHandler.h>
 
 #include "FileSystem.h"
 
@@ -81,6 +84,7 @@ namespace SubutaiLauncher
             std::string getOutputDirectory() const;
             std::string getFullPath() const;
         private:
+            Poco::Net::Context::Ptr _context;
             std::string buildRequest(std::string path, std::string key, std::string value);
             std::string _filename;
             std::string _content;

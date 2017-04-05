@@ -57,9 +57,6 @@ class MainContentComponent : public juce::Component, public juce::ButtonListener
         MarketplaceComponent _marketplace;
         CommunityComponent _community;
 
-        juce::ImageButton *_closeButton;
-        juce::ImageButton *_minimizeButton;
-
         Logo _logo;
         SidebarComponent _sidebar;
 

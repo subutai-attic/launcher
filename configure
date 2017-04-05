@@ -14,6 +14,9 @@ Options:
       Specify a version of python to use. Example:
       --python=3.6m
 
+    --python-dir=<path>
+      Looking for python files in specified directory
+
     --no-tests
       Disable building of tests
 
@@ -24,10 +27,19 @@ Options:
       Disable build of CLI client
 
     --static 
-      Build only static library (disables shared)
+      Build only static library 
 
     --shared 
-      Build only shared library (disabled static)
+      Build only shared library 
+
+    --collect-static=<directory>
+      Specify a directory where static libraries will be collected. When this option is enabled configure will create this directory and
+      place all *.a files it find into it. This will allow linker to use static libraries over dynamic as a workaround for QA1393
+      (For more details see: http://developer.apple.com/library/mac/#qa/qa2006/qa1393.html)
+      This will help developers to make static build for local use only. 
+      
+    --with-custom-python=<directory>
+      Specify directory to a custom Python installation. It should be compiled and installed Python, not just a source code.
 
     --scheme=<scheme>
       Build scheme for launcher. Possible values are: dev, master, production. Default: production
@@ -39,9 +51,11 @@ exit
 tests=1
 static=0
 shared=0
+collect_static=""
 python="2.7"
 pylib=""
 py_header=""
+py_config_header=""
 scheme="production"
 lib_ext=""
 openssl_dir=""
@@ -55,6 +69,7 @@ extra_defines=
 extra_libraries=
 # Code extension for Juce source files. On darwin we use 'mm'
 code_extension="cpp"
+custom_python=""
 
 os=$(uname)
 
@@ -63,6 +78,7 @@ if [ "$os" == "Linux" ]; then
     lib_ext="so"
     top_lib_dir=/usr/lib
     top_include_dir=/usr/include
+    python_dir=/usr
     os_libs="-lrt"
     extra_defines="-DLINUX=1"
     extra_libraries="-lX11 -lXext -lXinerama -lfreetype"
@@ -70,6 +86,7 @@ elif [ "$os" == "Darwin" ]; then
     lib_ext="dylib"
     top_lib_dir=/usr/local
     top_include_dir=/usr/local
+    python_dir=/usr/local
     s_libs=""
     extra_defines=
     code_extension="mm"
@@ -109,9 +126,15 @@ find_openssl_directory()
 
 check_python()
 {
-    echo -n "Looking for libpython$1.$lib_ext library path... "
+    if [ $static -eq 1 ]; then
+        lext="a"
+    else
+        lext=$lib_ext
+    fi
 
-    pypath=`find $top_lib_dir -name "libpython$1.$lib_ext" | grep -v Permission | head -1`
+    echo -n "Looking for libpython$1.$lext library path... "
+
+    pypath=`find $python_dir -name "libpython$1.$lext" | grep -v Permission | head -1`
     if [[ ( $? != 0 ) || ( -z "$pypath" ) ]]; then
         echo "ERROR: Failed to find path to python library"
         exit
@@ -125,23 +148,39 @@ check_python_header()
 {
     echo -n "Looking for Python.h... "
 
-    local py_header_dir=`find $top_include_dir -name "python$1" -type d | grep -v Permission`
+    local py_header_dir=`find $python_dir -name "Python.h" | grep $python | grep -v Permission`
     if [[ ( $? != 0 ) || ( -z "$py_header_dir" ) ]]; then
         echo -e "FAIL"
-        echo -e "Couldn't find python$1 directory under /usr/include"
+        echo -e "Couldn't find libpython$1 directory under $python_dir"
         exit
     fi
     while read -r line; do
-        local py_header_path=`find $line -name 'Python.h'`
-        if [[ ( $? != 0 ) || ( -z "$py_header_path" ) ]]; then
-            continue
-        fi
-        py_header=`dirname $py_header_path`
+        py_header=`dirname $line`
         echo -e "OK [$py_header]"
         return
     done <<< "$py_header_dir"
     echo -e "FAIL"
     echo -e "Couldn't find Python.h in:\n $py_header_dir"
+    exit
+}
+
+check_python_pyconfig() 
+{
+    echo -n "Looking for pyconfig.h... "
+
+    local py_header_dir=`find $python_dir -name "pyconfig.h" | grep $python | grep -v PC | grep -v Permission`
+    if [[ ( $? != 0 ) || ( -z "$py_header_dir" ) ]]; then
+        echo -e "FAIL"
+        echo -e "Couldn't find pyconfig.h directory under $python_dir"
+        exit
+    fi
+    while read -r line; do
+        py_config_header=`dirname $line`
+        echo -e "OK [$py_config_header]"
+        return
+    done <<< "$py_header_dir"
+    echo -e "FAIL"
+    echo -e "Couldn't find Python.h in:\n $py_config_header"
     exit
 }
 
@@ -160,6 +199,28 @@ find_openssl_header()
     echo -e "OK [$openssl_dir]"
 }
 
+collect_static_libraries()
+{
+    if [ "$collect_static" == "" ]; then
+        return
+    fi
+    echo "Collecting static libraries into $collect_static"
+    mkdir -p $collect_static
+    if [ $? != 0 ]; then
+        echo "Failed to create $collect_static directory" 
+        exit
+    fi
+    rm -f $collect_static/*.a
+    rm -f $collect_static/Python
+    # Looking for Poco static libraries
+    find /usr -name 'libPoco*.a' -exec cp -v {} $collect_static/ \;
+    find $python_dir -name 'libpython*.a' -exec cp -v {} $collect_static/ \;
+    cp -v $collect_static/libpython$python.a $collect_static/Python
+    find /usr -name 'libssl*.a' -exec cp -v {} $collect_static/ \;
+    find /usr -name 'libcrypto*.a' -exec cp -v {} $collect_static/ \;
+    find /usr -name 'libssh*.a' -exec cp -v {} $collect_static/ \;
+}
+
 while [ $# -ge 1 ]; do
 
     case "$1" in
@@ -167,11 +228,22 @@ while [ $# -ge 1 ]; do
             python="`echo ${1} | awk '{print substr($0,10)}' | tr ',;' '  '`" 
             ;;
 
+        --python-dir=*)
+            python_dir="`echo ${1} | awk '{print substr($0,14)}' | tr ',;' '  '`" 
+            echo "Specified Python directory: $python_dir"
+            ;;
+
+        --with-custom-python=*)
+            custom_python="`echo ${1} | awk '{print substr($0,22)}' | tr ',;' '  '`" 
+            python_dir=$custom_python
+            ;;
+
         --scheme=*)
             scheme="`echo ${1} | awk '{print substr($0,10)}' | tr ',;' '  '`" 
             ;;
 
         --static)
+            echo "Enabling static build"
             static=1
             ;;
 
@@ -181,6 +253,9 @@ while [ $# -ge 1 ]; do
 
         --no-tests)
             tests=0
+            ;;
+        --collect-static=*)
+            collect_static="`echo ${1} | awk '{print substr($0,18)}' | tr ',;' '  '`" 
             ;;
 
         --help)
@@ -196,13 +271,16 @@ done
 
 check_python_header $python
 check_python $python
+check_python_pyconfig $python
 #find_openssl_header
 find_openssl_directory
+collect_static_libraries
 
 echo "# generated by configure script" > config.make
 echo "PYTHON_VER = python$python" >> config.make
 echo "PYLIB_DIR = $pylib" >> config.make
 echo "PYLIB_HEADER_DIR = $py_header" >> config.make
+echo "PYCONFIG_HEADER_DIR = $py_config_header" >> config.make
 echo "BUILD_SCHEME = $scheme" >> config.make
 echo "OPENSSL_DIR = $openssl_directory" >> config.make
 echo "OS = $os" >> config.make
@@ -233,10 +311,20 @@ fi
 if [ $tests -eq 1 ]; then
     echo "BUILD_TESTS = 1" >> config.make
 fi
+if [ "$os" == "Linux" ]; then
+    echo "LIBDIRS = -L/usr/lib/x86_64-linux-gnu -L$pylib -L../bin -L/usr/X11R6/lib -L/usr/local/lib -L/usr/lib -L$openssl_directory/lib"
+elif [ "$os" == "Darwin" ]; then
+    stlibs=""
+    if [ "$collect_static" != "" ]; then
+        stlibs="-L$collect_static"
+    fi
+    echo "LIBDIRS = $stlibs -L/usr/local/lib -L$pylib -L../bin -L$openssl_directory/lib" >> config.make
+fi
 cat <<__EOF__ >>config.make
 export PYTHON_VER
 export PYLIB_DIR
 export PYLIB_HEADER_DIR
+export PYCONFIG_HEADER_DIR
 export BUILD_SCHEME
 export BUILD_SCHEME_DEF
 export OPENSSL_DIR
@@ -249,4 +337,5 @@ export LIB_EXT
 export EXTRA_DEFINES
 export CODE_EXT
 export EXTRA_LIBS
+export LIBDIRS
 __EOF__

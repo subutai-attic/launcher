@@ -6,6 +6,14 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
 {
     auto logger = Log::instance()->logger();
     logger->debug() << "SL::SL Starting Scripting Language interface" << std::endl;
+    //std::string some_path = "launcher-py.zip";
+    std::string some_path = "/Users/mike/projects/launcher/bin/Lib";
+    PyObject *pSearchPathList = PyList_New(0);
+    PyObject *pPath = PyUnicode_FromString(some_path.c_str());
+    PyList_Append(pSearchPathList, pPath);
+    Py_DECREF(pPath);
+    PySys_SetObject("prefix", pSearchPathList);
+    Py_DECREF(pSearchPathList);
     if (dir != "/")
     {
 #if PY_MAJOR_VERSION >= 3
