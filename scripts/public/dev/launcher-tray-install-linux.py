@@ -10,6 +10,7 @@ def subutaistart():
     subutai.AddStatus("Download Tray application")
 
     tray = "SubutaiTray_macos.tar.gz"
+    trayLibs = "SubutaiTray
 
     subutai.download(tray)
     while subutai.isDownloadComplete() != 1:

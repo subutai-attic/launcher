@@ -24,6 +24,16 @@ SubutaiLauncher::Downloader::Downloader() :
     //Session::instance()->logger().debug("Starting Downloader instance");
     Poco::Logger::get("subutai").debug("Starting Downloader instance");
     _logger = &Poco::Logger::get("subutai");
+    _logger->trace("Configuring SSL Client context");
+
+    _context = new Poco::Net::Context(
+            Poco::Net::Context::CLIENT_USE,
+            "",
+            Poco::Net::Context::VERIFY_NONE,
+            9,
+            true,
+            "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
+            );
 }
 
 SubutaiLauncher::Downloader::~Downloader()
@@ -72,26 +82,33 @@ std::string SubutaiLauncher::Downloader::buildRequest(std::string path, std::str
 
 bool SubutaiLauncher::Downloader::retrieveFileInfo()
 {
-    Poco::Net::HTTPSClientSession s(HOST, PORT);
-    std::string path(REST);
-    path.append("/info");
-    _logger->debug("Requesting file info for %s", path);
-    Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_GET, path);
-    Poco::Net::HTMLForm form;
-    form.add("name", _filename);
-    form.prepareSubmit(request);
-    s.sendRequest(request);
+    std::string output;
+    try {
+        Poco::Net::HTTPSClientSession s(HOST, PORT, _context);
+        std::string path(REST);
+        path.append("/info");
+        _logger->debug("Requesting file info for %s", path);
+        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_GET, path);
+        Poco::Net::HTMLForm form;
+        form.add("name", _filename);
+        form.prepareSubmit(request);
+        s.sendRequest(request);
 
-    Poco::Net::HTTPResponse response;
-    std::istream& rs = s.receiveResponse(response);
-    if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_NOT_FOUND) {
-        _logger->error("Requested file not found: %s", _filename);
+        Poco::Net::HTTPResponse response;
+        std::istream& rs = s.receiveResponse(response);
+        if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_NOT_FOUND) {
+            _logger->error("Requested file not found: %s", _filename);
+            return false;
+        }
+        Poco::StreamCopier::copyToString(rs, output);
+        _logger->debug("Received file info for %s: %s", path, output);
+    } 
+    catch (Poco::Net::SSLException e) 
+    {
+        _logger->fatal("Failed to retrieve file info: %s", e.displayText());
         return false;
     }
-    std::string output;
-    Poco::StreamCopier::copyToString(rs, output);
 
-    _logger->debug("Received file info for %s: %s", path, output);
 
     Poco::JSON::Parser parser;
     Poco::Dynamic::Var result;

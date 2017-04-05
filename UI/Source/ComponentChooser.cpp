@@ -309,6 +309,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
     }
     else if (button == _peerYes)
     {
+        _peer = true;
         _peerLabel.setColour(Label::textColourId, Colours::white);
         _cpuLabel.setColour(Label::textColourId, Colours::white);
         _memLabel.setColour(Label::textColourId, Colours::white);
@@ -321,6 +322,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
     }
     else if (button == _peerNo)
     {
+        _peer = false;
         _peerLabel.setColour(Label::textColourId, Colours::grey);
         _cpuLabel.setColour(Label::textColourId, Colours::grey);
         _memLabel.setColour(Label::textColourId, Colours::grey);

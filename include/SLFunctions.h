@@ -4,6 +4,7 @@
 #include <string>
 #include <thread>
 #include <Python.h>
+#include "Poco/Process.h"
 
 #include "Downloader.h"
 #include "Session.h"
@@ -513,6 +514,7 @@ namespace SubutaiLauncher {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
             return NULL;
 
+#if LAUNCHER_LINUX
         RootProcess* rp = new RootProcess();
 
         char cmd[1024];
@@ -520,10 +522,18 @@ namespace SubutaiLauncher {
 
         rp->addCommand(std::string(cmd));
         rp->execute("Install executable");
-
         delete rp;
-        
         return Py_BuildValue("i", 0);
+#elif LAUNCHER_MACOS
+        Poco::Process::Args symlinkArgs;
+        symlinkArgs.push_back("-s");
+        symlinkArgs.push_back(sl_string);
+        symlinkArgs.push_back(sl_desc);
+        auto ph = Poco::Process::launch("ln", symlinkArgs);
+        int exitCode = ph.wait();
+        return Py_BuildValue("i", exitCode);
+#endif
+        
     }
 
     // ========================================================================

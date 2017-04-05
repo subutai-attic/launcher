@@ -139,9 +139,11 @@ void WizardInstall::runImpl() {
 #endif
     }
 
+    _logger->debug("Stopping installation process and notifying parent");
     _running = false;
     auto parent = (Wizard*)getParentComponent();
     parent->stepCompleted(_name);
+    _logger->trace("Parent notified");
 }
 
 void WizardInstall::addLine(const std::string& text, bool error)
