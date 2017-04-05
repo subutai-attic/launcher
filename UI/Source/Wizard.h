@@ -2,9 +2,9 @@
 #define __WIZARD_H__
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include <Poco/Process.h>
-#include <Poco/File.h>
-#include <Poco/Environment.h>
+#include "Poco/Process.h"
+#include "Poco/File.h"
+#include "Poco/Environment.h"
 #include "Poco/Logger.h"
 #include "WizardIntro.h"
 #include "SystemCheck.h"

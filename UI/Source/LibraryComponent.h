@@ -1,13 +1,3 @@
-/*
-   ==============================================================================
-
-   LibraryComponent.h
-Created: 5 Aug 2016 5:58:23pm
-Author:  crioto
-
-==============================================================================
-*/
-
 #ifndef LIBRARYCOMPONENT_H_INCLUDED
 #define LIBRARYCOMPONENT_H_INCLUDED
 
@@ -23,12 +13,9 @@ Author:  crioto
 #include "../JuceLibraryCode/JuceHeader.h"
 
 #include "Poco/Logger.h"
-#include "LibraryActionThread.h"
 #include "InstallationDialog.h"
-#include "ConfigurationManager.h"
 #include "Vars.h"
 #include "Session.h"
-#include "SubutaiProcess.h"
 #include "LibraryItem.h"
 #include "LibraryItemTab.h"
 #include "LibrarySystemCheck.h"

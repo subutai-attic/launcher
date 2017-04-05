@@ -4,8 +4,11 @@
 #include "Environment.h"
 #include "SubutaiString.h"
 #include "FileSystem.h"
-#include "SubutaiProcess.h"
-#include "SubutaiLog.h"
+#include "Poco/Logger.h"
+#include "Poco/Process.h"
+#include "Poco/PipeStream.h"
+#include "Poco/Pipe.h"
+#include "Poco/StreamCopier.h"
 
 #include <string>
 
@@ -23,6 +26,7 @@ namespace SubutaiLauncher {
             bool isRunning();
             bool isInstalled();
         private:
+            Poco::Logger* _logger;
             std::string _version;
             std::string _path;
             std::string _location;

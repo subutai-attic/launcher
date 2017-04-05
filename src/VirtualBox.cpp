@@ -25,14 +25,19 @@ SubutaiLauncher::VirtualBox::~VirtualBox()
 
 std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::getPeers() 
 {
-    std::vector<std::string> args;
+
+    Poco::Process::Args args;
     args.push_back("list");
     args.push_back("vms");
-    SubutaiProcess p;
-    p.launch(BIN, args, _location);
-    p.wait();
-    auto out = p.getOutputBuffer();
-    std::vector<SubutaiVM> peers = VirtualBox::parseVms(out);
+
+    Poco::Pipe pOut;
+    Poco::ProcessHandle ph = Poco::Process::launch(_path, args, 0, &pOut, 0);
+    ph.wait();
+    Poco::PipeInputStream istr(pOut);
+    std::string buffer;
+    Poco::StreamCopier::copyToString(istr, buffer);
+
+    std::vector<SubutaiVM> peers = VirtualBox::parseVms(buffer);
     return peers;
 }
 
@@ -206,13 +211,17 @@ std::string SubutaiLauncher::VirtualBox::getBridgedInterface(const std::string& 
 
 std::string SubutaiLauncher::VirtualBox::getMachineInfo(const std::string& name) 
 {
-    std::vector<std::string> args;
+    Poco::Process::Args args;
     args.push_back("showvminfo");
     args.push_back(name);
-    SubutaiProcess p;
-    p.launch(BIN, args, _location);
-    p.wait();
-    return p.getOutputBuffer();
+
+    Poco::Pipe pOut;
+    Poco::ProcessHandle ph = Poco::Process::launch(_path, args, 0, &pOut, 0);
+    ph.wait();
+    Poco::PipeInputStream istr(pOut);
+    std::string buffer;
+    Poco::StreamCopier::copyToString(istr, buffer);
+    return buffer;
 }
 
 bool SubutaiLauncher::VirtualBox::isMachineExists(const std::string& name)
