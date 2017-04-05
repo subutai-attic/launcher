@@ -1,6 +1,12 @@
 #include "VirtualBox.h"
 
+#if LAUNCHER_LINUX
 const std::string SubutaiLauncher::VirtualBox::BIN = "vboxmanage";
+#elif LAUNCHER_MACOS
+const std::string SubutaiLauncher::VirtualBox::BIN = "VBoxManage";
+#else
+#error Not implemented on this platform
+#endif
 std::string SubutaiLauncher::VirtualBox::cloneName = "subutai";
 std::string SubutaiLauncher::VirtualBox::subutaiBranch = "subutai-dev";
 
@@ -41,7 +47,7 @@ bool SubutaiLauncher::VirtualBox::findInstallation()
         fp.append("/"+BIN);
         Poco::File f(fp);
         if (f.exists()) {
-            _logger->trace("VirtualBox installation found");
+            _logger->trace("VirtualBox installation found at %s", fp);
             _installed = true;
             _path = (*it);
             _location = _path;
@@ -76,27 +82,29 @@ std::string SubutaiLauncher::VirtualBox::extractVersion()
         return _version;
     }
 
-    std::vector<std::string> args;
+    Poco::Process::Args args;
     args.push_back("-v");
 
-    SubutaiProcess p;
-    p.launch(BIN, args, _location);
-    if (p.wait() == 0) {
-        _version = p.getOutputBuffer();
-        return _version;
-    }
-    return "";
+    Poco::Pipe output;
+    Poco::ProcessHandle ph = Poco::Process::launch(_path, args, 0, &output, 0);
+    Poco::PipeInputStream istr(output);
+
+    Poco::StreamCopier::copyToString(istr, _version);
+    return _version;
 }
 
 void SubutaiLauncher::VirtualBox::getVms()
 {
-    std::vector<std::string> args;
+    Poco::Process::Args args;
     args.push_back("list");
     args.push_back("vms");
-    SubutaiProcess p;
-    p.launch(BIN, args, _location);
-    p.wait();
-    auto out = p.getOutputBuffer();
+
+    Poco::Pipe output;
+    Poco::ProcessHandle ph = Poco::Process::launch(_path, args, 0, &output, 0);
+    Poco::PipeInputStream istr(output);
+
+    std::string result;
+    Poco::StreamCopier::copyToString(istr, result);
 }
 
 std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::parseVms(const std::string& buffer)
@@ -131,35 +139,63 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::parseVms(co
 
 std::string SubutaiLauncher::VirtualBox::execute(const std::string& command)
 {
-    SubutaiString str(command);
-    std::vector<std::string> args;
-    str.split(' ', args);
-    SubutaiProcess p;
-    p.launch(BIN, args, _location);
-    p.wait();
-    std::string out = p.getOutputBuffer();
-    _logger->debug("VirtualBox::execute %s: %s", command, out);
-    int i = 0;
-    return out;
+    _logger->information("VB: Executing %s", command);
+    Poco::Process::Args args;
+    Poco::StringTokenizer st(command, " ", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
+    for (auto it = st.begin(); it != st.end(); it++)
+    {
+        _logger->trace("Adding arguments %s", (*it));
+        args.push_back((*it));
+    }
+
+    Poco::Pipe output;
+    Poco::Pipe error;
+    Poco::ProcessHandle ph = Poco::Process::launch(_path, args, 0, &output, &error);
+    int status = ph.wait();
+    Poco::PipeInputStream iStdout(output);
+    Poco::PipeInputStream iStderr(error);
+
+    std::string pStdout;
+    std::string pStderr;
+    Poco::StreamCopier::copyToString(iStdout, pStdout);
+    Poco::StreamCopier::copyToString(iStderr, pStderr);
+
+    _logger->information("Command executed with status %d", status);
+
+    if (!pStderr.empty()) {
+        _logger->error("Error during execution of a command %s: %s", command, pStderr);
+    }
+    return pStdout;
 }
 
 std::string SubutaiLauncher::VirtualBox::execute(const std::string& command, int &exitStatus)
 {
-    SubutaiString str(command);
-    std::vector<std::string> args;
-    str.split(' ', args);
-    SubutaiProcess p;
-    p.launch(BIN, args, _location);
-    auto status = p.wait();
-    exitStatus = status;
-    std::string out = p.getOutputBuffer();
-    std::string err = p.getErrorBuffer();
-    if (status != 0) {
-        _logger->error("VB Command execution gave error: %s", err);
+    Poco::Process::Args args;
+    Poco::StringTokenizer st(command, " ", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
+    for (auto it = st.begin(); it != st.end(); it++)
+    {
+        args.push_back((*it));
     }
-    _logger->debug("VirtualBox::execute %s[%d]: %s", command, status, out);
-    int i = 0;
-    return out;
+
+    Poco::Pipe output;
+    Poco::Pipe error;
+    Poco::ProcessHandle ph = Poco::Process::launch(_path, args, 0, &output, &error);
+    int status = ph.wait();
+    Poco::PipeInputStream iStdout(output);
+    Poco::PipeInputStream iStderr(error);
+
+    std::string pStdout;
+    std::string pStderr;
+    Poco::StreamCopier::copyToString(iStdout, pStdout);
+    Poco::StreamCopier::copyToString(iStderr, pStderr);
+
+    exitStatus = status;
+    _logger->information("Command executed with status %d", status);
+
+    if (!pStderr.empty()) {
+        _logger->error("Error during execution of a command %s: %s", command, pStderr);
+    }
+    return pStdout;
 }
 
 std::string SubutaiLauncher::VirtualBox::getBridgedInterface(const std::string& iface) 

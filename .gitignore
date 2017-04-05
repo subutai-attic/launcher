@@ -70,3 +70,4 @@ lnchr.conf
 /package/darwin/flat/Distribution
 /package/darwin/root
 *.pkg
+.DS_Store

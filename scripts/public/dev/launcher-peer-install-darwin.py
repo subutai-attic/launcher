@@ -94,9 +94,11 @@ def setupVm( machineName ):
         subutai.download("core.ova")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
+
         subutai.download("subutai_4.0.15_amd64-dev.snap")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
+
         subutai.VBox("import /tmp/subutai/core.ova")
         subutai.VBox("modifyvm core --cpus 2")
         subutai.VBox("modifyvm core --nic1 nat")

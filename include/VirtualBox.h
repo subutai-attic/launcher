@@ -16,6 +16,9 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/Environment.h"
 #include "Poco/Logger.h"
+#include "Poco/Process.h"
+#include "Poco/PipeStream.h"
+#include "Poco/StreamCopier.h"
 
 #include "Environment.h"
 #include "SubutaiString.h"

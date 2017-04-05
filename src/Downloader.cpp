@@ -34,6 +34,8 @@ SubutaiLauncher::Downloader::Downloader() :
             true,
             "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
             );
+    Poco::Net::SSLManager::InvalidCertificateHandlerPtr ptrHandler ( new Poco::Net::AcceptCertificateHandler(false) );
+    Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, _context);
 }
 
 SubutaiLauncher::Downloader::~Downloader()

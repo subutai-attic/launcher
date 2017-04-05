@@ -40,6 +40,7 @@
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/Net/HTMLForm.h>
 #include <Poco/Net/HTTPResponse.h>
+#include <Poco/Net/AcceptCertificateHandler.h>
 
 #include "FileSystem.h"
 
