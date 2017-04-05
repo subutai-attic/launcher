@@ -2,18 +2,35 @@
 
 launcher=$1
 pythondir=$2
-if [ ! -f $launcher ]; then
+if [ ! -f "$launcher" ]; then
     echo "Couldn't find specified file: $launcher"
     exit 1
 fi
-if [ ! -d $pythondir ]; then
+if [ ! -d "$pythondir" ]; then
     echo "Couldn't find $python directory"
     exit 1
 fi
+# clean
+rm -rf flat
+rm -rf root
+rm -f *.pkg
 version=4.0.15
 # Copy files
-mkdir -p root/Applications; cp $launcher root/Applications/SubutaiLauncher.app
-mkdir -p root/usr/local/share/subutai; cp -r $pythondir/* root/usr/local/share/subutai/python/
+mkdir -p flat/Resources/en.lproj
+mkdir -p flat/base.pkg
+#mkdir -p root/Applications/SubutaiLauncher.app/Contents/Frameworks
+mkdir -p root/Applications/SubutaiLauncher.app/Contents/MacOS
+#mkdir -p root/Applications/SubutaiLauncher.app/Contents/PlugIns
+mkdir -p root/Applications/SubutaiLauncher.app/Contents/Resources
+
+cp $launcher root/Applications/SubutaiLauncher.app/Contents/MacOS/SubutaiLauncher
+mkdir -p root/usr/local/share/subutai/python; cp -r $pythondir/* root/usr/local/share/subutai/python/
+
+cp PkgInfo.tmpl root/Applications/SubutaiLauncher.app/Contents/PkgInfo
+cp Info.plist.tmpl root/Applications/SubutaiLauncher.app/Contents/Info.plist
+
+cp ./SubutaiLauncher.icns root/Applications/SubutaiLauncher.app/Contents/Resources/
+
 # Determine sizes and modify PackageInfo
 rootfiles=`find root | wc -l`
 rootsize=`du -b -s root | awk '{print $1}'`

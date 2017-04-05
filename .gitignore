@@ -68,3 +68,5 @@ lnchr.conf
 # Macos package
 /package/darwin/flat/base.pkg/PackageInfo
 /package/darwin/flat/Distribution
+/package/darwin/root
+*.pkg
