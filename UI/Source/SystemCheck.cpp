@@ -2,8 +2,12 @@
 
 SystemCheck::SystemCheck()
 {
+    _logger = &Poco::Logger::get("subutai");
+    _logger->trace("Starting System Check UI Component");
     auto font = juce::Font(15);
     auto font2 = juce::Font(13);
+
+    SubutaiLauncher::Environment env;
 
     _osLabel.setText("Operating System", dontSendNotification);
     _osLabel.setColour(Label::textColourId, Colours::white);
@@ -12,7 +16,7 @@ SystemCheck::SystemCheck()
     _osLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_osLabel);
 
-    _osValue.setText("11111", dontSendNotification);
+    _osValue.setText(env.versionOS(), dontSendNotification);
     _osValue.setColour(Label::textColourId, Colours::white);
     _osValue.setBounds(150, 15, 500, 40);
     _osValue.setFont(font);
@@ -33,7 +37,7 @@ SystemCheck::SystemCheck()
     _archLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_archLabel);
 
-    _archValue.setText("11111", dontSendNotification);
+    _archValue.setText(env.cpuArch(), dontSendNotification);
     _archValue.setColour(Label::textColourId, Colours::white);
     _archValue.setBounds(150, 55, 500, 40);
     _archValue.setFont(font);
@@ -54,7 +58,9 @@ SystemCheck::SystemCheck()
     _cpuLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_cpuLabel);
 
-    _cpuValue.setText("11111", dontSendNotification);
+    std::string cores = Poco::format("%lu", env.cpuNum());
+
+    _cpuValue.setText(cores, dontSendNotification);
     _cpuValue.setColour(Label::textColourId, Colours::white);
     _cpuValue.setBounds(150, 95, 500, 40);
     _cpuValue.setFont(font);
@@ -75,7 +81,9 @@ SystemCheck::SystemCheck()
     _memLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_memLabel);
 
-    _memValue.setText("11111", dontSendNotification);
+    std::string memValue = Poco::format("%lu MB", env.ramSize());
+
+    _memValue.setText(memValue, dontSendNotification);
     _memValue.setColour(Label::textColourId, Colours::white);
     _memValue.setBounds(150, 135, 500, 40);
     _memValue.setFont(font);
@@ -88,7 +96,7 @@ SystemCheck::SystemCheck()
     _memInfo.setFont(font2);
     _memInfo.setJustificationType(Justification::top);
     addAndMakeVisible(_memInfo);
-    
+
     _vtxLabel.setText("Virtualization support", dontSendNotification);
     _vtxLabel.setColour(Label::textColourId, Colours::white);
     _vtxLabel.setBounds(15, 175, 150, 40);
@@ -96,7 +104,10 @@ SystemCheck::SystemCheck()
     _vtxLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_vtxLabel);
 
-    _vtxValue.setText("11111", dontSendNotification);
+    std::string vtxStatus = "Disabled";
+    if (env.vtxEnabled()) vtxStatus = "Enabled";
+
+    _vtxValue.setText(vtxStatus, dontSendNotification);
     _vtxValue.setColour(Label::textColourId, Colours::white);
     _vtxValue.setBounds(150, 175, 500, 40);
     _vtxValue.setFont(font);
@@ -117,8 +128,18 @@ SystemCheck::SystemCheck()
     _vbLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_vbLabel);
 
-    _vbValue.setText("11111", dontSendNotification);
-    _vbValue.setColour(Label::textColourId, Colours::white);
+    SubutaiLauncher::VirtualBox vb;
+    vb.findInstallation();
+    if (vb.isInstalled())
+    {
+        _vbValue.setText(vb.extractVersion(), dontSendNotification);
+        _vbValue.setColour(Label::textColourId, Colours::white);
+    } 
+    else 
+    {
+        _vbValue.setText("Not installed", dontSendNotification);
+        _vbValue.setColour(Label::textColourId, Colours::red);
+    }
     _vbValue.setBounds(150, 215, 500, 40);
     _vbValue.setFont(font);
     _vbValue.setJustificationType(Justification::top);
@@ -130,19 +151,22 @@ SystemCheck::SystemCheck()
     _vbInfo.setFont(font2);
     _vbInfo.setJustificationType(Justification::top);
     addAndMakeVisible(_vbInfo);
+    _logger->trace("System Check UI Component created");
 }
 
 SystemCheck::~SystemCheck()
 {
-
+    _logger->trace("Destroying System Check UI Component");
 }
 
 void SystemCheck::paint(juce::Graphics& g)
 {
-    g.fillAll (Colour::greyLevel (0.2f));
+    g.fillAll(Colour::greyLevel (0.2f));
+    _logger->trace("SystemCheck::paint");
 }
 
 void SystemCheck::resized()
 {
+    _logger->trace("SystemCheck::resized");
 
 }

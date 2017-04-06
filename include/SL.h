@@ -8,15 +8,17 @@
 #include "SubutaiException.h"
 #include "SLException.h"
 #include "FileSystem.h"
-#include "SubutaiLog.h"
 #include "Session.h"
+
+#include "Poco/Logger.h"
+#include "Poco/String.h"
 
 #if LAUNCHER_LINUX
 #include <sys/stat.h>
 #elif LAUNCHER_WINDOWS
 //#error Not Implemented for this platform
 #elif LAUNCHER_MACOS
-#error Not Implemented for this platform
+//#error Not Implemented for this platform
 #else
 #error Unknown Platform
 #endif
@@ -34,6 +36,7 @@ namespace SubutaiLauncher {
             std::thread executeInThread(const std::string& module);
             long exitCode();
         private:
+            Poco::Logger* _logger;
             PyObject* _name;
             PyObject* _module;
             long _exitCode;

@@ -162,7 +162,7 @@ private:
 
             for (int i = 0; i < keyPresses.size(); ++i)
             {
-                const String key (keyPresses.getReference(i).getTextDescriptionWithIcons());
+                const String key (keyPresses.getReference (i).getTextDescriptionWithIcons());
 
                 if (shortcutKey.isNotEmpty())
                     shortcutKey << ", ";
@@ -221,14 +221,16 @@ public:
         setLookAndFeel (parent != nullptr ? &(parent->getLookAndFeel())
                                           : menu.lookAndFeel.get());
 
-        parentComponent = getLookAndFeel().getParentComponentForMenuOptions (options);
+        LookAndFeel& lf = getLookAndFeel();
 
-        setOpaque (getLookAndFeel().findColour (PopupMenu::backgroundColourId).isOpaque()
+        parentComponent = lf.getParentComponentForMenuOptions (options);
+
+        setOpaque (lf.findColour (PopupMenu::backgroundColourId).isOpaque()
                      || ! Desktop::canUseSemiTransparentWindows());
 
         for (int i = 0; i < menu.items.size(); ++i)
         {
-            PopupMenu::Item* const item = menu.items.getUnchecked(i);
+            PopupMenu::Item* const item = menu.items.getUnchecked (i);
 
             if (i < menu.items.size() - 1 || ! item->isSeparator)
                 items.add (new ItemComponent (*item, options.standardHeight, *this));
@@ -259,11 +261,13 @@ public:
         {
             addToDesktop (ComponentPeer::windowIsTemporary
                           | ComponentPeer::windowIgnoresKeyPresses
-                          | getLookAndFeel().getMenuWindowFlags());
+                          | lf.getMenuWindowFlags());
 
             getActiveWindows().add (this);
             Desktop::getInstance().addGlobalMouseListener (this);
         }
+
+        lf.preparePopupMenuWindow (*this);
     }
 
     ~MenuWindow()
@@ -321,11 +325,23 @@ public:
                 *managerOfChosenCommand = item->commandManager;
             }
 
-            exitModalState (item != nullptr ? item->itemID : 0);
+            exitModalState (getResultItemID (item));
 
             if (makeInvisible && (deletionChecker != nullptr))
                 setVisible (false);
         }
+    }
+
+    static int getResultItemID (const PopupMenu::Item* item)
+    {
+        if (item == nullptr)
+            return 0;
+
+        if (CustomCallback* cc = item->customCallback)
+            if (! cc->menuItemTriggered())
+                return 0;
+
+        return item->itemID;
     }
 
     void dismissMenu (const PopupMenu::Item* const item)
@@ -415,7 +431,7 @@ public:
 
         for (int i = mouseSourceStates.size(); --i >= 0;)
         {
-            mouseSourceStates.getUnchecked(i)->timerCallback();
+            mouseSourceStates.getUnchecked (i)->timerCallback();
 
             if (deletionChecker == nullptr)
                 return;
@@ -496,7 +512,7 @@ public:
     {
         for (int i = mouseSourceStates.size(); --i >= 0;)
         {
-            MouseSourceState& ms = *mouseSourceStates.getUnchecked(i);
+            MouseSourceState& ms = *mouseSourceStates.getUnchecked (i);
             if (ms.source == source)
                 return ms;
         }
@@ -522,7 +538,7 @@ public:
     bool isAnyMouseOver() const
     {
         for (int i = 0; i < mouseSourceStates.size(); ++i)
-            if (mouseSourceStates.getUnchecked(i)->isOver())
+            if (mouseSourceStates.getUnchecked (i)->isOver())
                 return true;
 
         return false;
@@ -751,7 +767,7 @@ public:
 
         for (int i = items.size(); --i >= 0;)
         {
-            if (ItemComponent* const m = items.getUnchecked(i))
+            if (ItemComponent* const m = items.getUnchecked (i))
             {
                 if (m->item.itemID == itemID
                      && windowPos.getHeight() > PopupMenuSettings::scrollZone * 4)
@@ -1169,7 +1185,7 @@ private:
             int amount = 0;
 
             for (int i = 0; i < window.items.size() && amount == 0; ++i)
-                amount = ((int) scrollAcceleration) * window.items.getUnchecked(i)->getHeight();
+                amount = ((int) scrollAcceleration) * window.items.getUnchecked (i)->getHeight();
 
             window.alterChildYPos (amount * direction);
             lastScrollTime = timeNow;
@@ -1200,7 +1216,7 @@ struct NormalComponentWrapper : public PopupMenu::CustomComponent
 
     void resized() override
     {
-        if (Component* const child = getChildComponent(0))
+        if (Component* const child = getChildComponent (0))
             child->setBounds (getLocalBounds());
     }
 
@@ -1279,6 +1295,7 @@ PopupMenu::Item::Item (const Item& other)
     subMenu (createCopyIfNotNull (other.subMenu.get())),
     image (other.image != nullptr ? other.image->createCopy() : nullptr),
     customComponent (other.customComponent),
+    customCallback (other.customCallback),
     commandManager (other.commandManager),
     shortcutKeyDescription (other.shortcutKeyDescription),
     colour (other.colour),
@@ -1296,6 +1313,7 @@ PopupMenu::Item& PopupMenu::Item::operator= (const Item& other)
     subMenu = createCopyIfNotNull (other.subMenu.get());
     image = (other.image != nullptr ? other.image->createCopy() : nullptr);
     customComponent = other.customComponent;
+    customCallback = other.customCallback;
     commandManager = other.commandManager;
     shortcutKeyDescription = other.shortcutKeyDescription;
     colour = other.colour;
@@ -1693,7 +1711,7 @@ int PopupMenu::getNumItems() const noexcept
     int num = 0;
 
     for (int i = items.size(); --i >= 0;)
-        if (! items.getUnchecked(i)->isSeparator)
+        if (! items.getUnchecked (i)->isSeparator)
             ++num;
 
     return num;
@@ -1778,21 +1796,48 @@ void PopupMenu::CustomComponent::triggerMenuItem()
 }
 
 //==============================================================================
-PopupMenu::MenuItemIterator::MenuItemIterator (const PopupMenu& m)  : menu (m), index (0) {}
+PopupMenu::CustomCallback::CustomCallback() {}
+PopupMenu::CustomCallback::~CustomCallback() {}
+
+//==============================================================================
+PopupMenu::MenuItemIterator::MenuItemIterator (const PopupMenu& m, bool searchR) : searchRecursively (searchR)
+{
+    currentItem = nullptr;
+    index.add (0);
+    menus.add (&m);
+}
+
 PopupMenu::MenuItemIterator::~MenuItemIterator() {}
 
 bool PopupMenu::MenuItemIterator::next()
 {
-    if (index >= menu.items.size())
+    if (index.size() == 0 || menus.getLast()->items.size() == 0)
         return false;
 
-    const Item* const item = menu.items.getUnchecked (index++);
+    currentItem = menus.getLast()->items.getUnchecked (index.getLast());
 
-    return ! (item->isSeparator && index >= menu.items.size()); // (avoid showing a separator at the end)
+    if (searchRecursively && currentItem->subMenu != nullptr)
+    {
+        index.add (0);
+        menus.add (currentItem->subMenu);
+    }
+    else
+        index.setUnchecked (index.size() - 1, index.getLast() + 1);
+
+    while (index.size() > 0 && index.getLast() >= menus.getLast()->items.size())
+    {
+        index.removeLast();
+        menus.removeLast();
+
+        if (index.size() > 0)
+            index.setUnchecked (index.size() - 1, index.getLast() + 1);
+    }
+
+    return true;
 }
 
-const PopupMenu::Item& PopupMenu::MenuItemIterator::getItem() const noexcept
+PopupMenu::Item& PopupMenu::MenuItemIterator::getItem() const noexcept
 {
-    jassert (isPositiveAndBelow (index - 1, menu.items.size()));
-    return *menu.items.getUnchecked (index - 1);
+    jassert (currentItem != nullptr);
+    return *(currentItem);
 }

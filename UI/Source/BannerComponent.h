@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    BannerComponent.h
-    Created: 5 Aug 2016 5:57:52pm
-    Author:  crioto
-
-  ==============================================================================
-*/
-
 #ifndef BANNERCOMPONENT_H_INCLUDED
 #define BANNERCOMPONENT_H_INCLUDED
 

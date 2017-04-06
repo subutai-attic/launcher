@@ -1,10 +1,12 @@
 #include "WizardWindow.h"
 
-WizardWindow::WizardWindow() : DocumentWindow(
+WizardWindow::WizardWindow() : DialogWindow(
         "Installation Wizard", 
         juce::Colours::lightgrey,
-        juce::DocumentWindow::closeButton)
+        false, true)
 {
+    _logger = &Poco::Logger::get("subutai");
+    _logger->trace("Creating Installation Wizard Window");
     setSize(640, 480);
     centreWithSize(getWidth(), getHeight());
     setDraggable(false);
@@ -16,11 +18,12 @@ WizardWindow::WizardWindow() : DocumentWindow(
 
 WizardWindow::~WizardWindow()
 {
-
+    _logger->trace("Destroying Installation Wizard Window");
 }
 
 void WizardWindow::closeButtonPressed()
 {
+    _logger->trace("WizardWindow: Close Button Pressed");
     delete this;
 }
 

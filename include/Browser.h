@@ -1,24 +1,16 @@
 #ifndef __SL_BROWSER_H__
 #define __SL_BROWSER_H__
 
+/*
 #include "Vars.h"
-
-#include <cstdlib>
-#include <iostream>
-#include <utility>
-#include <locale>
-#include <codecvt>
-#include <vector>
-#include <string>
-#include <iomanip>
-#include <ctime>
 
 #include "Environment.h"
 #include "SubutaiString.h"
 #include "FileSystem.h"
 #include "SubutaiProcess.h"
-#include "SSH.h"
-#include "Session.h"
+#include "Session.h"*/
+#include <string>
+#include <vector>
 
 namespace SubutaiLauncher {
     class Browser {

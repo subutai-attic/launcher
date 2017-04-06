@@ -2,8 +2,7 @@
 #define __NOTIFICATION_CENTER_H__
 
 #include <deque>
-
-#include "SubutaiLog.h"
+#include "Poco/Logger.h"
 
 namespace SubutaiLauncher
 {
@@ -56,6 +55,7 @@ namespace SubutaiLauncher
             NotificationMessage dispatchNotification();
             void clear();
         private:
+            Poco::Logger* _logger;
             EventPool _pool;
             NotificationPool _npool;
             bool _running;

@@ -1,8 +1,9 @@
 #ifndef __SL_EXCEPTION_H__
 #define __SL_EXCEPTION_H__
 
+#include "Poco/Logger.h"
 #include "SubutaiException.h"
-#include "SubutaiLog.h"
+
 namespace SubutaiLauncher {
 
     class SLException : public SubutaiException {

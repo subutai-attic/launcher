@@ -2,17 +2,19 @@
 *ycm_extra_conf*
 compile_commands.json
 bin
-build
+*.o
 CLI/bin
 CLI/build
 *_back
 trash
 bui.sh
 kurjun/*
+python_src
 
 # extra libs
 /third-party/python*
 /third-party/curl
+/third-party/openssl
 /third-party/libssh
 
 # linux build
@@ -27,6 +29,11 @@ deploy.sh
 *.filter*
 *.user
 *.opendb
+*.obj
+*.tlog
+*.lastbuildstate
+*.lib
+*.pdb
 subutai-launcher/Debug
 subutai-launcher/x64
 subutai-launcher/.vs
@@ -39,13 +46,28 @@ UI/Builds/VisualStudio2015/Debug/
 /x64
 /testsuite/Debug
 /testsuite/x64
+build/launcher-windows/subutai-launcher/x64/
+build/launcher-windows/UI/x64
 
 # python
 __pycache__
 *.pyc
+py-embed/*.c*
+py-embed/Makefile
 
 # misc
 /deploy
+*.log
+p2p
+md5-*
+*.zip
 
 # runtime
 lnchr.conf
+
+# Macos package
+/package/darwin/flat/base.pkg/PackageInfo
+/package/darwin/flat/Distribution
+/package/darwin/root
+*.pkg
+.DS_Store

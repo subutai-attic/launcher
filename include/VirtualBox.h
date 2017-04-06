@@ -13,12 +13,16 @@
 #include <iomanip>
 #include <ctime>
 
-#include <Poco/StringTokenizer.h>
+#include "Poco/StringTokenizer.h"
+#include "Poco/Environment.h"
+#include "Poco/Logger.h"
+#include "Poco/Process.h"
+#include "Poco/PipeStream.h"
+#include "Poco/StreamCopier.h"
 
 #include "Environment.h"
 #include "SubutaiString.h"
 #include "FileSystem.h"
-#include "SubutaiProcess.h"
 #include "SSH.h"
 #include "Session.h"
 
@@ -47,21 +51,6 @@ namespace SubutaiLauncher {
             void addVm(SubutaiVM vm);
             std::string execute(const std::string& command);
             std::string execute(const std::string& command, int &exitStatus);
-            std::string sysExecute(const std::string& command, const std::string& cargs);
-            std::string sysExecute(const std::string& command, const std::vector<std::string>& cargs);
-            std::string cloneVM();
-            bool cleanKnownHosts(std::string sport);
-            bool runScripts(std::string instVersion, std::string isMH);
-            bool setAutobuildIP(SSH &s_ssh);
-            bool stopVM();
-            bool restoreNet();
-            bool startVM();
-            bool waitingSSH(SSH &s_ssh, std::string sport);
-            bool connectSSH(SSH &s_ssh);
-            bool waitPeerIP();
-            bool runAutobuild();
-            bool importManagement();
-            std::string getBranch( std::string  instVersion);
 
             // New version
             std::string importVirtualMachine(const std::string& fileName, const std::string& targetName) const;
@@ -71,6 +60,7 @@ namespace SubutaiLauncher {
             bool isMachineRunning(const std::string& name);
 
         private:
+            Poco::Logger* _logger;
             std::string _version;
             std::string _path;
             std::string _location;

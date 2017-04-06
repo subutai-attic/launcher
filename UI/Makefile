@@ -1,12 +1,15 @@
-CC = g++ 
+CC = g++
 #-print-search-dirs 
 TARGET = subutai-launcher
 EXTRA_LIB_DIR = ../third-party
-INCLUDES = -Iinclude -I/usr/include/$(PYTHON_VER) -I../include -I../third-party/md5 -I../third-party/json
-LIBDIRS = -L/usr/lib/x86_64-linux-gnu -L$(PYLIB_DIR) -L../bin -L/usr/X11R6/lib
-ST_LIBS = -g -ggdb $(LIBDIRS) -Wl,-Bdynamic -lm -l$(PYTHON_VER) -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -Wl,-Bstatic -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -Wl,-Bstatic -lPocoFoundation -Wl,-Bdynamic -lrt -lssl -lcrypto -lcurl -lssh
-SH_LIBS = -g -ggdb $(LIBDIRS) -lm -l$(PYTHON_VER) -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation -lrt -lssl -lcrypto -lcurl -lssh
-CFLAGS =-DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DJUCE_APP_VERSION=1.0.0 -DBUILD_SCHEME="\"$(BUILD_SCHEME)\"" -DJUCE_APP_VERSION_HEX=0x10000 $(INCLUDES) -I/usr/include -I/usr/include/freetype2 -IJuceLibraryCode -IJuceLibraryCode/modules -std=c++11
+INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_DIR)/include -I../include -I../third-party/md5 -I../third-party/json
+#ST_LIBS = -g -ggdb $(LIBDIRS) -Wl,-Bdynamic $(EXTRA_LIBS) -lm -l$(PYTHON_VER) -ldl -lpthread -Wl,-Bstatic -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -Wl,-Bstatic -lPocoFoundation -Wl,-Bdynamic $(SYSLIBS) -lssl -lcrypto -lcurl -lssh
+#MACOS ONLY
+ST_LIBS = -g -ggdb $(LIBDIRS) $(EXTRA_LIBS) -lm -l$(PYTHON_VER) -ldl -lpthread -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation $(SYSLIBS) -lssl -lcrypto -lcurl -lssh
+SH_LIBS = -g -ggdb $(LIBDIRS) $(EXTRA_LIBS) -lm -l$(PYTHON_VER) -ldl -lpthread -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation $(SYSLIBS) -lssl -lcrypto -lcurl -lssh
+#CFLAGS = -Wall $(EXTRA_DEFINES) -DDEBUG=1 -D_DEBUG=1 -DJUCE_APP_VERSION=1.0.0 -DBUILD_SCHEME="\"$(BUILD_SCHEME)\"" -DJUCE_APP_VERSION_HEX=0x10000 $(INCLUDES) -I/usr/include -I/usr/include/freetype2 -IJuceLibraryCode -IJuceLibraryCode/modules -std=gnu++11
+CFLAGS = -Wall $(EXTRA_DEFINES) -DJUCE_APP_VERSION=1.0.0 -DBUILD_SCHEME="\"$(BUILD_SCHEME)\"" -DJUCE_APP_VERSION_HEX=0x10000 $(INCLUDES) -I/usr/include -I/usr/include/freetype2 -IJuceLibraryCode -IJuceLibraryCode/modules -std=gnu++11
+#-std=c++11
 
 JUCE=JuceLibraryCode
 
@@ -27,33 +30,33 @@ JUCE_OBJECTS = $(BUILD_DIR)/juce_core.o \
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
 	$(CC)  -Wall $(CFLAGS) -c $< -o $@
 
-ifdef SHARED_BUILD
-$(OUTPUT_DIR)/$(TARGET): $(OBJECTS) $(JUCE_OBJECTS)
-	$(CC)  $(OBJECTS) $(JUCE_OBJECTS) -Wall $(SH_LIBS) -o $@
-endif
-
 ifdef STATIC_BUILD
 $(OUTPUT_DIR)/$(TARGET)-static: $(OBJECTS) $(JUCE_OBJECTS)
-	$(CC)  $(OBJECTS) $(JUCE_OBJECTS) -Wall $(ST_LIBS) -o $@
+	$(CC) -Xlinker -search_paths_first -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk -stdlib=libc++ -mmacosx-version-min=10.12 -framework Foundation -framework Carbon -framework Cocoa -framework IOKit -framework QuartzCore -framework WebKit $(OBJECTS) $(JUCE_OBJECTS) -Wall $(ST_LIBS) -o $@
+endif
+
+ifdef SHARED_BUILD
+$(OUTPUT_DIR)/$(TARGET): $(OBJECTS) $(JUCE_OBJECTS)
+	$(CC) -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk -stdlib=libc++ -mmacosx-version-min=10.12 -framework Foundation -framework Carbon -framework Cocoa -framework IOKit -framework QuartzCore -framework WebKit $(OBJECTS) $(JUCE_OBJECTS) -Wall $(SH_LIBS) -o $@
 endif
 	
-$(BUILD_DIR)/juce_core.o: $(JUCE)/juce_core.cpp
-	$(CC)  -Wall $(CFLAGS) -c $< -o $@
+$(BUILD_DIR)/juce_core.o: $(JUCE)/juce_core.$(CODE_EXT)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/juce_data_structures.o: $(JUCE)/juce_data_structures.cpp
-	$(CC)  -Wall $(CFLAGS) -c $< -o $@
+$(BUILD_DIR)/juce_data_structures.o: $(JUCE)/juce_data_structures.$(CODE_EXT)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/juce_events.o: $(JUCE)/juce_events.cpp
-	$(CC)  -Wall $(CFLAGS) -c $< -o $@
+$(BUILD_DIR)/juce_events.o: $(JUCE)/juce_events.$(CODE_EXT)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/juce_graphics.o: $(JUCE)/juce_graphics.cpp
-	$(CC)  -Wall $(CFLAGS) -c $< -o $@
+$(BUILD_DIR)/juce_graphics.o: $(JUCE)/juce_graphics.$(CODE_EXT)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/juce_gui_basics.o: $(JUCE)/juce_gui_basics.cpp
-	$(CC)  -Wall $(CFLAGS) -c $< -o $@
+$(BUILD_DIR)/juce_gui_basics.o: $(JUCE)/juce_gui_basics.$(CODE_EXT)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/juce_gui_extra.o: $(JUCE)/juce_gui_extra.cpp
-	$(CC) -Wall $(CFLAGS) -c $< -o $@
+$(BUILD_DIR)/juce_gui_extra.o: $(JUCE)/juce_gui_extra.$(CODE_EXT)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	-rm $(OUTPUT_DIR)/$(TARGET)
