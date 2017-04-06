@@ -1,0 +1,12 @@
+Source: subutai-launcher
+Section: net
+Priority: optional
+Maintainer: Mikhail Savochkin (i@crioto.com)
+Build-Depends: debhelper (>=9)
+Standards-Version: 3.9.6
+Homepage: https://subut.ai
+
+Package: subutai-launcher
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Subutai Launcher Installer 
