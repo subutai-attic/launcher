@@ -1,13 +1,13 @@
 #include "SLException.h"
 
 
-SubutaiLauncher::SLException::SLException(const std::string& msg, int code) : SubutaiException(msg, code) {
-    auto l = Log::instance()->logger();
-    l->error() << "SLException " << std::endl;
+SubutaiLauncher::SLException::SLException(const std::string& msg, int code) : SubutaiException(msg, code) 
+{
+    Poco::Logger::get("subutai").error("SLException");
 }
 
-const char* SubutaiLauncher::SLException::name() const throw() {
-	
+const char* SubutaiLauncher::SLException::name() const throw() 
+{
     return "Scripting Language Exception";
 }
 

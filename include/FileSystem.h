@@ -7,7 +7,6 @@
 #include <Poco/File.h>
 
 #include "SubutaiException.h"
-#include "SubutaiLog.h"
 
 namespace SubutaiLauncher {
     class FileSystem {

@@ -201,18 +201,18 @@ void Wizard::buttonClicked(juce::Button* button)
 
 void Wizard::runInstall()
 {
-    SubutaiLauncher::Log::instance()->logger()->debug() << "Collecting choosen components" << std::endl;
+    _logger->debug("Collecting choosen components");
     auto c = _componentChooserPage->getComponents();
     if (c.ptp && !_ptpInstalled) {
         _ptpInstall->setVisible(true);
-        SubutaiLauncher::Log::instance()->logger()->debug() << "P2P Component has been chosen" << std::endl;
+        _logger->debug("P2P Component has been choosen");
         _ptpInstall->start("P2P");
         auto t = _ptpInstall->run();
         t.detach();
         return;
     }
     if (c.tray && !_trayInstalled) {
-        SubutaiLauncher::Log::instance()->logger()->debug() << "Tray Component has been chosen" << std::endl;
+        _logger->debug("Tray Component has been choosen");
         _trayInstall->start("Tray");
         _trayInstall->setVisible(true);
         auto t = _trayInstall->run();
@@ -220,7 +220,7 @@ void Wizard::runInstall()
         return;
     }
     if (c.ete && !_eteInstalled) {
-        SubutaiLauncher::Log::instance()->logger()->debug() << "Browser Plugin Component has been chosen" << std::endl;
+        _logger->debug("Browser Plugin Component has been choosen");
         _eteInstall->start("Browser Plugin");
         _eteInstall->setVisible(true);
         auto t = _eteInstall->run();
@@ -228,7 +228,7 @@ void Wizard::runInstall()
         return;
     }
     if (c.peer && !_peerInstalled) {
-        SubutaiLauncher::Log::instance()->logger()->debug() << "Peer Component has been chosen" << std::endl;
+        _logger->debug("Peer Component has been choosen");
         _peerInstall->start("Peer");
         _peerInstall->setVisible(true);
         auto t = _peerInstall->run();

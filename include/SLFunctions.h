@@ -8,7 +8,6 @@
 
 #include "Downloader.h"
 #include "Session.h"
-#include "Install.h"
 #include "NotificationCenter.h"
 #include "Environment.h"
 #include "VirtualBox.h"
@@ -79,14 +78,6 @@ namespace SubutaiLauncher {
 
     static PyObject* SL_GetDevVersion(PyObject* self, PyObject* args) {
         return Py_BuildValue("s", "4.0.16");
-    }
-
-    // ========================================================================
-
-    static PyObject* SL_getDistro(PyObject* self, PyObject* args) {
-        Environment e;
-        std::string distro = e.distroOS("-c");
-        return Py_BuildValue("s", distro.c_str());
     }
 
     // ========================================================================
@@ -204,70 +195,6 @@ namespace SubutaiLauncher {
             return NULL;
         Session::instance()->getDownloader()->setOutputDirectory(sl_tmpdir);
         return Py_BuildValue("i", 1);
-    }
-
-    // ========================================================================
-
-    static PyObject* SL_NewConfiguration(PyObject* self, PyObject* args, PyObject* keywords) {
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
-            return NULL;
-        Session::instance()->getConfManager()->addConfig(sl_string);
-        return Py_BuildValue("i", 1);
-    }
-
-    // ========================================================================
-
-    static PyObject* SL_SetConfigurationDesc(PyObject* self, PyObject* args, PyObject* keywords) {
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", desc_keywords, &sl_string, &sl_desc))
-            return NULL;
-        Session::instance()->getConfManager()->addDesc(sl_string, sl_desc);
-        return Py_BuildValue("i", 1);
-    }
-
-    // ========================================================================
-
-    static PyObject* SL_SetConfigurationFile(PyObject* self, PyObject* args, PyObject* keywords) {
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", desc_keywords, &sl_string, &sl_desc))
-            return NULL;
-        Session::instance()->getConfManager()->addFile(sl_string, sl_desc);
-        return Py_BuildValue("i", 1);
-    }
-
-    // ========================================================================
-
-    static PyObject* SL_Install(PyObject* self, PyObject* args, PyObject* keywords) {
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", string_keywords, &sl_filename, &sl_destination))
-            return NULL;
-        Install i;
-        i.setFilename(sl_filename);
-        i.setSrcPath(Session::instance()->getDownloader()->getOutputDirectory());
-        i.setDstPath(sl_destination);
-        try {
-            i.preInstall();
-            i.install();
-            i.postInstall();
-        } catch (SubutaiException &e) {
-            return Py_BuildValue("i", 1);
-
-        }
-        return Py_BuildValue("i", 0);
-    }
-
-
-    // ========================================================================
-
-    static PyObject* SL_UnInstall(PyObject* self, PyObject* args, PyObject* keywords) {
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|s", string_keywords, &sl_filename, &sl_destination))
-            return NULL;
-        Install i;
-        i.setFilename(sl_filename);
-        try {
-            i.unInstall();
-        } catch (SubutaiException &e) {
-            return Py_BuildValue("i", 1);
-
-        }
-        return Py_BuildValue("i", 0);
     }
 
     // ========================================================================
@@ -542,12 +469,7 @@ namespace SubutaiLauncher {
 
     static PyMethodDef SubutaiSLMethods[] = {
         {"download", (PyCFunction)SL_Download, METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN"},
-        {"install", (PyCFunction)SL_Install, METH_VARARGS | METH_KEYWORDS, "Installs a file"},
-        {"uninstall", (PyCFunction)SL_UnInstall, METH_VARARGS | METH_KEYWORDS, "Uninstalls a file"},
         {"setTmpDir", (PyCFunction)SL_SetTmpDir, METH_VARARGS | METH_KEYWORDS, "Sets tmp output directory"},
-        {"NewConfiguration", (PyCFunction)SL_NewConfiguration, METH_VARARGS | METH_KEYWORDS, "Creates a new configuration with a given name"},
-        {"SetConfigurationDesc", (PyCFunction)SL_SetConfigurationDesc, METH_VARARGS | METH_KEYWORDS, "Sets a description to a given configuration"},
-        {"SetConfigurationFile", (PyCFunction)SL_SetConfigurationFile, METH_VARARGS | METH_KEYWORDS, "Sets a python script to a given configuration"},
         {"isDownloadComplete", SL_IsDownloaded, METH_VARARGS, "Returns 1 if current download has been completed"},
         {"GetTmpDir", SL_GetTmpDir, METH_VARARGS, "Returns tmp directory"},
         {"GetInstallDir", SL_GetInstallDir, METH_VARARGS, "Returns installation directory"},
@@ -564,7 +486,6 @@ namespace SubutaiLauncher {
         {"Shutdown", SL_Shutdown, METH_VARARGS, "Finalizes the script"},
         {"GetMasterVersion", SL_GetMasterVersion, METH_VARARGS, "Returns master version of a product"},
         {"GetDevVersion", SL_GetDevVersion, METH_VARARGS, "Returns dev version of a product"},
-        {"getDistro", SL_getDistro, METH_VARARGS, "Returns OS distro"},
         // New version
         //{"ImportVirtualMachine", SL_importVirtualMachine, METH_VARARGS | METH_KEYWORDS, "Import a virtual machine into VB"},
         {"GetDefaultRoutingInterface", SL_GetDefaultRoutingInterface, METH_VARARGS, "Returns name of default network interface"},

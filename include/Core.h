@@ -24,7 +24,6 @@
 #include "VirtualBox.h"
 #include "Session.h"
 #include "Environment.h"
-#include "SubutaiLog.h"
 #include "Browser.h"
 
 #include <curl/curl.h>
@@ -44,8 +43,6 @@ namespace SubutaiLauncher
         private:
             std::vector<std::string> _args;
             bool _running;
-        protected:
-            void handleTest();
     };
 
 }

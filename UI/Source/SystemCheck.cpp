@@ -104,7 +104,10 @@ SystemCheck::SystemCheck()
     _vtxLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_vtxLabel);
 
-    _vtxValue.setText(env.vtxEnabled(), dontSendNotification);
+    std::string vtxStatus = "Disabled";
+    if (env.vtxEnabled()) vtxStatus = "Enabled";
+
+    _vtxValue.setText(vtxStatus, dontSendNotification);
     _vtxValue.setColour(Label::textColourId, Colours::white);
     _vtxValue.setBounds(150, 175, 500, 40);
     _vtxValue.setFont(font);

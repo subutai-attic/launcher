@@ -5,6 +5,7 @@ const std::string SubutaiLauncher::Tray::BIN = "SubutaiTray";
 SubutaiLauncher::Tray::Tray()
 {
     _version = "";
+    _logger = &Poco::Logger::get("subutai");
 }
 
 SubutaiLauncher::Tray::~Tray()
@@ -14,8 +15,7 @@ SubutaiLauncher::Tray::~Tray()
 
 bool SubutaiLauncher::Tray::findInstallation()
 {
-    auto l = Log::instance()->logger();
-    l->debug() << "Searching for Tray installation" << std::endl;
+    _logger->debug("Searching for Tray installation");
     auto env = new Environment();
     SubutaiString pathVar(env->getVar("PATH", ""));
     std::vector<std::string> path;
@@ -29,50 +29,27 @@ bool SubutaiLauncher::Tray::findInstallation()
 		_location = _path;
 		_path.append(FileSystem::DELIM);
 		_path.append(BIN);
-    	        l->debug() << "Tray found in " << _location << std::endl;
+        _logger->debug("Tray was found in %s", _location);
 		return true;
 	    }
 	}
-    l->debug() << "Tray was not found" << std::endl;
+    _logger->debug("Tray was not found");
     return false;
 }
 
 std::string SubutaiLauncher::Tray::extractVersion()
 {
-//    if (_version != "") {
-//	return _version;
-//    }
 
-    auto l = Log::instance()->logger();
-
-    std::vector<std::string> args;
+    Poco::Process::Args args;
     args.push_back("-v");
 
-    SubutaiProcess p;
-    int pid = p.launch(BIN, args, _location);
-    if (pid < 0)
-        return "NA";
-    std::string res;
-    std::string res1;
-    std::vector<std::string> vres;
-    if (p.wait() == 0) {
-        res = p.getOutputBuffer();
-        l->debug() << "SubutaiLauncher::Tray version output res: " << res << "/ "<< std ::endl;
-        res1 = p.getErrorBuffer();
-        l->debug() << "SubutaiLauncher::Tray version error res1: " << res1 << "/" <<std::endl;
+    Poco::Pipe pOut;
+    Poco::ProcessHandle ph = Poco::Process::launch(_path, args, 0, &pOut, 0);
+    ph.wait();
+    Poco::PipeInputStream istr(pOut);
 
-        SubutaiString st(res);
-	int found = std::string::npos;
-	found = res.find("error");
-	if (found != std::string::npos) {
-	    _version = "not defined";
-	} else {
-    	    vres = st.ssplit("\n");
-    	    _version = vres.back();
-	}
-        return _version;
-    }
-    return "";
+    Poco::StreamCopier::copyToString(istr, _version);
+    return _version;
 }
 
 bool SubutaiLauncher::Tray::isInstalled()

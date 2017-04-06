@@ -3,7 +3,8 @@
 
 #include <stdexcept>
 #include <string>
-#include "SubutaiLog.h"
+
+#include "Poco/Logger.h"
 
 namespace SubutaiLauncher {
 

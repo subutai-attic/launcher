@@ -8,8 +8,10 @@
 #include "SubutaiException.h"
 #include "SLException.h"
 #include "FileSystem.h"
-#include "SubutaiLog.h"
 #include "Session.h"
+
+#include "Poco/Logger.h"
+#include "Poco/String.h"
 
 #if LAUNCHER_LINUX
 #include <sys/stat.h>
@@ -34,6 +36,7 @@ namespace SubutaiLauncher {
             std::thread executeInThread(const std::string& module);
             long exitCode();
         private:
+            Poco::Logger* _logger;
             PyObject* _name;
             PyObject* _module;
             long _exitCode;

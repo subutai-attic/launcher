@@ -9,7 +9,6 @@
 #include "Downloader.h"
 #include "Settings.h"
 #include "NotificationCenter.h"
-#include "ConfigurationManager.h"
 
 namespace SubutaiLauncher 
 {
@@ -21,7 +20,6 @@ namespace SubutaiLauncher
             void destroyInstance();
             Downloader* getDownloader();
             Settings* getSettings();
-            ConfigurationManager* getConfManager();
             NotificationCenter* getNotificationCenter();
             void setSSHCredentials(const std::string& user, const std::string& pass, const std::string& hostname, long port);
             std::string getSSHUser();
@@ -35,7 +33,6 @@ namespace SubutaiLauncher
             //SubutaiLauncher::VirtualBox* _virtualBox;
             Downloader* _downloader;
             Settings* _settings;
-            ConfigurationManager* _confManager;
             NotificationCenter* _notificationCenter;
             std::string _sshUser;
             std::string _sshPass;
