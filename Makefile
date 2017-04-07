@@ -61,9 +61,11 @@ endif
 ifdef BUILD_TESTS
 test: directories
 test: lib
-test: $(OUTPUT_DIR)/$(TEST_TARGET)
-test:
-	@cp testsuite/*.py bin/
+#test: $(OUTPUT_DIR)/$(TEST_TARGET)
+test: directories lib
+	$(MAKE) -C ./testsuite
+#test:
+#	@cp testsuite/*.py bin/
 endif
 
 cli: lib
@@ -169,11 +171,11 @@ OBJS = $(BUILD_DIR)/Core.o \
 $(OUTPUT_DIR)/$(DYNAMIC_LIB_TARGET): $(OBJS)
 	$(CC) -shared $^ $(LDFLAGS) -o $@
 
-$(OUTPUT_DIR)/$(STATIC_LIB_TARGET): $(OBJECTS)
+$(OUTPUT_DIR)/$(STATIC_LIB_TARGET): $(OBJS)
 	$(AR) $(ARFLAGS) $@ $^
 
-$(OUTPUT_DIR)/$(TEST_TARGET): $(T_OBJECTS)
-	$(CC) $(T_OBJECTS) -Wall $(LDFLAGS) -lPocoCppUnit -L$(OUTPUT_DIR) -lsubutai-launcher -o $@
+#$(OUTPUT_DIR)/$(TEST_TARGET): $(T_OBJECTS)
+#	$(CC) $(T_OBJECTS) -Wall $(LDFLAGS) -lPocoCppUnit -L$(OUTPUT_DIR) -lsubutai-launcher -o $@
 
 directories:
 	@mkdir -p $(OUTPUT_DIR)
