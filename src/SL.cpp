@@ -167,9 +167,6 @@ void SubutaiLauncher::SL::execute()
     catch (...)
     {
         std::exception_ptr p = std::current_exception();
-#if LAUNCHER_LINUX
-        l->error() << "SL::execute() Unknown exception caught: " <<  (p ? p.__cxa_exception_type()->name() : "null")  << std::endl;
-#endif
         PyErr_Print();
     }
 
