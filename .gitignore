@@ -23,6 +23,7 @@ python_src
 config.make
 UI/Builds/LinuxMakefile/build
 deploy.sh
+package/subutai*
 
 # windows build
 *.sdf
@@ -71,3 +72,10 @@ lnchr.conf
 /package/darwin/root
 *.pkg
 .DS_Store
+
+# Linux package
+/package/linux/debian/debhelper-build-stamp
+/package/linux/debian/subutai-launcher.substvars
+/package/linux/debian/subutai-launcher.debhelper.log
+/package/linux/debian/subutai-launcher
+

@@ -109,7 +109,7 @@ bool SubutaiLauncher::Environment::vtxEnabled()
     
     Poco::Pipe pOut;
 
-    Poco::ProcessHandle ph = Poco::Process::launch("/usr/bin/lscpu", args, 0, pOut, 0);
+    Poco::ProcessHandle ph = Poco::Process::launch("/usr/bin/lscpu", args, 0, &pOut, 0);
     ph.wait();
 
     Poco::PipeInputStream istr(pOut);
@@ -118,7 +118,7 @@ bool SubutaiLauncher::Environment::vtxEnabled()
 
     size_t vmx = buffer.find("vmx");
     size_t virt = buffer.find("Virtualization");
-    if (vmx != std::string::npos && virt != std::string npos) 
+    if (vmx != std::string::npos && virt != std::string::npos) 
     {
         return true;
     }
