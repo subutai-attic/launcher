@@ -79,7 +79,6 @@ void SubutaiLauncher::Core::run()
     _running = true;
     initializePython();
     initializeSSL();
-    curl_global_init(CURL_GLOBAL_ALL);
     Session::instance();
     parseArgs();
 }

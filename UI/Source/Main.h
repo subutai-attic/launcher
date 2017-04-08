@@ -1,13 +1,3 @@
-/*
-   ==============================================================================
-
-   Main.h
-Created: 18 Aug 2016 6:45:47pm
-Author:  crioto
-
-==============================================================================
-*/
-
 #ifndef MAIN_H_INCLUDED
 #define MAIN_H_INCLUDED
 
@@ -33,19 +23,19 @@ class UIApplication  : public juce::JUCEApplication
         //==============================================================================
         void initialise (const juce::String& commandLine) override
         {
+            std::string pTitle = "SubutaiLauncher";
+            pTitle.append(BUILD_SCHEME);
             // This method is where you should put your application's initialisation code..
             //
             //
-	    //uid_t cuser = getuid();
-	    //if (cuser !=0) {
-		
-	    //}
+            //uid_t cuser = getuid();
+            //if (cuser !=0) {
+
+            //}
             _core = new SubutaiLauncher::Core(std::vector<std::string>());
             _core->run();
 
-            mainWindow = new MainWindow ("Subutai Launcher [" \
-                    BUILD_SCHEME \
-                    "]");
+            mainWindow = new MainWindow(pTitle);
         }
 
         void shutdown() override

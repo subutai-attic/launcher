@@ -78,41 +78,6 @@ namespace SubutaiLauncher
             return true;
         }
         return false;
-        /*
-        std::map<std::string, std::string> query;
-        auto response = performGetRequest("tray/balance", query);
-        long code = 0;
-        std::printf("[HUB] Received during balance: %s\n", response.c_str());
-        */
-        return true;
     }
 
-    std::string Hub::performRequest(bool post, std::string endpoint, std::map<std::string, std::string> query) 
-    {
-        _response.clear();
-        char request[4096];
-#if LAUNCHER_WINDOWS
-        sprintf_s(request, sizeof(request), "%s%s/%s", URL.c_str(), REST.c_str(), endpoint.c_str());
-#else
-        std::sprintf(request, "%s%s/%s", URL.c_str(), REST.c_str(), endpoint.c_str());
-#endif
-
-        if (!query.empty()) {
-#if LAUNCHER_WINDOWS
-            sprintf_s(request, sizeof(request), "%s?", request);
-#else
-            std::sprintf(request, "%s?", request);
-#endif
-            for (auto it = query.begin(); it != query.end(); it++) {
-#if LAUNCHER_WINDOWS
-                sprintf_s(request, sizeof(request), "%s%s=%s&", request, it->first.c_str(), it->second.c_str());
-#else
-                std::sprintf(request, "%s%s=%s&", request, it->first.c_str(), it->second.c_str());
-#endif
-
-            }
-        }
-    }
 }
-
-

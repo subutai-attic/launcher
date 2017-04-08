@@ -2,9 +2,9 @@ include ../config.make
 
 CC = g++
 TARGET = testsuite
-INCLUDES = -I../include -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_DIR)/include $(VB) -I../third-party/md5 -I../third-party/json -I/usr/local/include
+INCLUDES = -I../include -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_DIR)/include -I/usr/local/include
 LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -lcurl -lssh -L$(PYLIB_DIR) -lPocoNet -lPocoNetSSL -lPocoFoundation -lPocoJSON
-CXXFLAGS = $(INCLUDES) -std=c++11 -Wall -DBUILD_SCHEME="\"$(BUILD_SCHEME)\""
+CXXFLAGS = $(INCLUDES) -std=c++11 -Wall
 LDFLAGS = $(LIBS) -lPocoCppUnit -L$(OUTPUT_DIR) -lsubutai-launcher
 
 OUTPUT_DIR = ../bin

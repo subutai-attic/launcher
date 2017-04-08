@@ -40,7 +40,6 @@ namespace SubutaiLauncher
             bool balance();
         private:
             Poco::Net::NameValueCollection getCookies();
-            std::string performRequest(bool post, std::string endpoint, std::map<std::string, std::string> query);
             std::string _login;
             std::string _password;
             std::string _response;

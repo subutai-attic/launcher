@@ -14,5 +14,12 @@
 #define LAUNCHER_LINUX 1
 #endif
 
+#if BUILD_SCHEME_DEV
+#define BUILD_SCHEME "dev"
+#elif BUILD_SCHEME_MASTER
+#define BUILD_SCHEME "master"
+#else
+#define BUILD_SCHEME "production"
+#endif
 
 #endif

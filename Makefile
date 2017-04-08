@@ -1,15 +1,12 @@
 include config.make
 
 CC=g++
-DYNAMIC_LIB_TARGET = libsubutai-launcher.$(LIB_EXT)
-STATIC_LIB_TARGET = libsubutai-launcher.a
-EXTRA_LIBS_DIR = third-party
+SHARED_TARGET = libsubutai-launcher.$(LIB_EXT)
+STATIC_TARGET = libsubutai-launcher.a
 TEST_TARGET=testsuite
-VB_DIR = third-party/xpcom
-VB = -I$(VB_DIR) -I$(VB_DIR)/xpcom -I$(VB_DIR)/nsprpub -I$(VB_DIR)/string -I$(VB_DIR)/ipcd
-INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_DIR)/include $(VB) -Ithird-party/md5 -Ithird-party/json -I/usr/local/include
+INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_DIR)/include -I/usr/local/include
 LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -lcurl -lssh -L$(PYLIB_DIR) -lPocoNet -lPocoNetSSL -lPocoFoundation -lPocoJSON
-CXXFLAGS = $(INCLUDES) -std=c++11 -DRT_OS_LINUX -DBUILD_SCHEME="\"$(BUILD_SCHEME)\"" $(BUILD_SCHEME_DEF)
+CXXFLAGS = $(INCLUDES) -std=c++11 -DRT_OS_LINUX $(BUILD_SCHEME_DEF)
 LDFLAGS = $(LIBS)
 
 SRC_DIR = src
@@ -44,14 +41,14 @@ ifdef SHARED_BUILD
 lib: shared 
 
 shared: directories
-shared: $(OUTPUT_DIR)/$(DYNAMIC_LIB_TARGET)
+shared: $(OUTPUT_DIR)/$(SHARED_TARGET)
 endif
 
 ifdef STATIC_BUILD
 lib: static
 
 static: directories
-static: $(OUTPUT_DIR)/$(STATIC_LIB_TARGET)
+static: $(OUTPUT_DIR)/$(STATIC_TARGET)
 endif
 
 ifdef BUILD_TESTS
@@ -133,15 +130,6 @@ $(BUILD_DIR)/Tray.o: $(SRC_DIR)/Tray.cpp $(INCLUDE_DIR)/Tray.h
 $(BUILD_DIR)/VirtualBox.o: $(SRC_DIR)/VirtualBox.cpp $(INCLUDE_DIR)/VirtualBox.h
 	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
 
-#$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
-#	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
-
-#$(BUILD_DIR)/third-party/json/%.o: third-party/json/%.cpp $(HEADERS)
-#	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
-
-#$(BUILD_DIR)/third-party/md5/%.o: third-party/md5/%.cpp $(HEADERS)
-#	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
-
 OBJS = $(BUILD_DIR)/Core.o \
 								 	 $(BUILD_DIR)/Downloader.o \
 									 $(BUILD_DIR)/Environment.o \
@@ -161,34 +149,32 @@ OBJS = $(BUILD_DIR)/Core.o \
 									 $(BUILD_DIR)/Tray.o \
 									 $(BUILD_DIR)/VirtualBox.o	 
 
-$(OUTPUT_DIR)/$(DYNAMIC_LIB_TARGET): $(OBJS)
+$(OUTPUT_DIR)/$(SHARED_TARGET): $(OBJS)
 	$(CC) -shared $^ $(LDFLAGS) -o $@
 
-$(OUTPUT_DIR)/$(STATIC_LIB_TARGET): $(OBJS)
+$(OUTPUT_DIR)/$(STATIC_TARGET): $(OBJS)
 	$(AR) $(ARFLAGS) $@ $^
 
 directories:
 	@mkdir -p $(OUTPUT_DIR)
 	@mkdir -p $(BUILD_DIR)
-	#@mkdir -p $(BUILD_DIR)/third-party/json
-	#@mkdir -p $(BUILD_DIR)/third-party/md5
 	$(MAKE) -C ./testsuite directories
 
 files:
 	@cp assets/* bin/
 
 clean:
-	@rm -rf $(OUTPUT_DIR)/*
-	@rm -f $(OBJS)
+	@rm -fv $(OUTPUT_DIR)/$(SHARED_TARGET)
+	@rm -fv $(OUTPUT_DIR)/$(STATIC_TARGET)
+	@rm -fv $(OBJS)
 	$(MAKE) -C ./CLI clean
 	$(MAKE) -C ./UI clean
 	$(MAKE) -C ./testsuite clean
 
 mrproper:
-	@rm -rf $(OUTPUT_DIR)
-	@rm -rf $(BUILD_DIR)
-	#@rm -rf $(BUILD_DIR)/third-party
+	@rm -rfv $(OUTPUT_DIR)
+	@rm -rfv $(BUILD_DIR)
 	$(MAKE) -C ./CLI mrproper
 	$(MAKE) -C ./UI mrproper
 	$(MAKE) -C ./testsuite mrproper
-	@rm -f config.make
+	@rm -rfv config.make

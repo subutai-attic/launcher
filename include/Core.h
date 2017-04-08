@@ -27,8 +27,6 @@
 #include "Environment.h"
 #include "Browser.h"
 
-#include <curl/curl.h>
-
 namespace SubutaiLauncher 
 {
 
