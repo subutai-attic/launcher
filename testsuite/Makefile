@@ -17,7 +17,8 @@ OBJECTS = $(BUILD_DIR)/DownloaderTest.o \
 		  $(BUILD_DIR)/PeerSetupTest.o \
 		  $(BUILD_DIR)/SLTest.o \
 		  $(BUILD_DIR)/SSHTest.o \
-		  $(BUILD_DIR)/TestSuite.o
+		  $(BUILD_DIR)/TestSuite.o \
+		  $(BUILD_DIR)/HubTest.o 
 
 $(OUTPUT_DIR)/$(TARGET): $(OBJECTS)
 	$(CC) $^ $(LDFLAGS) -o $@
@@ -36,3 +37,16 @@ $(BUILD_DIR)/SSHTest.o: SSHTest.cpp SSHTest.h
 
 $(BUILD_DIR)/TestSuite.o: TestSuite.cpp TestSuite.h
 	$(CC) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/HubTest.o: HubTest.cpp HubTest.h
+	$(CC) $(CXXFLAGS) -c $< -o $@
+
+directories:
+	@mkdir -p $(BUILD_DIR)
+
+clean:
+	@rm -f $(OBJECTS)
+	@rm -f $(OUTPUT_DIR)/$(TARGET)
+
+mrproper: clean
+	@rm -f $(BUILD_DIR)

@@ -32,6 +32,7 @@ void SubutaiLauncher::Core::initializePython()
 
 
 #if PY_MAJOR_VERSION < 3
+    #error Python versions below 3.5 is not supported
     Py_InitModule("subutai", SubutaiSLMethods);
 #endif
 
@@ -47,23 +48,37 @@ void SubutaiLauncher::Core::initializePython()
     */
 }
 
+void SubutaiLauncher::Core::initializeSSL()
+{
+    Poco::Logger::get("subutai").debug("Configuring SSL Client context");
+
+    Poco::Net::Context* pContext = new Poco::Net::Context(
+            Poco::Net::Context::CLIENT_USE,
+            "",
+            Poco::Net::Context::VERIFY_NONE,
+            9,
+            true,
+            "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
+            );
+    Poco::Net::SSLManager::InvalidCertificateHandlerPtr ptrHandler ( new Poco::Net::AcceptCertificateHandler(false) );
+    Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, pContext);
+}
+
 void SubutaiLauncher::Core::run()
 {
-    FileSystem fs("/");
-    try 
+    Poco::File f;
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
+    f = Poco::File("/tmp/subutai");
+#elif LAUNCHER_WINDOWS
+    f = Poco::File("C:\tmp");
+#endif
+    if (!f.exists())
     {
-        if (! fs.isFileExists("/tmp/subutai"))
-        {
-            //create /tmp/subutai
-            fs.createDirectory("/tmp/subutai");
-        }
-    }
-    catch(SubutaiException e) 
-    {
-        return ;
+        f.createDirectories();
     }
     _running = true;
     initializePython();
+    initializeSSL();
     curl_global_init(CURL_GLOBAL_ALL);
     Session::instance();
     parseArgs();

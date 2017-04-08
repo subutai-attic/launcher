@@ -20,22 +20,8 @@ SubutaiLauncher::Downloader::Downloader() :
     _done(false),
     _outputDir(".")
 {
-    //Log::instance()->logger()->debug() << "Starting Downloader instance" << std::endl;
-    //Session::instance()->logger().debug("Starting Downloader instance");
-    Poco::Logger::get("subutai").debug("Starting Downloader instance");
     _logger = &Poco::Logger::get("subutai");
-    _logger->trace("Configuring SSL Client context");
-
-    _context = new Poco::Net::Context(
-            Poco::Net::Context::CLIENT_USE,
-            "",
-            Poco::Net::Context::VERIFY_NONE,
-            9,
-            true,
-            "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
-            );
-    Poco::Net::SSLManager::InvalidCertificateHandlerPtr ptrHandler ( new Poco::Net::AcceptCertificateHandler(false) );
-    Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, _context);
+    _logger->debug("Starting Downloader instance");
 }
 
 SubutaiLauncher::Downloader::~Downloader()
@@ -86,7 +72,7 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo()
 {
     std::string output;
     try {
-        Poco::Net::HTTPSClientSession s(HOST, PORT, _context);
+        Poco::Net::HTTPSClientSession s(HOST, PORT);
         std::string path(REST);
         path.append("/info");
         _logger->debug("Requesting file info for %s", path);

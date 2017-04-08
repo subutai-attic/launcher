@@ -1,5 +1,4 @@
 CC = g++
-#-print-search-dirs 
 TARGET = subutai-launcher
 EXTRA_LIB_DIR = ../third-party
 INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_DIR)/include -I../include -I../third-party/md5 -I../third-party/json
@@ -11,7 +10,7 @@ SH_LIBS = -g -ggdb $(LIBDIRS) $(EXTRA_LIBS) -lm -l$(PYTHON_VER) -ldl -lpthread -
 CFLAGS = -Wall $(EXTRA_DEFINES) -DJUCE_APP_VERSION=1.0.0 -DBUILD_SCHEME="\"$(BUILD_SCHEME)\"" -DJUCE_APP_VERSION_HEX=0x10000 $(INCLUDES) -I/usr/include -I/usr/include/freetype2 -IJuceLibraryCode -IJuceLibraryCode/modules -std=gnu++11
 #-std=c++11
 
-JUCE=JuceLibraryCode
+JUCE = JuceLibraryCode
 
 SRC_DIR = Source
 BUILD_DIR = ../build/ui
@@ -26,6 +25,16 @@ JUCE_OBJECTS = $(BUILD_DIR)/juce_core.o \
 			   $(BUILD_DIR)/juce_graphics.o \
 			   $(BUILD_DIR)/juce_gui_basics.o \
 			   $(BUILD_DIR)/juce_gui_extra.o
+
+shared-bin: $(TARGET)
+
+static-bin: $(TARGET)-static
+
+$(TARGET): directories
+$(TARGET): $(OUTPUT_DIR)/$(TARGET)
+
+$(TARGET)-static: directories
+$(TARGET)-static: $(OUTPUT_DIR)/$(TARGET)-static
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
 	$(CC)  -Wall $(CFLAGS) -c $< -o $@
@@ -57,6 +66,9 @@ $(BUILD_DIR)/juce_gui_basics.o: $(JUCE)/juce_gui_basics.$(CODE_EXT)
 
 $(BUILD_DIR)/juce_gui_extra.o: $(JUCE)/juce_gui_extra.$(CODE_EXT)
 	$(CC) $(CFLAGS) -c $< -o $@
+
+directories:
+	@mkdir -p $(BUILD_DIR)
 
 clean:
 	-rm $(OUTPUT_DIR)/$(TARGET)

@@ -6,7 +6,6 @@
 #include <string>
 #include <Python.h>
 
-
 #include <Poco/Message.h>
 #include <Poco/Channel.h>
 #include <Poco/ConsoleChannel.h>
@@ -17,6 +16,8 @@
 #include <Poco/Logger.h>
 #include <Poco/LogStream.h>
 #include <Poco/AutoPtr.h>
+#include "Poco/Net/SSLManager.h"
+#include "Poco/Net/AcceptCertificateHandler.h"
 
 #include "SL.h"
 #include "SLFunctions.h"
@@ -37,6 +38,7 @@ namespace SubutaiLauncher
             Core(std::vector<std::string> args);
             ~Core();
             void initializePython();
+            void initializeSSL();
             void run();
             void parseArgs();
             void setupLogger();

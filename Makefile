@@ -14,15 +14,11 @@ LDFLAGS = $(LIBS)
 
 SRC_DIR = src
 INCLUDE_DIR = include
-BUILD_DIR = build
+BUILD_DIR = build/lib
 OUTPUT_DIR = bin
 TEST_DIR = testsuite
 
-SOURCES = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard third-party/json/*.cpp) $(wildcard third-party/md5/*.cpp)
 HEADERS = $(wildcard $(INCLUDE_DIR)/*.h)
-OBJECTS = $(patsubst %,$(BUILD_DIR)/%.o, $(subst src/,,$(subst .cpp,,$(SOURCES))))
-TESTS = $(wildcard $(TEST_DIR)/*.cpp)
-T_OBJECTS = $(patsubst %,$(BUILD_DIR)/$(TEST_DIR)/%.o, $(subst $(TEST_DIR)/,,$(subst .cpp,,$(TESTS))))
 
 .PHONE: lib all clean
 
@@ -74,13 +70,13 @@ cli: lib
 ifdef STATIC_BUILD
 ui: ui-static
 ui-static: static
-	$(MAKE) -C ./UI
+	$(MAKE) -C ./UI static-bin
 endif
 
 ifdef SHARED_BUILD 
 ui: ui-shared
 ui-shared: shared
-	$(MAKE) -C ./UI
+	$(MAKE) -C ./UI shared-bin
 endif
 
 $(BUILD_DIR)/Core.o: $(SRC_DIR)/Core.cpp $(INCLUDE_DIR)/Core.h
@@ -140,14 +136,11 @@ $(BUILD_DIR)/VirtualBox.o: $(SRC_DIR)/VirtualBox.cpp $(INCLUDE_DIR)/VirtualBox.h
 #$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
 #	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/third-party/json/%.o: third-party/json/%.cpp $(HEADERS)
-	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
+#$(BUILD_DIR)/third-party/json/%.o: third-party/json/%.cpp $(HEADERS)
+#	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/third-party/md5/%.o: third-party/md5/%.cpp $(HEADERS)
-	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
-
-$(BUILD_DIR)/$(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
-	$(CC) $(CXXFLAGS) -c $< -o $@
+#$(BUILD_DIR)/third-party/md5/%.o: third-party/md5/%.cpp $(HEADERS)
+#	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
 
 OBJS = $(BUILD_DIR)/Core.o \
 								 	 $(BUILD_DIR)/Downloader.o \
@@ -174,35 +167,28 @@ $(OUTPUT_DIR)/$(DYNAMIC_LIB_TARGET): $(OBJS)
 $(OUTPUT_DIR)/$(STATIC_LIB_TARGET): $(OBJS)
 	$(AR) $(ARFLAGS) $@ $^
 
-#$(OUTPUT_DIR)/$(TEST_TARGET): $(T_OBJECTS)
-#	$(CC) $(T_OBJECTS) -Wall $(LDFLAGS) -lPocoCppUnit -L$(OUTPUT_DIR) -lsubutai-launcher -o $@
-
 directories:
 	@mkdir -p $(OUTPUT_DIR)
 	@mkdir -p $(BUILD_DIR)
-	@mkdir -p $(BUILD_DIR)/third-party/json
-	@mkdir -p $(BUILD_DIR)/third-party/md5
-	@mkdir -p $(BUILD_DIR)/$(TEST_DIR)
-	@mkdir -p $(BUILD_DIR)/ui
+	#@mkdir -p $(BUILD_DIR)/third-party/json
+	#@mkdir -p $(BUILD_DIR)/third-party/md5
+	$(MAKE) -C ./testsuite directories
 
 files:
 	@cp assets/* bin/
 
 clean:
-	@rm -rf bin/*
-	@rm -rf build/*.o
-	@rm -rf build/testsuite
-	@rm -rf build/third-party
-	@rm -rf build/ui
+	@rm -rf $(OUTPUT_DIR)/*
+	@rm -f $(OBJS)
 	$(MAKE) -C ./CLI clean
 	$(MAKE) -C ./UI clean
+	$(MAKE) -C ./testsuite clean
 
 mrproper:
-	@rm -rf bin
-	@rm -rf build/.o
-	@rm -rf build/testsuite
-	@rm -rf build/third-party
-	@rm -rf build/ui
+	@rm -rf $(OUTPUT_DIR)
+	@rm -rf $(BUILD_DIR)
+	#@rm -rf $(BUILD_DIR)/third-party
 	$(MAKE) -C ./CLI mrproper
 	$(MAKE) -C ./UI mrproper
+	$(MAKE) -C ./testsuite mrproper
 	@rm -f config.make
