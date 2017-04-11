@@ -12,7 +12,7 @@ Note, that path specified above is for Darwin version of a launcher. On Linux yo
 Next step is to build Launcher with a custom configuration arguments:
 
 ```
-./configure --static --python=3.7m --python-dir=/usr/local/share/subutai --static-libs=/tmp/launcher
+./configure --static --python=3.7m --python-dir=/usr/local/share/subutai --collect-static=/tmp/launcher
 ```
 
 * `--static` will force to use static libraries
