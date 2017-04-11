@@ -17,7 +17,7 @@ const std::string SubutaiLauncher::Downloader::HOST = "cdn.subut.ai";
 
 SubutaiLauncher::Downloader::Downloader() : 
     _content(""),
-    _done(false),
+    _done(true),
     _outputDir(".")
 {
     _logger = &Poco::Logger::get("subutai");
@@ -44,7 +44,7 @@ void SubutaiLauncher::Downloader::reset()
 void SubutaiLauncher::Downloader::setFilename(const std::string& filename)
 {
     _filename = filename;
-    _logger->debug("Downloader::setFilename %s", _filename);
+    _logger->trace("Downloader::setFilename %s", _filename);
 }
 
 std::string SubutaiLauncher::Downloader::buildRequest(std::string path, std::string key, std::string value)

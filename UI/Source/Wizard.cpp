@@ -123,6 +123,10 @@ Wizard::~Wizard()
     delete _systemCheckPage;
     delete _componentChooserPage;
     delete _ptpInstall;
+    delete _trayInstall;
+    delete _eteInstall;
+    delete _peerInstall;
+    delete _finishPage;
 }
 
 void Wizard::paint(juce::Graphics& g)
@@ -195,7 +199,7 @@ void Wizard::buttonClicked(juce::Button* button)
                 break;
         }
     } else if (button == &_cancel) {
-
+        runCancelConfirmation();
     }
 }
 
@@ -277,4 +281,13 @@ void Wizard::stepCompleted(const std::string& name)
     _back.setEnabled(false);
     _back.setVisible(false);
     _finishPage->setVisible(true);
+}
+
+void Wizard::runCancelConfirmation()
+{
+    juce::String message = "Are you sure you want to cancel installation?";
+
+    juce::DialogWindow::LaunchOptions options;
+    _cancelMessage.setText(message, juce::dontSendNotification);
+
 }

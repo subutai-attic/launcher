@@ -18,6 +18,7 @@ WizardWindow::WizardWindow() : DialogWindow(
 
 WizardWindow::~WizardWindow()
 {
+    delete _wizard;
     _logger->trace("Destroying Installation Wizard Window");
 }
 

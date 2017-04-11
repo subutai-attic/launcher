@@ -146,10 +146,9 @@ std::string SubutaiLauncher::Environment::cpuArch()
     return ar;
 }
 
-unsigned SubutaiLauncher::Environment::cpuNum() 
+unsigned int SubutaiLauncher::Environment::cpuNum() 
 {
-    unsigned pr = Poco::Environment::processorCount();
-    return pr;
+    return Poco::Environment::processorCount();
 }
 
 std::string SubutaiLauncher::Environment::getVar(const std::string& name, const std::string& defaultValue) 

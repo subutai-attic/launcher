@@ -35,7 +35,7 @@ namespace SubutaiLauncher {
             ~Environment();
             std::string versionOS();
             std::string cpuArch();
-            unsigned cpuNum();
+            unsigned int cpuNum();
             unsigned processorNum();
             unsigned is64();
             unsigned long ramSize();

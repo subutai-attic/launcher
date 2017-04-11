@@ -58,7 +58,7 @@ SystemCheck::SystemCheck()
     _cpuLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_cpuLabel);
 
-    std::string cores = Poco::format("%lu", env.cpuNum());
+    std::string cores = Poco::format("%u", env.cpuNum());
 
     _cpuValue.setText(cores, dontSendNotification);
     _cpuValue.setColour(Label::textColourId, Colours::white);
@@ -81,7 +81,7 @@ SystemCheck::SystemCheck()
     _memLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_memLabel);
 
-    std::string memValue = Poco::format("%lu MB", env.ramSize());
+    std::string memValue = Poco::format("%lu MB", env.ramSize() / 1024 / 1024);
 
     _memValue.setText(memValue, dontSendNotification);
     _memValue.setColour(Label::textColourId, Colours::white);

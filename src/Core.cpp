@@ -9,11 +9,14 @@ SubutaiLauncher::Core::Core(std::vector<std::string> args) :
 
 SubutaiLauncher::Core::~Core()
 {
+
+    Poco::Logger::get("subutai").information("Stopping Subutai Launcher Core");
     if (_running) {
         while (!Session::instance()->getDownloader()->isDone()) {
             // Waiting
         };
     }
+    Poco::Logger::get("subutai").information("Subutai Launcher Core stopped");
 
     Py_Finalize();
 }
