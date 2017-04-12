@@ -1,5 +1,9 @@
 #include "Environment.h"
 
+#if LAUNCHER_MACOS
+const std::string SubutaiLauncher::Environment::EXTRA_PATH="/usr/local/bin:";
+#endif
+
 SubutaiLauncher::Environment::Environment() 
 {
     _logger = &Poco::Logger::get("subutai");

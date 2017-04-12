@@ -44,7 +44,12 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::getPeers()
 bool SubutaiLauncher::VirtualBox::findInstallation()
 {
     _logger->trace("Searching for VirtualBox installation in PATH");
-    Poco::StringTokenizer st(Poco::Environment::get("PATH", ""), ":",
+    std::string path;
+#if LAUNCHER_MACOS
+    path.append(Environment::EXTRA_PATH);
+#endif
+    path.append(Poco::Environment::get("PATH", ""));
+    Poco::StringTokenizer st(path, ":",
             Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
     for (auto it = st.begin(); it != st.end(); it++)
     {

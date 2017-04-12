@@ -31,6 +31,9 @@ namespace SubutaiLauncher {
 
     class Environment {
         public:
+#if LAUNCHER_MACOS
+            static const std::string EXTRA_PATH;
+#endif
             Environment();
             ~Environment();
             std::string versionOS();
