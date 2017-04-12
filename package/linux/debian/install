@@ -1,2 +1,2 @@
-SubutaiLauncher /opt/subutai/bin
-python /opt/subutai
+debian/SubutaiLauncher /opt/subutai/bin
+debian/python /opt/subutai

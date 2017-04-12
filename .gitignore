@@ -78,4 +78,6 @@ lnchr.conf
 /package/linux/debian/subutai-launcher.substvars
 /package/linux/debian/subutai-launcher.debhelper.log
 /package/linux/debian/subutai-launcher
+/package/linux/debian/SubutaiLauncher
+/package/linux/debian/python
 

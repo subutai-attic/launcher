@@ -15,6 +15,8 @@ fi
 rm -rf debian/python
 rm -rf debian/SubutaiLauncher
 
+mkdir -p debian/python
+
 cp $launcher debian/SubutaiLauncher
 cp -r $pythondir/* debian/python/
 
