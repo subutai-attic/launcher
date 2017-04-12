@@ -1,13 +1,10 @@
 CC = g++
 TARGET = subutai-launcher
 INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_DIR)/include -I../include
-#ST_LIBS = -g -ggdb $(LIBDIRS) -Wl,-Bdynamic $(EXTRA_LIBS) -lm -l$(PYTHON_VER) -ldl -lpthread -Wl,-Bstatic -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -Wl,-Bstatic -lPocoFoundation -Wl,-Bdynamic $(SYSLIBS) -lssl -lcrypto -lcurl -lssh
 #MACOS ONLY
-ST_LIBS = -g -ggdb $(LIBDIRS) $(EXTRA_LIBS) -lm -l$(PYTHON_VER) -ldl -lpthread -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation $(SYSLIBS) -lssl -lcrypto -lcurl -lssh
+ST_LIBS = -g -ggdb $(LIBDIRS) $(WLSH) $(EXTRA_LIBS) -lm $(WLST) -l$(PYTHON_VER) $(WLSH) -ldl -lpthread $(WLST) -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation $(WLSH) $(SYSLIBS) -lssl -lcrypto -lssh -lutil
 SH_LIBS = -g -ggdb $(LIBDIRS) $(EXTRA_LIBS) -lm -l$(PYTHON_VER) -ldl -lpthread -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation $(SYSLIBS) -lssl -lcrypto -lcurl -lssh
-#CXXFLAGS = -Wall $(EXTRA_DEFINES) -DDEBUG=1 -D_DEBUG=1 -DJUCE_APP_VERSION=1.0.0 -DBUILD_SCHEME="\"$(BUILD_SCHEME)\"" -DJUCE_APP_VERSION_HEX=0x10000 $(INCLUDES) -I/usr/include -I/usr/include/freetype2 -IJuceLibraryCode -IJuceLibraryCode/modules -std=gnu++11
 CXXFLAGS = -Wall $(EXTRA_DEFINES) $(BUILD_SCHEME_DEF) -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 $(INCLUDES) -I/usr/include -I/usr/include/freetype2 -IJuceLibraryCode -IJuceLibraryCode/modules -std=gnu++11
-#-std=c++11
 
 JUCE = JuceLibraryCode
 
@@ -134,12 +131,12 @@ $(TARGET)-static: $(OUTPUT_DIR)/$(TARGET)-static
 
 ifdef STATIC_BUILD
 $(OUTPUT_DIR)/$(TARGET)-static: $(OBJS) $(JUCE_OBJECTS)
-	$(CC) -Xlinker -search_paths_first -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk -stdlib=libc++ -mmacosx-version-min=10.12 -framework Foundation -framework Carbon -framework Cocoa -framework IOKit -framework QuartzCore -framework WebKit $(OBJECTS) $(JUCE_OBJECTS) -Wall $(ST_LIBS) -o $@
+	$(CC) $(LDFLAGS) $(OBJECTS) $(JUCE_OBJECTS) $(ST_LIBS) -o $@
 endif
 
 ifdef SHARED_BUILD
 $(OUTPUT_DIR)/$(TARGET): $(OBJS) $(JUCE_OBJECTS)
-	$(CC) -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk -stdlib=libc++ -mmacosx-version-min=10.12 -framework Foundation -framework Carbon -framework Cocoa -framework IOKit -framework QuartzCore -framework WebKit $(OBJECTS) $(JUCE_OBJECTS) -Wall $(SH_LIBS) -o $@
+	$(CC) $(LDFLAGS) $(OBJECTS) $(JUCE_OBJECTS) $(SH_LIBS) -o $@
 endif
 	
 $(BUILD_DIR)/juce_core.o: $(JUCE)/juce_core.$(CODE_EXT)
