@@ -49,20 +49,26 @@ namespace SubutaiLauncher
         return _running;
     }
 
-    void NotificationCenter::notificationRaised(NotificationType t, const std::string& s)
+    void NotificationCenter::notificationRaised(NotificationType t, Poco::DynamicAny v)
     {
-        _logger->debug("Notification raised: %s", s);
+        //_logger->debug("Notification raised: %s", v.convert<std::string>());
         NotificationMessage m;
         m.type = t;
-        m.message = s;
+        m.message = v;
         _npool.push_back(m);
     }
 
     NotificationMessage NotificationCenter::dispatchNotification()
     {
+        if (_npool.empty()) return NotificationMessage{N_EMPTY, Poco::DynamicAny(0)};
         auto m = _npool.front();
         _npool.pop_front();
         return m;
+    }
+
+    bool NotificationCenter::notificationEmpty()
+    {
+        return _npool.empty();
     }
 
     void NotificationCenter::clear()

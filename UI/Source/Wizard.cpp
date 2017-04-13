@@ -239,6 +239,8 @@ void Wizard::runInstall()
         t.detach();
         return;
     }
+    _logger->debug("Nothing to install");
+    finish();
 }
 
 void Wizard::stepCompleted(const std::string& name)
@@ -273,6 +275,12 @@ void Wizard::stepCompleted(const std::string& name)
         runInstall();
         return;
     } 
+
+    finish();
+}
+
+void Wizard::finish()
+{
     // Show final page
     _cancel.setEnabled(false);
     _cancel.setVisible(false);

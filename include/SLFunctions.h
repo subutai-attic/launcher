@@ -21,6 +21,8 @@ namespace SubutaiLauncher {
     static char const* sl_desc = "";
     static char const* sl_destination = "";
 
+    static double const* sl_double;
+
     // SSH
     static char const* ssh_user;        // SSH User
     static char const* ssh_pass;        // SSH Password
@@ -44,6 +46,7 @@ namespace SubutaiLauncher {
     static char* tmpdir_keywords[] = {(char*)"tmpdir", NULL};
     static char* string_keywords[] = {(char*)"string", NULL};
     static char* desc_keywords[] = {(char*)"string", (char*)"desc", NULL};
+    static char* double_keywords[] = {(char*)"double", NULL};
 
     // ========================================================================
 
@@ -206,7 +209,8 @@ namespace SubutaiLauncher {
     static PyObject* SL_RaiseError(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
-        Session::instance()->getNotificationCenter()->notificationRaised(N_ERROR, sl_string);
+        Poco::DynamicAny v(sl_string);
+        Session::instance()->getNotificationCenter()->notificationRaised(N_ERROR, v);
         return Py_BuildValue("i", 1);
     }
 
@@ -215,7 +219,8 @@ namespace SubutaiLauncher {
     static PyObject* SL_RaiseWarning(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
-        Session::instance()->getNotificationCenter()->notificationRaised(N_WARNING, sl_string);
+        Poco::DynamicAny v(sl_string);
+        Session::instance()->getNotificationCenter()->notificationRaised(N_WARNING, v);
         return Py_BuildValue("i", 1);
     }
 
@@ -224,7 +229,8 @@ namespace SubutaiLauncher {
     static PyObject* SL_RaiseInfo(PyObject* self, PyObject* args, PyObject* keywords) {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
-        Session::instance()->getNotificationCenter()->notificationRaised(N_INFO, sl_string);
+        Poco::DynamicAny v(sl_string);
+        Session::instance()->getNotificationCenter()->notificationRaised(N_INFO, v);
         return Py_BuildValue("i", 1);
     }
 
@@ -436,6 +442,36 @@ namespace SubutaiLauncher {
         return Py_BuildValue("i", 0);
     }
 
+    static PyObject* SL_GetDownloadProgress(PyObject* self, PyObject* args) 
+    {
+        auto pProgress = Session::instance()->getDownloader()->getPercent();
+        return Py_BuildValue("d", pProgress);
+    }
+
+    static PyObject* SL_SetProgress(PyObject* self, PyObject* args, PyObject* keywords)
+    {  
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "d", double_keywords, &sl_double))
+            return NULL;
+
+        Session::instance()->getNotificationCenter()->notificationRaised(N_DOUBLE_DATA, sl_double);
+        return Py_BuildValue("i", 0);
+    }
+
+    static PyObject* SL_GetFileSize(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+            return NULL;
+
+        auto pDownloader = Session::instance()->getDownloader();
+        pDownloader->setFilename(sl_string);
+        long result = -1;
+        if (pDownloader->retrieveFileInfo()) {
+            auto pInfo = pDownloader->info();
+            result = pInfo.size;
+        }
+        return Py_BuildValue("l", result);
+    }
+
     static PyObject* SL_MakeLink(PyObject* self, PyObject* args, PyObject* keywords) 
     {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
@@ -502,6 +538,9 @@ namespace SubutaiLauncher {
         {"AddStatus", (PyCFunction)SL_AddStatus, METH_VARARGS | METH_KEYWORDS, "Add status"},
         //{"RootCommand", (PyCFunction)SL_RootCommand, METH_VARARGS | METH_KEYWORDS, "Executes root command"},
         {"MakeLink", (PyCFunction)SL_MakeLink, METH_VARARGS | METH_KEYWORDS, "Executes ln -s on root behalf"},
+        {"GetDownloadProgress", SL_GetDownloadProgress, METH_VARARGS, "Return percentage of download"},
+        {"SetProgress", (PyCFunction)SL_SetProgress, METH_VARARGS | METH_KEYWORDS, "Sets action percentage"},
+        {"GetFileSize", (PyCFunction)SL_GetFileSize, METH_VARARGS | METH_KEYWORDS, "Gets remote file size"},
         {NULL, NULL, 0, NULL}
     };
 

@@ -59,9 +59,9 @@ void WizardInstall::start(const std::string& name)
     _logger->trace("Recreating progress bar");
     std::string nt("Installing ");
     nt.append(name);
-    _title->setText(nt, dontSendNotification);
+    _title->setText(nt, juce::dontSendNotification);
     _progress = 0.0;
-    _pb = new ProgressBar(_progress);
+    _pb = new juce::ProgressBar(_progress);
     _pb->setBounds(20, 60, 460, 25);
     addAndMakeVisible(_pb);
 
@@ -108,7 +108,6 @@ void WizardInstall::runImpl() {
     SubutaiLauncher::SL sl(downloader->getOutputDirectory());
     sl.open(_script);
     auto t = sl.executeInThread();
-    t.detach();
     auto nc = SubutaiLauncher::Session::instance()->getNotificationCenter();
     bool download = false;
     while (_running) {
@@ -116,6 +115,7 @@ void WizardInstall::runImpl() {
         if (st != "") addLine(st);
         auto e = nc->dispatch();
         if (e == SubutaiLauncher::SCRIPT_FINISHED) {
+            t.join();
             addLine("Script execution completed");
             _logger->information("%s script execution completed", script);
             _progress = 100.0;
@@ -126,16 +126,30 @@ void WizardInstall::runImpl() {
             download = false;
         }
 
-        if (download) {
-            _progress = (double)SubutaiLauncher::Session::instance()->getDownloader()->getPercent();
+        if (!nc->notificationEmpty()) 
+        {
+            auto pNotification = nc->dispatchNotification();
+            if (pNotification.type == SubutaiLauncher::N_DOUBLE_DATA) {
+                try {
+                    _progress = pNotification.message.convert<double>();
+                } catch (Poco::BadCastException e) {
+                    _logger->error("Failed to convert progress value");
+                    _progress = 1.0;
+                }
+            }
         }
+
+
+        //        if (download) {
+        //            _progress = (double)SubutaiLauncher::Session::instance()->getDownloader()->getPercent();
+        //        }
 
         repaint();
 
 #if LAUNCHER_LINUX || LAUNCHER_MACOS
         usleep(100);
 #else
-		Sleep(100);
+        Sleep(100);
 #endif
     }
 

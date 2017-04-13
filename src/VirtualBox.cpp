@@ -149,7 +149,11 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::parseVms(co
 
 std::string SubutaiLauncher::VirtualBox::execute(const std::string& command)
 {
-    _logger->information("VB: Executing %s", command);
+    if (_path.empty()) 
+    {
+        findInstallation();
+    }
+    _logger->information("VB: Executing '%s %s'", _path, command);
     Poco::Process::Args args;
     Poco::StringTokenizer st(command, " ", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
     for (auto it = st.begin(); it != st.end(); it++)
@@ -180,6 +184,10 @@ std::string SubutaiLauncher::VirtualBox::execute(const std::string& command)
 
 std::string SubutaiLauncher::VirtualBox::execute(const std::string& command, int &exitStatus)
 {
+    if (_path.empty()) 
+    {
+        findInstallation();
+    }
     Poco::Process::Args args;
     Poco::StringTokenizer st(command, " ", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
     for (auto it = st.begin(); it != st.end(); it++)

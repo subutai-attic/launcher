@@ -44,6 +44,10 @@ $(BUILD_DIR)/HubTest.o: HubTest.cpp HubTest.h
 directories:
 	@mkdir -p $(BUILD_DIR)
 
+files:
+	@cp *.py /tmp/subutai/
+	@cp *.py $(OUTPUT_DIR)
+
 clean:
 	@rm -f $(OBJECTS)
 	@rm -f $(OUTPUT_DIR)/$(TARGET)

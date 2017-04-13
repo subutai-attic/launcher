@@ -333,8 +333,8 @@ elif [ "$os" == "Darwin" ]; then
         stlibs="-L$collect_static"
     fi
     echo "LIBDIRS = $stlibs -L/usr/local/lib -L$pylib -L../bin -L$openssl_directory/lib" >> config.make
-    echo "LDFLAGS = -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk -stdlib=libc++ -mmacosx-version-min=10.12 -framework Foundation -framework Carbon -framework Cocoa -framework IOKit -framework QuartzCore -framework WebKit" >> config.make
-    echo "export LDFLAGS" >> config.make
+    echo "BLDFLAGS = -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk -stdlib=libc++ -mmacosx-version-min=10.12 -framework Foundation -framework Carbon -framework Cocoa -framework IOKit -framework QuartzCore -framework WebKit" >> config.make
+    echo "export BLDFLAGS" >> config.make
 fi
 cat <<__EOF__ >>config.make
 export PYTHON_VER
