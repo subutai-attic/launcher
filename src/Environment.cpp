@@ -163,6 +163,7 @@ std::string SubutaiLauncher::Environment::getVar(const std::string& name, const 
 std::string SubutaiLauncher::Environment::setVar(const std::string& name, const std::string& value)
 {
     Poco::Environment::set(name, value);
+	return value;
 }
 
 std::string SubutaiLauncher::Environment::getDefaultGateway()

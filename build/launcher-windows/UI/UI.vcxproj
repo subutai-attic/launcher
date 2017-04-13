@@ -81,8 +81,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\include;..\..\..\third-party\libssh\include;..\..\..\third-party\openssl\include;..\..\..\third-party\curl\include;..\..\..\third-party\json;$(PYTHON_ROOT)\include;$(POCO_ROOT)\Foundation\include;$(POCO_ROOT)\NetSSL_OpenSSL\include;$(POCO_ROOT)\Net\include;$(POCO_ROOT)\JSON\include;$(POCO_ROOT)\Crypto\include;..\..\..\UI\JuceLibraryCode;..\..\..\UI\JuceLibraryCode\modules</IncludePath>
-    <LibraryPath>$(PYTHON_ROOT)/libs;$(POCO_ROOT)/lib64;..\..\..\bin;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\include;..\..\..\third-party\libssh\include;..\..\..\third-party\openssl\include;..\..\..\third-party\curl\include;..\..\..\third-party\json;$(PYTHON_ROOT)\include;$(POCO_ROOT)\Foundation\include;$(POCO_ROOT)\Util\include;$(POCO_ROOT)\NetSSL_OpenSSL\include;$(POCO_ROOT)\Net\include;$(POCO_ROOT)\JSON\include;$(POCO_ROOT)\Crypto\include;..\..\..\UI\JuceLibraryCode;..\..\..\UI\JuceLibraryCode\modules</IncludePath>
+    <LibraryPath>$(PYTHON_ROOT)/libs;$(POCO_ROOT)/lib64;..\..\..\bin;..\..\..\third-party\libssh\lib;$(LibraryPath)</LibraryPath>
+    <OutDir>..\..\..\bin</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -108,6 +109,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>ssh.lib;python36.lib;subutai-launcher.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -135,14 +137,14 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;BUILD_SCHEME="dev";-D_WINSOCK_=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUGTT;_WINDOWS;BUILD_SCHEME="dev";-D_WINSOCK_=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>launcher.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ssh.lib;python3.lib;subutai-launcher.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -158,7 +160,6 @@
     <ClCompile Include="..\..\..\UI\Source\HubComponent.cpp" />
     <ClCompile Include="..\..\..\UI\Source\InstallationComponent.cpp" />
     <ClCompile Include="..\..\..\UI\Source\InstallationDialog.cpp" />
-    <ClCompile Include="..\..\..\UI\Source\LibraryActionThread.cpp" />
     <ClCompile Include="..\..\..\UI\Source\LibraryComponent.cpp" />
     <ClCompile Include="..\..\..\UI\Source\LibraryItem.cpp" />
     <ClCompile Include="..\..\..\UI\Source\LibraryItemTab.cpp" />
@@ -185,7 +186,6 @@
     <ClInclude Include="..\..\..\UI\Source\HubComponent.h" />
     <ClInclude Include="..\..\..\UI\Source\InstallationComponent.h" />
     <ClInclude Include="..\..\..\UI\Source\InstallationDialog.h" />
-    <ClInclude Include="..\..\..\UI\Source\LibraryActionThread.h" />
     <ClInclude Include="..\..\..\UI\Source\LibraryComponent.h" />
     <ClInclude Include="..\..\..\UI\Source\LibraryItem.h" />
     <ClInclude Include="..\..\..\UI\Source\LibraryItemTab.h" />

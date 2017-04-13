@@ -5,7 +5,7 @@ const std::string SubutaiLauncher::VirtualBox::BIN = "vboxmanage";
 #elif LAUNCHER_MACOS
 const std::string SubutaiLauncher::VirtualBox::BIN = "VBoxManage";
 #else
-#error Not implemented on this platform
+const std::string SubutaiLauncher::VirtualBox::BIN = "VBoxManage.exe";
 #endif
 std::string SubutaiLauncher::VirtualBox::cloneName = "subutai";
 std::string SubutaiLauncher::VirtualBox::subutaiBranch = "subutai-dev";

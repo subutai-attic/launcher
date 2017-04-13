@@ -76,7 +76,8 @@
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\include;..\..\..\third-party\libssh\include;..\..\..\third-party\openssl\include;..\..\..\third-party\curl\include;..\..\..\third-party\json;$(PYTHON_ROOT)\include;$(POCO_ROOT)\Foundation\include;$(POCO_ROOT)\NetSSL_OpenSSL\include;$(POCO_ROOT)\Net\include;$(POCO_ROOT)\JSON\include;$(POCO_ROOT)\Crypto\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\include;..\..\..\third-party\libssh\include;..\..\..\third-party\openssl\include;..\..\..\third-party\curl\include;..\..\..\third-party\json;$(PYTHON_ROOT)\include;$(POCO_ROOT)\Foundation\include;$(POCO_ROOT)\NetSSL_OpenSSL\include;$(POCO_ROOT)\Net\include;$(POCO_ROOT)\JSON\include;$(POCO_ROOT)\Crypto\include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\include;..\..\..\third-party\libssh\include;..\..\..\third-party\openssl\include;..\..\..\third-party\curl\include;..\..\..\third-party\json;$(PYTHON_ROOT)\include;$(POCO_ROOT)\Foundation\include;$(POCO_ROOT)\Util\include;$(POCO_ROOT)\Net\include;$(POCO_ROOT)\NetSSL_OpenSSL\include;$(POCO_ROOT)\JSON\include;$(POCO_ROOT)\Crypto\include</IncludePath>
+    <OutDir>..\..\..\bin</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -139,7 +140,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Browser.cpp" />
-    <ClCompile Include="..\..\..\src\ConfigurationManager.cpp" />
     <ClCompile Include="..\..\..\src\Core.cpp" />
     <ClCompile Include="..\..\..\src\Downloader.cpp" />
     <ClCompile Include="..\..\..\src\Environment.cpp" />
@@ -154,8 +154,6 @@
     <ClCompile Include="..\..\..\src\SLFunctions.cpp" />
     <ClCompile Include="..\..\..\src\SSH.cpp" />
     <ClCompile Include="..\..\..\src\SubutaiException.cpp" />
-    <ClCompile Include="..\..\..\src\SubutaiLog.cpp" />
-    <ClCompile Include="..\..\..\src\SubutaiProcess.cpp" />
     <ClCompile Include="..\..\..\src\SubutaiString.cpp" />
     <ClCompile Include="..\..\..\src\Tray.cpp" />
     <ClCompile Include="..\..\..\src\VBox.cpp" />
@@ -163,13 +161,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\Browser.h" />
-    <ClInclude Include="..\..\..\include\ConfigurationManager.h" />
     <ClInclude Include="..\..\..\include\Core.h" />
     <ClInclude Include="..\..\..\include\Downloader.h" />
     <ClInclude Include="..\..\..\include\E2E.h" />
     <ClInclude Include="..\..\..\include\Environment.h" />
     <ClInclude Include="..\..\..\include\FileSystem.h" />
     <ClInclude Include="..\..\..\include\NotificationCenter.h" />
+    <ClInclude Include="..\..\..\include\P2P.h" />
     <ClInclude Include="..\..\..\include\RootProcess.h" />
     <ClInclude Include="..\..\..\include\Session.h" />
     <ClInclude Include="..\..\..\include\Settings.h" />
@@ -179,9 +177,6 @@
     <ClInclude Include="..\..\..\include\SSH.h" />
     <ClInclude Include="..\..\..\include\SubutaiException.h" />
     <ClInclude Include="..\..\..\include\SubutaiLauncher.h" />
-    <ClInclude Include="..\..\..\include\SubutaiLog.h" />
-    <ClInclude Include="..\..\..\include\SubutaiP2P.h" />
-    <ClInclude Include="..\..\..\include\SubutaiProcess.h" />
     <ClInclude Include="..\..\..\include\SubutaiString.h" />
     <ClInclude Include="..\..\..\include\Tray.h" />
     <ClInclude Include="..\..\..\include\Vars.h" />

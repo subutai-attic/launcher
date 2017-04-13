@@ -35,6 +35,7 @@ package/subutai*
 *.lastbuildstate
 *.lib
 *.pdb
+.vs
 subutai-launcher/Debug
 subutai-launcher/x64
 subutai-launcher/.vs
