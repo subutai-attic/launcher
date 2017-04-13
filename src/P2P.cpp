@@ -1,4 +1,9 @@
+#include "Vars.h"
+#if LAUNCHER_WINDOWS
+#include "../include/P2P.h"
+#else
 #include "P2P.h"
+#endif
 
 const std::string SubutaiLauncher::P2P::BIN = "p2p";
 
