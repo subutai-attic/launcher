@@ -6,13 +6,14 @@ def subutaistart():
 
     machineName = "subutai-unit-test-1"
 
-    call(['ssh-keygen', '-R', '[localhost]:4567'])
+    call(['ssh-keygen', '-R', '[127.0.0.1]:4567'])
 
-    subutai.SetSSHCredentials("subutai", "ubuntai", "localhost", 4567)
+    subutai.SetSSHCredentials("subutai", "ubuntai", "127.0.0.1", 4567)
 
     setupVm(machineName)
     startVm(machineName)
     waitSSH()
+    sleep(60)
     installSnapFromStore()
     sleep(60)
     initBtrfs()
@@ -21,7 +22,13 @@ def subutaistart():
     sleep(60)
     #installSubutai("", "", "", 0)
     reconfigureNic(machineName)
-    sleep(60)
+    sleep(10)
+    stopVm(machineName)
+    sleep(20)
+    startVm(machineName)
+    sleep(20)
+    waitSSH()
+    sleep(20)
     installManagement()
     sleep(60)
     setupSSH()
@@ -97,6 +104,13 @@ def startVm( machineName ):
 
     return;
 
+def stopVm( machineName ):
+
+    if subutai.CheckVMRunning(machineName) != 0:
+        subutai.VBox("controlvm " + machineName + " poweroff soft")
+
+    return;
+
 def setupVm( machineName ):
     if subutai.CheckVMExists(machineName) != 0:
         subutai.download("core.ova")
@@ -122,8 +136,8 @@ def installSubutai( snapFile, user, host, port ):
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
 
-    call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/launcher-prepare-server', 'ubuntu@localhost:~/prepare-server'])
-    call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/subutai_4.0.15_amd64-dev.snap', 'ubuntu@localhost:~/subutai_latest.snap'])
+    call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/launcher-prepare-server', 'ubuntu@127.0.0.1:~/prepare-server'])
+    call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/subutai_4.0.15_amd64-dev.snap', 'ubuntu@127.0.0.1:~/subutai_latest.snap'])
 
     subutai.SSHRun("sudo chmod +x /home/ubuntu/prepare-server")
     subutai.SSHRun("sudo /home/ubuntu/prepare-server")

@@ -132,7 +132,6 @@ Wizard::~Wizard()
 void Wizard::paint(juce::Graphics& g)
 {
     g.fillAll (Colour (0xff222222));
-    //g.fillAll (Colour::greyLevel (0.2f));
 }
 
 void Wizard::resized()

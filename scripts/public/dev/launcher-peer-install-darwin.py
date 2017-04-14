@@ -2,120 +2,135 @@ import subutai
 from time import sleep
 from subprocess import call
 
+
 def subutaistart():
 
-    machineName = "subutai-peer"
+    machineName = "subutai-peer-1"
 
-    call(['ssh-keygen', '-R', '[localhost]:4567'])
+    call(['ssh-keygen', '-R', '[127.0.0.1]:4567'])
 
-    subutai.SetSSHCredentials("subutai", "ubuntai", "localhost", 4567)
+    subutai.SetSSHCredentials("subutai", "ubuntai", "127.0.0.1", 4567)
 
     setupVm(machineName)
-    subutai.SetProgress(10.0)
+    subutai.SetProgress(4.0)
     startVm(machineName)
-    subutai.SetProgress(11.0)
+    subutai.SetProgress(7.0)
     waitSSH()
-    subutai.SetProgress(12.0)
+    subutai.SetProgress(8.0)
+    sleep(60)
     installSnapFromStore()
-    subutai.SetProgress(50.0)
+    subutai.SetProgress(10.0)
     sleep(60)
     initBtrfs()
-    subutai.SetProgress(53.0)
+    subutai.SetProgress(20.0)
     sleep(60)
     setAlias()
-    subutai.SetProgress(54.0)
+    subutai.SetProgress(30.0)
     sleep(60)
+    # installSubutai("", "", "", 0)
     reconfigureNic(machineName)
-    subutai.SetProgress(59.0)
-    sleep(60)
+    subutai.SetProgress(40.0)
+    sleep(10)
+    stopVm(machineName)
+    subutai.SetProgress(50.0)
+    sleep(20)
+    startVm(machineName)
+    subutai.SetProgress(60.0)
+    sleep(20)
+    waitSSH()
+    subutai.SetProgress(70.0)
+    sleep(20)
     installManagement()
-    subutai.SetProgress(97.0)
+    subutai.SetProgress(80.0)
     sleep(60)
+    waitSSH()
+    subutai.SetProgress(90.0)
     setupSSH()
-    subutai.SetProgress(100.0)
+    subutai.SetProgress(99.0)
 
-    return;
+    subutai.Shutdown()
 
-def precalculate():
-    size = 0
-    size = size + subutai.GetFileSize("core.ova")
-    size = size + subutai.GetFileSize("subutai_4.0.15_amd64-dev.snap")
-
-    return size
+    return
 
 
 def waitSSH():
+    subutai.log("info", "Waiting for machine to bring SSH")
     attempts = 0
     while subutai.TestSSH() != 0:
         sleep(1)
         attempts = attempts + 1
         if attempts == 30:
+            subutai.log("error", "SSH timeout for 30 second")
             return
+    subutai.log("info", "SSH Connected")
     return
 
 
 def installManagement():
-    subutai.AddStatus("Installing management container")
-    attempts = 0
-    while subutai.TestSSH() != 0:
-        sleep(1)
-        attempts = attempts + 1
-        if attempts == 30:
-            return
-
+    subutai.AddStatus("Installing Management Container")
+    subutai.log("info", "Installing management")
     subutai.SSHRun("sudo subutai -d import management")
 
-    return;
+    return
+
 
 def installSnapFromStore():
     subutai.AddStatus("Installing Subutai")
+    subutai.log("info", "Installing subutai snap")
     subutai.SSHRun("sudo snap install --beta --devmode subutai-dev")
 
-    return;
+    return
+
 
 def initBtrfs():
-    subutai.AddStatus("Initializing btrfs")
+    subutai.log("info", "Initializing BTRFS")
+    subutai.AddStatus("Initializing BTRFS")
     subutai.SSHRun("sudo subutai-dev.btrfsinit /dev/sdb")
 
-    return;
+    return
+
 
 def setAlias():
-    subutai.AddStatus("Setting aliases")
+    subutai.log("info", "Setting Alias")
     subutai.SSHRun("sudo bash -c 'snap alias subutai-dev subutai'")
 
     return
 
-def setupSSH():
-    subutai.AddStatus("Adding SSH key")
-    attempts = 0
-    while subutai.TestSSH() != 0:
-        sleep(1)
-        attempts = attempts + 1
-        if attempts == 30:
-            return
 
+def setupSSH():
+    subutai.log("info", "Setting up SSH")
     subutai.SSHRun("mkdir -p /home/subutai/.ssh")
     subutai.InstallSSHKey()
 
-    return;
+    return
 
-def startVm( machineName ):
+
+def startVm(machineName):
+    subutai.log("info", "Starting virtual machine")
     if subutai.CheckVMRunning(machineName) != 0:
         subutai.VBox("startvm --type headless " + machineName)
 
-    return;
+    return
 
-def setupVm( machineName ):
-    subutai.AddStatus("Setting up a VM")
+
+def stopVm(machineName):
+    subutai.log("info", "Stopping Virtual machine")
+    if subutai.CheckVMRunning(machineName) != 0:
+        subutai.VBox("controlvm " + machineName + " poweroff soft")
+
+    return
+
+
+def setupVm(machineName):
+    subutai.log("info", "Setting up a VM")
+    subutai.AddStatus("Installing VM")
     if subutai.CheckVMExists(machineName) != 0:
         subutai.download("core.ova")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
-
         subutai.download("subutai_4.0.15_amd64-dev.snap")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
-
         subutai.VBox("import /tmp/subutai/core.ova")
         subutai.VBox("modifyvm core --cpus 2")
         subutai.VBox("modifyvm core --nic1 nat")
@@ -124,32 +139,30 @@ def setupVm( machineName ):
         subutai.VBox("modifyvm core --rtcuseutc on")
         ret = subutai.VBoxS("modifyvm core --name " + machineName)
         if ret != 0:
-            subutai.AddStatus("Machine " +machineName+ " already exists")
+            subutai.log("error", "Machine already exists")
 
-    return;
+    return
 
-def installSubutai( snapFile, user, host, port ):
+
+def installSubutai(snapFile, user, host, port):
     subutai.download("launcher-prepare-server")
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
 
-    call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/launcher-prepare-server', 'ubuntu@localhost:~/prepare-server'])
-    call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/subutai_4.0.15_amd64-dev.snap', 'ubuntu@localhost:~/subutai_latest.snap'])
+    call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/launcher-prepare-server', 'ubuntu@127.0.0.1:~/prepare-server'])
+    call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/subutai_4.0.15_amd64-dev.snap', 'ubuntu@127.0.0.1:~/subutai_latest.snap'])
 
     subutai.SSHRun("sudo chmod +x /home/ubuntu/prepare-server")
     subutai.SSHRun("sudo /home/ubuntu/prepare-server")
 
-    return;
+    return
 
-def reconfigureNic( machineName ):
-    subutai.AddStatus("Reconfiguring NIC on: " + machineName)
 
-    subutai.VBox("controlvm " + machineName + " poweroff soft")
-
+def reconfigureNic(machineName):
+    subutai.AddStatus("Configuring Network")
+    subutai.log("info", "Reconfiguring NIC")
     gateway = subutai.GetDefaultRoutingInterface()
-
     bridged = subutai.GetVBoxBridgedInterface(gateway)
-
     subutai.VBox("modifyvm " + machineName + ' --nic1 bridged --bridgeadapter1 ' + bridged)
     subutai.VBox("modifyvm " + machineName + " --nic2 nat")
     subutai.VBox("modifyvm " + machineName + " --cableconnected2 on")
@@ -166,8 +179,9 @@ def reconfigureNic( machineName ):
     subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 vboxnet0")
     subutai.VBox("startvm --type headless " + machineName)
 
-    return;
+    return
+
 
 def waitSnap():
 
-    return;
+    return

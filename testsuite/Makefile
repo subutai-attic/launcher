@@ -18,7 +18,9 @@ OBJECTS = $(BUILD_DIR)/DownloaderTest.o \
 		  $(BUILD_DIR)/SLTest.o \
 		  $(BUILD_DIR)/SSHTest.o \
 		  $(BUILD_DIR)/TestSuite.o \
-		  $(BUILD_DIR)/HubTest.o 
+		  $(BUILD_DIR)/HubTest.o \
+		  $(BUILD_DIR)/EnvironmentTest.o \
+		  $(BUILD_DIR)/VirtualBoxTest.o
 
 $(OUTPUT_DIR)/$(TARGET): $(OBJECTS)
 	$(CC) $^ $(LDFLAGS) -o $@
@@ -41,8 +43,15 @@ $(BUILD_DIR)/TestSuite.o: TestSuite.cpp TestSuite.h
 $(BUILD_DIR)/HubTest.o: HubTest.cpp HubTest.h
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
+$(BUILD_DIR)/EnvironmentTest.o: EnvironmentTest.cpp EnvironmentTest.h
+	$(CC) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/VirtualBoxTest.o: VirtualBoxTest.cpp VirtualBoxTest.h
+	$(CC) $(CXXFLAGS) -c $< -o $@
+
 directories:
 	@mkdir -p $(BUILD_DIR)
+	@mkdir -p /tmp/subutai
 
 files:
 	@cp *.py /tmp/subutai/

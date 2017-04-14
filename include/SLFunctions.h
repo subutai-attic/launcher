@@ -13,7 +13,8 @@
 #include "VirtualBox.h"
 #include "RootProcess.h"
 
-namespace SubutaiLauncher {
+namespace SubutaiLauncher 
+{
 
     static char const* sl_filename = "";
     static char const* sl_tmpdir = "";
@@ -50,57 +51,68 @@ namespace SubutaiLauncher {
 
     // ========================================================================
 
-    static PyObject* SL_HelloWorld(PyObject* self, PyObject* args) {
+    static PyObject* SL_HelloWorld(PyObject* self, PyObject* args) 
+    {
         return Py_BuildValue("s", "Hello, World!");
     }
 
-    static PyObject* SL_GetScheme(PyObject* self, PyObject* args) {
+    // ========================================================================
+
+    static PyObject* SL_GetScheme(PyObject* self, PyObject* args) 
+    {
         std::printf("GetScheme: %s\n", BUILD_SCHEME);
         return Py_BuildValue("s", "Hello, World!");
     }
 
     // ========================================================================
 
-    static PyObject* SL_Debug(PyObject* self, PyObject* args) {
+    static PyObject* SL_Debug(PyObject* self, PyObject* args) 
+    {
         return Py_BuildValue("s", "Debug");
     }
 
     // ========================================================================
 
-    static PyObject* SL_Version(PyObject* self, PyObject* args) {
+    static PyObject* SL_Version(PyObject* self, PyObject* args) 
+    {
         return Py_BuildValue("s", "Version: 0.1.0");
     }
 
     // ========================================================================
 
-    static PyObject* SL_GetMasterVersion(PyObject* self, PyObject* args) {
+    static PyObject* SL_GetMasterVersion(PyObject* self, PyObject* args) 
+    {
         return Py_BuildValue("s", "4.0.15");
     }
 
     // ========================================================================
 
-    static PyObject* SL_GetDevVersion(PyObject* self, PyObject* args) {
+    static PyObject* SL_GetDevVersion(PyObject* self, PyObject* args) 
+    {
         return Py_BuildValue("s", "4.0.16");
     }
 
     // ========================================================================
 
-    static PyObject* SL_Shutdown(PyObject* self, PyObject* args) {
+    static PyObject* SL_Shutdown(PyObject* self, PyObject* args) 
+    {
         Session::instance()->getNotificationCenter()->add(SCRIPT_FINISHED);
         return Py_BuildValue("i", 1);
     }
 
     // ========================================================================
 
-    static PyObject* SL_CheckDirectories(PyObject* self, PyObject* args) {
+    static PyObject* SL_CheckDirectories(PyObject* self, PyObject* args) 
+    {
         auto settings = Session::instance()->getSettings();
         auto tmpDir = settings->getTmpPath();
         auto installDir = settings->getInstallationPath();
 
-        try {
-
+        try 
+        {
             FileSystem fs("/");
-            if (!fs.isFileExists(installDir)) {
+            if (!fs.isFileExists(installDir)) 
+            {
                 fs.createDirectory(installDir);
             }
             FileSystem ifs(installDir);
@@ -125,7 +137,9 @@ namespace SubutaiLauncher {
                 ifs.createDirectory("lib");
             }
 
-        } catch (SubutaiException e) {
+        } 
+        catch (SubutaiException e) 
+        {
             return Py_BuildValue("i", 0);
         }
 
@@ -134,16 +148,29 @@ namespace SubutaiLauncher {
 
     // ========================================================================
 
-    static PyObject* SL_Download(PyObject* self, PyObject* args, PyObject* keywords) {
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", download_keywords, &sl_filename))
+    static PyObject* SL_Download(
+            PyObject* self, 
+            PyObject* args, 
+            PyObject* keywords) 
+    {
+        if (!PyArg_ParseTupleAndKeywords(
+                    args, keywords, "s|i", download_keywords, &sl_filename))
+        {
             return NULL;
-        std::printf("Requested download of a file: %s\n", sl_filename);
+        }
         auto downloader = Session::instance()->getDownloader();
         PyErr_Print();
         downloader->setFilename(sl_filename);
-        if (!downloader->retrieveFileInfo()) {
-            std::printf("Failed to retrieve file data");
-        } else {
+        if (!downloader->retrieveFileInfo()) 
+        {
+            Session::instance()
+                ->getNotificationCenter()
+                ->notificationRaised(
+                        N_ERROR, 
+                        Poco::DynamicAny("Failed to retrieve file data"));
+        } 
+        else 
+        {
             Session::instance()->getNotificationCenter()->add(DOWNLOAD_STARTED);
             std::printf("File info retrieved\n");
             auto t = downloader->download();
@@ -154,7 +181,8 @@ namespace SubutaiLauncher {
 
     // ========================================================================
 
-    static PyObject* SL_IsDownloaded(PyObject* self, PyObject* args) {
+    static PyObject* SL_IsDownloaded(PyObject* self, PyObject* args) 
+    {
         auto downloader = Session::instance()->getDownloader();
         if (downloader->isDone())
         {
@@ -169,7 +197,8 @@ namespace SubutaiLauncher {
 
     // ========================================================================
 
-    static PyObject* SL_GetProgress(PyObject* self, PyObject* args) {
+    static PyObject* SL_GetProgress(PyObject* self, PyObject* args) 
+    {
         auto downloader = Session::instance()->getDownloader();
         auto percent = downloader->getPercent();
         return Py_BuildValue("i", percent);
@@ -177,7 +206,8 @@ namespace SubutaiLauncher {
 
     // ========================================================================
 
-    static PyObject* SL_GetTmpDir(PyObject* self, PyObject* args) {
+    static PyObject* SL_GetTmpDir(PyObject* self, PyObject* args) 
+    {
         auto settings = Session::instance()->getSettings();
         auto path = settings->getTmpPath().c_str();
         return Py_BuildValue("s", path);
@@ -185,7 +215,8 @@ namespace SubutaiLauncher {
 
     // ========================================================================
 
-    static PyObject* SL_GetInstallDir(PyObject* self, PyObject* args) {
+    static PyObject* SL_GetInstallDir(PyObject* self, PyObject* args) 
+    {
         auto settings = Session::instance()->getSettings();
         auto path = settings->getInstallationPath().c_str();
         return Py_BuildValue("s", path);
@@ -193,7 +224,8 @@ namespace SubutaiLauncher {
 
     // ========================================================================
 
-    static PyObject* SL_SetTmpDir(PyObject* self, PyObject* args, PyObject* keywords) {
+    static PyObject* SL_SetTmpDir(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", tmpdir_keywords, &sl_tmpdir))
             return NULL;
         Session::instance()->getDownloader()->setOutputDirectory(sl_tmpdir);
@@ -206,7 +238,8 @@ namespace SubutaiLauncher {
 
     // ========================================================================
 
-    static PyObject* SL_RaiseError(PyObject* self, PyObject* args, PyObject* keywords) {
+    static PyObject* SL_RaiseError(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
         Poco::DynamicAny v(sl_string);
@@ -216,7 +249,8 @@ namespace SubutaiLauncher {
 
     // ========================================================================
 
-    static PyObject* SL_RaiseWarning(PyObject* self, PyObject* args, PyObject* keywords) {
+    static PyObject* SL_RaiseWarning(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
         Poco::DynamicAny v(sl_string);
@@ -226,7 +260,8 @@ namespace SubutaiLauncher {
 
     // ========================================================================
 
-    static PyObject* SL_RaiseInfo(PyObject* self, PyObject* args, PyObject* keywords) {
+    static PyObject* SL_RaiseInfo(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
         Poco::DynamicAny v(sl_string);
@@ -236,7 +271,8 @@ namespace SubutaiLauncher {
 
     // ========================================================================
 
-    static PyObject* SL_VBox(PyObject* self, PyObject* args, PyObject* keywords) {
+    static PyObject* SL_VBox(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
 
@@ -250,7 +286,8 @@ namespace SubutaiLauncher {
 
     // ========================================================================
 
-    static PyObject* SL_VBoxS(PyObject* self, PyObject* args, PyObject* keywords) {
+    static PyObject* SL_VBoxS(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
 
@@ -262,7 +299,8 @@ namespace SubutaiLauncher {
 
     // ========================================================================
 
-    static PyObject* SL_GetDefaultRoutingInterface(PyObject* self, PyObject* args) {
+    static PyObject* SL_GetDefaultRoutingInterface(PyObject* self, PyObject* args) 
+    {
         Environment env;
         return Py_BuildValue("s", env.getDefaultGateway().c_str());
     }
@@ -334,20 +372,23 @@ namespace SubutaiLauncher {
         p->setHost(s->getSSHHostname(), s->getSSHPort());
         p->setUsername(s->getSSHUser(), s->getSSHPass());
         p->connect();
-        if (!p->isConnected()) {
+        if (!p->isConnected()) 
+        {
             p->disconnect();
             delete p;
             return Py_BuildValue("i", 1);
         }
         p->authenticate();
-        if (!p->isAuthenticated()) {
+        if (!p->isAuthenticated()) 
+        {
             p->disconnect();
             delete p;
             return Py_BuildValue("i", 1);
         }
 
         auto key = SSH::getPublicKey();
-        if (key == "") {
+        if (key == "") 
+        {
             p->disconnect();
             delete p;
             return Py_BuildValue("i", 1);
