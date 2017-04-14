@@ -540,6 +540,15 @@ namespace SubutaiLauncher
         
     }
 
+    static PyObject* SL_Log(PyObject* self, PyObject* args, PyObject* keywords) 
+    {
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
+            return NULL;
+
+        Poco::Logger::get("subutai").information("SL %s: %s", sl_string, sl_desc);
+    }
+
+
     // ========================================================================
     // Module bindings
     // ========================================================================
@@ -582,6 +591,7 @@ namespace SubutaiLauncher
         {"GetDownloadProgress", SL_GetDownloadProgress, METH_VARARGS, "Return percentage of download"},
         {"SetProgress", (PyCFunction)SL_SetProgress, METH_VARARGS | METH_KEYWORDS, "Sets action percentage"},
         {"GetFileSize", (PyCFunction)SL_GetFileSize, METH_VARARGS | METH_KEYWORDS, "Gets remote file size"},
+        {"log", (PyCFunction)SL_Log, METH_VARARGS | METH_KEYWORDS, "Writes to log"},
         {NULL, NULL, 0, NULL}
     };
 
