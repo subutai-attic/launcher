@@ -106,6 +106,8 @@ void SubutaiLauncher::Core::setupLogger()
     pSplitter->addChannel(cConsole);
 #if LAUNCHER_MACOS
     pChannel->setProperty("path", "/usr/local/share/subutai/log/subutai-launcher.log");
+#elif LAUNCHER_LINUX
+    pChannel->setProperty("path", "/opt/subutai/log/subutai-launcher.log");
 #else
     pChannel->setProperty("path", "subutai-launcher.log");
 #endif
