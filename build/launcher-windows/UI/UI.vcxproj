@@ -81,9 +81,10 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\include;..\..\..\third-party\libssh\include;..\..\..\third-party\openssl\include;..\..\..\third-party\curl\include;..\..\..\third-party\json;$(PYTHON_ROOT)\include;$(POCO_ROOT)\Foundation\include;$(POCO_ROOT)\Util\include;$(POCO_ROOT)\NetSSL_OpenSSL\include;$(POCO_ROOT)\Net\include;$(POCO_ROOT)\JSON\include;$(POCO_ROOT)\Crypto\include;..\..\..\UI\JuceLibraryCode;..\..\..\UI\JuceLibraryCode\modules</IncludePath>
-    <LibraryPath>$(PYTHON_ROOT)/libs;$(POCO_ROOT)/lib64;..\..\..\bin;..\..\..\third-party\libssh\lib;$(LibraryPath)</LibraryPath>
-    <OutDir>..\..\..\bin</OutDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\include;..\..\..\third-party\libssh\include;..\..\..\third-party\openssl\include;..\..\..\third-party\curl\include;..\..\..\third-party\json;$(__PYTHON_ROOT)\include;$(POCO_ROOT)\Foundation\include;$(POCO_ROOT)\Util\include;$(POCO_ROOT)\NetSSL_OpenSSL\include;$(POCO_ROOT)\Net\include;$(POCO_ROOT)\JSON\include;$(POCO_ROOT)\Crypto\include;..\..\..\UI\JuceLibraryCode;..\..\..\UI\JuceLibraryCode\modules;D:\Projects\cpython\Include;D:\Projects\cpython\PC</IncludePath>
+    <LibraryPath>$(__PYTHON_ROOT)/libs;$(POCO_ROOT)/lib64;..\..\..\bin;..\..\..\third-party\libssh\lib;D:\Projects\cpython\PCbuild\amd64;$(LibraryPath)</LibraryPath>
+    <OutDir>..\..\..\bin\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -144,7 +145,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>ssh.lib;python3.lib;subutai-launcher.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>python3.lib;ssh.lib;subutai-launcher.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -168,6 +169,7 @@
     <ClCompile Include="..\..\..\UI\Source\Logo.cpp" />
     <ClCompile Include="..\..\..\UI\Source\Main.cpp" />
     <ClCompile Include="..\..\..\UI\Source\MainComponent.cpp" />
+    <ClCompile Include="..\..\..\UI\Source\MainWindow.cpp" />
     <ClCompile Include="..\..\..\UI\Source\MarketplaceComponent.cpp" />
     <ClCompile Include="..\..\..\UI\Source\Sidebar.cpp" />
     <ClCompile Include="..\..\..\UI\Source\SocialMediaIcons.cpp" />
