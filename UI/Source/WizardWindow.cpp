@@ -1,6 +1,6 @@
 #include "WizardWindow.h"
 
-WizardWindow::WizardWindow() : DialogWindow(
+WizardWindow::WizardWindow() : juce::DialogWindow(
         "Installation Wizard", 
         juce::Colours::lightgrey,
         false, true)
@@ -28,3 +28,7 @@ void WizardWindow::closeButtonPressed()
     delete this;
 }
 
+bool WizardWindow::escapeKeyPressed()
+{
+
+}

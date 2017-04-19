@@ -24,4 +24,21 @@
 #endif
 #endif
 
+#if defined(_WIN32) && defined(POCO_DLL)
+    #if defined(Subutai_EXPORTS)
+        #define Subutai_API __declspec(dllexport)
+    #else
+        #define Subutai_API __declspec(dllimport)
+    #endif
+#endif
+
+
+#if !defined(Subutai_API)
+    #if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
+        #define Subutai_API __attribute__ ((visibility ("default")))
+    #else
+        #define Subutai_API
+    #endif
+#endif
+
 #endif

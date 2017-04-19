@@ -1,9 +1,5 @@
 import subutai
 from time import sleep
-# from shutil import copyfile
-# from shutil import rmtree
-#import os
-# import stat
 import tarfile
 
 def subutaistart():

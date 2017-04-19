@@ -119,6 +119,7 @@ void SubutaiLauncher::SL::execute(std::string module) {
 
 void SubutaiLauncher::SL::execute()
 {
+    _logger->debug("Preparing script for execution");
     auto ncenter = Session::instance()->getNotificationCenter();
     while (ncenter->isRunning())
     {

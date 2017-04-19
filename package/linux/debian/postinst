@@ -1,0 +1,4 @@
+#!/bin/bash
+
+mkdir /opt/subutai/log
+chown $USER /opt/subutai/log

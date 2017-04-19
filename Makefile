@@ -162,6 +162,7 @@ directories:
 
 files:
 	@cp assets/* bin/
+	$(MAKE) -C ./testsuite files
 
 clean:
 	@rm -fv $(OUTPUT_DIR)/$(SHARED_TARGET)

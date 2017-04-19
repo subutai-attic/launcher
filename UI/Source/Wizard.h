@@ -26,6 +26,7 @@ class Wizard :
         void runInstall();
         void stepCompleted(const std::string& name);
         void runCancelConfirmation();
+        void finish();
     private:
         Poco::Logger* _logger;
         int _step;
@@ -46,6 +47,8 @@ class Wizard :
         WizardInstall* _eteInstall;
         WizardInstall* _peerInstall;
         WizardFinish* _finishPage;
+
+        std::thread _installThread;
 
         bool _ptpInstalled;
         bool _eteInstalled;

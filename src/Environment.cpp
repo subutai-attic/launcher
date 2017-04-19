@@ -176,7 +176,7 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
     gatewayName = "0.0.0.0";
     elnum = 8;
 #elif LAUNCHER_MACOS
-    binary = "/bin/netstat";
+    binary = "/usr/sbin/netstat";
     gatewayName = "default";
     elnum = 6;
 #endif
@@ -185,7 +185,7 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
     args.push_back("-rn");
     
     Poco::Pipe pOut;
-    Poco::ProcessHandle ph = Poco::Process::launch("/usr/bin/netstat", args, 0, &pOut, 0);
+    Poco::ProcessHandle ph = Poco::Process::launch(binary, args, 0, &pOut, 0);
     ph.wait();
 
     Poco::PipeInputStream istr(pOut);
