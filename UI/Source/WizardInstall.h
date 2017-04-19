@@ -18,6 +18,7 @@ class WizardInstall : public juce::Component
         void start(const std::string& name);
         void wait();
         std::thread run();
+        bool isRunning();
     private:
         Poco::Logger* _logger;
         bool _running;

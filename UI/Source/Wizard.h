@@ -48,6 +48,8 @@ class Wizard :
         WizardInstall* _peerInstall;
         WizardFinish* _finishPage;
 
+        std::thread _installThread;
+
         bool _ptpInstalled;
         bool _eteInstalled;
         bool _peerInstalled;

@@ -18,8 +18,9 @@ const std::string WizardInstall::E2E_INSTALL = "launcher-chrome-e2e-install-darw
 const std::string WizardInstall::PEER_INSTALL = "launcher-peer-install-darwin";
 #endif
 
-WizardInstall::WizardInstall()
+WizardInstall::WizardInstall() : _running(false)
 {
+    _pb = nullptr;
     _logger = &Poco::Logger::get("subutai");
     _logger->trace("Creating Wizard Install UI Component");
     auto font = juce::Font(20);
@@ -53,8 +54,10 @@ void WizardInstall::start(const std::string& name)
 {
     _logger->information("Starting %s installation", name);
     _name = name;
-    if (_pb) {
+    if (_pb != nullptr) {
+        _logger->trace("Destroying progress bar");
         delete _pb;
+        _logger->trace("Progress bar deleted");
     }
     _logger->trace("Recreating progress bar");
     std::string nt("Installing ");
@@ -107,7 +110,8 @@ void WizardInstall::runImpl() {
 
     SubutaiLauncher::SL sl(downloader->getOutputDirectory());
     sl.open(_script);
-    auto t = sl.executeInThread();
+    std::thread pScriptThread;
+    pScriptThread = sl.executeInThread();
     auto nc = SubutaiLauncher::Session::instance()->getNotificationCenter();
     bool download = false;
     while (_running) {
@@ -115,7 +119,7 @@ void WizardInstall::runImpl() {
         if (st != "") addLine(st);
         auto e = nc->dispatch();
         if (e == SubutaiLauncher::SCRIPT_FINISHED) {
-            t.join();
+            pScriptThread.join();
             addLine("Script execution completed");
             _logger->information("%s script execution completed", script);
             _progress = 100.0;
@@ -175,4 +179,9 @@ void WizardInstall::addLine(const std::string& text, bool error)
     line->setJustificationType(Justification::top);
     addAndMakeVisible(line);
     _lines.push_back(line);
+}
+
+bool WizardInstall::isRunning()
+{
+    return _running;
 }

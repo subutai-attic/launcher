@@ -206,37 +206,48 @@ void Wizard::runInstall()
 {
     _logger->debug("Collecting choosen components");
     auto c = _componentChooserPage->getComponents();
+    if (_ptpInstall->isRunning() || _trayInstall->isRunning() || _eteInstall->isRunning() || _peerInstall->isRunning()) {
+        _logger->trace("Waiting for install thread to complete");
+        _installThread.join();
+    }
+    try 
+    {
     if (c.ptp && !_ptpInstalled) {
         _ptpInstall->setVisible(true);
         _logger->debug("P2P Component has been choosen");
         _ptpInstall->start("P2P");
-        auto t = _ptpInstall->run();
-        t.detach();
+        _installThread = _ptpInstall->run();
         return;
     }
     if (c.tray && !_trayInstalled) {
         _logger->debug("Tray Component has been choosen");
         _trayInstall->start("Tray");
         _trayInstall->setVisible(true);
-        auto t = _trayInstall->run();
-        t.detach();
+        _installThread = _trayInstall->run();
         return;
     }
     if (c.ete && !_eteInstalled) {
         _logger->debug("Browser Plugin Component has been choosen");
         _eteInstall->start("Browser Plugin");
         _eteInstall->setVisible(true);
-        auto t = _eteInstall->run();
-        t.detach();
+        _installThread = _eteInstall->run();
         return;
     }
     if (c.peer && !_peerInstalled) {
         _logger->debug("Peer Component has been choosen");
         _peerInstall->start("Peer");
         _peerInstall->setVisible(true);
-        auto t = _peerInstall->run();
-        t.detach();
+        _installThread = _peerInstall->run();
         return;
+    } 
+    } 
+    catch (SubutaiLauncher::SLException& e)
+    {
+        _logger->error(e.displayText());
+    }
+    catch (SubutaiLauncher::SubutaiException& e)
+    {
+        _logger->error(e.displayText());
     }
     _logger->debug("Nothing to install");
     finish();

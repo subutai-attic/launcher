@@ -300,12 +300,18 @@ echo "EXTRA_DEFINES = $extra_defines" >> config.make
 echo "CODE_EXT = $code_extension" >> config.make
 echo "EXTRA_LIBS = $extra_libraries" >> config.make
 if [ "$scheme" == "production" ]; then
+    echo "Production scheme"
     echo "BUILD_SCHEME_DEF = -DBUILD_SCHEME_PRODUCTION" >> config.make
 elif [ "$sheme" == "master" ]; then
+    echo "Stage scheme"
     echo "BUILD_SCHEME_DEF = -DBUILD_SCHEME_MASTER" >> config.make
 else
+    echo "Developer scheme"
     echo "BUILD_SCHEME_DEF = -DBUILD_SCHEME_DEV" >> config.make
 fi
+
+echo "Shared: $shared"
+
 if [ $shared -eq 0 ]; then
     if [ $static -eq 1 ]; then
         echo "STATIC_BUILD = 1" >> config.make
@@ -313,11 +319,13 @@ if [ $shared -eq 0 ]; then
         echo "SHARED_BUILD = 1" >> config.make
     fi
 else
+    echo "Enabling shared build"
     echo "SHARED_BUILD = 1" >> config.make
     if [ $static -eq 1 ]; then
         echo "STATIC_BUILD = 1" >> config.make
     fi
 fi
+
 if [ $tests -eq 1 ]; then
     echo "BUILD_TESTS = 1" >> config.make
 fi

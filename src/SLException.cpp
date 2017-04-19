@@ -1,13 +1,8 @@
 #include "SLException.h"
+#include <typeinfo>
 
+namespace SubutaiLauncher {
 
-SubutaiLauncher::SLException::SLException(const std::string& msg, int code) : SubutaiException(msg, code) 
-{
-    Poco::Logger::get("subutai").error("SLException");
+POCO_IMPLEMENT_EXCEPTION(SLException, Poco::Exception, "Scripting Language Exception")
+
 }
-
-const char* SubutaiLauncher::SLException::name() const throw() 
-{
-    return "Scripting Language Exception";
-}
-
