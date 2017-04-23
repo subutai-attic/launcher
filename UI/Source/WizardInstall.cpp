@@ -18,14 +18,16 @@ const std::string WizardInstall::E2E_INSTALL = "launcher-chrome-e2e-install-darw
 const std::string WizardInstall::PEER_INSTALL = "launcher-peer-install-darwin";
 #endif
 
-WizardInstall::WizardInstall() : _running(false)
+WizardInstall::WizardInstall() : 
+    _running(false),
+    _active(false)
 {
     _pb = nullptr;
     _logger = &Poco::Logger::get("subutai");
     _logger->trace("Creating Wizard Install UI Component");
     auto font = juce::Font(20);
     _title = new juce::Label();
-    _title->setText("Initializing", dontSendNotification);
+    _title->setText("Initializing", juce::dontSendNotification);
     _title->setColour(Label::textColourId, Colours::white);
     _title->setBounds(20, 20, 480, 40);
     _title->setFont(font);
@@ -78,13 +80,25 @@ void WizardInstall::start(const std::string& name)
     } else if (name == "Peer") {
         _script = PEER_INSTALL;
     }
+    _logger->debug("Installation initializator has been finished");
 }
 
-void WizardInstall::wait()
+int WizardInstall::wait()
 {
+    if (_running && _installThread.joinable())
+    {
+        _installThread.join();
+        return 0;
+    }
+    return 1;
 }
 
-std::thread WizardInstall::run()
+void WizardInstall::run()
+{
+    _installThread = runThread();
+}
+
+std::thread WizardInstall::runThread()
 {
     return std::thread([=] { runImpl(); });
 }
@@ -105,56 +119,63 @@ void WizardInstall::runImpl() {
         _logger->information("Downloaded %s installation script", script);
         addLine("Installation script downloaded");
     }
-    auto td = downloader->download();
-    td.join();
+    std::thread pDownloadThread = downloader->download();
+    pDownloadThread.join();
 
     SubutaiLauncher::SL sl(downloader->getOutputDirectory());
     sl.open(_script);
     std::thread pScriptThread;
-    pScriptThread = sl.executeInThread();
-    auto nc = SubutaiLauncher::Session::instance()->getNotificationCenter();
-    bool download = false;
-    while (_running) {
-        auto st = SubutaiLauncher::Session::instance()->getStatus();
-        if (st != "") addLine(st);
-        auto e = nc->dispatch();
-        if (e == SubutaiLauncher::SCRIPT_FINISHED) {
-            pScriptThread.join();
-            addLine("Script execution completed");
-            _logger->information("%s script execution completed", script);
-            _progress = 100.0;
-            _running = false;
-        } else if (e == SubutaiLauncher::DOWNLOAD_STARTED) {
-            download = true;
-        } else if (e == SubutaiLauncher::DOWNLOAD_FINISHED) {
-            download = false;
-        }
+    try 
+    {
+        pScriptThread = sl.executeInThread();
+        auto nc = SubutaiLauncher::Session::instance()->getNotificationCenter();
+        bool download = false;
+        while (_running) {
+            auto st = SubutaiLauncher::Session::instance()->getStatus();
+            if (st != "") addLine(st);
+            auto e = nc->dispatch();
+            if (e == SubutaiLauncher::SCRIPT_FINISHED) {
+                pScriptThread.join();
+                addLine("Script execution completed");
+                _logger->information("%s script execution completed", script);
+                _progress = 100.0;
+                _running = false;
+            } else if (e == SubutaiLauncher::DOWNLOAD_STARTED) {
+                download = true;
+            } else if (e == SubutaiLauncher::DOWNLOAD_FINISHED) {
+                download = false;
+            }
 
-        if (!nc->notificationEmpty()) 
-        {
-            auto pNotification = nc->dispatchNotification();
-            if (pNotification.type == SubutaiLauncher::N_DOUBLE_DATA) {
-                try {
-                    _progress = pNotification.message.convert<double>();
-                } catch (Poco::BadCastException e) {
-                    _logger->error("Failed to convert progress value");
-                    _progress = 1.0;
+            if (!nc->notificationEmpty()) 
+            {
+                auto pNotification = nc->dispatchNotification();
+                if (pNotification.type == SubutaiLauncher::N_DOUBLE_DATA) {
+                    try {
+                        _progress = pNotification.message.convert<double>();
+                    } catch (Poco::BadCastException e) {
+                        _logger->error("Failed to convert progress value");
+                        _progress = 1.0;
+                    }
                 }
             }
-        }
 
 
-        //        if (download) {
-        //            _progress = (double)SubutaiLauncher::Session::instance()->getDownloader()->getPercent();
-        //        }
+            //        if (download) {
+            //            _progress = (double)SubutaiLauncher::Session::instance()->getDownloader()->getPercent();
+            //        }
 
-        repaint();
+            //repaint();
 
 #if LAUNCHER_LINUX || LAUNCHER_MACOS
-        usleep(100);
+            usleep(100);
 #else
-        Sleep(100);
+            Sleep(100);
 #endif
+        }
+    } 
+    catch (SubutaiLauncher::SLException& e)
+    {
+        _logger->error(e.displayText());
     }
 
     _logger->debug("Stopping installation process and notifying parent");
@@ -184,4 +205,31 @@ void WizardInstall::addLine(const std::string& text, bool error)
 bool WizardInstall::isRunning()
 {
     return _running;
+}
+
+bool WizardInstall::isActive()
+{
+    return _active;
+}
+
+void WizardInstall::activate()
+{
+    if (_active)
+    {
+        _logger->error("Tried to activate installation screen that is already active");
+        return;
+    }
+    _active = true;
+    this->setVisible(true);
+}
+
+void WizardInstall::deactivate()
+{
+    if (!_active)
+    {
+        _logger->error("Tried to deactivate installation screen that is inactive");
+        return;
+    }
+    _active = false;
+    this->setVisible(false);
 }
