@@ -2,3 +2,5 @@
 
 mkdir /opt/subutai/log
 chown $USER /opt/subutai/log
+
+ln -s /opt/subutai/bin/SubutaiLauncher /usr/bin/SubutaiLauncher

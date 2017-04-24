@@ -8,5 +8,5 @@ Homepage: https://subut.ai
 
 Package: subutai-launcher
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: python3, ${shlibs:Depends}, ${misc:Depends}
 Description: Subutai Launcher Installer 
