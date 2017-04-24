@@ -172,7 +172,7 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
     std::string binary, gatewayName;
     int elnum;
 #if LAUNCHER_LINUX
-    binary = "/usr/bin/netstat";
+    binary = "/bin/netstat";
     gatewayName = "0.0.0.0";
     elnum = 8;
 #elif LAUNCHER_MACOS

@@ -10,7 +10,7 @@ LDFLAGS = $(LIBS) -lPocoCppUnit -L$(OUTPUT_DIR) -lsubutai-launcher
 OUTPUT_DIR = ../bin
 BUILD_DIR = ../build/testsuite
 
-$(TARGET): $(OUTPUT_DIR)/libsubutai-launcher.dylib
+$(TARGET): $(OUTPUT_DIR)/libsubutai-launcher.$(LIB_EXT)
 $(TARGET): $(OUTPUT_DIR)/$(TARGET)
 
 OBJECTS = $(BUILD_DIR)/DownloaderTest.o \
