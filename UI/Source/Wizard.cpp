@@ -4,7 +4,8 @@ Wizard::Wizard() :
     _next("Next"),
     _back("Back"),
     _cancel("Cancel"),
-    _step(1)
+    _step(1),
+    _shutdown(false)
 {
     _logger = &Poco::Logger::get("subutai");
 #if LAUNCHER_LINUX
@@ -119,6 +120,8 @@ Wizard::Wizard() :
 
 Wizard::~Wizard()
 {
+    _shutdown = true;
+    cleanInstallers();
     delete _introPage;
     delete _systemCheckPage;
     delete _componentChooserPage;
@@ -206,40 +209,37 @@ void Wizard::runInstall()
 {
     _logger->debug("Collecting choosen components");
     auto c = _componentChooserPage->getComponents();
-    if (_ptpInstall->isRunning() || _trayInstall->isRunning() || _eteInstall->isRunning() || _peerInstall->isRunning()) {
-        _logger->trace("Waiting for install thread to complete");
-        _installThread.join();
-    }
+    cleanInstallers();
     try 
     {
-    if (c.ptp && !_ptpInstalled) {
-        _ptpInstall->setVisible(true);
-        _logger->debug("P2P Component has been choosen");
-        _ptpInstall->start("P2P");
-        _installThread = _ptpInstall->run();
-        return;
-    }
-    if (c.tray && !_trayInstalled) {
-        _logger->debug("Tray Component has been choosen");
-        _trayInstall->start("Tray");
-        _trayInstall->setVisible(true);
-        _installThread = _trayInstall->run();
-        return;
-    }
-    if (c.ete && !_eteInstalled) {
-        _logger->debug("Browser Plugin Component has been choosen");
-        _eteInstall->start("Browser Plugin");
-        _eteInstall->setVisible(true);
-        _installThread = _eteInstall->run();
-        return;
-    }
-    if (c.peer && !_peerInstalled) {
-        _logger->debug("Peer Component has been choosen");
-        _peerInstall->start("Peer");
-        _peerInstall->setVisible(true);
-        _installThread = _peerInstall->run();
-        return;
-    } 
+        if (c.ptp && !_ptpInstalled) {
+            _ptpInstall->activate();
+            _logger->debug("P2P Component has been choosen");
+            _ptpInstall->start("P2P");
+            _ptpInstall->run();
+            return;
+        }
+        if (c.tray && !_trayInstalled) {
+            _trayInstall->activate();
+            _logger->debug("Tray Component has been choosen");
+            _trayInstall->start("Tray");
+            _trayInstall->run();
+            return;
+        }
+        if (c.ete && !_eteInstalled) {
+            _eteInstall->activate();
+            _logger->debug("Browser Plugin Component has been choosen");
+            _eteInstall->start("Browser Plugin");
+            _eteInstall->run();
+            return;
+        }
+        if (c.peer && !_peerInstalled) {
+            _peerInstall->activate();
+            _logger->debug("Peer Component has been choosen");
+            _peerInstall->start("Peer");
+            _peerInstall->run();
+            return;
+        } 
     } 
     catch (SubutaiLauncher::SLException& e)
     {
@@ -255,6 +255,10 @@ void Wizard::runInstall()
 
 void Wizard::stepCompleted(const std::string& name)
 {
+    if (_shutdown)
+    {
+        return;
+    }
     if (name == "P2P")
     {
         _ptpInstalled = true;
@@ -291,6 +295,7 @@ void Wizard::stepCompleted(const std::string& name)
 
 void Wizard::finish()
 {
+    cleanInstallers();
     // Show final page
     _cancel.setEnabled(false);
     _cancel.setVisible(false);
@@ -299,6 +304,51 @@ void Wizard::finish()
     _back.setEnabled(false);
     _back.setVisible(false);
     _finishPage->setVisible(true);
+}
+
+void Wizard::cleanInstallers()
+{
+    _logger->trace("Cleaning install pages");
+    if (_ptpInstall->isActive())
+    {
+        _logger->trace("Deactivating P2P Installation page");
+        _ptpInstall->deactivate();
+        if (_ptpInstall->isRunning())
+        {
+            _logger->trace("Waiting for thread to complete");
+            _ptpInstall->wait();
+        }
+    }
+    if (_trayInstall->isActive())
+    {
+        _logger->trace("Deactivating Tray Installation page");
+        _trayInstall->deactivate();
+        if (_trayInstall->isRunning())
+        {
+            _logger->trace("Waiting for thread to complete");
+            _trayInstall->wait();
+        }
+    }
+    if (_eteInstall->isActive())
+    {
+        _logger->trace("Deactivating ETE Installation page");
+        _eteInstall->deactivate();
+        if (_eteInstall->isRunning())
+        {
+            _logger->trace("Waiting for thread to complete");
+            _eteInstall->wait();
+        }
+    }
+    if (_peerInstall->isActive())
+    {
+        _logger->trace("Deactivating Peer Installation page");
+        _peerInstall->deactivate();
+        if (_peerInstall->isRunning())
+        {
+            _logger->trace("Waiting for thread to complete");
+            _peerInstall->wait();
+        }
+    }
 }
 
 void Wizard::runCancelConfirmation()

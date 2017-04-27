@@ -28,6 +28,22 @@ void SLTest::testGetScheme()
     SubutaiLauncher::SL sl("./");
     sl.open("unit-test-get-scheme");
     sl.execute();
+    delete c;
+}
+
+void SLTest::testFailedScript()
+{
+    SubutaiLauncher::Core *c = new SubutaiLauncher::Core(std::vector<std::string>());
+    c->initializePython();
+    SubutaiLauncher::SL sl("./testsuite");
+    sl.open("unit-test-failed-script");
+    sl.execute();
+    delete c;
+}
+
+void SLTest::testFailedScriptThread()
+{
+
 }
 
 CppUnit::Test * SLTest::suite()
@@ -35,6 +51,8 @@ CppUnit::Test * SLTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SLTest");
 
     CppUnit_addTest(pSuite, SLTest, testGetScheme);
+    CppUnit_addTest(pSuite, SLTest, testFailedScript);
+    CppUnit_addTest(pSuite, SLTest, testFailedScriptThread);
 
 	return pSuite;
 }

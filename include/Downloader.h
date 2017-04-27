@@ -74,8 +74,6 @@ namespace SubutaiLauncher
             void downloadImpl();
             bool isDone();
             double getPercent();
-            static size_t handleFile(char* data, size_t size, size_t nmemb, void *p);
-            size_t handleFileImpl(char* data, size_t size, size_t nmemb);
             bool verifyDownload();
             long currentProgress();
             void setOutputDirectory(const std::string& dir);

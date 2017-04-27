@@ -151,18 +151,21 @@ void SubutaiLauncher::SL::execute()
 #endif
     PyList_Append(sysPath, tmpPath);
 
+    /*
     try 
     {
+    */
         _module = PyImport_Import(_name);
         if (!_module){
             PyErr_Print();
             throw SLException("Cannot find specified module", 7);
         }
         Py_XDECREF(_name);
+    /*
     }
     catch (std::exception const &exc)
     {
-        _logger->error("Exception during execution: %s", exc.what());
+        _logger->error("Exception during execution: %s", std::string(exc.what()));
         PyErr_Print();
     }
     catch (...)
@@ -170,6 +173,7 @@ void SubutaiLauncher::SL::execute()
         std::exception_ptr p = std::current_exception();
         PyErr_Print();
     }
+    */
 
     if (_module == NULL || _module == 0){
         _logger->debug("SL::execute Can't find module %s", _module);
