@@ -1,6 +1,8 @@
 #ifndef __SL_FUNCTIONS_H__
 #define __SL_FUNCTIONS_H__
 
+#include "Vars.h"
+
 #include <string>
 #include <thread>
 #include <Python.h>

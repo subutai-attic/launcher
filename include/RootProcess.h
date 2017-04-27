@@ -1,6 +1,8 @@
 #ifndef __ROOT_PROCESS_H__
 #define __ROOT_PROCESS_H__
 
+#include "Vars.h"
+
 #include <vector>
 #include <string>
 

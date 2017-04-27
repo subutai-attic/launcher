@@ -1,6 +1,9 @@
 #ifndef __VARS_H__
 #define __VARS_H__
 
+#define POCO_STATIC 1
+#define LIBSSH_STATIC 1
+
 #if defined(linux) || defined(__linux) || defined(__linux__) || defined(__TOS_LINUX__) || defined(EMSCRIPTEN)
 #define LAUNCHER_LINUX 1
 #define PATH_DELIM "/"

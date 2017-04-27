@@ -1,10 +1,10 @@
 #ifndef __SL_H__
 #define __SL_H__
 
+#include "Vars.h"
+
 #include <string>
 #include <Python.h>
-
-#include "Vars.h"
 #include "SubutaiException.h"
 #include "SLException.h"
 #include "FileSystem.h"

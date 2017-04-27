@@ -1,6 +1,8 @@
 #ifndef __SETTINGS_H__
 #define __SETTINGS_H__
 
+#include "Vars.h"
+
 #include <string>
 #include <sstream>
 #include <fstream>

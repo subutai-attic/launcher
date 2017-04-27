@@ -16,9 +16,9 @@
 
 #if LAUNCHER_WINDOWS
 #include <io.h>
-#endif
+#endif 
 
-#include <libssh/libssh.h>
+#include "libssh/libssh.h"
 #include "Environment.h"
 #include "FileSystem.h"
 #include "SubutaiString.h"

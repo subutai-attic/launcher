@@ -1,6 +1,8 @@
 #ifndef __DOWNLOADER_H__
 #define __DOWNLOADER_H__
 
+#include "Vars.h"
+
 #include <string>
 #include <sstream>
 #include <iostream>

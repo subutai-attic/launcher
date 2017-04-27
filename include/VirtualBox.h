@@ -68,8 +68,6 @@ namespace SubutaiLauncher {
             bool _running;
             bool _updateRequired;
             std::vector<SubutaiVM> _vms;
-
-
     };
 
 }

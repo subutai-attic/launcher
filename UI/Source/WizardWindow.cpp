@@ -30,5 +30,5 @@ void WizardWindow::closeButtonPressed()
 
 bool WizardWindow::escapeKeyPressed()
 {
-
+	return true;
 }

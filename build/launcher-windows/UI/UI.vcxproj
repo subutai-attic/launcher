@@ -81,10 +81,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\include;..\..\..\third-party\libssh\include;..\..\..\third-party\openssl\include;..\..\..\third-party\curl\include;..\..\..\third-party\json;$(__PYTHON_ROOT)\include;$(POCO_ROOT)\Foundation\include;$(POCO_ROOT)\Util\include;$(POCO_ROOT)\NetSSL_OpenSSL\include;$(POCO_ROOT)\Net\include;$(POCO_ROOT)\JSON\include;$(POCO_ROOT)\Crypto\include;..\..\..\UI\JuceLibraryCode;..\..\..\UI\JuceLibraryCode\modules;D:\Projects\cpython\Include;D:\Projects\cpython\PC</IncludePath>
-    <LibraryPath>$(__PYTHON_ROOT)/libs;$(POCO_ROOT)/lib64;..\..\..\bin;..\..\..\third-party\libssh\lib;D:\Projects\cpython\PCbuild\amd64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\include;D:\Projects\libssh\include;..\..\..\third-party\openssl\include;..\..\..\third-party\curl\include;..\..\..\third-party\json;$(POCO_ROOT)\Foundation\include;$(POCO_ROOT)\Util\include;$(POCO_ROOT)\NetSSL_OpenSSL\include;$(POCO_ROOT)\Net\include;$(POCO_ROOT)\JSON\include;$(POCO_ROOT)\Crypto\include;..\..\..\UI\JuceLibraryCode;..\..\..\UI\JuceLibraryCode\modules;D:\Projects\cpython\Include;D:\Projects\cpython\PC</IncludePath>
+    <LibraryPath>D:\Projects\cpython\PCbuild\amd64;$(POCO_ROOT)/lib64;..\..\..\bin;..\..\..\third-party\libssh\lib;$(LibraryPath)</LibraryPath>
     <OutDir>..\..\..\bin\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <ExcludePath>D:\Python-2.7.12;D:\Python-3.6.1;$(ExcludePath)</ExcludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -138,14 +139,14 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUGTT;_WINDOWS;BUILD_SCHEME="dev";-D_WINSOCK_=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>POCO_STATIC;NDEBUGTT;_WINDOWS;BUILD_SCHEME="dev";-D_WINSOCK_=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>python3.lib;ssh.lib;subutai-launcher.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>python37.lib;ssh.lib;PocoFoundationmd.lib;PocoNetmd.lib;PocoNetSSLmd.lib;PocoUtilmd.lib;PocoJSONmd.lib;iphlpapi.lib;subutai-launcher.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

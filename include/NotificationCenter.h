@@ -1,6 +1,8 @@
 #ifndef __NOTIFICATION_CENTER_H__
 #define __NOTIFICATION_CENTER_H__
 
+#include "Vars.h"
+
 #include <deque>
 #include "Poco/Logger.h"
 #include "Poco/DynamicAny.h"
