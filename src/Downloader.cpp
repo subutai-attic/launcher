@@ -71,9 +71,10 @@ std::string SubutaiLauncher::Downloader::buildRequest(std::string path, std::str
 bool SubutaiLauncher::Downloader::retrieveFileInfo()
 {
     std::string output;
+    std::string path;
     try {
         Poco::Net::HTTPSClientSession s(HOST, PORT);
-        std::string path(REST);
+        path.append(REST);
         path.append("/info");
         _logger->debug("Requesting file info for %s", path);
         Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_GET, path);
@@ -91,7 +92,14 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo()
         Poco::StreamCopier::copyToString(rs, output);
         _logger->debug("Received file info for %s: %s", path, output);
     } 
-    catch (Poco::Net::SSLException e) 
+    catch (Poco::TimeoutException& e)
+    {
+        _logger->fatal("Request timeout: %s", e.displayText());
+        std::string err;
+        Poco::format(err, "Request timeout: %s [%s]", path, e.displayText());
+        throw SubutaiException(err);
+    }
+    catch (Poco::Net::SSLException& e) 
     {
         _logger->fatal("Failed to retrieve file info: %s", e.displayText());
         return false;
