@@ -1,6 +1,9 @@
 #!/bin/bash
 
-mkdir /opt/subutai/log
-chown $USER /opt/subutai/log
+mkdir -p /opt/subutai/log
+chmod -R 0777 /opt/subutai/log
 
+if [ -L /usr/bin/SubutaiLauncher ]; then
+rm -rf /usr/bin/SubutaiLauncher
+fi
 ln -s /opt/subutai/bin/SubutaiLauncher /usr/bin/SubutaiLauncher
