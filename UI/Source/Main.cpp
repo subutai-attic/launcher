@@ -5,8 +5,30 @@
 
 UIApplication::UIApplication()
 {
-    _core = new SubutaiLauncher::Core(std::vector<std::string>());
-    _core->run();
+	try 
+	{
+		_core = new SubutaiLauncher::Core(std::vector<std::string>());
+	}
+	catch (Poco::OpenFileException& e)
+	{
+		std::printf("Couldn't open log file: %s", e.displayText().c_str());
+	}
+	try 
+	{
+		_core->run();
+	}
+	catch (Poco::FileException& e)
+	{
+		Poco::Logger::get("subutai").error(e.displayText());
+	}
+	catch (Poco::PathSyntaxException& e)
+	{
+		Poco::Logger::get("subutai").error(e.displayText());
+	}
+	catch (Poco::OpenFileException& e)
+	{
+		Poco::Logger::get("subutai").error(e.displayText());
+	}
 }
 
 const juce::String UIApplication::getApplicationName()

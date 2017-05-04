@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "subutai-launcher", "subutai-launcher\subutai-launcher.vcxproj", "{E8C8B802-D3FC-4EFC-9B78-4B2806B346D6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UI", "UI\UI.vcxproj", "{E2D67014-6102-4E1D-9A38-0F7F759C57F6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E8C8B802-D3FC-4EFC-9B78-4B2806B346D6} = {E8C8B802-D3FC-4EFC-9B78-4B2806B346D6}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

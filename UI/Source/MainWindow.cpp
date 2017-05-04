@@ -17,7 +17,10 @@ MainWindow::MainWindow(juce::String name) : juce::DocumentWindow(
     MainContentComponent* mainComponent = new MainContentComponent();
     setContentOwned(mainComponent, true);
 
-    centreWithSize(getWidth(), getHeight());
+    centreWithSize(getWidth(), getHeight() + 50);
+#if LAUNCHER_WINDOWS
+	this->setTopLeftPosition(200, 200);
+#endif
     setDraggable(true);
     setVisible(true);
     setResizable(true, true);

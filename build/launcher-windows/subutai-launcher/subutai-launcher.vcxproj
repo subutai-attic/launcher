@@ -70,7 +70,9 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\include;$(POCO_ROOT)\Foundation\include;..\..\..\third-party\libssh\include;$(POCO_ROOT)\Net\include;$(POCO_ROOT)\NetSSL_OpenSSL\include;$(POCO_ROOT)\Crypto\include;$(POCO_ROOT)\JSON\include;..\..\..\third-party\openssl\include;$(POCO_ROOT)\openssl\include;$(PYTHON_ROOT)\include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\include;D:\Projects\libssh\include;..\..\..\third-party\openssl\include;..\..\..\third-party\curl\include;..\..\..\third-party\json;$(POCO_ROOT)\Foundation\include;$(POCO_ROOT)\Util\include;$(POCO_ROOT)\Net\include;$(POCO_ROOT)\NetSSL_OpenSSL\include;$(POCO_ROOT)\JSON\include;$(POCO_ROOT)\Crypto\include;D:\Projects\cpython\Include;D:\Projects\cpython\PC</IncludePath>
+    <OutDir>..\..\..\bin\</OutDir>
+    <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\include;..\..\..\third-party\libssh\include;..\..\..\third-party\openssl\include;..\..\..\third-party\curl\include;..\..\..\third-party\json;$(PYTHON_ROOT)\include;$(POCO_ROOT)\Foundation\include;$(POCO_ROOT)\NetSSL_OpenSSL\include;$(POCO_ROOT)\Net\include;$(POCO_ROOT)\JSON\include;$(POCO_ROOT)\Crypto\include</IncludePath>
@@ -80,6 +82,10 @@
     <OutDir>..\..\..\bin</OutDir>
     <LibraryPath>$(POCO_ROOT)/lib64;..\..\..\third-party\libssh\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;D:\Projects\cpython\PCbuild\amd64</LibraryPath>
     <ExcludePath>D:\Python-2.7.12;d:\Python-3.6.1;$(ExcludePath)</ExcludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\..\..\bin\</OutDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\..\include;D:\Projects\libssh\include;..\..\..\third-party\openssl\include;..\..\..\third-party\curl\include;..\..\..\third-party\json;$(POCO_ROOT)\Foundation\include;$(POCO_ROOT)\Util\include;$(POCO_ROOT)\Net\include;$(POCO_ROOT)\NetSSL_OpenSSL\include;$(POCO_ROOT)\JSON\include;$(POCO_ROOT)\Crypto\include;D:\Projects\cpython\Include;D:\Projects\cpython\PC</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -140,9 +146,6 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Browser.cpp" />
     <ClCompile Include="..\..\..\src\Core.cpp" />

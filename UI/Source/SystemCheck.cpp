@@ -129,17 +129,30 @@ SystemCheck::SystemCheck()
     addAndMakeVisible(_vbLabel);
 
     SubutaiLauncher::VirtualBox vb;
-    vb.findInstallation();
-    if (vb.isInstalled())
-    {
-        _vbValue.setText(vb.extractVersion(), dontSendNotification);
-        _vbValue.setColour(Label::textColourId, Colours::white);
-    } 
-    else 
-    {
-        _vbValue.setText("Not installed", dontSendNotification);
-        _vbValue.setColour(Label::textColourId, Colours::red);
-    }
+	try {
+		vb.findInstallation();
+		if (vb.isInstalled())
+		{
+			_vbValue.setText(vb.extractVersion(), dontSendNotification);
+			_vbValue.setColour(Label::textColourId, Colours::white);
+		}
+		else
+		{
+			_vbValue.setText("Not installed", dontSendNotification);
+			_vbValue.setColour(Label::textColourId, Colours::red);
+		}
+	}
+	catch (Poco::NotFoundException& e)
+	{
+		_vbValue.setText("Not installed", dontSendNotification);
+		_vbValue.setColour(Label::textColourId, Colours::red);
+	}
+	catch (Poco::SystemException& e)
+	{
+		_vbValue.setText("Not installed", dontSendNotification);
+		_vbValue.setColour(Label::textColourId, Colours::red);
+	}
+    
     _vbValue.setBounds(150, 215, 500, 40);
     _vbValue.setFont(font);
     _vbValue.setJustificationType(Justification::top);
