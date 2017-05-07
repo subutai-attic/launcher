@@ -3,7 +3,7 @@
 const std::string SubutaiLauncher::Settings::CONFIG_FILE = "lnchr.conf";
 #if LAUNCHER_LINUX
 const std::string SubutaiLauncher::Settings::DEFAULT_PATH = "/opt/subutai";
-#elif LAUNCHER_WINDOW
+#elif LAUNCHER_WINDOWS
 const std::string SubutaiLauncher::Settings::DEFAULT_PATH = "C:\Subutai";
 #elif LAUNCHER_MACOS
 const std::string SubutaiLauncher::Settings::DEFAULT_PATH = "/usr/local/share/subutai";

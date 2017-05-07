@@ -9,7 +9,6 @@ SubutaiLauncher::Core::Core(std::vector<std::string> args) :
 
 SubutaiLauncher::Core::~Core()
 {
-
     Poco::Logger::get("subutai").information("Stopping Subutai Launcher Core");
     if (_running) {
         while (!Session::instance()->getDownloader()->isDone()) {
@@ -24,6 +23,20 @@ SubutaiLauncher::Core::~Core()
 void SubutaiLauncher::Core::initializePython()
 {
     Poco::Logger::get("subutai").information("Initializing Python v%d.%d", PY_MAJOR_VERSION, PY_MINOR_VERSION);
+
+#if LAUNCHER_WINDOWS
+	//std::string pPythonPath = Poco::Environment::get("PYTHONPATH");
+	//std::string pPythonHome = Poco::Environment::get("PYTHONHOME");
+
+	std::string pNewPythonPath = "D:\\Projects\cpython";
+	std::string pNewPythonHome = "D:\\Projects\cpython";
+	
+	//Poco::Environment::set("PYTHONPATH", pNewPythonPath);
+	//Poco::Environment::set("PYTHONHOME", pNewPythonHome);
+
+	Py_SetPythonHome(L".");
+#endif
+
     //Environment e;
     //e.setVar("PYTHONPATH", ".");
     //
@@ -73,12 +86,38 @@ void SubutaiLauncher::Core::run()
 #if LAUNCHER_LINUX || LAUNCHER_MACOS
     f = Poco::File("/tmp/subutai");
 #elif LAUNCHER_WINDOWS
-    f = Poco::File("C:\tmp");
+	std::string path = "C:\\";
+	try
+	{
+		std::string drive = Poco::Environment::get("%USERPROFILE%");
+		path = drive;
+		path.append("\\subutai\\");
+		path.append("\\tmp\\");
+	}
+	catch (Poco::NotFoundException& e)
+	{
+		std::printf("Failed to extract home directory: %s\n", e.displayText());
+	}
+    f = Poco::File(path);
 #endif
-    if (!f.exists())
-    {
-        f.createDirectories();
-    }
+	try 
+	{
+		if (!f.exists())
+		{
+			try
+			{
+				f.createDirectories();
+			}
+			catch (std::exception e)
+			{
+				std::printf("%s\n", e.what());
+			}
+		}
+	}
+	catch (Poco::FileException& e)
+	{
+		e.rethrow();
+	}
     _running = true;
     initializePython();
     initializeSSL();
@@ -109,7 +148,18 @@ void SubutaiLauncher::Core::setupLogger()
 #elif LAUNCHER_LINUX
     pChannel->setProperty("path", "/opt/subutai/log/subutai-launcher.log");
 #else
-    pChannel->setProperty("path", "subutai-launcher.log");
+	std::string path = "C:\\Subutai";
+	try
+	{
+		std::string drive = Poco::Environment::get("%userprofile%");
+		path = drive;
+		path.append("\\subutai\\log\\subutai-laucnher.log");
+	}
+	catch (Poco::NotFoundException& e)
+	{
+		std::printf("Couldn't find home directory: %s\n", e.displayText());
+	}
+    pChannel->setProperty("path", path);
 #endif
     pChannel->setProperty("rotation", "5 M");
     Poco::AutoPtr<Poco::FormattingChannel> pFormatChannel(new Poco::FormattingChannel(pFormatter, pSplitter));
