@@ -207,7 +207,7 @@ void SubutaiLauncher::SL::execute()
                 Py_DECREF(_module);
                 PyErr_Print();
                 ncenter->stop();
-                _logger->error("Execution exit code: %d", _exitCode);
+                _logger->error("Execution exit code: %ld", _exitCode);
                 PyErr_Print();
                 throw SLException("Script execution failed", 5);
             }

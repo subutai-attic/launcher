@@ -144,8 +144,10 @@ void Wizard::resized()
 
 void Wizard::buttonClicked(juce::Button* button)
 {
-    if (button == &_next) {
-        switch (_step) {
+    if (button == &_next) 
+    {
+        switch (_step) 
+        {
             case 1:
                 _introPage->setVisible(false);
                 _systemCheckPage->setVisible(true);
@@ -178,8 +180,11 @@ void Wizard::buttonClicked(juce::Button* button)
                 _stepIntro.setColour(Label::textColourId, juce::Colour(7, 141, 208));
                 break;
         }
-    } else if (button == &_back) {
-        switch (_step) {
+    } 
+    else if (button == &_back) 
+    {
+        switch (_step) 
+        {
             case 1:
                 break;
             case 2:
@@ -200,7 +205,9 @@ void Wizard::buttonClicked(juce::Button* button)
             default:
                 break;
         }
-    } else if (button == &_cancel) {
+    } 
+    else if (button == &_cancel) 
+    {
         runCancelConfirmation();
     }
 }
@@ -212,28 +219,32 @@ void Wizard::runInstall()
     cleanInstallers();
     try 
     {
-        if (c.ptp && !_ptpInstalled) {
+        if (c.ptp && !_ptpInstalled) 
+        {
             _ptpInstall->activate();
             _logger->debug("P2P Component has been choosen");
             _ptpInstall->start("P2P");
             _ptpInstall->run();
             return;
         }
-        if (c.tray && !_trayInstalled) {
+        if (c.tray && !_trayInstalled) 
+        {
             _trayInstall->activate();
             _logger->debug("Tray Component has been choosen");
             _trayInstall->start("Tray");
             _trayInstall->run();
             return;
         }
-        if (c.ete && !_eteInstalled) {
+        if (c.ete && !_eteInstalled) 
+        {
             _eteInstall->activate();
             _logger->debug("Browser Plugin Component has been choosen");
             _eteInstall->start("Browser Plugin");
             _eteInstall->run();
             return;
         }
-        if (c.peer && !_peerInstalled) {
+        if (c.peer && !_peerInstalled) 
+        {
             _peerInstall->activate();
             _logger->debug("Peer Component has been choosen");
             _peerInstall->start("Peer");
@@ -304,6 +315,9 @@ void Wizard::finish()
     _back.setEnabled(false);
     _back.setVisible(false);
     _finishPage->setVisible(true);
+
+    _stepFinal.setColour(Label::textColourId, juce::Colour(7, 141, 208));
+    _stepInstall.setColour(Label::textColourId, Colours::white);
 }
 
 void Wizard::cleanInstallers()

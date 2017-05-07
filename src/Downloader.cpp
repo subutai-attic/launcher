@@ -139,7 +139,7 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo()
     _logger->debug("Owner: %s", _file.owner);
     _logger->debug("Name: %s", _file.name);
     _logger->debug("ID: %s", _file.id);
-    _logger->debug("Size: %lu", _file.size);
+    _logger->debug("Size: %ld", _file.size);
 
     return true;
 }
