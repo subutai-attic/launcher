@@ -7,3 +7,7 @@ if [ -L /usr/bin/SubutaiLauncher ]; then
 rm -rf /usr/bin/SubutaiLauncher
 fi
 ln -s /opt/subutai/bin/SubutaiLauncher /usr/bin/SubutaiLauncher
+mkdir -p /opt/subutai/python/Lib
+cp -r /opt/subutai/python/lib/python3.7/* /opt/subutai/python/Lib/
+mkdir -p /opt/subutai/bin/Lib
+cp -r /opt/subutai/python/lib/python3.7/* /opt/subutai/bin/Lib/
