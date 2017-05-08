@@ -22,9 +22,6 @@ def subutaistart():
 
     subutai.AddStatus("Installing Tray")
 
-    st = os.stat(installDir+"/bin/SubutaiTray")
-    os.chmod(installDir+"/bin/SubutaiTray", st.st_mode | stat.S_IEXEC)
-
     tar = tarfile.open(tmpDir+"/"+tray, "r:gz")
     tar.extractall("/Applications/Subutai")
     tar.close()

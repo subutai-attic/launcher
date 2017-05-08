@@ -26,11 +26,11 @@ class WizardInstall : public juce::Component
     private:
         std::thread runThread();
         void runImpl();
+        void addLine(const std::string& text, bool error = false);
     private:
         Poco::Logger* _logger;
         bool _running;
         bool _active;
-        void addLine(const std::string& text, bool error = false);
         juce::ProgressBar* _pb;
         juce::Label* _title;
         double _progress;

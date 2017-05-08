@@ -27,7 +27,7 @@ WizardFinish::~WizardFinish()
 
 void WizardFinish::paint(juce::Graphics& g)
 {
-    g.fillAll (Colour::greyLevel (0.2f));
+    g.fillAll(Colour::greyLevel (0.2f));
 }
 
 void WizardFinish::resized()

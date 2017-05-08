@@ -122,14 +122,22 @@ Wizard::~Wizard()
 {
     _shutdown = true;
     cleanInstallers();
-    delete _introPage;
-    delete _systemCheckPage;
-    delete _componentChooserPage;
-    delete _ptpInstall;
-    delete _trayInstall;
-    delete _eteInstall;
-    delete _peerInstall;
-    delete _finishPage;
+    _logger->trace("Requesting Introduction page destroy");
+    if (_introPage != nullptr) delete _introPage;
+    _logger->trace("Requesting System Check page destroy");
+    if (_systemCheckPage != nullptr) delete _systemCheckPage;
+    _logger->trace("Requesting Component Selector page destroy");
+    if (_componentChooserPage != nullptr) delete _componentChooserPage;
+    _logger->trace("Requesting P2P Installation page destroy");
+    if (_ptpInstall != nullptr) delete _ptpInstall;
+    _logger->trace("Requesting Tray Installation page destroy");
+    if (_trayInstall != nullptr) delete _trayInstall;
+    _logger->trace("Requesting ETE Installation page destroy");
+    if (_eteInstall != nullptr) delete _eteInstall;
+    _logger->trace("Requesting Peer Installation page destroy");
+    if (_peerInstall != nullptr) delete _peerInstall;
+    _logger->trace("Requesting Finish page destroy");
+    if (_finishPage != nullptr) delete _finishPage;
 }
 
 void Wizard::paint(juce::Graphics& g)
@@ -292,14 +300,18 @@ void Wizard::stepCompleted(const std::string& name)
     }
 
     // Determine if we need to install something else
-    _logger->debug("Looking for a next component");
+    _logger->debug("Looking for next component");
     auto c = _componentChooserPage->getComponents();
     if ((c.ptp && !_ptpInstalled) || (c.tray && !_trayInstalled) || (c.ete && !_eteInstalled) || (c.peer && !_peerInstalled))
     {
         _logger->debug("Next component found");
         runInstall();
         return;
-    } 
+    }  
+    else 
+    {
+        _logger->trace("Nothing else to install. Proceeding to a final page");
+    }
 
     finish();
 }

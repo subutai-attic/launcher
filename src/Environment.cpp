@@ -194,17 +194,15 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
 
     Poco::StringTokenizer lines(netstat, "\n", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
     bool isDefault = false;
-    for (auto line = lines.begin(); line != lines.end(); line++) {
+    for (auto line = lines.begin(); line != lines.end(); line++) 
+    {
         Poco::StringTokenizer elements((*line), " ", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
         int i = 0;
-        for (auto el = elements.begin(); el != elements.end(); el++) {
+        for (auto el = elements.begin(); el != elements.end(); el++) 
+        {
             i++;
-            if ((*el) == gatewayName) {
-                isDefault = true;
-            }
-            if (isDefault && i == elnum) {
-                return (*el);
-            }
+            if ((*el) == gatewayName) isDefault = true;
+            if (isDefault && i == elnum) return (*el);
         }
     }
     return "unknown";

@@ -18,7 +18,7 @@ WizardWindow::WizardWindow() : juce::DialogWindow(
 
 WizardWindow::~WizardWindow()
 {
-    delete _wizard;
+    if (_wizard != nullptr) delete _wizard;
     _logger->trace("Destroying Installation Wizard Window");
 }
 
