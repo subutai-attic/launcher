@@ -139,9 +139,9 @@ def setupVm(machineName):
             sleep(0.05)
         subutai.VBox("import /tmp/subutai/core.ova")
         subutai.VBox("modifyvm core --cpus 2")
-        subutai.VBox("modifyvm core --nic2 nat")
-        subutai.VBox("modifyvm core --cableconnected2 on")
-        subutai.VBox("modifyvm core --natpf2 ssh-fwd,tcp,,4567,,22 --natpf2 https-fwd,tcp,,9999,,8443")
+        subutai.VBox("modifyvm core --nic1 nat")
+        subutai.VBox("modifyvm core --cableconnected1 on")
+        subutai.VBox("modifyvm core --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
         subutai.VBox("modifyvm core --rtcuseutc on")
         ret = subutai.VBoxS("modifyvm core --name " + machineName)
         if ret != 0:
@@ -170,19 +170,19 @@ def reconfigureNic(machineName):
     gateway = subutai.GetDefaultRoutingInterface()
     bridged = subutai.GetVBoxBridgedInterface(gateway)
     subutai.VBox("modifyvm " + machineName + ' --nic1 bridged --bridgeadapter1 ' + bridged)
-#    subutai.VBox("modifyvm " + machineName + " --nic2 nat")
-#    subutai.VBox("modifyvm " + machineName + " --cableconnected2 on")
-#    subutai.VBox("modifyvm " + machineName + ' --natpf2 ssh-fwd,tcp,,4567,,22 --natpf2 https-fwd,tcp,,9999,,8443')
+    subutai.VBox("modifyvm " + machineName + " --nic2 nat")
+    subutai.VBox("modifyvm " + machineName + " --cableconnected2 on")
+    subutai.VBox("modifyvm " + machineName + ' --natpf2 ssh-fwd,tcp,,4567,,22 --natpf2 https-fwd,tcp,,9999,,8443')
 
-#    ret = subutai.VBoxS("hostonlyif ipconfig vboxnet0 --ip 192.168.56.1")
+    ret = subutai.VBoxS("hostonlyif ipconfig vboxnet0 --ip 192.168.56.1")
 
-#    if ret == 1:
-#        subutai.VBox("hostonlyif create")
-#        subutai.VBox("hostonlyif ipconfig vboxnet0 --ip 192.168.56.1")
-#        subutai.VBox("dhcpserver add --ifname vboxnet0 --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
-#        subutai.VBox("dhcpserver modify --ifname vboxnet0 --enable")
+    if ret == 1:
+        subutai.VBox("hostonlyif create")
+        subutai.VBox("hostonlyif ipconfig vboxnet0 --ip 192.168.56.1")
+        subutai.VBox("dhcpserver add --ifname vboxnet0 --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
+        subutai.VBox("dhcpserver modify --ifname vboxnet0 --enable")
 
-#    subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 vboxnet0")
+    subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 vboxnet0")
 
     return
 
