@@ -119,7 +119,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BUILD_SCHEME_DEV;BUILD_SCHEME="dev";WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -152,6 +152,7 @@
     <ClCompile Include="..\..\..\src\Downloader.cpp" />
     <ClCompile Include="..\..\..\src\Environment.cpp" />
     <ClCompile Include="..\..\..\src\FileSystem.cpp" />
+    <ClCompile Include="..\..\..\src\Hub.cpp" />
     <ClCompile Include="..\..\..\src\NotificationCenter.cpp" />
     <ClCompile Include="..\..\..\src\P2P.cpp" />
     <ClCompile Include="..\..\..\src\RootProcess.cpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="..\..\..\include\E2E.h" />
     <ClInclude Include="..\..\..\include\Environment.h" />
     <ClInclude Include="..\..\..\include\FileSystem.h" />
+    <ClInclude Include="..\..\..\include\Hub.h" />
     <ClInclude Include="..\..\..\include\NotificationCenter.h" />
     <ClInclude Include="..\..\..\include\P2P.h" />
     <ClInclude Include="..\..\..\include\RootProcess.h" />

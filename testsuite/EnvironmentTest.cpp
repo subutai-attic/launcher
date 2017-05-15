@@ -23,6 +23,8 @@ void EnvironmentTest::tearDown()
 
 void EnvironmentTest::testGetDefaultGateway()
 {
+	std::vector<std::string> args;
+	SubutaiLauncher::Core c(args);
     SubutaiLauncher::Environment env;
     std::string result = env.getDefaultGateway();
     std::printf("Gateway: %s", result.c_str());

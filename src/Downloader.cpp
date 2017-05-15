@@ -9,10 +9,12 @@ const std::string SubutaiLauncher::Downloader::HOST = "devcdn.subut.ai";
 const std::string SubutaiLauncher::Downloader::URL = "https://mastercdn.subut.ai:8338";
 const std::string SubutaiLauncher::Downloader::REST = "/kurjun/rest/raw";
 const std::string SubutaiLauncher::Downloader::HOST = "mastercdn.subut.ai";
-#else 
+#elif BUILD_SCHEME_PRODUCTION
 const std::string SubutaiLauncher::Downloader::URL = "https://cdn.subut.ai:8338";
 const std::string SubutaiLauncher::Downloader::REST = "/kurjun/rest/raw";
 const std::string SubutaiLauncher::Downloader::HOST = "cdn.subut.ai";
+#else
+#error Build scheme was not specified
 #endif
 
 SubutaiLauncher::Downloader::Downloader() : 

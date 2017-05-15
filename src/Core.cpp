@@ -89,7 +89,7 @@ void SubutaiLauncher::Core::run()
 	std::string path = "C:\\";
 	try
 	{
-		std::string drive = Poco::Environment::get("%USERPROFILE%");
+		std::string drive = Poco::Environment::get("USERPROFILE");
 		path = drive;
 		path.append("\\subutai\\");
 		path.append("\\tmp\\");
@@ -151,15 +151,25 @@ void SubutaiLauncher::Core::setupLogger()
 	std::string path = "C:\\Subutai";
 	try
 	{
-		std::string drive = Poco::Environment::get("%userprofile%");
+		std::string drive = Poco::Environment::get("USERPROFILE");
 		path = drive;
-		path.append("\\subutai\\log\\subutai-laucnher.log");
+		path.append("\\subutai\\log");
+		Poco::File f(path);
+		if (!f.exists()) f.createDirectories();
+		path.append("\\subutai-launcher.log");
 	}
 	catch (Poco::NotFoundException& e)
 	{
 		std::printf("Couldn't find home directory: %s\n", e.displayText());
 	}
-    pChannel->setProperty("path", path);
+	try 
+	{
+		pChannel->setProperty("path", path);
+	}
+	catch (Poco::OpenFileException& e)
+	{
+		std::printf("Can't create log file: %s\n", e.displayText());
+	}
 #endif
     pChannel->setProperty("rotation", "5 M");
     Poco::AutoPtr<Poco::FormattingChannel> pFormatChannel(new Poco::FormattingChannel(pFormatter, pSplitter));

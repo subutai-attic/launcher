@@ -22,7 +22,12 @@
 #include "Poco/Logger.h"
 
 #if LAUNCHER_WINDOWS
-//#include <windows.h>
+#include <windows.h>
+#include <WinSock2.h>
+#include <IPHlpApi.h>
+#pragma comment(lib, "IPHLPAPI.LIB")
+#define ENV_MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
+#define ENV_FREE(x) HeapFree(GetProcessHeap(), 0, (x))
 #elif LAUNCHER_MACOS
 #include <sys/sysctl.h>
 #endif

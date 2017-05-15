@@ -207,6 +207,52 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
     }
     return "unknown";
 #else
-	return "Not Implemented";
+	PIP_ADAPTER_INFO pAdapterInfo;
+	PIP_ADAPTER_INFO pAdapter = NULL;
+	DWORD pRet = 0;
+
+	ULONG pOutBufLen = sizeof(IP_ADAPTER_INFO);
+
+	pAdapterInfo = (IP_ADAPTER_INFO *)ENV_MALLOC(sizeof(IP_ADAPTER_INFO));
+	if (pAdapterInfo == NULL)
+	{
+		_logger->error("Failed to allocate memory");
+		return "unknown";
+	}
+
+	_logger->debug("Retrieving adapter info");
+
+	if (GetAdaptersInfo(pAdapterInfo, &pOutBufLen) == ERROR_BUFFER_OVERFLOW)
+	{
+		if (pAdapterInfo) ENV_FREE(pAdapterInfo);
+		pAdapterInfo = (IP_ADAPTER_INFO *)ENV_MALLOC(pOutBufLen);
+		if (pAdapterInfo == NULL)
+		{
+			_logger->error("Failed to allocate memory for GetAdaptersInfo");
+			return "unknown";
+		}
+	}
+	
+	_logger->trace("Memory allocated");
+
+	if ((pRet = GetAdaptersInfo(pAdapterInfo, &pOutBufLen)) == NO_ERROR)
+	{
+		pAdapter = pAdapterInfo;
+		while (pAdapter)
+		{
+			// TODO: Make sure we are returning default one here
+			if (pAdapterInfo) ENV_FREE(pAdapterInfo);
+			return std::string(pAdapter->AdapterName);
+
+			pAdapter = pAdapter->Next;
+		}
+	}
+	else
+	{
+		_logger->error("Failed to retrieve adapter info: %lu", pRet);
+	}
+	
+	if (pAdapterInfo) ENV_FREE(pAdapterInfo);
+	return "unknown";
 #endif
 }
