@@ -1,11 +1,13 @@
 import subutai
+import hashlib
 from time import sleep
 from subprocess import call
 
 
 def subutaistart():
 
-    machineName = "subutai-peer-l1"
+    m = hashlib.md5()
+    machineName = "subutai-" + m.hexdigest()
 
     call(['ssh-keygen', '-R', '[127.0.0.1]:4567'])
 
@@ -13,11 +15,12 @@ def subutaistart():
 
     setupVm(machineName)
     subutai.SetProgress(4.0)
+    sleep(6)
     startVm(machineName)
-    subutai.SetProgress(7.0)
-    waitSSH()
-    subutai.SetProgress(8.0)
     sleep(60)
+    waitSSH()
+    sleep(60)
+    setupSSH()
     installSnapFromStore()
     subutai.SetProgress(10.0)
     sleep(60)
@@ -26,27 +29,15 @@ def subutaistart():
     sleep(60)
     setAlias()
     subutai.SetProgress(30.0)
-    sleep(60)
-    # installSubutai("", "", "", 0)
-    reconfigureNic(machineName)
-    subutai.SetProgress(40.0)
     sleep(10)
-    stopVm(machineName)
-    subutai.SetProgress(50.0)
-    sleep(20)
-    startVm(machineName)
-    subutai.SetProgress(60.0)
-    sleep(20)
-    waitSSH()
-    subutai.SetProgress(70.0)
-    sleep(20)
     installManagement()
     subutai.SetProgress(80.0)
     sleep(60)
-    waitSSH()
-    subutai.SetProgress(90.0)
-    setupSSH()
-    subutai.SetProgress(99.0)
+    stopVm(machineName)
+    sleep(5)
+    reconfigureNic(machineName)
+    sleep(5)
+    startVm(machineName)
 
     subutai.Shutdown()
 
