@@ -4,8 +4,8 @@ INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_
 #MACOS ONLY
 ST_LIBS = -g -ggdb $(LIBDIRS) $(WLSH) $(EXTRA_LIBS) -lm $(WLST) -l$(PYTHON_VER) $(WLSH) -ldl -lpthread $(WLST) -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation $(WLSH) $(SYSLIBS) -lssl -lcrypto -lssh -lutil -lcurl
 SH_LIBS = -g -ggdb $(LIBDIRS) $(EXTRA_LIBS) -lm -l$(PYTHON_VER) -ldl -lpthread -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation $(SYSLIBS) -lssl -lcrypto -lcurl -lssh
-CXXFLAGS = -Wall $(EXTRA_DEFINES) $(BUILD_SCHEME_DEF) -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 $(INCLUDES) -I/usr/include -I/usr/include/freetype2 -IJuceLibraryCode -IJuceLibraryCode/modules -std=gnu++11
-LDFLAGS = $(BLDFLAGS)
+CXXFLAGS = -g -Wall $(EXTRA_DEFINES) $(BUILD_SCHEME_DEF) -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 $(INCLUDES) -I/usr/include -I/usr/include/freetype2 -IJuceLibraryCode -IJuceLibraryCode/modules -std=gnu++11
+LDFLAGS = -g $(BLDFLAGS)
 
 JUCE = JuceLibraryCode
 

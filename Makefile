@@ -6,8 +6,8 @@ STATIC_TARGET = libsubutai-launcher.a
 TEST_TARGET=testsuite
 INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_DIR)/include -I/usr/local/include
 LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -lcurl -lssh -L$(PYLIB_DIR) -lPocoNet -lPocoNetSSL -lPocoFoundation -lPocoJSON
-CXXFLAGS = $(INCLUDES) -std=c++11 -DRT_OS_LINUX $(BUILD_SCHEME_DEF) $(EXTRA_DEFINES)
-LDFLAGS = $(LIBS)
+CXXFLAGS = -g $(INCLUDES) -std=c++11 -DRT_OS_LINUX $(BUILD_SCHEME_DEF) $(EXTRA_DEFINES)
+LDFLAGS = -s $(LIBS)
 
 SRC_DIR = src
 INCLUDE_DIR = include
