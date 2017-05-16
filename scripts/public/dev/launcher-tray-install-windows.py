@@ -8,18 +8,19 @@ import tarfile
 
 
 def subutaistart():
-    subutai.AddStatus("Download VirtualBox")
+    subutai.AddStatus("Download Tray application")
 
-    vbox = "VirtualBox_osx.pkg"
+    tray = "SubutaiTray_libs_osx.tar.gz"
+    libssh = "libssh2-1.6.0-0_osx.pkg"
 
-    subutai.download(vbox)
+    subutai.download(tray)
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
 
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
 
-    subutai.AddStatus("Installing VirtualBox")
+    subutai.AddStatus("Installing Tray")
 
     tar = tarfile.open(tmpDir+"/"+tray, "r:gz")
     tar.extractall("/Applications/Subutai")
