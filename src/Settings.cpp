@@ -12,8 +12,8 @@ const std::string SubutaiLauncher::Settings::DEFAULT_PATH = "/usr/local/share/su
 const std::string SubutaiLauncher::Settings::DEFAULT_TMP = "/tmp/subutai";
 
 SubutaiLauncher::Settings::Settings() {
-    setInstallationPath(DEFAULT_PATH);
-    setTmpPath(DEFAULT_TMP);
+    setInstallationPath(getDefaultInstallationPath());
+    setTmpPath(getDefaultTmpPath());
     return;
     FileSystem fs(".");
     if (!fs.isFileExists(CONFIG_FILE)) {
@@ -80,6 +80,45 @@ std::string SubutaiLauncher::Settings::getInstallationPath() const {
 
 std::string SubutaiLauncher::Settings::getTmpPath() const {
     return _tmpPath;
+}
+
+std::string SubutaiLauncher::Settings::getDefaultTmpPath() const
+{
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
+	return DEFAULT_TMP;
+#else
+	std::string drive;
+	try
+	{
+		drive = Poco::Environment::get("USERPROFILE");
+		drive.append("\\subutai\\");
+		drive.append("\\tmp\\");
+	}
+	catch (Poco::NotFoundException& e)
+	{
+		std::printf("Failed to extract home directory: %s\n", e.displayText());
+	}
+	return drive;
+#endif
+}
+
+std::string SubutaiLauncher::Settings::getDefaultInstallationPath() const
+{
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
+	return DEFAULT_PATH;
+#else
+	std::string drive;
+	try
+	{
+		drive = Poco::Environment::get("USERPROFILE");
+		drive.append("\\subutai\\");
+	}
+	catch (Poco::NotFoundException& e)
+	{
+		std::printf("Failed to extract home directory: %s\n", e.displayText());
+	}
+	return drive;
+#endif
 }
 
 void SubutaiLauncher::Settings::setInstallationPath(const std::string& path) {

@@ -133,7 +133,7 @@ void SubutaiLauncher::SL::execute()
     ncenter->start();
     _logger->information("Starting script execution: %s", _name);
 
-    if (_name == NULL  )
+    if (_name == NULL)
     {
         ncenter->stop();
         _logger->error("SL::execute: Empty module name: %s", _module);
