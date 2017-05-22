@@ -193,6 +193,9 @@ void WizardInstall::runImpl()
     } 
     catch (SubutaiLauncher::SLException& e)
     {
+		pScriptThread.join();
+		_running = false;
+		_progress = 100.0;
         _logger->error(e.displayText());
     }
 
