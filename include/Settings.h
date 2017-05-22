@@ -10,6 +10,7 @@
 
 #include "Vars.h"
 #include "FileSystem.h"
+#include "Poco/Environment.h"
 
 namespace SubutaiLauncher {
     class Settings {
@@ -23,6 +24,8 @@ namespace SubutaiLauncher {
             void save();
             std::string getInstallationPath() const;
             std::string getTmpPath() const;
+			std::string getDefaultTmpPath() const;
+			std::string getDefaultInstallationPath() const;
             void setInstallationPath(const std::string& path);
             void setTmpPath(const std::string& path);
         private:
