@@ -10,7 +10,7 @@ import tarfile
 def subutaistart():
     subutai.AddStatus("Download Tray application")
 
-    tray = "SubutaiTray_libs_osx.tar.gz"
+    tray = "SubutaiTray_libs.zip"
     libssh = "libssh2-1.6.0-0_osx.pkg"
 
     subutai.download(tray)
