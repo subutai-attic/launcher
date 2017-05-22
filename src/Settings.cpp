@@ -9,7 +9,11 @@ const std::string SubutaiLauncher::Settings::DEFAULT_PATH = "C:\Subutai";
 const std::string SubutaiLauncher::Settings::DEFAULT_PATH = "/usr/local/share/subutai";
 #endif
 
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
 const std::string SubutaiLauncher::Settings::DEFAULT_TMP = "/tmp/subutai";
+#else
+const std::string SubutaiLauncher::Settings::DEFAULT_TMP = "/tmp/subutai";
+#endif
 
 SubutaiLauncher::Settings::Settings() {
     setInstallationPath(DEFAULT_PATH);
