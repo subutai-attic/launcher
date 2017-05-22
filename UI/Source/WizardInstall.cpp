@@ -37,6 +37,16 @@ WizardInstall::WizardInstall() :
 
 WizardInstall::~WizardInstall()
 {
+    _logger->trace("Waiting for installation thread to complete");
+    int rc = wait();
+    if (rc == 0)
+    {
+        _logger->trace("Thread finished");
+    }
+    else
+    {
+        _logger->trace("Thread was not running");
+    }
     _logger->trace("Destroying Wizard Install UI Component");
     for (auto it = _lines.begin(); it != _lines.end(); it++)
     {
