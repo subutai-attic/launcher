@@ -141,15 +141,22 @@ void SubutaiLauncher::SL::execute()
         throw SLException("Empty module name", 12);
     }
     PyObject* sysPath = PySys_GetObject((char*)"path");
-    _logger->trace("SL::execute syspath: %s, dir: %s", sysPath, _dir);
+	if (sysPath == NULL)
+	{
+		_logger->error("Failed to extract path from python system");
+	}
+	else
+	{
+		_logger->trace("SL::execute syspath: %s, dir: %s", sysPath, _dir);
 
 #if PY_MAJOR_VERSION >= 3
-    PyObject* tmpPath = PyUnicode_FromString(_dir.c_str());
-    //PyObject* tmpPath = PyUnicode_DecodeFSDefault(_dir.c_str());
+		PyObject* tmpPath = PyUnicode_FromString(_dir.c_str());
+		//PyObject* tmpPath = PyUnicode_DecodeFSDefault(_dir.c_str());
 #else
-    PyObject* tmpPath = PyString_FromString(_dir.c_str());
+		PyObject* tmpPath = PyString_FromString(_dir.c_str());
 #endif
-    PyList_Append(sysPath, tmpPath);
+		PyList_Append(sysPath, tmpPath);
+	}
 
     /*
     try 

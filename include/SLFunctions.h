@@ -7,6 +7,7 @@
 #include <thread>
 #include <Python.h>
 #include "Poco/Process.h"
+#include "Poco/StringTokenizer.h"
 
 #include "Downloader.h"
 #include "Session.h"
@@ -587,6 +588,37 @@ namespace SubutaiLauncher
         //Poco::Logger::get("subutai").information("SL %s: %s", std::string(sl_string), std::string(sl_desc));
     }
 
+	static PyObject* SL_RegisterService(PyObject* self, PyObject* args, PyObject* keywords)
+	{
+		if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
+			return NULL;
+
+		// sl_string - name of service
+		// sl_desc - path_to_exe|arguments
+
+		std::vector<std::string> pArgs;
+		std::string pPath = "";
+
+		Poco::StringTokenizer st(std::string(sl_desc), "|", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+		for (auto it = st.begin(); it != st.end(); it++)
+		{
+			if (it == st.begin())
+			{
+				pPath = (*it);
+				continue;
+			}
+			pArgs.push_back((*it));
+		}
+
+		Environment e;
+		bool rc = e.registerService(std::string(sl_string), pPath, pArgs);
+		if (rc)
+		{
+			return Py_BuildValue("i", 0);
+		}
+		return Py_BuildValue("i", 1);
+	}
+
 
     // ========================================================================
     // Module bindings
@@ -631,6 +663,7 @@ namespace SubutaiLauncher
         {"SetProgress", (PyCFunction)SL_SetProgress, METH_VARARGS | METH_KEYWORDS, "Sets action percentage"},
         {"GetFileSize", (PyCFunction)SL_GetFileSize, METH_VARARGS | METH_KEYWORDS, "Gets remote file size"},
         {"log", (PyCFunction)SL_Log, METH_VARARGS | METH_KEYWORDS, "Writes to log"},
+		{ "RegisterService", (PyCFunction)SL_RegisterService, METH_VARARGS | METH_KEYWORDS, "Writes to log" },
         {NULL, NULL, 0, NULL}
     };
 

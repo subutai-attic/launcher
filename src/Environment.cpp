@@ -256,3 +256,54 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
 	return "unknown";
 #endif
 }
+
+// Check whether NSSM tool is available
+bool SubutaiLauncher::Environment::isNSSMInstalled()
+{
+	_logger->debug("Checking NSSM tool");
+	std::string path = Session::instance()->getSettings()->getTmpPath() + "\\nssm.exe";
+	Poco::File f(path);
+	if (f.exists())
+	{
+		_logger->trace("NSSM tool exists");
+		return true;
+	}
+	_logger->trace("NSSM tool doesn't exists");
+	return false;
+}
+
+bool SubutaiLauncher::Environment::registerService(const std::string& name, const std::string& path, std::vector<std::string> args)
+{
+	_logger->information("Registering %s as a Windows Service", path);
+	if (!isNSSMInstalled())
+	{
+		_logger->error("NSSM tool is not installed");
+		return false;
+	}
+	_logger->debug("NSSM tool found");
+	
+	std::string pPath = Session::instance()->getSettings()->getTmpPath() + "\\nssm.exe";
+	Poco::Process::Args pArgs;
+	pArgs.push_back("install");
+	pArgs.push_back("\""+name+"\"");
+	pArgs.push_back("\"" + path + "\"");
+	for (auto it = args.begin(); it != args.end(); it++)
+	{
+		pArgs.push_back("\"" + (*it) + "\"");
+	}
+	_logger->trace("Executing NSSM");
+	Poco::ProcessHandle ph = Poco::Process::launch(pPath, pArgs, 0, 0, 0);
+	int exitCode = ph.wait();
+	_logger->trace("NSSM has been executed");
+	if (exitCode != 0)
+	{
+		_logger->error("Service installation failed. Exit code: %d", exitCode);
+	}
+	else
+	{
+		_logger->information("Service was installed");
+		return true;
+	}
+
+	return false;
+}

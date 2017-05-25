@@ -20,6 +20,8 @@
 #include "Poco/PipeStream.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Logger.h"
+#include "Poco/File.h"
+#include "Session.h"
 
 #if LAUNCHER_WINDOWS
 #include <windows.h>
@@ -52,6 +54,9 @@ namespace SubutaiLauncher {
             std::string getVar(const std::string& name, const std::string& defaultValue);
             std::string setVar(const std::string& name, const std::string& value);
             std::string getDefaultGateway();
+			// Windows only
+			bool isNSSMInstalled();
+			bool registerService(const std::string& name, const std::string& path, std::vector<std::string> args);
         private:
             Poco::Logger* _logger;
     };

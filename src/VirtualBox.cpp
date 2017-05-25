@@ -25,7 +25,6 @@ SubutaiLauncher::VirtualBox::~VirtualBox()
 
 std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::getPeers() 
 {
-
     Poco::Process::Args args;
     args.push_back("list");
     args.push_back("vms");
@@ -48,11 +47,19 @@ bool SubutaiLauncher::VirtualBox::findInstallation()
 #if LAUNCHER_MACOS
     path.append(Environment::EXTRA_PATH);
 #endif
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
     path.append(Poco::Environment::get("PATH", ""));
     Poco::StringTokenizer st(path, ":",
             Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
+#else
+	std::vector<std::string> st;
+	st.push_back(Poco::Environment::get("programfiles")+"\\Oracle\\VirtualBox");
+	st.push_back(Poco::Environment::get("programfiles(x86)") + "\\Oracle\\VirtualBox");
+	st.push_back(Poco::Environment::get("ProgramW6432") + "\\Oracle\\VirtualBox");
+#endif
     for (auto it = st.begin(); it != st.end(); it++)
     {
+		_logger->trace("Searching for %s in %s", BIN, (*it));
         std::string fp = (*it);
         fp.append("/"+BIN);
         Poco::File f(fp);

@@ -25,6 +25,12 @@ Wizard::Wizard() :
     bin.createDirectories();
     bin = Poco::File("/usr/local/share/subutai/etc");
     bin.createDirectories();
+#elif LAUNCHER_WINDOWS
+	Poco::File bin(SubutaiLauncher::Session::instance()->getSettings()->getInstallationPath()+"/bin");
+	if (!bin.exists())
+	{
+		bin.createDirectories();
+	}
 #endif
 
     setSize(800, 600);
