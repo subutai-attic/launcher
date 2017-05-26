@@ -200,7 +200,7 @@ void SubutaiLauncher::Downloader::downloadImpl()
         }
 
         _logger->information("Starting file downloads [%s]", _file.name);
-        std::ofstream out(path, std::fstream::app);
+        std::ofstream out(path, std::fstream::app | std::fstream::out | std::fstream::binary);
         Poco::StreamCopier::copyStream(*pStr.get(), out);
     } catch (Poco::Net::HTTPException e) {
         _logger->error("File download failed: %s", e.displayText());

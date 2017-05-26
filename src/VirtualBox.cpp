@@ -63,7 +63,8 @@ bool SubutaiLauncher::VirtualBox::findInstallation()
         std::string fp = (*it);
         fp.append("/"+BIN);
         Poco::File f(fp);
-        if (f.exists()) {
+        if (f.exists()) 
+		{
             _logger->trace("VirtualBox installation found at %s", fp);
             _installed = true;
             _path = (*it);
@@ -95,7 +96,8 @@ bool SubutaiLauncher::VirtualBox::isUpdateRequired()
 
 std::string SubutaiLauncher::VirtualBox::extractVersion()
 {
-    if (_version != "") {
+    if (_version != "") 
+	{
         return _version;
     }
 
@@ -135,7 +137,8 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::parseVms(co
     SubutaiString buf(buffer);
     std::vector<std::string> lines;
     buf.split('\n', lines);
-    for (auto it = lines.begin(); it != lines.end(); it++) {
+    for (auto it = lines.begin(); it != lines.end(); it++) 
+	{
         if ((*it).empty() || (*it).length() < 10) continue;
         const char* line = const_cast<char*>((*it).c_str());
 #if LAUNCHER_LINUX || LAUNCHER_MACOS
@@ -147,7 +150,8 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::parseVms(co
         v.name = std::string(vmname);
         v.id = std::string(vmid);
         int i = v.name.find("subutai",0);
-        if (i != std::string::npos){
+        if (i != std::string::npos)
+		{
             vms.push_back(v);
         }
     }
@@ -183,7 +187,8 @@ std::string SubutaiLauncher::VirtualBox::execute(const std::string& command)
 
     _logger->information("Command executed with status %d", status);
 
-    if (!pStderr.empty()) {
+    if (!pStderr.empty()) 
+	{
         _logger->error("Error during execution of a command %s: %s", command, pStderr);
     }
     return pStdout;
@@ -217,7 +222,8 @@ std::string SubutaiLauncher::VirtualBox::execute(const std::string& command, int
     exitStatus = status;
     _logger->information("Command executed with status %d", status);
 
-    if (!pStderr.empty()) {
+    if (!pStderr.empty()) 
+	{
         _logger->error("Error during execution of a command %s: %s", command, pStderr);
     }
     return pStdout;
@@ -247,8 +253,10 @@ std::string SubutaiLauncher::VirtualBox::getMachineInfo(const std::string& name)
 bool SubutaiLauncher::VirtualBox::isMachineExists(const std::string& name)
 {
     auto list = getPeers();
-    for (auto it = list.begin(); it != list.end(); it++) {
-        if ((*it).name == name) {
+    for (auto it = list.begin(); it != list.end(); it++) 
+	{
+        if ((*it).name == name) 
+		{
             return true;
         }
     }
@@ -258,14 +266,19 @@ bool SubutaiLauncher::VirtualBox::isMachineExists(const std::string& name)
 bool SubutaiLauncher::VirtualBox::isMachineRunning(const std::string& name)
 {
     auto list = getPeers();
-    for (auto it = list.begin(); it != list.end(); it++) {
-        if ((*it).name == name) {
+    for (auto it = list.begin(); it != list.end(); it++) 
+	{
+        if ((*it).name == name) 
+		{
             auto info = getMachineInfo(name);
             Poco::StringTokenizer lines(info, "\n", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
-            for (auto line = lines.begin(); line != lines.end(); line++) {
-                if ((*line).substr(0, 6) == "State:") {
+            for (auto line = lines.begin(); line != lines.end(); line++) 
+			{
+                if ((*line).substr(0, 6) == "State:") 
+				{
                     auto p = (*line).find("running", 0);
-                    if (p != std::string::npos) {
+                    if (p != std::string::npos) 
+					{
                         return true;
                     } 
                     return false;
