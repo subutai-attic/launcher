@@ -3,6 +3,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainComponent.h"
+#include "Poco/Logger.h"
 
 class MainWindow : public juce::DocumentWindow
 {
@@ -11,6 +12,7 @@ class MainWindow : public juce::DocumentWindow
         void closeButtonPressed() override;
 
     private:
+        Poco::Logger* _logger;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
 };
 

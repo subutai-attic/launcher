@@ -1,5 +1,9 @@
 #include "Environment.h"
 
+#if LAUNCHER_MACOS
+const std::string SubutaiLauncher::Environment::EXTRA_PATH="/usr/local/bin:";
+#endif
+
 SubutaiLauncher::Environment::Environment() 
 {
     _logger = &Poco::Logger::get("subutai");
@@ -146,10 +150,9 @@ std::string SubutaiLauncher::Environment::cpuArch()
     return ar;
 }
 
-unsigned SubutaiLauncher::Environment::cpuNum() 
+unsigned int SubutaiLauncher::Environment::cpuNum() 
 {
-    unsigned pr = Poco::Environment::processorCount();
-    return pr;
+    return Poco::Environment::processorCount();
 }
 
 std::string SubutaiLauncher::Environment::getVar(const std::string& name, const std::string& defaultValue) 
@@ -160,6 +163,7 @@ std::string SubutaiLauncher::Environment::getVar(const std::string& name, const 
 std::string SubutaiLauncher::Environment::setVar(const std::string& name, const std::string& value)
 {
     Poco::Environment::set(name, value);
+	return value;
 }
 
 std::string SubutaiLauncher::Environment::getDefaultGateway()
@@ -168,11 +172,11 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
     std::string binary, gatewayName;
     int elnum;
 #if LAUNCHER_LINUX
-    binary = "/usr/bin/netstat";
+    binary = "/bin/netstat";
     gatewayName = "0.0.0.0";
     elnum = 8;
 #elif LAUNCHER_MACOS
-    binary = "/bin/netstat";
+    binary = "/usr/sbin/netstat";
     gatewayName = "default";
     elnum = 6;
 #endif
@@ -181,7 +185,7 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
     args.push_back("-rn");
     
     Poco::Pipe pOut;
-    Poco::ProcessHandle ph = Poco::Process::launch("/usr/bin/netstat", args, 0, &pOut, 0);
+    Poco::ProcessHandle ph = Poco::Process::launch(binary, args, 0, &pOut, 0);
     ph.wait();
 
     Poco::PipeInputStream istr(pOut);
@@ -190,21 +194,116 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
 
     Poco::StringTokenizer lines(netstat, "\n", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
     bool isDefault = false;
-    for (auto line = lines.begin(); line != lines.end(); line++) {
+    for (auto line = lines.begin(); line != lines.end(); line++) 
+    {
         Poco::StringTokenizer elements((*line), " ", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
         int i = 0;
-        for (auto el = elements.begin(); el != elements.end(); el++) {
+        for (auto el = elements.begin(); el != elements.end(); el++) 
+        {
             i++;
-            if ((*el) == gatewayName) {
-                isDefault = true;
-            }
-            if (isDefault && i == elnum) {
-                return (*el);
-            }
+            if ((*el) == gatewayName) isDefault = true;
+            if (isDefault && i == elnum) return (*el);
         }
     }
     return "unknown";
 #else
-	return "Not Implemented";
+	PIP_ADAPTER_INFO pAdapterInfo;
+	PIP_ADAPTER_INFO pAdapter = NULL;
+	DWORD pRet = 0;
+
+	ULONG pOutBufLen = sizeof(IP_ADAPTER_INFO);
+
+	pAdapterInfo = (IP_ADAPTER_INFO *)ENV_MALLOC(sizeof(IP_ADAPTER_INFO));
+	if (pAdapterInfo == NULL)
+	{
+		_logger->error("Failed to allocate memory");
+		return "unknown";
+	}
+
+	_logger->debug("Retrieving adapter info");
+
+	if (GetAdaptersInfo(pAdapterInfo, &pOutBufLen) == ERROR_BUFFER_OVERFLOW)
+	{
+		if (pAdapterInfo) ENV_FREE(pAdapterInfo);
+		pAdapterInfo = (IP_ADAPTER_INFO *)ENV_MALLOC(pOutBufLen);
+		if (pAdapterInfo == NULL)
+		{
+			_logger->error("Failed to allocate memory for GetAdaptersInfo");
+			return "unknown";
+		}
+	}
+	
+	_logger->trace("Memory allocated");
+
+	if ((pRet = GetAdaptersInfo(pAdapterInfo, &pOutBufLen)) == NO_ERROR)
+	{
+		pAdapter = pAdapterInfo;
+		while (pAdapter)
+		{
+			// TODO: Make sure we are returning default one here
+			if (pAdapterInfo) ENV_FREE(pAdapterInfo);
+			return std::string(pAdapter->AdapterName);
+
+			pAdapter = pAdapter->Next;
+		}
+	}
+	else
+	{
+		_logger->error("Failed to retrieve adapter info: %lu", pRet);
+	}
+	
+	if (pAdapterInfo) ENV_FREE(pAdapterInfo);
+	return "unknown";
 #endif
+}
+
+// Check whether NSSM tool is available
+bool SubutaiLauncher::Environment::isNSSMInstalled()
+{
+	_logger->debug("Checking NSSM tool");
+	std::string path = Session::instance()->getSettings()->getTmpPath() + "\\nssm.exe";
+	Poco::File f(path);
+	if (f.exists())
+	{
+		_logger->trace("NSSM tool exists");
+		return true;
+	}
+	_logger->trace("NSSM tool doesn't exists");
+	return false;
+}
+
+bool SubutaiLauncher::Environment::registerService(const std::string& name, const std::string& path, std::vector<std::string> args)
+{
+	_logger->information("Registering %s as a Windows Service", path);
+	if (!isNSSMInstalled())
+	{
+		_logger->error("NSSM tool is not installed");
+		return false;
+	}
+	_logger->debug("NSSM tool found");
+	
+	std::string pPath = Session::instance()->getSettings()->getTmpPath() + "\\nssm.exe";
+	Poco::Process::Args pArgs;
+	pArgs.push_back("install");
+	pArgs.push_back("\""+name+"\"");
+	pArgs.push_back("\"" + path + "\"");
+	for (auto it = args.begin(); it != args.end(); it++)
+	{
+		pArgs.push_back("\"" + (*it) + "\"");
+	}
+	_logger->trace("Executing NSSM");
+	Poco::ProcessHandle ph = Poco::Process::launch(pPath, pArgs, 0, 0, 0);
+	int exitCode = ph.wait();
+	_logger->trace("NSSM has been executed");
+	if (exitCode != 0)
+	{
+		_logger->error("Service installation failed. Exit code: %d", exitCode);
+	}
+	else
+	{
+		_logger->information("Service was installed");
+		return true;
+	}
+
+	return false;
 }

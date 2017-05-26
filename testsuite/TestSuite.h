@@ -5,6 +5,9 @@
 #include "PeerSetupTest.h"
 #include "SSHTest.h"
 #include "SLTest.h"
+#include "HubTest.h"
+#include "VirtualBoxTest.h"
+#include "EnvironmentTest.h"
 
 class SubutaiLauncherTestSuite
 {

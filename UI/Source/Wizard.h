@@ -13,7 +13,8 @@
 #include "RootProcess.h"
 #include "WizardFinish.h"
 
-class Wizard : public juce::Component,
+class Wizard : 
+    public juce::Component,
     public juce::ButtonListener
 {
     public:
@@ -21,9 +22,12 @@ class Wizard : public juce::Component,
         ~Wizard();
         void paint (juce::Graphics&) override;
         void resized() override;
-        void buttonClicked(juce::Button* button);
+        void buttonClicked(juce::Button* button) override;
         void runInstall();
         void stepCompleted(const std::string& name);
+        void runCancelConfirmation();
+        void finish();
+        void cleanInstallers();
     private:
         Poco::Logger* _logger;
         int _step;
@@ -32,6 +36,7 @@ class Wizard : public juce::Component,
         juce::Label _stepComponentChooser;
         juce::Label _stepInstall;
         juce::Label _stepFinal;
+        juce::Label _cancelMessage;
         juce::TextButton _next;
         juce::TextButton _cancel;
         juce::TextButton _back;
@@ -44,6 +49,7 @@ class Wizard : public juce::Component,
         WizardInstall* _peerInstall;
         WizardFinish* _finishPage;
 
+        bool _shutdown;
         bool _ptpInstalled;
         bool _eteInstalled;
         bool _peerInstalled;

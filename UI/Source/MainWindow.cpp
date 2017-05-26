@@ -6,6 +6,8 @@ MainWindow::MainWindow(juce::String name) : juce::DocumentWindow(
         juce::DocumentWindow::allButtons
         )
 {
+    _logger = &Poco::Logger::get("subutai");
+    _logger->trace("Creating main window");
     //setUsingNativeTitleBar (false);
     //setTitleBarHeight(0);
     auto display = juce::Desktop::getInstance().getDisplays().getMainDisplay();
@@ -15,7 +17,10 @@ MainWindow::MainWindow(juce::String name) : juce::DocumentWindow(
     MainContentComponent* mainComponent = new MainContentComponent();
     setContentOwned(mainComponent, true);
 
-    centreWithSize(getWidth(), getHeight());
+    centreWithSize(getWidth(), getHeight() + 50);
+#if LAUNCHER_WINDOWS
+	this->setTopLeftPosition(200, 200);
+#endif
     setDraggable(true);
     setVisible(true);
     setResizable(true, true);
@@ -25,5 +30,7 @@ MainWindow::MainWindow(juce::String name) : juce::DocumentWindow(
 
 void MainWindow::closeButtonPressed()
 {
+    _logger->trace("Close Button Pressed");
     juce::JUCEApplication::getInstance()->systemRequestedQuit();
+    _logger->trace("System Quit Requested");
 }

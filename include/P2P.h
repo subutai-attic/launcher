@@ -1,6 +1,8 @@
 #ifndef __P2P_H__
 #define __P2P_H__
 
+#include "Vars.h"
+
 #include "Environment.h"
 #include "SubutaiString.h"
 #include "FileSystem.h"

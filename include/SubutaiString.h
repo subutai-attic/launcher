@@ -1,6 +1,7 @@
 #ifndef __STRING_H__
 #define __STRING_H__
 
+#include "Vars.h"
 #include <string>
 #include <vector>
 #include <sstream>

@@ -13,6 +13,8 @@ public:
 	void tearDown();
 
     void testGetScheme();
+    void testFailedScript();
+    void testFailedScriptThread();
 
 	static CppUnit::Test* suite();
 };

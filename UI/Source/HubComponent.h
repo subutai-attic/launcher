@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    HubComponent.h
-    Created: 8 Aug 2016 2:15:07pm
-    Author:  crioto
-
-  ==============================================================================
-*/
-
 #ifndef HUBCOMPONENT_H_INCLUDED
 #define HUBCOMPONENT_H_INCLUDED
 

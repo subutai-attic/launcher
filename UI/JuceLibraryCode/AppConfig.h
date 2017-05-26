@@ -44,7 +44,7 @@
 // juce_core flags:
 
 #ifndef    JUCE_FORCE_DEBUG
- //#define JUCE_FORCE_DEBUG
+// #define JUCE_FORCE_DEBUG 1
 #endif
 
 #ifndef    JUCE_LOG_ASSERTIONS
@@ -64,7 +64,7 @@
 #endif
 
 #ifndef    JUCE_USE_CURL
- #define   JUCE_USE_CURL 1
+ //#define   JUCE_USE_CURL 1
 #endif
 
 //==============================================================================

@@ -9,11 +9,13 @@ SubutaiLauncher::Core::Core(std::vector<std::string> args) :
 
 SubutaiLauncher::Core::~Core()
 {
+    Poco::Logger::get("subutai").information("Stopping Subutai Launcher Core");
     if (_running) {
         while (!Session::instance()->getDownloader()->isDone()) {
             // Waiting
         };
     }
+    Poco::Logger::get("subutai").information("Subutai Launcher Core stopped");
 
     Py_Finalize();
 }
@@ -21,6 +23,20 @@ SubutaiLauncher::Core::~Core()
 void SubutaiLauncher::Core::initializePython()
 {
     Poco::Logger::get("subutai").information("Initializing Python v%d.%d", PY_MAJOR_VERSION, PY_MINOR_VERSION);
+
+#if LAUNCHER_WINDOWS
+	//std::string pPythonPath = Poco::Environment::get("PYTHONPATH");
+	//std::string pPythonHome = Poco::Environment::get("PYTHONHOME");
+
+	std::string pNewPythonPath = "D:\\Projects\cpython";
+	std::string pNewPythonHome = "D:\\Projects\cpython";
+	
+	//Poco::Environment::set("PYTHONPATH", pNewPythonPath);
+	//Poco::Environment::set("PYTHONHOME", pNewPythonHome);
+
+	Py_SetPythonHome(L".");
+#endif
+
     //Environment e;
     //e.setVar("PYTHONPATH", ".");
     //
@@ -32,6 +48,7 @@ void SubutaiLauncher::Core::initializePython()
 
 
 #if PY_MAJOR_VERSION < 3
+    #error Python versions below 3.5 is not supported
     Py_InitModule("subutai", SubutaiSLMethods);
 #endif
 
@@ -47,24 +64,63 @@ void SubutaiLauncher::Core::initializePython()
     */
 }
 
+void SubutaiLauncher::Core::initializeSSL()
+{
+    Poco::Logger::get("subutai").debug("Configuring SSL Client context");
+
+    Poco::Net::Context* pContext = new Poco::Net::Context(
+            Poco::Net::Context::CLIENT_USE,
+            "",
+            Poco::Net::Context::VERIFY_NONE,
+            9,
+            true,
+            "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
+            );
+    Poco::Net::SSLManager::InvalidCertificateHandlerPtr ptrHandler ( new Poco::Net::AcceptCertificateHandler(false) );
+    Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, pContext);
+}
+
 void SubutaiLauncher::Core::run()
 {
-    FileSystem fs("/");
-    try 
-    {
-        if (! fs.isFileExists("/tmp/subutai"))
-        {
-            //create /tmp/subutai
-            fs.createDirectory("/tmp/subutai");
-        }
-    }
-    catch(SubutaiException e) 
-    {
-        return ;
-    }
+    Poco::File f;
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
+    f = Poco::File("/tmp/subutai");
+#elif LAUNCHER_WINDOWS
+	std::string path = "C:\\";
+	try
+	{
+		std::string drive = Poco::Environment::get("USERPROFILE");
+		path = drive;
+		path.append("\\subutai\\");
+		path.append("\\tmp\\");
+	}
+	catch (Poco::NotFoundException& e)
+	{
+		std::printf("Failed to extract home directory: %s\n", e.displayText());
+	}
+    f = Poco::File(path);
+#endif
+	try 
+	{
+		if (!f.exists())
+		{
+			try
+			{
+				f.createDirectories();
+			}
+			catch (std::exception e)
+			{
+				std::printf("%s\n", e.what());
+			}
+		}
+	}
+	catch (Poco::FileException& e)
+	{
+		e.rethrow();
+	}
     _running = true;
     initializePython();
-    curl_global_init(CURL_GLOBAL_ALL);
+    initializeSSL();
     Session::instance();
     parseArgs();
 }
@@ -89,8 +145,31 @@ void SubutaiLauncher::Core::setupLogger()
     pSplitter->addChannel(cConsole);
 #if LAUNCHER_MACOS
     pChannel->setProperty("path", "/usr/local/share/subutai/log/subutai-launcher.log");
+#elif LAUNCHER_LINUX
+    pChannel->setProperty("path", "/opt/subutai/log/subutai-launcher.log");
 #else
-    pChannel->setProperty("path", "subutai-launcher.log");
+	std::string path = "C:\\Subutai";
+	try
+	{
+		std::string drive = Poco::Environment::get("USERPROFILE");
+		path = drive;
+		path.append("\\subutai\\log");
+		Poco::File f(path);
+		if (!f.exists()) f.createDirectories();
+		path.append("\\subutai-launcher.log");
+	}
+	catch (Poco::NotFoundException& e)
+	{
+		std::printf("Couldn't find home directory: %s\n", e.displayText());
+	}
+	try 
+	{
+		pChannel->setProperty("path", path);
+	}
+	catch (Poco::OpenFileException& e)
+	{
+		std::printf("Can't create log file: %s\n", e.displayText());
+	}
 #endif
     pChannel->setProperty("rotation", "5 M");
     Poco::AutoPtr<Poco::FormattingChannel> pFormatChannel(new Poco::FormattingChannel(pFormatter, pSplitter));

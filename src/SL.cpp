@@ -119,6 +119,7 @@ void SubutaiLauncher::SL::execute(std::string module) {
 
 void SubutaiLauncher::SL::execute()
 {
+    _logger->debug("Preparing script for execution");
     auto ncenter = Session::instance()->getNotificationCenter();
     while (ncenter->isRunning())
     {
@@ -132,7 +133,7 @@ void SubutaiLauncher::SL::execute()
     ncenter->start();
     _logger->information("Starting script execution: %s", _name);
 
-    if (_name == NULL  )
+    if (_name == NULL)
     {
         ncenter->stop();
         _logger->error("SL::execute: Empty module name: %s", _module);
@@ -140,28 +141,38 @@ void SubutaiLauncher::SL::execute()
         throw SLException("Empty module name", 12);
     }
     PyObject* sysPath = PySys_GetObject((char*)"path");
-    _logger->trace("SL::execute syspath: %s, dir: %s", sysPath, _dir);
+	if (sysPath == NULL)
+	{
+		_logger->error("Failed to extract path from python system");
+	}
+	else
+	{
+		_logger->trace("SL::execute syspath: %s, dir: %s", sysPath, _dir);
 
 #if PY_MAJOR_VERSION >= 3
-    PyObject* tmpPath = PyUnicode_FromString(_dir.c_str());
-    //PyObject* tmpPath = PyUnicode_DecodeFSDefault(_dir.c_str());
+		PyObject* tmpPath = PyUnicode_FromString(_dir.c_str());
+		//PyObject* tmpPath = PyUnicode_DecodeFSDefault(_dir.c_str());
 #else
-    PyObject* tmpPath = PyString_FromString(_dir.c_str());
+		PyObject* tmpPath = PyString_FromString(_dir.c_str());
 #endif
-    PyList_Append(sysPath, tmpPath);
+		PyList_Append(sysPath, tmpPath);
+	}
 
+    /*
     try 
     {
+    */
         _module = PyImport_Import(_name);
         if (!_module){
             PyErr_Print();
             throw SLException("Cannot find specified module", 7);
         }
         Py_XDECREF(_name);
+    /*
     }
     catch (std::exception const &exc)
     {
-        _logger->error("Exception during execution: %s", exc.what());
+        _logger->error("Exception during execution: %s", std::string(exc.what()));
         PyErr_Print();
     }
     catch (...)
@@ -169,6 +180,7 @@ void SubutaiLauncher::SL::execute()
         std::exception_ptr p = std::current_exception();
         PyErr_Print();
     }
+    */
 
     if (_module == NULL || _module == 0){
         _logger->debug("SL::execute Can't find module %s", _module);
@@ -202,7 +214,7 @@ void SubutaiLauncher::SL::execute()
                 Py_DECREF(_module);
                 PyErr_Print();
                 ncenter->stop();
-                _logger->error("Execution exit code: %d", _exitCode);
+                _logger->error("Execution exit code: %ld", _exitCode);
                 PyErr_Print();
                 throw SLException("Script execution failed", 5);
             }

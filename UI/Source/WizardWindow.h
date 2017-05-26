@@ -11,6 +11,7 @@ class WizardWindow : public juce::DialogWindow
         WizardWindow();
         ~WizardWindow();
         void closeButtonPressed();
+        bool escapeKeyPressed();
     private:
         Poco::Logger* _logger;
         Wizard* _wizard;

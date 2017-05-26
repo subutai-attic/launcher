@@ -1,169 +1,83 @@
 #include "Hub.h"
 
+namespace SubutaiLauncher 
+{
 
-const std::string SubutaiLauncher::Hub::URL = "https://hub.subut.ai";
-const std::string SubutaiLauncher::Hub::REST = "/rest/v1";
-
-SubutaiLauncher::Hub::Hub() : curl(curl_easy_init()) {
-	curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
-}
-
-SubutaiLauncher::Hub::~Hub() {
-	curl_easy_cleanup(curl);
-}
-
-void SubutaiLauncher::Hub::setLogin(std::string login) {
-	_login = login;
-}
-
-void SubutaiLauncher::Hub::setPassword(std::string password) {
-	_password = password;
-}
-
-bool SubutaiLauncher::Hub::auth() {
-	std::map<std::string, std::string> query;
-	query["email"] = _login;
-	query["password"] = _password;
-	auto response = performPostRequest("tray/login", query);
-	long code = 0;
-	std::printf("[HUB] Received during auth: %s\n", response.c_str());
-	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
-	if (code == 200 && code != CURLE_ABORTED_BY_CALLBACK) {
-		return true;
-	}
-	else {
-		return false;
-	}
-	return false;
-}
-
-bool SubutaiLauncher::Hub::balance() {
-	std::map<std::string, std::string> query;
-	auto response = performGetRequest("tray/balance", query);
-	long code = 0;
-	std::printf("[HUB] Received during balance: %s\n", response.c_str());
-	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
-	if (code == 200 && code != CURLE_ABORTED_BY_CALLBACK) {
-		return true;
-	}
-	else {
-		return false;
-	}
-	return false;
-}
-
-std::string SubutaiLauncher::Hub::performGetRequest(std::string endpoint, std::map<std::string, std::string> query) {
-	return performRequest(false, endpoint, query);
-}
-
-std::string SubutaiLauncher::Hub::performPostRequest(std::string endpoint, std::map<std::string, std::string> query) {
-	return performRequest(true, endpoint, query);
-}
-
-std::string SubutaiLauncher::Hub::performRequest(bool post, std::string endpoint, std::map<std::string, std::string> query) {
-	_response.clear();
-	char request[4096];
-#if LAUNCHER_WINDOWS
-	sprintf_s(request, sizeof(request), "%s%s/%s", URL.c_str(), REST.c_str(), endpoint.c_str());
-#else
-	std::sprintf(request, "%s%s/%s", URL.c_str(), REST.c_str(), endpoint.c_str());
+#if BUILD_SCHEME_DEV
+    const std::string Hub::URL = "dev.subut.ai";
+#elif BUILD_SCHEME_MASTER
+    const std::string Hub::URL = "stage.subut.ai";
+#elif BUILD_SCHEME_PRODUCTION
+    const std::string Hub::URL = "hub.subut.ai";
 #endif
+    const std::string Hub::REST = "/rest/v1";
 
-	if (!query.empty()) {
-#if LAUNCHER_WINDOWS
-		sprintf_s(request, sizeof(request), "%s?", request);
-#else
-		std::sprintf(request, "%s?", request);
-#endif
-		for (auto it = query.begin(); it != query.end(); it++) {
-#if LAUNCHER_WINDOWS
-			sprintf_s(request, sizeof(request), "%s%s=%s&", request, it->first.c_str(), it->second.c_str());
-#else
-			std::sprintf(request, "%s%s=%s&", request, it->first.c_str(), it->second.c_str());
-#endif
+    Hub::Hub() : _session(URL, 443)
+    {
+        _logger = &Poco::Logger::get("subutai");
+        _logger->information("Starting Hub Session [%s]", URL);
+    }
 
-		}
-	}
+    Hub::~Hub() 
+    {
+    }
 
-	std::printf("Performing request: %s\n", request);
+    void Hub::setLogin(std::string login) 
+    {
+        _login = login;
+    }
 
-	curl_easy_reset(curl);
-	printCookies();
-	struct curl_slist *headers = NULL;
-	headers = curl_slist_append(headers, "Content-Type: application/json");
-	curl_easy_setopt(curl, CURLOPT_URL, request);
-	if (post) {
-		curl_easy_setopt(curl, CURLOPT_POST, 1);
-	}
-	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleResponse);
-	curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handleHeaders);
-	auto result = curl_easy_perform(curl);
-	if (result == 0) {
-		return _response;
-	}
-	else {
-		return "";
-	}
+    void Hub::setPassword(std::string password) 
+    {
+        _password = password;
+    }
+
+    bool Hub::auth() 
+    {
+        _logger->debug("Authenticating at %s%s/tray/login", URL, REST);
+        Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/tray/login");
+        Poco::Net::HTMLForm pForm;
+        pForm.add("email", _login);
+        pForm.add("password", _password);
+        pForm.prepareSubmit(pRequest);
+        _session.sendRequest(pRequest);
+
+        Poco::Net::HTTPResponse pResponse;
+        std::istream& rs = _session.receiveResponse(pResponse);
+        std::string pBuffer;
+        Poco::StreamCopier::copyToString(rs, pBuffer);
+        _logger->trace("Received during login: %s", pBuffer);
+        if (pResponse.getStatus() == Poco::Net::HTTPResponse::HTTP_OK) 
+        {
+            std::vector<Poco::Net::HTTPCookie> pCookies;
+            pResponse.getCookies(pCookies);
+            for (auto it = pCookies.begin(); it != pCookies.end(); it++)
+            {
+                _logger->trace("Saving Hub cookie: %s => %s", (*it).getName(), (*it).getValue());
+                _cookies.add((*it).getName(), (*it).getValue());
+            }
+            return true;
+        }
+        return false;
+    }
+
+    bool Hub::balance() 
+    {
+        _logger->debug("Requesting user balance at %s%s/tray/balance", URL, REST);
+        Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_GET, REST+"/tray/balance");
+        pRequest.setCookies(_cookies);
+        _session.sendRequest(pRequest);
+
+        Poco::Net::HTTPResponse pResponse;
+        std::istream& rs = _session.receiveResponse(pResponse);
+        std::string pBuffer;
+        Poco::StreamCopier::copyToString(rs, pBuffer);
+        _logger->trace("Received during balance: %s", pBuffer);
+        if (pResponse.getStatus() == Poco::Net::HTTPResponse::HTTP_OK) 
+        {
+            return true;
+        }
+        return false;
+    }
+
 }
-
-size_t SubutaiLauncher::Hub::handleResponse(char* data, size_t size, size_t nmemb, void *p) {
-	return static_cast<Hub*>(p)->handleResponseImpl(data, size, nmemb);
-}
-
-size_t SubutaiLauncher::Hub::handleResponseImpl(char* data, size_t size, size_t nmemb) {
-	_response.append(data, size * nmemb);
-	return size * nmemb;
-}
-
-size_t SubutaiLauncher::Hub::handleHeaders(char* data, size_t size, size_t nitems, void *p) {
-	return static_cast<Hub*>(p)->handleHeadersImpl(data, size, nitems);
-}
-
-size_t SubutaiLauncher::Hub::handleHeadersImpl(char* data, size_t size, size_t nitems) {
-	if (size * nitems <= 2) {
-		return nitems * size;
-	}
-	std::printf("Header: %s", data);
-
-	/*
-	   auto h = std::string(data);
-
-	   auto pos = h.find_first_of(" ");
-	   if (pos != std::npos) {
-	   auto header = h.substr(pos);
-	   if (header == "HTTP/1.1") {
-
-	   }
-	   }
-	   */
-
-	return nitems * size;
-}
-
-void SubutaiLauncher::Hub::printCookies() {
-	CURLcode res;
-	struct curl_slist *cookies;
-	struct curl_slist *nc;
-	int i;
-
-	printf("Cookies, curl knows:\n");
-	res = curl_easy_getinfo(curl, CURLINFO_COOKIELIST, &cookies);
-	if (res != CURLE_OK) {
-		fprintf(stderr, "Curl curl_easy_getinfo failed: %s\n",
-			curl_easy_strerror(res));
-		exit(1);
-	}
-	nc = cookies, i = 1;
-	while (nc) {
-		printf("[%d]: %s\n", i, nc->data);
-		nc = nc->next;
-		i++;
-	}
-	if (i == 1) {
-		printf("(none)\n");
-	}
-	curl_slist_free_all(cookies);
-}
-

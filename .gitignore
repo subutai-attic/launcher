@@ -24,6 +24,7 @@ config.make
 UI/Builds/LinuxMakefile/build
 deploy.sh
 package/subutai*
+*.deb
 
 # windows build
 *.sdf
@@ -35,6 +36,7 @@ package/subutai*
 *.lastbuildstate
 *.lib
 *.pdb
+.vs
 subutai-launcher/Debug
 subutai-launcher/x64
 subutai-launcher/.vs
@@ -78,4 +80,6 @@ lnchr.conf
 /package/linux/debian/subutai-launcher.substvars
 /package/linux/debian/subutai-launcher.debhelper.log
 /package/linux/debian/subutai-launcher
+/package/linux/debian/SubutaiLauncher
+/package/linux/debian/python
 

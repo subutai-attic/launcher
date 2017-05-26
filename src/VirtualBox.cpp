@@ -5,7 +5,7 @@ const std::string SubutaiLauncher::VirtualBox::BIN = "vboxmanage";
 #elif LAUNCHER_MACOS
 const std::string SubutaiLauncher::VirtualBox::BIN = "VBoxManage";
 #else
-#error Not implemented on this platform
+const std::string SubutaiLauncher::VirtualBox::BIN = "VBoxManage.exe";
 #endif
 std::string SubutaiLauncher::VirtualBox::cloneName = "subutai";
 std::string SubutaiLauncher::VirtualBox::subutaiBranch = "subutai-dev";
@@ -25,7 +25,6 @@ SubutaiLauncher::VirtualBox::~VirtualBox()
 
 std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::getPeers() 
 {
-
     Poco::Process::Args args;
     args.push_back("list");
     args.push_back("vms");
@@ -44,14 +43,28 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::getPeers()
 bool SubutaiLauncher::VirtualBox::findInstallation()
 {
     _logger->trace("Searching for VirtualBox installation in PATH");
-    Poco::StringTokenizer st(Poco::Environment::get("PATH", ""), ":",
+    std::string path;
+#if LAUNCHER_MACOS
+    path.append(Environment::EXTRA_PATH);
+#endif
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
+    path.append(Poco::Environment::get("PATH", ""));
+    Poco::StringTokenizer st(path, ":",
             Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
+#else
+	std::vector<std::string> st;
+	st.push_back(Poco::Environment::get("programfiles")+"\\Oracle\\VirtualBox");
+	st.push_back(Poco::Environment::get("programfiles(x86)") + "\\Oracle\\VirtualBox");
+	st.push_back(Poco::Environment::get("ProgramW6432") + "\\Oracle\\VirtualBox");
+#endif
     for (auto it = st.begin(); it != st.end(); it++)
     {
+		_logger->trace("Searching for %s in %s", BIN, (*it));
         std::string fp = (*it);
         fp.append("/"+BIN);
         Poco::File f(fp);
-        if (f.exists()) {
+        if (f.exists()) 
+		{
             _logger->trace("VirtualBox installation found at %s", fp);
             _installed = true;
             _path = (*it);
@@ -83,7 +96,8 @@ bool SubutaiLauncher::VirtualBox::isUpdateRequired()
 
 std::string SubutaiLauncher::VirtualBox::extractVersion()
 {
-    if (_version != "") {
+    if (_version != "") 
+	{
         return _version;
     }
 
@@ -123,7 +137,8 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::parseVms(co
     SubutaiString buf(buffer);
     std::vector<std::string> lines;
     buf.split('\n', lines);
-    for (auto it = lines.begin(); it != lines.end(); it++) {
+    for (auto it = lines.begin(); it != lines.end(); it++) 
+	{
         if ((*it).empty() || (*it).length() < 10) continue;
         const char* line = const_cast<char*>((*it).c_str());
 #if LAUNCHER_LINUX || LAUNCHER_MACOS
@@ -135,7 +150,8 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::parseVms(co
         v.name = std::string(vmname);
         v.id = std::string(vmid);
         int i = v.name.find("subutai",0);
-        if (i != std::string::npos){
+        if (i != std::string::npos)
+		{
             vms.push_back(v);
         }
     }
@@ -144,7 +160,11 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::parseVms(co
 
 std::string SubutaiLauncher::VirtualBox::execute(const std::string& command)
 {
-    _logger->information("VB: Executing %s", command);
+    if (_path.empty()) 
+    {
+        findInstallation();
+    }
+    _logger->information("VB: Executing '%s %s'", _path, command);
     Poco::Process::Args args;
     Poco::StringTokenizer st(command, " ", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
     for (auto it = st.begin(); it != st.end(); it++)
@@ -167,7 +187,8 @@ std::string SubutaiLauncher::VirtualBox::execute(const std::string& command)
 
     _logger->information("Command executed with status %d", status);
 
-    if (!pStderr.empty()) {
+    if (!pStderr.empty()) 
+	{
         _logger->error("Error during execution of a command %s: %s", command, pStderr);
     }
     return pStdout;
@@ -175,6 +196,10 @@ std::string SubutaiLauncher::VirtualBox::execute(const std::string& command)
 
 std::string SubutaiLauncher::VirtualBox::execute(const std::string& command, int &exitStatus)
 {
+    if (_path.empty()) 
+    {
+        findInstallation();
+    }
     Poco::Process::Args args;
     Poco::StringTokenizer st(command, " ", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
     for (auto it = st.begin(); it != st.end(); it++)
@@ -197,7 +222,8 @@ std::string SubutaiLauncher::VirtualBox::execute(const std::string& command, int
     exitStatus = status;
     _logger->information("Command executed with status %d", status);
 
-    if (!pStderr.empty()) {
+    if (!pStderr.empty()) 
+	{
         _logger->error("Error during execution of a command %s: %s", command, pStderr);
     }
     return pStdout;
@@ -227,8 +253,10 @@ std::string SubutaiLauncher::VirtualBox::getMachineInfo(const std::string& name)
 bool SubutaiLauncher::VirtualBox::isMachineExists(const std::string& name)
 {
     auto list = getPeers();
-    for (auto it = list.begin(); it != list.end(); it++) {
-        if ((*it).name == name) {
+    for (auto it = list.begin(); it != list.end(); it++) 
+	{
+        if ((*it).name == name) 
+		{
             return true;
         }
     }
@@ -238,14 +266,19 @@ bool SubutaiLauncher::VirtualBox::isMachineExists(const std::string& name)
 bool SubutaiLauncher::VirtualBox::isMachineRunning(const std::string& name)
 {
     auto list = getPeers();
-    for (auto it = list.begin(); it != list.end(); it++) {
-        if ((*it).name == name) {
+    for (auto it = list.begin(); it != list.end(); it++) 
+	{
+        if ((*it).name == name) 
+		{
             auto info = getMachineInfo(name);
             Poco::StringTokenizer lines(info, "\n", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
-            for (auto line = lines.begin(); line != lines.end(); line++) {
-                if ((*line).substr(0, 6) == "State:") {
+            for (auto line = lines.begin(); line != lines.end(); line++) 
+			{
+                if ((*line).substr(0, 6) == "State:") 
+				{
                     auto p = (*line).find("running", 0);
-                    if (p != std::string::npos) {
+                    if (p != std::string::npos) 
+					{
                         return true;
                     } 
                     return false;

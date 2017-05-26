@@ -58,7 +58,7 @@ SystemCheck::SystemCheck()
     _cpuLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_cpuLabel);
 
-    std::string cores = Poco::format("%lu", env.cpuNum());
+    std::string cores = Poco::format("%u", env.cpuNum());
 
     _cpuValue.setText(cores, dontSendNotification);
     _cpuValue.setColour(Label::textColourId, Colours::white);
@@ -81,7 +81,7 @@ SystemCheck::SystemCheck()
     _memLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_memLabel);
 
-    std::string memValue = Poco::format("%lu MB", env.ramSize());
+    std::string memValue = Poco::format("%lu MB", env.ramSize() / 1024 / 1024);
 
     _memValue.setText(memValue, dontSendNotification);
     _memValue.setColour(Label::textColourId, Colours::white);
@@ -129,17 +129,30 @@ SystemCheck::SystemCheck()
     addAndMakeVisible(_vbLabel);
 
     SubutaiLauncher::VirtualBox vb;
-    vb.findInstallation();
-    if (vb.isInstalled())
-    {
-        _vbValue.setText(vb.extractVersion(), dontSendNotification);
-        _vbValue.setColour(Label::textColourId, Colours::white);
-    } 
-    else 
-    {
-        _vbValue.setText("Not installed", dontSendNotification);
-        _vbValue.setColour(Label::textColourId, Colours::red);
-    }
+	try {
+		vb.findInstallation();
+		if (vb.isInstalled())
+		{
+			_vbValue.setText(vb.extractVersion(), dontSendNotification);
+			_vbValue.setColour(Label::textColourId, Colours::white);
+		}
+		else
+		{
+			_vbValue.setText("Not installed", dontSendNotification);
+			_vbValue.setColour(Label::textColourId, Colours::red);
+		}
+	}
+	catch (Poco::NotFoundException& e)
+	{
+		_vbValue.setText("Not installed", dontSendNotification);
+		_vbValue.setColour(Label::textColourId, Colours::red);
+	}
+	catch (Poco::SystemException& e)
+	{
+		_vbValue.setText("Not installed", dontSendNotification);
+		_vbValue.setColour(Label::textColourId, Colours::red);
+	}
+    
     _vbValue.setBounds(150, 215, 500, 40);
     _vbValue.setFont(font);
     _vbValue.setJustificationType(Justification::top);

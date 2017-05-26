@@ -4,14 +4,31 @@
 #include <string>
 #include <cstring>
 #include <map>
-#include <curl/curl.h>
-#include <json/json.h>
 
 #include "Vars.h"
+#include "Poco/Logger.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/Net/SSLException.h"
+#include "Poco/Net/SSLManager.h"
+#include "Poco/Net/HTTPStreamFactory.h"
+#include "Poco/Net/FTPStreamFactory.h"
+#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPSClientSession.h"
+#include "Poco/Net/HTTPStreamFactory.h"
+#include "Poco/Net/HTTPSStreamFactory.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTMLForm.h"
+#include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/AcceptCertificateHandler.h"
+#include "Poco/Net/HTTPCookie.h"
+#include "Poco/Net/NameValueCollection.h"
 
-namespace SubutaiLauncher {
+namespace SubutaiLauncher 
+{
 
-    class Hub {
+    class Hub 
+    {
         public:
             static const std::string URL;
             static const std::string REST;
@@ -21,19 +38,14 @@ namespace SubutaiLauncher {
             void setPassword(std::string password);
             bool auth();
             bool balance();
-            static size_t handleResponse(char* data, size_t size, size_t nmemb, void *p);
-            static size_t handleHeaders(char* data, size_t size, size_t nitems, void *p);
-            size_t handleResponseImpl(char* data, size_t size, size_t nmemb);
-            size_t handleHeadersImpl(char* data, size_t size, size_t nitems);
         private:
-            std::string performRequest(bool post, std::string endpoint, std::map<std::string, std::string> query);
-            void printCookies();
-            std::string performPostRequest(std::string endpoint, std::map<std::string, std::string> query);
-            std::string performGetRequest(std::string endpoint, std::map<std::string, std::string> query);
+            Poco::Net::NameValueCollection getCookies();
             std::string _login;
             std::string _password;
             std::string _response;
-            CURL* curl;
+            Poco::Logger* _logger;
+            Poco::Net::HTTPSClientSession _session;
+            Poco::Net::NameValueCollection _cookies;
     };
 
 }

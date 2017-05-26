@@ -22,7 +22,7 @@ class ComponentChooser : public juce::Component,
         ~ComponentChooser();
         void paint (juce::Graphics&) override;
         void resized() override;
-        void buttonClicked(juce::Button* button);
+        void buttonClicked(juce::Button* button) override;
         ChosenComponents getComponents();
     private:
         Poco::Logger *_logger;
