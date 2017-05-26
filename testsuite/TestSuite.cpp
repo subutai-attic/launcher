@@ -1,27 +1,18 @@
-#include "Poco/CppUnit/TestRunner.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "TestSuite.h"
 
-#include "LogTest.h"
-#include "DownloaderTest.h"
-#include "PeerSetupTest.h"
-#include "SSHTest.h"
-#include "SLTest.h"
-
-class SubutaiLauncherTestSuite
+CppUnit::Test* SubutaiLauncherTestSuite::suite()
 {
-public:
-	static CppUnit::Test* suite()
-	{
-		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SubutaiLauncher");
+    CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SubutaiLauncher");
 
-		pSuite->addTest(LogTest::suite());
-		pSuite->addTest(DownloaderTest::suite());
-        pSuite->addTest(PeerSetupTest::suite());
-        pSuite->addTest(SSHTest::suite());
-        pSuite->addTest(SLTest::suite());
+    pSuite->addTest(DownloaderTest::suite());
+    pSuite->addTest(PeerSetupTest::suite());
+    pSuite->addTest(SSHTest::suite());
+    pSuite->addTest(SLTest::suite());
+    pSuite->addTest(HubTest::suite());
+    pSuite->addTest(VirtualBoxTest::suite());
+    pSuite->addTest(EnvironmentTest::suite());
 
-		return pSuite;
-	}
-};
+    return pSuite;
+}
 
 CppUnitMain(SubutaiLauncherTestSuite)

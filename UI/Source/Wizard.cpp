@@ -4,7 +4,8 @@ Wizard::Wizard() :
     _next("Next"),
     _back("Back"),
     _cancel("Cancel"),
-    _step(1)
+    _step(1),
+    _shutdown(false)
 {
     _logger = &Poco::Logger::get("subutai");
 #if LAUNCHER_LINUX
@@ -24,6 +25,12 @@ Wizard::Wizard() :
     bin.createDirectories();
     bin = Poco::File("/usr/local/share/subutai/etc");
     bin.createDirectories();
+#elif LAUNCHER_WINDOWS
+	Poco::File bin(SubutaiLauncher::Session::instance()->getSettings()->getInstallationPath()+"/bin");
+	if (!bin.exists())
+	{
+		bin.createDirectories();
+	}
 #endif
 
     setSize(800, 600);
@@ -119,16 +126,29 @@ Wizard::Wizard() :
 
 Wizard::~Wizard()
 {
-    delete _introPage;
-    delete _systemCheckPage;
-    delete _componentChooserPage;
-    delete _ptpInstall;
+    _shutdown = true;
+    cleanInstallers();
+    _logger->trace("Requesting Introduction page destroy");
+    if (_introPage != nullptr) delete _introPage;
+    _logger->trace("Requesting System Check page destroy");
+    if (_systemCheckPage != nullptr) delete _systemCheckPage;
+    _logger->trace("Requesting Component Selector page destroy");
+    if (_componentChooserPage != nullptr) delete _componentChooserPage;
+    _logger->trace("Requesting P2P Installation page destroy");
+    if (_ptpInstall != nullptr) delete _ptpInstall;
+    _logger->trace("Requesting Tray Installation page destroy");
+    if (_trayInstall != nullptr) delete _trayInstall;
+    _logger->trace("Requesting ETE Installation page destroy");
+    if (_eteInstall != nullptr) delete _eteInstall;
+    _logger->trace("Requesting Peer Installation page destroy");
+    if (_peerInstall != nullptr) delete _peerInstall;
+    _logger->trace("Requesting Finish page destroy");
+    if (_finishPage != nullptr) delete _finishPage;
 }
 
 void Wizard::paint(juce::Graphics& g)
 {
     g.fillAll (Colour (0xff222222));
-    //g.fillAll (Colour::greyLevel (0.2f));
 }
 
 void Wizard::resized()
@@ -138,8 +158,10 @@ void Wizard::resized()
 
 void Wizard::buttonClicked(juce::Button* button)
 {
-    if (button == &_next) {
-        switch (_step) {
+    if (button == &_next) 
+    {
+        switch (_step) 
+        {
             case 1:
                 _introPage->setVisible(false);
                 _systemCheckPage->setVisible(true);
@@ -172,8 +194,11 @@ void Wizard::buttonClicked(juce::Button* button)
                 _stepIntro.setColour(Label::textColourId, juce::Colour(7, 141, 208));
                 break;
         }
-    } else if (button == &_back) {
-        switch (_step) {
+    } 
+    else if (button == &_back) 
+    {
+        switch (_step) 
+        {
             case 1:
                 break;
             case 2:
@@ -194,8 +219,10 @@ void Wizard::buttonClicked(juce::Button* button)
             default:
                 break;
         }
-    } else if (button == &_cancel) {
-
+    } 
+    else if (button == &_cancel) 
+    {
+        runCancelConfirmation();
     }
 }
 
@@ -203,42 +230,60 @@ void Wizard::runInstall()
 {
     _logger->debug("Collecting choosen components");
     auto c = _componentChooserPage->getComponents();
-    if (c.ptp && !_ptpInstalled) {
-        _ptpInstall->setVisible(true);
-        _logger->debug("P2P Component has been choosen");
-        _ptpInstall->start("P2P");
-        auto t = _ptpInstall->run();
-        t.detach();
-        return;
+    cleanInstallers();
+    try 
+    {
+        if (c.ptp && !_ptpInstalled) 
+        {
+            _ptpInstall->activate();
+            _logger->debug("P2P Component has been choosen");
+            _ptpInstall->start("P2P");
+            _ptpInstall->run();
+            return;
+        }
+        if (c.tray && !_trayInstalled) 
+        {
+            _trayInstall->activate();
+            _logger->debug("Tray Component has been choosen");
+            _trayInstall->start("Tray");
+            _trayInstall->run();
+            return;
+        }
+        if (c.ete && !_eteInstalled) 
+        {
+            _eteInstall->activate();
+            _logger->debug("Browser Plugin Component has been choosen");
+            _eteInstall->start("Browser Plugin");
+            _eteInstall->run();
+            return;
+        }
+        if (c.peer && !_peerInstalled) 
+        {
+            _peerInstall->activate();
+            _logger->debug("Peer Component has been choosen");
+            _peerInstall->start("Peer");
+            _peerInstall->run();
+            return;
+        } 
+    } 
+    catch (SubutaiLauncher::SLException& e)
+    {
+        _logger->error(e.displayText());
     }
-    if (c.tray && !_trayInstalled) {
-        _logger->debug("Tray Component has been choosen");
-        _trayInstall->start("Tray");
-        _trayInstall->setVisible(true);
-        auto t = _trayInstall->run();
-        t.detach();
-        return;
+    catch (SubutaiLauncher::SubutaiException& e)
+    {
+        _logger->error(e.displayText());
     }
-    if (c.ete && !_eteInstalled) {
-        _logger->debug("Browser Plugin Component has been choosen");
-        _eteInstall->start("Browser Plugin");
-        _eteInstall->setVisible(true);
-        auto t = _eteInstall->run();
-        t.detach();
-        return;
-    }
-    if (c.peer && !_peerInstalled) {
-        _logger->debug("Peer Component has been choosen");
-        _peerInstall->start("Peer");
-        _peerInstall->setVisible(true);
-        auto t = _peerInstall->run();
-        t.detach();
-        return;
-    }
+    _logger->debug("Nothing to install");
+    finish();
 }
 
 void Wizard::stepCompleted(const std::string& name)
 {
+    if (_shutdown)
+    {
+        return;
+    }
     if (name == "P2P")
     {
         _ptpInstalled = true;
@@ -261,14 +306,25 @@ void Wizard::stepCompleted(const std::string& name)
     }
 
     // Determine if we need to install something else
-    _logger->debug("Looking for a next component");
+    _logger->debug("Looking for next component");
     auto c = _componentChooserPage->getComponents();
     if ((c.ptp && !_ptpInstalled) || (c.tray && !_trayInstalled) || (c.ete && !_eteInstalled) || (c.peer && !_peerInstalled))
     {
         _logger->debug("Next component found");
         runInstall();
         return;
-    } 
+    }  
+    else 
+    {
+        _logger->trace("Nothing else to install. Proceeding to a final page");
+    }
+
+    finish();
+}
+
+void Wizard::finish()
+{
+    cleanInstallers();
     // Show final page
     _cancel.setEnabled(false);
     _cancel.setVisible(false);
@@ -277,4 +333,61 @@ void Wizard::stepCompleted(const std::string& name)
     _back.setEnabled(false);
     _back.setVisible(false);
     _finishPage->setVisible(true);
+
+    _stepFinal.setColour(Label::textColourId, juce::Colour(7, 141, 208));
+    _stepInstall.setColour(Label::textColourId, Colours::white);
+}
+
+void Wizard::cleanInstallers()
+{
+    _logger->trace("Cleaning install pages");
+    if (_ptpInstall->isActive())
+    {
+        _logger->trace("Deactivating P2P Installation page");
+        _ptpInstall->deactivate();
+        if (_ptpInstall->isRunning())
+        {
+            _logger->trace("Waiting for thread to complete");
+            _ptpInstall->wait();
+        }
+    }
+    if (_trayInstall->isActive())
+    {
+        _logger->trace("Deactivating Tray Installation page");
+        _trayInstall->deactivate();
+        if (_trayInstall->isRunning())
+        {
+            _logger->trace("Waiting for thread to complete");
+            _trayInstall->wait();
+        }
+    }
+    if (_eteInstall->isActive())
+    {
+        _logger->trace("Deactivating ETE Installation page");
+        _eteInstall->deactivate();
+        if (_eteInstall->isRunning())
+        {
+            _logger->trace("Waiting for thread to complete");
+            _eteInstall->wait();
+        }
+    }
+    if (_peerInstall->isActive())
+    {
+        _logger->trace("Deactivating Peer Installation page");
+        _peerInstall->deactivate();
+        if (_peerInstall->isRunning())
+        {
+            _logger->trace("Waiting for thread to complete");
+            _peerInstall->wait();
+        }
+    }
+}
+
+void Wizard::runCancelConfirmation()
+{
+    juce::String message = "Are you sure you want to cancel installation?";
+
+    juce::DialogWindow::LaunchOptions options;
+    _cancelMessage.setText(message, juce::dontSendNotification);
+
 }

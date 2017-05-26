@@ -23,12 +23,22 @@ void DownloaderTest::tearDown()
 
 void DownloaderTest::testRetrieveFileInfo()
 {
-    SubutaiLauncher::Downloader d;
-    d.setFilename("p2p");
-    auto r = d.retrieveFileInfo();
-    assert(r);
-    auto i = d.info();
-    assert(i.name == "p2p");
+	try
+	{
+		std::vector<std::string> args;
+		SubutaiLauncher::Core c(args);
+		c.initializeSSL();
+		SubutaiLauncher::Downloader d;
+		d.setFilename("p2p");
+		auto r = d.retrieveFileInfo();
+		assert(r);
+		auto i = d.info();
+		assert(i.name == "p2p");
+	}
+	catch (Poco::OpenFileException& e)
+	{
+		std::printf("Openfileexception: %s", e.displayText());
+	}
 }
 
 void DownloaderTest::testParseFileInfo()

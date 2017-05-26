@@ -9,33 +9,21 @@ const std::string SubutaiLauncher::Downloader::HOST = "devcdn.subut.ai";
 const std::string SubutaiLauncher::Downloader::URL = "https://mastercdn.subut.ai:8338";
 const std::string SubutaiLauncher::Downloader::REST = "/kurjun/rest/raw";
 const std::string SubutaiLauncher::Downloader::HOST = "mastercdn.subut.ai";
-#else 
+#elif BUILD_SCHEME_PRODUCTION
 const std::string SubutaiLauncher::Downloader::URL = "https://cdn.subut.ai:8338";
 const std::string SubutaiLauncher::Downloader::REST = "/kurjun/rest/raw";
 const std::string SubutaiLauncher::Downloader::HOST = "cdn.subut.ai";
+#else
+#error Build scheme was not specified
 #endif
 
 SubutaiLauncher::Downloader::Downloader() : 
     _content(""),
-    _done(false),
+    _done(true),
     _outputDir(".")
 {
-    //Log::instance()->logger()->debug() << "Starting Downloader instance" << std::endl;
-    //Session::instance()->logger().debug("Starting Downloader instance");
-    Poco::Logger::get("subutai").debug("Starting Downloader instance");
     _logger = &Poco::Logger::get("subutai");
-    _logger->trace("Configuring SSL Client context");
-
-    _context = new Poco::Net::Context(
-            Poco::Net::Context::CLIENT_USE,
-            "",
-            Poco::Net::Context::VERIFY_NONE,
-            9,
-            true,
-            "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
-            );
-    Poco::Net::SSLManager::InvalidCertificateHandlerPtr ptrHandler ( new Poco::Net::AcceptCertificateHandler(false) );
-    Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, _context);
+    _logger->debug("Starting Downloader instance");
 }
 
 SubutaiLauncher::Downloader::~Downloader()
@@ -58,7 +46,7 @@ void SubutaiLauncher::Downloader::reset()
 void SubutaiLauncher::Downloader::setFilename(const std::string& filename)
 {
     _filename = filename;
-    _logger->debug("Downloader::setFilename %s", _filename);
+    _logger->trace("Downloader::setFilename %s", _filename);
 }
 
 std::string SubutaiLauncher::Downloader::buildRequest(std::string path, std::string key, std::string value)
@@ -85,9 +73,10 @@ std::string SubutaiLauncher::Downloader::buildRequest(std::string path, std::str
 bool SubutaiLauncher::Downloader::retrieveFileInfo()
 {
     std::string output;
+    std::string path;
     try {
-        Poco::Net::HTTPSClientSession s(HOST, PORT, _context);
-        std::string path(REST);
+        Poco::Net::HTTPSClientSession s(HOST, PORT);
+        path.append(REST);
         path.append("/info");
         _logger->debug("Requesting file info for %s", path);
         Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_GET, path);
@@ -105,7 +94,14 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo()
         Poco::StreamCopier::copyToString(rs, output);
         _logger->debug("Received file info for %s: %s", path, output);
     } 
-    catch (Poco::Net::SSLException e) 
+    catch (Poco::TimeoutException& e)
+    {
+        _logger->fatal("Request timeout: %s", e.displayText());
+        std::string err;
+        Poco::format(err, "Request timeout: %s [%s]", path, e.displayText());
+        throw SubutaiException(err);
+    }
+    catch (Poco::Net::SSLException& e) 
     {
         _logger->fatal("Failed to retrieve file info: %s", e.displayText());
         return false;
@@ -145,7 +141,7 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo()
     _logger->debug("Owner: %s", _file.owner);
     _logger->debug("Name: %s", _file.name);
     _logger->debug("ID: %s", _file.id);
-    _logger->debug("Size: %lu", _file.size);
+    _logger->debug("Size: %ld", _file.size);
 
     return true;
 }
@@ -204,7 +200,7 @@ void SubutaiLauncher::Downloader::downloadImpl()
         }
 
         _logger->information("Starting file downloads [%s]", _file.name);
-        std::ofstream out(path, std::fstream::app);
+        std::ofstream out(path, std::fstream::app | std::fstream::out | std::fstream::binary);
         Poco::StreamCopier::copyStream(*pStr.get(), out);
     } catch (Poco::Net::HTTPException e) {
         _logger->error("File download failed: %s", e.displayText());
@@ -264,6 +260,7 @@ SubutaiLauncher::SubutaiFile SubutaiLauncher::Downloader::info()
 
 void SubutaiLauncher::Downloader::setOutputDirectory(const std::string& dir)
 {
+	_logger->debug("Setting Download output directory to %s", dir);
     _outputDir = dir;
 }
 

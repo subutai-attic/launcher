@@ -1,25 +1,20 @@
-/*
-  ==============================================================================
-
-    LoginScreen.cpp
-    Created: 31 Jul 2016 6:41:07pm
-    Author:  crioto
-
-  ==============================================================================
-*/
-
 #include "LoginScreen.h"
 
-LoginScreen::LoginScreen() : _button("Login"), _password("Password", (juce_wchar) 0x2022) {
+LoginScreen::LoginScreen() : 
+    _button("Login"), 
+    _password("Password", (juce::juce_wchar) 0x2022) 
+{
 
 }
 
-LoginScreen::~LoginScreen() {
+LoginScreen::~LoginScreen() 
+{
 
 }
 
-void LoginScreen::paint(Graphics& g) {
-    g.fillAll (Colour (0xff555555));
+void LoginScreen::paint(juce::Graphics& g) 
+{
+    g.fillAll(juce::Colour(0xff555555));
 
     addAndMakeVisible(_login);
     _login.setBounds(10, 25, 180, 24);
@@ -34,9 +29,10 @@ void LoginScreen::paint(Graphics& g) {
     _button.setBounds(10, 105, 180, 24);
 }
 
-void LoginScreen::buttonClicked(Button* button) {
+void LoginScreen::buttonClicked(juce::Button* button) 
+{
     if (button == &_button) {
         //_button.setVisible(false);
-        this->removeFromDesktop();
+        removeFromDesktop();
     }
 }

@@ -1,6 +1,8 @@
 #ifndef __SL_BROWSER_H__
 #define __SL_BROWSER_H__
 
+#include "Vars.h"
+
 /*
 #include "Vars.h"
 

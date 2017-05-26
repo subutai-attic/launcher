@@ -20,9 +20,16 @@
 #include "Poco/PipeStream.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Logger.h"
+#include "Poco/File.h"
+#include "Session.h"
 
 #if LAUNCHER_WINDOWS
-//#include <windows.h>
+#include <windows.h>
+#include <WinSock2.h>
+#include <IPHlpApi.h>
+#pragma comment(lib, "IPHLPAPI.LIB")
+#define ENV_MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
+#define ENV_FREE(x) HeapFree(GetProcessHeap(), 0, (x))
 #elif LAUNCHER_MACOS
 #include <sys/sysctl.h>
 #endif
@@ -31,11 +38,14 @@ namespace SubutaiLauncher {
 
     class Environment {
         public:
+#if LAUNCHER_MACOS
+            static const std::string EXTRA_PATH;
+#endif
             Environment();
             ~Environment();
             std::string versionOS();
             std::string cpuArch();
-            unsigned cpuNum();
+            unsigned int cpuNum();
             unsigned processorNum();
             unsigned is64();
             unsigned long ramSize();
@@ -44,6 +54,9 @@ namespace SubutaiLauncher {
             std::string getVar(const std::string& name, const std::string& defaultValue);
             std::string setVar(const std::string& name, const std::string& value);
             std::string getDefaultGateway();
+			// Windows only
+			bool isNSSMInstalled();
+			bool registerService(const std::string& name, const std::string& path, std::vector<std::string> args);
         private:
             Poco::Logger* _logger;
     };

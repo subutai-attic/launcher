@@ -1,8 +1,11 @@
 #ifndef __NOTIFICATION_CENTER_H__
 #define __NOTIFICATION_CENTER_H__
 
+#include "Vars.h"
+
 #include <deque>
 #include "Poco/Logger.h"
+#include "Poco/DynamicAny.h"
 
 namespace SubutaiLauncher
 {
@@ -23,13 +26,14 @@ namespace SubutaiLauncher
         N_EMPTY = 0,
         N_ERROR,
         N_WARNING,
-        N_INFO
+        N_INFO,
+        N_DOUBLE_DATA
     };
 
     struct NotificationMessage
     {
         NotificationType type;
-        std::string message;
+        Poco::DynamicAny message;
     };
 
     typedef std::deque<ScriptAction> EventPool;
@@ -51,8 +55,9 @@ namespace SubutaiLauncher
 
             // Specific events 
 
-            void notificationRaised(NotificationType t, const std::string& s);
+            void notificationRaised(NotificationType t, Poco::DynamicAny v);
             NotificationMessage dispatchNotification();
+            bool notificationEmpty();
             void clear();
         private:
             Poco::Logger* _logger;

@@ -1,6 +1,6 @@
 #include "WizardWindow.h"
 
-WizardWindow::WizardWindow() : DialogWindow(
+WizardWindow::WizardWindow() : juce::DialogWindow(
         "Installation Wizard", 
         juce::Colours::lightgrey,
         false, true)
@@ -18,6 +18,7 @@ WizardWindow::WizardWindow() : DialogWindow(
 
 WizardWindow::~WizardWindow()
 {
+    if (_wizard != nullptr) delete _wizard;
     _logger->trace("Destroying Installation Wizard Window");
 }
 
@@ -27,3 +28,7 @@ void WizardWindow::closeButtonPressed()
     delete this;
 }
 
+bool WizardWindow::escapeKeyPressed()
+{
+	return true;
+}

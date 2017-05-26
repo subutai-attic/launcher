@@ -1,15 +1,12 @@
 CC=g++
 TARGET = sl-cli
-EXTRA_LIBS_DIR = ../third-party
-VB_DIR = ../third-party/xpcom
-VB = -I$(VB_DIR) -I$(VB_DIR)/xpcom -I$(VB_DIR)/nsprpub -I$(VB_DIR)/string -I$(VB_DIR)/ipcd
-INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(OPENSSL_DIR)/include -I../include $(VB) -I../third-party/md5 -I../third-party/json
+INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(OPENSSL_DIR)/include -I../include
 LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -lcurl -lssh -lsubutai-launcher -L../bin -L$(PYLIB_DIR) -lPocoNet
-CFLAGS = -L/lib/x86_64-linux-gnu -Wno-write-strings $(INCLUDES) $(LIBS) -std=c++11 -DRT_OS_LINUX -DBUILD_SCHEME="\"$(BUILD_SCHEME)\""
+CFLAGS = -L/lib/x86_64-linux-gnu -Wno-write-strings $(INCLUDES) $(LIBS) -std=c++11 -DRT_OS_LINUX
 
 SRC_DIR = src
 INCLUDE_DIR = include
-BUILD_DIR = build
+BUILD_DIR = ../build/CLI
 OUTPUT_DIR = ../bin
 
 SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
@@ -30,10 +27,10 @@ $(OUTPUT_DIR)/$(TARGET): $(OBJECTS)
 	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
 
 directories:
-	@mkdir -p build
+	@mkdir -p $(BUILD_DIR)
 
 clean:
-	@rm -rf build/*
+	@rm -rf $(BUILD_DIR)/*
 
 mrproper:
-	@rm -rf build
+	@rm -rf $(BUILD_DIR)

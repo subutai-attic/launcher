@@ -4,16 +4,15 @@ WizardIntro::WizardIntro()
 {
     _logger = &Poco::Logger::get("subutai");
     _logger->trace("Creating Wizard Intro UI Component");
-    auto font = juce::Font(15);
-    _text.setText("Welcommmmmeeee");
-    _text.setBounds(10, 10, 490, 400);
+    auto font = juce::Font(17);
+    _text.setText("Welcome to Subutai Installation Wizard!\n\nThis application will help you to setup Subutai Peer and all necessary components.\n\n");
+    _text.setJustification(juce::Justification::topLeft);
+    _text.setBounds(10, 10, getParentWidth(), getParentHeight());
     _text.setColour(Colours::white);
     _text.setFont(font, true);
-    /*  
-    _text.setBoundingBox(RelativeParallelogram( Point<float>(0, 0),
-                Point<float>(100, 0),
-                Point<float>(0, 0)));
-                */
+    _text.setBoundingBox(RelativeParallelogram( Point<float>(20, 20),
+                Point<float>(400, 20),
+                Point<float>(20, 400)));
     //_text.setBoundingBox(getBounds().toFloat());
     addAndMakeVisible(_text);
 }
