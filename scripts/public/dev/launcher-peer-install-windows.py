@@ -7,7 +7,7 @@ from subprocess import call
 def subutaistart():
 
     m = hashlib.md5()
-    machineName = "subutai-" + m.hexdigest()
+    machineName = "subutai-w" + m.hexdigest()
 
     call(['ssh-keygen', '-R', '[127.0.0.1]:4567'])
 

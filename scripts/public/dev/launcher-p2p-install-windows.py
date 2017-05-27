@@ -13,6 +13,11 @@ def subutaistart():
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
 
+    subutai.AddStatus("Download extra tools")
+    subutai.download("nssm.exe")
+    while subutai.isDownloadComplete() != 1:
+        sleep(0.05)
+
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
 
@@ -21,5 +26,10 @@ def subutaistart():
 
     st = os.stat(installDir+"/bin/p2p.exe")
     os.chmod(installDir+"/bin/p2p.exe", st.st_mode | stat.S_IEXEC)
+
+    subutai.AddStatus("Registering P2P as a Windows service")
+    subutai.RegisterService("P2P", installDir+"/bin/p2p.exe|daemon")
+
+    sleep(10)
 
     subutai.Shutdown()

@@ -178,7 +178,8 @@ void SubutaiLauncher::Downloader::downloadImpl()
     Poco::URI uri(buildRequest("get", "name", _filename));
 
     std::string path;
-    try {
+    try 
+	{
         std::auto_ptr<std::istream> pStr(Poco::URIStreamOpener::defaultOpener().open(uri));
         path.append(_outputDir);
         path.append(PATH_DELIM);
@@ -234,15 +235,20 @@ bool SubutaiLauncher::Downloader::verifyDownload()
     path.append(_file.name);
 
     Poco::MD5Engine md5;
-    try {
+    try 
+	{
         Poco::DigestOutputStream ostr(md5);
         Poco::FileInputStream fs(path);
         Poco::StreamCopier::copyStream(fs, ostr);
         ostr.close();
         fs.close();
-    } catch (Poco::FileNotFoundException e) {
+    } 
+	catch (Poco::FileNotFoundException e) 
+	{
         _logger->error("File verification: File not found");
-    } catch (std::exception e) {
+    } 
+	catch (std::exception e) 
+	{
         _logger->error("File verification: Unknown exception");
     }
 
@@ -252,7 +258,8 @@ bool SubutaiLauncher::Downloader::verifyDownload()
 
 SubutaiLauncher::SubutaiFile SubutaiLauncher::Downloader::info()
 {
-    if (_file.name == "") {
+    if (_file.name == "") 
+	{
         retrieveFileInfo();
     }
     return _file;
