@@ -19,6 +19,7 @@
 #include "Poco/Process.h"
 #include "Poco/PipeStream.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/String.h"
 
 #include "Environment.h"
 #include "SubutaiString.h"

@@ -119,7 +119,7 @@ def setupVm(machineName):
         subutai.download("core.ova")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
-        subutai.VBox("import '"+subutai.GetTmpDir()+"core.ova'")
+        subutai.VBox("import " + subutai.GetTmpDir().replace(" ", "+++") + "core.ova")
         subutai.VBox("modifyvm core --cpus 2")
         subutai.VBox("modifyvm core --nic1 nat")
         subutai.VBox("modifyvm core --cableconnected1 on")
