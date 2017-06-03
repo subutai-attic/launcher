@@ -9,7 +9,7 @@ def subutaistart():
     m = hashlib.md5()
     machineName = "subutai-w" + m.hexdigest()
 
-    call(['ssh-keygen', '-R', '[127.0.0.1]:4567'])
+    call(['ssh-keygen.exe', '-R', '[127.0.0.1]:4567'])
 
     subutai.SetSSHCredentials("subutai", "ubuntai", "127.0.0.1", 4567)
 
@@ -119,10 +119,7 @@ def setupVm(machineName):
         subutai.download("core.ova")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
-        subutai.download("subutai_4.0.15_amd64-dev.snap")
-        while subutai.isDownloadComplete() != 1:
-            sleep(0.05)
-        subutai.VBox("import /tmp/subutai/core.ova")
+        subutai.VBox("import " + subutai.GetTmpDir().replace(" ", "+++") + "core.ova")
         subutai.VBox("modifyvm core --cpus 2")
         subutai.VBox("modifyvm core --nic1 nat")
         subutai.VBox("modifyvm core --cableconnected1 on")
@@ -131,20 +128,6 @@ def setupVm(machineName):
         ret = subutai.VBoxS("modifyvm core --name " + machineName)
         if ret != 0:
             subutai.log("error", "Machine already exists")
-
-    return
-
-
-def installSubutai(snapFile, user, host, port):
-    subutai.download("launcher-prepare-server")
-    while subutai.isDownloadComplete() != 1:
-        sleep(0.05)
-
-    call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/launcher-prepare-server', 'ubuntu@127.0.0.1:~/prepare-server'])
-    call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/subutai_4.0.15_amd64-dev.snap', 'ubuntu@127.0.0.1:~/subutai_latest.snap'])
-
-    subutai.SSHRun("sudo chmod +x /home/ubuntu/prepare-server")
-    subutai.SSHRun("sudo /home/ubuntu/prepare-server")
 
     return
 
