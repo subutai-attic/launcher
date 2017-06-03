@@ -97,11 +97,14 @@ void WizardInstall::start(const std::string& name)
 
 int WizardInstall::wait()
 {
-    if (_running && _installThread.joinable())
+    _logger->trace("WizardInstall::wait()");
+    if (_installThread.joinable())
     {
         _installThread.join();
+        _logger->trace("Install thread has been stopped");
         return 0;
     }
+    _logger->trace("Install thread is not running");
     return 1;
 }
 
@@ -153,7 +156,7 @@ void WizardInstall::runImpl()
             auto e = nc->dispatch();
             if (e == SubutaiLauncher::SCRIPT_FINISHED) 
             {
-                pScriptThread.join();
+                //pScriptThread.join();
                 addLine("Script execution completed");
                 _logger->information("%s script execution completed", script);
                 _progress = 100.0;
@@ -193,11 +196,13 @@ void WizardInstall::runImpl()
     } 
     catch (SubutaiLauncher::SLException& e)
     {
-		pScriptThread.join();
+		//pScriptThread.join();
 		_running = false;
 		_progress = 100.0;
         _logger->error(e.displayText());
     }
+
+    pScriptThread.join();
 
     _logger->debug("Stopping installation process and notifying parent");
     _running = false;
