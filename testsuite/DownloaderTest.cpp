@@ -37,7 +37,7 @@ void DownloaderTest::testRetrieveFileInfo()
 	}
 	catch (Poco::OpenFileException& e)
 	{
-		std::printf("Openfileexception: %s", e.displayText());
+		std::printf("Openfileexception: %s", e.displayText().c_str());
 	}
 }
 

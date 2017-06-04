@@ -170,7 +170,6 @@ std::string SubutaiLauncher::VirtualBox::execute(const std::string& command)
     {
         findInstallation();
     }
-
 	
     _logger->information("VB: Executing '%s %s'", _path, command);
     Poco::Process::Args args;
@@ -178,10 +177,11 @@ std::string SubutaiLauncher::VirtualBox::execute(const std::string& command)
 
     for (auto it = st.begin(); it != st.end(); it++)
     {
-        _logger->trace("Adding arguments %s", (*it));
+        
 
 		// Replacing +++ with spaces here to fix path issues
 		std::string pCommand = Poco::replace((*it), "+++", " ");
+		_logger->trace("Adding arguments %s [%s]", (*it), pCommand);
         args.push_back(pCommand);
     }
 
