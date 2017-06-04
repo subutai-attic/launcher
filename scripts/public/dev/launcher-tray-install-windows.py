@@ -28,7 +28,7 @@ def subutaistart():
     zf.close()
 
     zfl = zipfile.ZipFile(tmpDir+"/"+sshlib, 'r')
-    zfl.extractall(installDir)
+    zfl.extractall(installDir+"/bin")
     zfl.close()
 
     subutai.CreateDesktopShortcut(installDir+"/tray/SubutaiTray.exe",

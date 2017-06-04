@@ -7,9 +7,10 @@ from subprocess import call
 def subutaistart():
 
     m = hashlib.md5()
+    m.update(b'subutaivm')
     machineName = "subutai-w" + m.hexdigest()
 
-    call(['ssh-keygen.exe', '-R', '[127.0.0.1]:4567'])
+    #call(['ssh-keygen.exe', '-R', '[127.0.0.1]:4567'])
 
     subutai.SetSSHCredentials("subutai", "ubuntai", "127.0.0.1", 4567)
 
@@ -125,6 +126,8 @@ def setupVm(machineName):
         subutai.VBox("modifyvm core --cableconnected1 on")
         subutai.VBox("modifyvm core --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
         subutai.VBox("modifyvm core --rtcuseutc on")
+        adapterName = "VirtualBox+++Host-Only+++Ethernet+++Adapter"
+        subutai.VBox("modifyvm core --nic3 hostonly --hostonlyadapter3 "+adapterName)
         ret = subutai.VBoxS("modifyvm core --name " + machineName)
         if ret != 0:
             subutai.log("error", "Machine already exists")
