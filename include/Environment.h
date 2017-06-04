@@ -26,6 +26,7 @@
 
 #if LAUNCHER_WINDOWS
 #include <windows.h>
+#include <VersionHelpers.h>
 #include <WinSock2.h>
 #include <shlobj.h>
 #include <winnls.h>
@@ -66,6 +67,7 @@ namespace SubutaiLauncher {
 			bool isNSSMInstalled();
 			bool registerService(const std::string& name, const std::string& path, std::vector<std::string> args);
 			void CreateShortcut(const std::string& source, const std::string& name);
+			void updatePath();
         private:
             Poco::Logger* _logger;
     };

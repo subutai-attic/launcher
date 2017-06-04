@@ -663,6 +663,15 @@ namespace SubutaiLauncher
 		return Py_BuildValue("i", 0);
 	}
 
+	// ========================================================================
+
+	static PyObject* SL_UpdatePath(PyObject* self, PyObject* args)
+	{
+		Environment e;
+		e.updatePath();
+		return Py_BuildValue("i", 0);
+	}
+
     // ========================================================================
     // Module bindings
     // ========================================================================
@@ -708,6 +717,7 @@ namespace SubutaiLauncher
 		{"log", (PyCFunction)SL_Log, METH_VARARGS | METH_KEYWORDS, "Writes to log"},
 		{ "RegisterService", (PyCFunction)SL_RegisterService, METH_VARARGS | METH_KEYWORDS, "Writes to log" },
 		{ "CreateDesktopShortcut", (PyCFunction)SL_CreateDesktopShortcut, METH_VARARGS | METH_KEYWORDS, "Creates a shortcut on a desktop" },
+		{ "UpdatePath", SL_UpdatePath, METH_VARARGS, "Updates path variables on windows" },
         {NULL, NULL, 0, NULL}
     };
 

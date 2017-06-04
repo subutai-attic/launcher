@@ -14,6 +14,7 @@ public:
 	void tearDown();
 
     void testGetDefaultGateway();
+	void testUpdatePath();
 
 	static CppUnit::Test* suite();
 };

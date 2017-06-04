@@ -31,11 +31,18 @@ void EnvironmentTest::testGetDefaultGateway()
     assert(result != "unknown");
 }
 
+void EnvironmentTest::testUpdatePath()
+{
+	SubutaiLauncher::Environment env;
+	env.updatePath();
+}
+
 CppUnit::Test * EnvironmentTest::suite()
 {
     CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("EnvironmentTest");
 
     CppUnit_addTest(pSuite, EnvironmentTest, testGetDefaultGateway);
+	CppUnit_addTest(pSuite, EnvironmentTest, testUpdatePath);
 
     return pSuite;
 }

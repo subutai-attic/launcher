@@ -141,7 +141,8 @@ std::string SubutaiLauncher::Environment::versionOS()
 {
     _logger->trace("Environment: Getting operating system information");
     std::string os;
-    os = Poco::Environment::osDisplayName() + " " + Poco::Environment::osVersion();
+    //os = Poco::Environment::osDisplayName() + " " + Poco::Environment::osVersion();
+	os = Poco::Environment::osDisplayName();
     return os;
 }
 
@@ -319,12 +320,16 @@ void SubutaiLauncher::Environment::CreateShortcut(const std::string& source, con
 
 	_logger->debug("Shortcut for %s located in %s with name %s", pPath.getFileName(), pPath.parent().toString(), pName.append(".lnk"));
 
-	LPCSTR pszTargetfile = pPath.getFileName().c_str();
+	std::string pLinkFile = std::string(pName).append("");
+
+	//LPCSTR pszTargetfile = pPath.getFileName().c_str();
+	LPCSTR pszTargetfile = source.c_str();
 	LPCSTR pszTargetargs = "";
-	LPCSTR pszLinkfile = pName.append(".lnk").c_str();
+	LPCSTR pszLinkfile = pLinkFile.c_str();
 	LPCSTR pszDescription = name.c_str();
 	int iShowmode = SW_SHOW;
-	LPCSTR pszCurdir = pPath.parent().toString().c_str();
+	//LPCSTR pszCurdir = pPath.parent().toString().c_str();
+	LPCSTR pszCurdir = "";
 	LPCSTR pszIconfile = "";
 	int iIconindex = 0;
 	HRESULT       hRes;                  /* Returned COM result code */
@@ -392,6 +397,22 @@ void SubutaiLauncher::Environment::CreateShortcut(const std::string& source, con
 					wszLinkfile, MAX_PATH);
 				hRes = pPersistFile->Save(wszLinkfile, TRUE);
 				pPersistFile->Release();
+
+				// Moving newly created link to desktop FOLDERID_Desktop
+				PTCHAR filePath;
+				if (FAILED(SHGetFolderPath(NULL,
+					CSIDL_DESKTOPDIRECTORY | CSIDL_FLAG_CREATE,
+					NULL,
+					SHGFP_TYPE_CURRENT,
+					filePath))) // Store the path of the desktop in filePath.
+				{
+					_logger->error("Failed to find Desktop directory");
+				}
+				else
+				{
+					Poco::File f(pLinkFile);
+					f.moveTo(std::string(filePath));
+				}
 			}
 			pShellLink->Release();
 		}
@@ -400,4 +421,43 @@ void SubutaiLauncher::Environment::CreateShortcut(const std::string& source, con
 	CoUninitialize();
 	_logger->trace("Environment::CreateShortcut ~");
 #endif
+}
+
+void SubutaiLauncher::Environment::updatePath()
+{
+	std::string pPath = Poco::Environment::get("PATH");
+	_logger->debug("PATH: %s", pPath);
+	Poco::StringTokenizer st(pPath, ";", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+	std::string pBin = Session::instance()->getSettings()->getInstallationPath();
+	Poco::Path pBinPath(pBin);
+	pBinPath.append("/bin");
+
+	bool bFound = false;
+
+	for (auto it = st.begin(); it != st.end(); it++)
+	{
+		_logger->trace("Probing %s", (*it));
+		if ((*it) == pBinPath.toString())
+		{
+			bFound = false;
+			break;
+		}
+	}
+
+	if (!bFound)
+	{
+		_logger->information("Updating PATH environment variable to %s", pBinPath.toString());
+		pPath.append(";");
+		pPath.append(pBinPath.toString());
+		try 
+		{
+			Poco::Environment::set("PATH", pPath);
+		}
+		catch (Poco::SystemException& e)
+		{
+			_logger->error("Failed to set PATH environment variable");
+		}
+		return;
+	}
+	_logger->information("PATH variable is up-to-date");
 }
