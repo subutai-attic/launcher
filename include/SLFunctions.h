@@ -653,6 +653,22 @@ namespace SubutaiLauncher
 
 	// ========================================================================
 
+	static PyObject* SL_UnregisterService(PyObject* self, PyObject* args, PyObject* keywords)
+	{
+		if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+			return NULL;
+
+		Environment e;
+		bool rc = e.unregisterService(std::string(sl_string));
+		if (rc)
+		{
+			return Py_BuildValue("i", 0);
+		}
+		return Py_BuildValue("i", 1);
+	}
+
+	// ========================================================================
+
 	static PyObject* SL_CreateDesktopShortcut(PyObject* self, PyObject* args, PyObject* keywords)
 	{
 		if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
@@ -715,7 +731,8 @@ namespace SubutaiLauncher
 		{"SetProgress", (PyCFunction)SL_SetProgress, METH_VARARGS | METH_KEYWORDS, "Sets action percentage"},
 		{"GetFileSize", (PyCFunction)SL_GetFileSize, METH_VARARGS | METH_KEYWORDS, "Gets remote file size"},
 		{"log", (PyCFunction)SL_Log, METH_VARARGS | METH_KEYWORDS, "Writes to log"},
-		{ "RegisterService", (PyCFunction)SL_RegisterService, METH_VARARGS | METH_KEYWORDS, "Writes to log" },
+		{ "RegisterService", (PyCFunction)SL_RegisterService, METH_VARARGS | METH_KEYWORDS, "Win32: Register new service" },
+		{ "UnregisterService", (PyCFunction)SL_UnregisterService, METH_VARARGS | METH_KEYWORDS, "Win32: Unregister service" },
 		{ "CreateDesktopShortcut", (PyCFunction)SL_CreateDesktopShortcut, METH_VARARGS | METH_KEYWORDS, "Creates a shortcut on a desktop" },
 		{ "UpdatePath", SL_UpdatePath, METH_VARARGS, "Updates path variables on windows" },
         {NULL, NULL, 0, NULL}

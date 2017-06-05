@@ -66,6 +66,7 @@ namespace SubutaiLauncher {
 			// Windows only
 			bool isNSSMInstalled();
 			bool registerService(const std::string& name, const std::string& path, std::vector<std::string> args);
+			bool unregisterService(const std::string& name);
 			void CreateShortcut(const std::string& source, const std::string& name);
 			void updatePath();
         private:

@@ -192,16 +192,19 @@ void SubutaiLauncher::SL::execute()
     PyEval_InitThreads();
 
     PyObject *pFunc, *pArgs, *pValue;
-    if (!(_module == NULL || _module == 0)) {
+    if (!(_module == NULL || _module == 0)) 
+	{
         pFunc = PyObject_GetAttrString(_module, "subutaistart");
 
-        if (pFunc && PyCallable_Check(pFunc)) {
+        if (pFunc && PyCallable_Check(pFunc)) 
+		{
             _logger->debug("subutaistart() entry point was not found");
             PyErr_Print();
             pArgs = PyTuple_New(0);
             pValue = PyObject_CallObject(pFunc, pArgs);
             Py_DECREF(pArgs);
-            if (pValue != NULL) {
+            if (pValue != NULL) 
+			{
 #if PY_MAJOR_VERSION >= 3
                 _exitCode = PyLong_AsLong(pValue);
 #else
@@ -209,7 +212,8 @@ void SubutaiLauncher::SL::execute()
 #endif
                 Py_DECREF(pValue);
             }
-            else {
+            else 
+			{
                 Py_DECREF(pFunc);
                 Py_DECREF(_module);
                 PyErr_Print();
@@ -219,7 +223,8 @@ void SubutaiLauncher::SL::execute()
                 throw SLException("Script execution failed", 5);
             }
         }
-        else {
+        else 
+		{
             if (PyErr_Occurred()) PyErr_Print();
             ncenter->stop();
             throw SLException("Cannot find subutaistart() function", 6);
@@ -227,7 +232,8 @@ void SubutaiLauncher::SL::execute()
         Py_XDECREF(pFunc);
         Py_DECREF(_module);
     }
-    else {
+    else 
+	{
         PyErr_Print();
         ncenter->stop();
         PyErr_Print();

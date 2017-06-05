@@ -264,7 +264,7 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
 bool SubutaiLauncher::Environment::isNSSMInstalled()
 {
 	_logger->debug("Checking NSSM tool");
-	std::string path = Session::instance()->getSettings()->getTmpPath() + "\\nssm.exe";
+	std::string path = Session::instance()->getSettings()->getInstallationPath() + "\\bin\\nssm.exe";
 	Poco::File f(path);
 	if (f.exists())
 	{
@@ -285,16 +285,61 @@ bool SubutaiLauncher::Environment::registerService(const std::string& name, cons
 	}
 	_logger->debug("NSSM tool found");
 	
-	std::string pPath = Session::instance()->getSettings()->getTmpPath() + "\\nssm.exe";
+	std::string pPath = Session::instance()->getSettings()->getInstallationPath() + "\\bin\\nssm.exe";
 	Poco::Process::Args pArgs;
 	pArgs.push_back("install");
 	pArgs.push_back("\""+name+"\"");
-	pArgs.push_back("\"" + path + "\"");
+	Poco::Path pBinPath(path);
+	pArgs.push_back("\"" + pBinPath.toString() + "\"");
 	for (auto it = args.begin(); it != args.end(); it++)
 	{
 		pArgs.push_back("\"" + (*it) + "\"");
 	}
-	_logger->trace("Executing NSSM");
+	_logger->trace("Executing NSSM: Name: %s Path: %s", name, path);
+	std::string cmdLine = "nssm.exe ";
+	for (auto it = pArgs.begin(); it != pArgs.end(); it++)
+	{
+		cmdLine.append((*it) + " ");
+	}
+	_logger->debug("Running command: %s", cmdLine);
+	Poco::ProcessHandle ph = Poco::Process::launch(pPath, pArgs, 0, 0, 0);
+	int exitCode = ph.wait();
+	_logger->trace("NSSM has been executed");
+	if (exitCode != 0)
+	{
+		_logger->error("Service installation failed. Exit code: %d", exitCode);
+	}
+	else
+	{
+		_logger->information("Service was installed");
+		return true;
+	}
+
+	return false;
+}
+
+bool SubutaiLauncher::Environment::unregisterService(const std::string & name)
+{
+	_logger->information("Unregistering %s Windows Service", name);
+	if (!isNSSMInstalled())
+	{
+		_logger->error("NSSM tool is not installed");
+		return false;
+	}
+	_logger->debug("NSSM tool found");
+
+	std::string pPath = Session::instance()->getSettings()->getInstallationPath() + "\\bin\\nssm.exe";
+	Poco::Process::Args pArgs;
+	pArgs.push_back("remove");
+	pArgs.push_back("\"" + name + "\"");
+	pArgs.push_back("confirm");
+
+	std::string cmdLine = "nssm.exe ";
+	for (auto it = pArgs.begin(); it != pArgs.end(); it++)
+	{
+		cmdLine.append((*it) + " ");
+	}
+	_logger->debug("Running command: %s", cmdLine);
 	Poco::ProcessHandle ph = Poco::Process::launch(pPath, pArgs, 0, 0, 0);
 	int exitCode = ph.wait();
 	_logger->trace("NSSM has been executed");

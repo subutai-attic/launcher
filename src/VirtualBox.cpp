@@ -216,7 +216,10 @@ std::string SubutaiLauncher::VirtualBox::execute(const std::string& command, int
     Poco::StringTokenizer st(command, " ", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
     for (auto it = st.begin(); it != st.end(); it++)
     {
-        args.push_back((*it));
+		// Replacing +++ with spaces here to fix path issues
+		std::string pCommand = Poco::replace((*it), "+++", " ");
+		_logger->trace("Adding arguments %s [%s]", (*it), pCommand);
+		args.push_back(pCommand);
     }
 
     Poco::Pipe output;
