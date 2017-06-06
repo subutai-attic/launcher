@@ -9,6 +9,8 @@ def subutaistart():
 
     subutai.AddStatus("Download p2p binary")
 
+    subutai.UnregisterService("Subutai P2P")
+
     subutai.download("p2p.exe")
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
