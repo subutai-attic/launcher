@@ -653,6 +653,22 @@ namespace SubutaiLauncher
 
 	// ========================================================================
 
+	static PyObject* SL_UnregisterService(PyObject* self, PyObject* args, PyObject* keywords)
+	{
+		if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+			return NULL;
+
+		Environment e;
+		bool rc = e.unregisterService(std::string(sl_string));
+		if (rc)
+		{
+			return Py_BuildValue("i", 0);
+		}
+		return Py_BuildValue("i", 1);
+	}
+
+	// ========================================================================
+
 	static PyObject* SL_CreateDesktopShortcut(PyObject* self, PyObject* args, PyObject* keywords)
 	{
 		if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
@@ -663,52 +679,80 @@ namespace SubutaiLauncher
 		return Py_BuildValue("i", 0);
 	}
 
+	// ========================================================================
+
+	static PyObject* SL_UpdatePath(PyObject* self, PyObject* args)
+	{
+		Environment e;
+		e.updatePath();
+		return Py_BuildValue("i", 0);
+	}
+
+	// ========================================================================
+
+	static PyObject* SL_ProcessKill(PyObject* self, PyObject* args, PyObject* keywords)
+	{
+		if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+			return NULL;
+
+		Environment e;
+		bool rc = e.killProcess(std::string(sl_string));
+		if (rc)
+		{
+			return Py_BuildValue("i", 0);
+		}
+		return Py_BuildValue("i", 1);
+	}
+
     // ========================================================================
     // Module bindings
     // ========================================================================
 
 	static PyMethodDef SubutaiSLMethods[] = {
-		{"download", (PyCFunction)SL_Download, METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN"},
-		{"setTmpDir", (PyCFunction)SL_SetTmpDir, METH_VARARGS | METH_KEYWORDS, "Sets tmp output directory"},
-		{"isDownloadComplete", SL_IsDownloaded, METH_VARARGS, "Returns 1 if current download has been completed"},
-		{"GetTmpDir", SL_GetTmpDir, METH_VARARGS, "Returns tmp directory"},
-		{"GetInstallDir", SL_GetInstallDir, METH_VARARGS, "Returns installation directory"},
-		{"getProgress", SL_GetProgress, METH_VARARGS, "Returns bool"},
-		{"hello", SL_HelloWorld, METH_VARARGS, "Hello World method of subutai scripting language"},
-		{"debug", SL_Debug, METH_VARARGS, "Shows debug information about current launcher instance and environment"},
-		{"version", SL_Version, METH_VARARGS, "Display launcher version"},
-		{"CheckDirectories", SL_CheckDirectories, METH_VARARGS, "Display launcher version"},
-		{"RaiseError", (PyCFunction)SL_RaiseError, METH_VARARGS | METH_KEYWORDS, "Raising error"},
-		{"RaiseWarning", (PyCFunction)SL_RaiseWarning, METH_VARARGS | METH_KEYWORDS, "Raising warning"},
-		{"RaiseInfo", (PyCFunction)SL_RaiseInfo, METH_VARARGS | METH_KEYWORDS, "Raising info"},
-		{"VBox", (PyCFunction)SL_VBox, METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something"},
-		{"VBoxS", (PyCFunction)SL_VBoxS, METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something and returns status"},
-		{"Shutdown", SL_Shutdown, METH_VARARGS, "Finalizes the script"},
-		{"GetMasterVersion", SL_GetMasterVersion, METH_VARARGS, "Returns master version of a product"},
-		{"GetDevVersion", SL_GetDevVersion, METH_VARARGS, "Returns dev version of a product"},
+		{ "download", (PyCFunction)SL_Download, METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN" },
+		{ "setTmpDir", (PyCFunction)SL_SetTmpDir, METH_VARARGS | METH_KEYWORDS, "Sets tmp output directory" },
+		{ "isDownloadComplete", SL_IsDownloaded, METH_VARARGS, "Returns 1 if current download has been completed" },
+		{ "GetTmpDir", SL_GetTmpDir, METH_VARARGS, "Returns tmp directory" },
+		{ "GetInstallDir", SL_GetInstallDir, METH_VARARGS, "Returns installation directory" },
+		{ "getProgress", SL_GetProgress, METH_VARARGS, "Returns bool" },
+		{ "hello", SL_HelloWorld, METH_VARARGS, "Hello World method of subutai scripting language" },
+		{ "debug", SL_Debug, METH_VARARGS, "Shows debug information about current launcher instance and environment" },
+		{ "version", SL_Version, METH_VARARGS, "Display launcher version" },
+		{ "CheckDirectories", SL_CheckDirectories, METH_VARARGS, "Display launcher version" },
+		{ "RaiseError", (PyCFunction)SL_RaiseError, METH_VARARGS | METH_KEYWORDS, "Raising error" },
+		{ "RaiseWarning", (PyCFunction)SL_RaiseWarning, METH_VARARGS | METH_KEYWORDS, "Raising warning" },
+		{ "RaiseInfo", (PyCFunction)SL_RaiseInfo, METH_VARARGS | METH_KEYWORDS, "Raising info" },
+		{ "VBox", (PyCFunction)SL_VBox, METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something" },
+		{ "VBoxS", (PyCFunction)SL_VBoxS, METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something and returns status" },
+		{ "Shutdown", SL_Shutdown, METH_VARARGS, "Finalizes the script" },
+		{ "GetMasterVersion", SL_GetMasterVersion, METH_VARARGS, "Returns master version of a product" },
+		{ "GetDevVersion", SL_GetDevVersion, METH_VARARGS, "Returns dev version of a product" },
 		// New version
 		//{"ImportVirtualMachine", SL_importVirtualMachine, METH_VARARGS | METH_KEYWORDS, "Import a virtual machine into VB"},
-		{"GetDefaultRoutingInterface", SL_GetDefaultRoutingInterface, METH_VARARGS, "Returns name of default network interface"},
-		{"GetVBoxBridgedInterface", (PyCFunction)SL_GetVBoxBridgedInterface, METH_VARARGS | METH_KEYWORDS, "Returns name of default network interface"},
-		{"SetSSHCredentials", (PyCFunction)SL_SetSSHCredentials, METH_VARARGS | METH_KEYWORDS, "Set SSH Connection credentials"},
-		{"TestSSH", (PyCFunction)SL_TestSSH, METH_VARARGS, "Test if SSH connection is alive"},
-		{"InstallSSHKey", (PyCFunction)SL_InstallSSHKey, METH_VARARGS, "Install SSH public key"},
-		{"SSHRun", (PyCFunction)SL_SSHRun, METH_VARARGS | METH_KEYWORDS, "Run command over SSH"},
-		{"CheckVMExists", (PyCFunction)SL_CheckVMExists, METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name exists"},
-		{"CheckVMRunning", (PyCFunction)SL_CheckVMRunning, METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name running"},
-		{"GetScheme", SL_GetScheme, METH_VARARGS, "Returns current scheme: production, master, dev"},
-		{"StartProcedure", (PyCFunction)SL_StartProcedure, METH_VARARGS | METH_KEYWORDS, "Starts install/update/remove procedure"},
-		{"StopProcedure", SL_StopProcedure, METH_VARARGS, "Stops install/update/remove procedure"},
-		{"AddStatus", (PyCFunction)SL_AddStatus, METH_VARARGS | METH_KEYWORDS, "Add status"},
+		{ "GetDefaultRoutingInterface", SL_GetDefaultRoutingInterface, METH_VARARGS, "Returns name of default network interface" },
+		{ "GetVBoxBridgedInterface", (PyCFunction)SL_GetVBoxBridgedInterface, METH_VARARGS | METH_KEYWORDS, "Returns name of default network interface" },
+		{ "SetSSHCredentials", (PyCFunction)SL_SetSSHCredentials, METH_VARARGS | METH_KEYWORDS, "Set SSH Connection credentials" },
+		{ "TestSSH", (PyCFunction)SL_TestSSH, METH_VARARGS, "Test if SSH connection is alive" },
+		{ "InstallSSHKey", (PyCFunction)SL_InstallSSHKey, METH_VARARGS, "Install SSH public key" },
+		{ "SSHRun", (PyCFunction)SL_SSHRun, METH_VARARGS | METH_KEYWORDS, "Run command over SSH" },
+		{ "CheckVMExists", (PyCFunction)SL_CheckVMExists, METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name exists" },
+		{ "CheckVMRunning", (PyCFunction)SL_CheckVMRunning, METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name running" },
+		{ "GetScheme", SL_GetScheme, METH_VARARGS, "Returns current scheme: production, master, dev" },
+		{ "StartProcedure", (PyCFunction)SL_StartProcedure, METH_VARARGS | METH_KEYWORDS, "Starts install/update/remove procedure" },
+		{ "StopProcedure", SL_StopProcedure, METH_VARARGS, "Stops install/update/remove procedure" },
+		{ "AddStatus", (PyCFunction)SL_AddStatus, METH_VARARGS | METH_KEYWORDS, "Add status" },
 		//{"RootCommand", (PyCFunction)SL_RootCommand, METH_VARARGS | METH_KEYWORDS, "Executes root command"},
-		{"MakeLink", (PyCFunction)SL_MakeLink, METH_VARARGS | METH_KEYWORDS, "Executes ln -s on root behalf"},
-		{"GetDownloadProgress", SL_GetDownloadProgress, METH_VARARGS, "Return percentage of download"},
-		{"SetProgress", (PyCFunction)SL_SetProgress, METH_VARARGS | METH_KEYWORDS, "Sets action percentage"},
-		{"GetFileSize", (PyCFunction)SL_GetFileSize, METH_VARARGS | METH_KEYWORDS, "Gets remote file size"},
-		{"log", (PyCFunction)SL_Log, METH_VARARGS | METH_KEYWORDS, "Writes to log"},
-		{ "RegisterService", (PyCFunction)SL_RegisterService, METH_VARARGS | METH_KEYWORDS, "Writes to log" },
+		{ "MakeLink", (PyCFunction)SL_MakeLink, METH_VARARGS | METH_KEYWORDS, "Executes ln -s on root behalf" },
+		{ "GetDownloadProgress", SL_GetDownloadProgress, METH_VARARGS, "Return percentage of download" },
+		{ "SetProgress", (PyCFunction)SL_SetProgress, METH_VARARGS | METH_KEYWORDS, "Sets action percentage" },
+		{ "GetFileSize", (PyCFunction)SL_GetFileSize, METH_VARARGS | METH_KEYWORDS, "Gets remote file size" },
+		{ "log", (PyCFunction)SL_Log, METH_VARARGS | METH_KEYWORDS, "Writes to log" },
+		{ "RegisterService", (PyCFunction)SL_RegisterService, METH_VARARGS | METH_KEYWORDS, "Win32: Register new service" },
+		{ "UnregisterService", (PyCFunction)SL_UnregisterService, METH_VARARGS | METH_KEYWORDS, "Win32: Unregister service" },
 		{ "CreateDesktopShortcut", (PyCFunction)SL_CreateDesktopShortcut, METH_VARARGS | METH_KEYWORDS, "Creates a shortcut on a desktop" },
-        {NULL, NULL, 0, NULL}
+		{ "UpdatePath", SL_UpdatePath, METH_VARARGS, "Updates path variables on windows" },
+		{ "ProcessKill", (PyCFunction)SL_ProcessKill, METH_VARARGS | METH_KEYWORDS, "Kills a Windows process" },
+        { NULL, NULL, 0, NULL }
     };
 
 #if PY_MAJOR_VERSION >= 3

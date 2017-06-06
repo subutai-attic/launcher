@@ -35,9 +35,20 @@ void SLTest::testFailedScript()
 {
     SubutaiLauncher::Core *c = new SubutaiLauncher::Core(std::vector<std::string>());
     c->initializePython();
-    SubutaiLauncher::SL sl("./testsuite");
+    SubutaiLauncher::SL sl("../testsuite");
     sl.open("unit-test-failed-script");
-    sl.execute();
+	sl.execute();
+	/*
+	std::thread t;
+	try 
+	{
+		t = sl.executeInThread();
+	}
+	catch (SubutaiLauncher::SLException& e)
+	{
+		std::printf("Exception %s\n", e.displayText().c_str());
+	}
+	if (t.joinable()) t.join();*/
     delete c;
 }
 
