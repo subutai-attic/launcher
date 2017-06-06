@@ -7,9 +7,10 @@ from subprocess import call
 def subutaistart():
 
     m = hashlib.md5()
-    machineName = "subutai-" + m.hexdigest()
+    m.update(b'subutaivm')
+    machineName = "subutai-w" + m.hexdigest()
 
-    call(['ssh-keygen', '-R', '[127.0.0.1]:4567'])
+    #call(['ssh-keygen.exe', '-R', '[127.0.0.1]:4567'])
 
     subutai.SetSSHCredentials("subutai", "ubuntai", "127.0.0.1", 4567)
 
@@ -119,32 +120,17 @@ def setupVm(machineName):
         subutai.download("core.ova")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
-        subutai.download("subutai_4.0.15_amd64-dev.snap")
-        while subutai.isDownloadComplete() != 1:
-            sleep(0.05)
-        subutai.VBox("import /tmp/subutai/core.ova")
+        subutai.VBox("import " + subutai.GetTmpDir().replace(" ", "+++") + "core.ova")
         subutai.VBox("modifyvm core --cpus 2")
         subutai.VBox("modifyvm core --nic1 nat")
         subutai.VBox("modifyvm core --cableconnected1 on")
         subutai.VBox("modifyvm core --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
         subutai.VBox("modifyvm core --rtcuseutc on")
+        adapterName = "VirtualBox+++Host-Only+++Ethernet+++Adapter"
+        subutai.VBox("modifyvm core --nic3 hostonly --hostonlyadapter3 "+adapterName)
         ret = subutai.VBoxS("modifyvm core --name " + machineName)
         if ret != 0:
             subutai.log("error", "Machine already exists")
-
-    return
-
-
-def installSubutai(snapFile, user, host, port):
-    subutai.download("launcher-prepare-server")
-    while subutai.isDownloadComplete() != 1:
-        sleep(0.05)
-
-    call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/launcher-prepare-server', 'ubuntu@127.0.0.1:~/prepare-server'])
-    call(['/usr/bin/scp', '-P4567', '-o', 'StrictHostKeyChecking=no', '/tmp/subutai/subutai_4.0.15_amd64-dev.snap', 'ubuntu@127.0.0.1:~/subutai_latest.snap'])
-
-    subutai.SSHRun("sudo chmod +x /home/ubuntu/prepare-server")
-    subutai.SSHRun("sudo /home/ubuntu/prepare-server")
 
     return
 
@@ -159,15 +145,16 @@ def reconfigureNic(machineName):
     subutai.VBox("modifyvm " + machineName + " --cableconnected2 on")
     subutai.VBox("modifyvm " + machineName + ' --natpf2 ssh-fwd,tcp,,4567,,22 --natpf2 https-fwd,tcp,,9999,,8443')
 
-    ret = subutai.VBoxS("hostonlyif ipconfig vboxnet0 --ip 192.168.56.1")
+    adapterName = "VirtualBox+++Host-Only+++Ethernet+++Adapter"
+    ret = subutai.VBoxS("hostonlyif ipconfig " + adapterName + " --ip 192.168.56.1")
 
     if ret == 1:
         subutai.VBox("hostonlyif create")
-        subutai.VBox("hostonlyif ipconfig vboxnet0 --ip 192.168.56.1")
-        subutai.VBox("dhcpserver add --ifname vboxnet0 --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
-        subutai.VBox("dhcpserver modify --ifname vboxnet0 --enable")
+        subutai.VBox("hostonlyif ipconfig " + adapterName + " --ip 192.168.56.1")
+        subutai.VBox("dhcpserver add --ifname " + adapterName + " --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
+        subutai.VBox("dhcpserver modify --ifname " + adapterName + " --enable")
 
-    subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 vboxnet0")
+    subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
 
     return
 

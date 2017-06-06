@@ -21,11 +21,21 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/Logger.h"
 #include "Poco/File.h"
+#include "Poco/Path.h"
 #include "Session.h"
 
 #if LAUNCHER_WINDOWS
 #include <windows.h>
+#include <VersionHelpers.h>
 #include <WinSock2.h>
+#include <shlobj.h>
+#include <winnls.h>
+#include <shobjidl.h>
+#include <objbase.h>
+#include <objidl.h>
+#include <shlguid.h>
+#include <tlhelp32.h>
+//#include <atlbase.h>
 #include <IPHlpApi.h>
 #pragma comment(lib, "IPHLPAPI.LIB")
 #define ENV_MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
@@ -57,7 +67,14 @@ namespace SubutaiLauncher {
 			// Windows only
 			bool isNSSMInstalled();
 			bool registerService(const std::string& name, const std::string& path, std::vector<std::string> args);
+			bool unregisterService(const std::string& name);
+			void CreateShortcut(const std::string& source, const std::string& name);
+			void updatePath();
+			bool killProcess(const std::string& name);
         private:
+#if LAUNCHER_WINDOWS
+			BOOL terminateWinProcess(DWORD dwProcessId, UINT uExitCode);
+#endif
             Poco::Logger* _logger;
     };
 

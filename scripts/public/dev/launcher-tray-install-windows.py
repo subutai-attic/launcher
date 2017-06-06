@@ -1,19 +1,20 @@
 import subutai
 from time import sleep
-from shutil import copyfile
 import os
-import stat
-from subprocess import call
-import tarfile
+import zipfile
 
 
 def subutaistart():
     subutai.AddStatus("Download Tray application")
 
-    tray = "SubutaiTray_libs_osx.tar.gz"
-    libssh = "libssh2-1.6.0-0_osx.pkg"
+    tray = "SubutaiTray_libs.zip"
+    sshlib = "ssh.zip"
 
     subutai.download(tray)
+    while subutai.isDownloadComplete() != 1:
+        sleep(0.05)
+
+    subutai.download(sshlib)
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
 
@@ -22,15 +23,15 @@ def subutaistart():
 
     subutai.AddStatus("Installing Tray")
 
-    tar = tarfile.open(tmpDir+"/"+tray, "r:gz")
-    tar.extractall("/Applications/Subutai")
-    tar.close()
+    zf = zipfile.ZipFile(tmpDir+"/"+tray, 'r')
+    zf.extractall(installDir)
+    zf.close()
 
-    subutai.AddStatus("Installing Tray dependencies")
-    subutai.download(libssh)
-    while subutai.isDownloadComplete() != 1:
-        sleep(0.05)
+    zfl = zipfile.ZipFile(tmpDir+"/"+sshlib, 'r')
+    zfl.extractall(installDir+"/bin")
+    zfl.close()
 
-    call(['installer', '-pkg', tmpDir+'/'+libssh, '-target', installDir])
+    subutai.CreateDesktopShortcut(installDir+"/tray/SubutaiTray.exe",
+                                  "Subutai Tray")
 
     subutai.Shutdown()

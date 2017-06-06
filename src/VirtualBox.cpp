@@ -25,10 +25,16 @@ SubutaiLauncher::VirtualBox::~VirtualBox()
 
 std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::getPeers() 
 {
+	if (_path == "")
+	{
+		findInstallation();
+	}
+	_logger->trace("Retrieving list of peers");
     Poco::Process::Args args;
     args.push_back("list");
     args.push_back("vms");
 
+	_logger->trace("Executing %s", _path);
     Poco::Pipe pOut;
     Poco::ProcessHandle ph = Poco::Process::launch(_path, args, 0, &pOut, 0);
     ph.wait();
@@ -164,13 +170,19 @@ std::string SubutaiLauncher::VirtualBox::execute(const std::string& command)
     {
         findInstallation();
     }
+	
     _logger->information("VB: Executing '%s %s'", _path, command);
     Poco::Process::Args args;
     Poco::StringTokenizer st(command, " ", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
+
     for (auto it = st.begin(); it != st.end(); it++)
     {
-        _logger->trace("Adding arguments %s", (*it));
-        args.push_back((*it));
+        
+
+		// Replacing +++ with spaces here to fix path issues
+		std::string pCommand = Poco::replace((*it), "+++", " ");
+		_logger->trace("Adding arguments %s [%s]", (*it), pCommand);
+        args.push_back(pCommand);
     }
 
     Poco::Pipe output;
@@ -204,7 +216,10 @@ std::string SubutaiLauncher::VirtualBox::execute(const std::string& command, int
     Poco::StringTokenizer st(command, " ", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
     for (auto it = st.begin(); it != st.end(); it++)
     {
-        args.push_back((*it));
+		// Replacing +++ with spaces here to fix path issues
+		std::string pCommand = Poco::replace((*it), "+++", " ");
+		_logger->trace("Adding arguments %s [%s]", (*it), pCommand);
+		args.push_back(pCommand);
     }
 
     Poco::Pipe output;
@@ -252,19 +267,23 @@ std::string SubutaiLauncher::VirtualBox::getMachineInfo(const std::string& name)
 
 bool SubutaiLauncher::VirtualBox::isMachineExists(const std::string& name)
 {
+	_logger->trace("Checking %s VM exists", name);
     auto list = getPeers();
     for (auto it = list.begin(); it != list.end(); it++) 
 	{
         if ((*it).name == name) 
 		{
+			_logger->trace("%s exists", name);
             return true;
         }
     }
+	_logger->trace("%s does not exists", name);
     return false;
 }
 
 bool SubutaiLauncher::VirtualBox::isMachineRunning(const std::string& name)
 {
+	_logger->trace("Checking %s VM running", name);
     auto list = getPeers();
     for (auto it = list.begin(); it != list.end(); it++) 
 	{

@@ -5,7 +5,7 @@ import os
 def subutaistart():
     subutai.AddStatus("Installing Browser Plugin")
 
-    location = os.environ['HOME'] + '/Library/Application Support/Google/Chrome/External Extensions'
+    location = os.environ['USERPROFILE'] + '/Library/Application Support/Google/Chrome/External Extensions'
     if not os.path.exists(location):
         os.makedirs(location)
 

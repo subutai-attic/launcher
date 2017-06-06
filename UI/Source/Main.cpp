@@ -29,6 +29,8 @@ UIApplication::UIApplication()
 	{
 		Poco::Logger::get("subutai").error(e.displayText());
 	}
+	SubutaiLauncher::Environment env;
+	env.updatePath();
 }
 
 const juce::String UIApplication::getApplicationName()
