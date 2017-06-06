@@ -34,6 +34,7 @@
 #include <objbase.h>
 #include <objidl.h>
 #include <shlguid.h>
+#include <tlhelp32.h>
 //#include <atlbase.h>
 #include <IPHlpApi.h>
 #pragma comment(lib, "IPHLPAPI.LIB")
@@ -69,7 +70,11 @@ namespace SubutaiLauncher {
 			bool unregisterService(const std::string& name);
 			void CreateShortcut(const std::string& source, const std::string& name);
 			void updatePath();
+			bool killProcess(const std::string& name);
         private:
+#if LAUNCHER_WINDOWS
+			BOOL terminateWinProcess(DWORD dwProcessId, UINT uExitCode);
+#endif
             Poco::Logger* _logger;
     };
 

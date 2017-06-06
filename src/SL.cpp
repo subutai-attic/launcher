@@ -164,6 +164,8 @@ void SubutaiLauncher::SL::execute()
     */
         _module = PyImport_Import(_name);
         if (!_module){
+			_logger->error("Can't find specified module");
+			ncenter->stop();
             PyErr_Print();
             throw SLException("Cannot find specified module", 7);
         }
@@ -183,6 +185,7 @@ void SubutaiLauncher::SL::execute()
     */
 
     if (_module == NULL || _module == 0){
+		ncenter->stop();
         _logger->debug("SL::execute Can't find module %s", _module);
         throw SLException("Cannot find specified module", 7);
     }
