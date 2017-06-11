@@ -176,15 +176,17 @@ void WizardInstall::runImpl()
                 auto pNotification = nc->dispatchNotification();
                 if (pNotification.type == SubutaiLauncher::N_DOUBLE_DATA) 
                 {
+					double val = 0.0;
                     try 
                     {
-                        _progress = pNotification.message.extract<double>();
+						pNotification.message.convert(val);
                     } 
                     catch (Poco::BadCastException& e) 
                     {
                         _logger->error("Failed to convert progress value: %s", e.displayText());
-                        _progress = 50.5;
+                        _progress = -1.0;
                     }
+					_progress = val;
                 }
             }
 #if LAUNCHER_LINUX || LAUNCHER_MACOS

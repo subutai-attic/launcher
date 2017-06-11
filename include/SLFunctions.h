@@ -39,7 +39,8 @@ namespace SubutaiLauncher
     static char const* sl_desc = "";
     static char const* sl_destination = "";
 
-    static double const* sl_double;
+    //static double const* sl_double;
+	static double sl_double;
 
     // SSH
     static char const* ssh_user;        // SSH User
@@ -579,12 +580,15 @@ namespace SubutaiLauncher
 
     static PyObject* SL_SetProgress(PyObject* self, PyObject* args, PyObject* keywords)
     {  
+		std::printf("111\n");
 		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+		std::printf("222\n");
         //Poco::Logger::get("subutai").information("SL_SetProgress");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "d", double_keywords, &sl_double))
             return NULL;
 
-		Poco::DynamicAny pProgress(sl_double);
+		std::printf("DOUBLE: %f\n", sl_double);
+		Poco::Dynamic::Var pProgress = sl_double;
         Session::instance()->getNotificationCenter()->notificationRaised(N_DOUBLE_DATA, pProgress);
         return Py_BuildValue("i", 0);
     }

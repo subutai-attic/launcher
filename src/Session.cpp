@@ -3,6 +3,7 @@
 SubutaiLauncher::Session* SubutaiLauncher::Session::_instance = NULL;
 
 SubutaiLauncher::Session::Session() :
+	_terminate(false),
     _sshUser(""),
     _sshPass(""),
     _sshHostname(""),
