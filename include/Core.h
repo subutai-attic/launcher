@@ -20,6 +20,9 @@
 #include <Poco/AutoPtr.h>
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/AcceptCertificateHandler.h"
+#include "Poco/Timestamp.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeFormatter.h"
 
 #include "SL.h"
 #include "SLFunctions.h"

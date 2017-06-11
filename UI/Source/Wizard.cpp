@@ -8,6 +8,7 @@ Wizard::Wizard() :
     _shutdown(false)
 {
     _logger = &Poco::Logger::get("subutai");
+	SubutaiLauncher::Session::instance()->start();
 #if LAUNCHER_LINUX
     SubutaiLauncher::RootProcess* rp = new SubutaiLauncher::RootProcess();
     rp->addCommand("mkdir -p /opt/subutai");

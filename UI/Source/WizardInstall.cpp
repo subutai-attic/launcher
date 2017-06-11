@@ -154,7 +154,7 @@ void WizardInstall::runImpl()
             auto st = SubutaiLauncher::Session::instance()->getStatus();
             if (st != "") addLine(st);
             auto e = nc->dispatch();
-            if (e == SubutaiLauncher::SCRIPT_FINISHED) 
+            if (e == SubutaiLauncher::SCRIPT_FINISHED || SubutaiLauncher::Session::instance()->isTerminating()) 
             {
                 //pScriptThread.join();
                 addLine("Script execution completed");
@@ -178,12 +178,12 @@ void WizardInstall::runImpl()
                 {
                     try 
                     {
-                        _progress = pNotification.message.convert<double>();
+                        _progress = pNotification.message.extract<double>();
                     } 
-                    catch (Poco::BadCastException e) 
+                    catch (Poco::BadCastException& e) 
                     {
-                        _logger->error("Failed to convert progress value");
-                        _progress = 1.0;
+                        _logger->error("Failed to convert progress value: %s", e.displayText());
+                        _progress = 50.5;
                     }
                 }
             }

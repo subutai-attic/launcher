@@ -244,9 +244,42 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
 		while (pAdapter)
 		{
 			// TODO: Make sure we are returning default one here
-			if (pAdapterInfo) ENV_FREE(pAdapterInfo);
-			return std::string(pAdapter->AdapterName);
+			
+			std::string pName = std::string(pAdapter->AdapterName);
+			
+			
+			_logger->information("Network adapter name: %s", pName);
+			_logger->information("Adapter description: %s", std::string(pAdapter->Description));
 
+			_logger->debug("Retrievin adapetr infor from windows registry");
+			std::string baseKey = "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Network\\{4d36e972-e325-11ce-bfc1-08002be10318}";
+			Poco::Util::WinRegistryKey key(baseKey, true);
+			if (!key.exists())
+			{
+				_logger->error("Network registry key doesn't exists");
+				continue;
+			}
+			std::string subkey = baseKey + "\\" + pName;
+			Poco::Util::WinRegistryKey pSubKey(subkey, true);
+			if (!pSubKey.exists())
+			{
+				_logger->error("Network registry subkey doesn't exists");
+				continue;
+			}
+			Poco::Util::WinRegistryKey pConnectionKey(subkey + "\\Connection", true);
+			if (!pConnectionKey.exists())
+			{
+				_logger->error("Network registry connection doesn't exists");
+				continue;
+			}
+
+			std::string pNiceName = pConnectionKey.getString("Name");
+			_logger->information("Adapter name: %s", pNiceName);
+
+			if (pAdapterInfo) ENV_FREE(pAdapterInfo);
+			return pNiceName;
+
+			// This is unreachiable due to previous TODO
 			pAdapter = pAdapter->Next;
 		}
 	}

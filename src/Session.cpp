@@ -91,3 +91,18 @@ Poco::Logger& SubutaiLauncher::Session::logger()
 {
     return Poco::Logger::get("SubutaiLogger");
 }
+
+bool SubutaiLauncher::Session::isTerminating()
+{
+	return _terminate;
+}
+
+void SubutaiLauncher::Session::terminate()
+{
+	_terminate = true;
+}
+
+void SubutaiLauncher::Session::start()
+{
+	_terminate = false;
+}
