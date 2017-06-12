@@ -40,6 +40,8 @@
 #pragma comment(lib, "IPHLPAPI.LIB")
 #define ENV_MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
 #define ENV_FREE(x) HeapFree(GetProcessHeap(), 0, (x))
+
+#include "Poco/Util/WinRegistryKey.h"
 #elif LAUNCHER_MACOS
 #include <sys/sysctl.h>
 #endif

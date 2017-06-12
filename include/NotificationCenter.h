@@ -21,19 +21,20 @@ namespace SubutaiLauncher
         SHOW_MESSAGE
     };
 
-    enum NotificationType
+    typedef enum
     {
         N_EMPTY = 0,
         N_ERROR,
         N_WARNING,
         N_INFO,
-        N_DOUBLE_DATA
-    };
+        N_DOUBLE_DATA,
+		N_GENERIC
+    } NotificationType;
 
     struct NotificationMessage
     {
         NotificationType type;
-        Poco::DynamicAny message;
+        Poco::Dynamic::Var message;
     };
 
     typedef std::deque<ScriptAction> EventPool;
@@ -55,7 +56,7 @@ namespace SubutaiLauncher
 
             // Specific events 
 
-            void notificationRaised(NotificationType t, Poco::DynamicAny v);
+            void notificationRaised(NotificationType t, Poco::Dynamic::Var v);
             NotificationMessage dispatchNotification();
             bool notificationEmpty();
             void clear();

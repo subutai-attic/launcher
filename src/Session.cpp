@@ -3,6 +3,7 @@
 SubutaiLauncher::Session* SubutaiLauncher::Session::_instance = NULL;
 
 SubutaiLauncher::Session::Session() :
+	_terminate(false),
     _sshUser(""),
     _sshPass(""),
     _sshHostname(""),
@@ -90,4 +91,19 @@ std::string SubutaiLauncher::Session::getStatus()
 Poco::Logger& SubutaiLauncher::Session::logger()
 {
     return Poco::Logger::get("SubutaiLogger");
+}
+
+bool SubutaiLauncher::Session::isTerminating()
+{
+	return _terminate;
+}
+
+void SubutaiLauncher::Session::terminate()
+{
+	_terminate = true;
+}
+
+void SubutaiLauncher::Session::start()
+{
+	_terminate = false;
 }

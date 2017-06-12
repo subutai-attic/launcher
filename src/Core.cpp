@@ -143,10 +143,13 @@ void SubutaiLauncher::Core::setupLogger()
     pFormatter->setProperty("times", "local");
     pSplitter->addChannel(pChannel);
     pSplitter->addChannel(cConsole);
+	Poco::DateTime dt;
+	Poco::Timestamp now;
+	std::string filename = "subutai-launcer-" + Poco::DateTimeFormatter::format(now, "%Y-%m-%d_%H-%M-%S") + ".log";
 #if LAUNCHER_MACOS
-    pChannel->setProperty("path", "/usr/local/share/subutai/log/subutai-launcher.log");
+    pChannel->setProperty("path", "/usr/local/share/subutai/log/" + filename);
 #elif LAUNCHER_LINUX
-    pChannel->setProperty("path", "/opt/subutai/log/subutai-launcher.log");
+    pChannel->setProperty("path", "/opt/subutai/log/" + filename);
 #else
 	std::string path = "C:\\Subutai";
 	try
@@ -156,7 +159,7 @@ void SubutaiLauncher::Core::setupLogger()
 		path.append("\\subutai\\log");
 		Poco::File f(path);
 		if (!f.exists()) f.createDirectories();
-		path.append("\\subutai-launcher.log");
+		path.append("\\" + filename);
 	}
 	catch (Poco::NotFoundException& e)
 	{

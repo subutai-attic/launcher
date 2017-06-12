@@ -31,7 +31,11 @@ namespace SubutaiLauncher
             void addStatus(const std::string& text);
             std::string getStatus();
             Poco::Logger& logger();
+			bool isTerminating();
+			void terminate();
+			void start();
         private:
+			bool _terminate;
             //SubutaiLauncher::VirtualBox* _virtualBox;
             Downloader* _downloader;
             Settings* _settings;

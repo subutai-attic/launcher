@@ -25,6 +25,7 @@ WizardWindow::~WizardWindow()
 void WizardWindow::closeButtonPressed()
 {
     _logger->trace("WizardWindow: Close Button Pressed");
+	SubutaiLauncher::Session::instance()->terminate();
     delete this;
 }
 

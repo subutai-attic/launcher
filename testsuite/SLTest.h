@@ -16,6 +16,9 @@ public:
     void testFailedScript();
     void testFailedScriptThread();
 
+	// Test functions
+	void testSLF_SetProgress();
+
 	static CppUnit::Test* suite();
 };
 

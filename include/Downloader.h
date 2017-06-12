@@ -61,6 +61,7 @@ namespace SubutaiLauncher
         public:
             static const std::string URL;
             static const std::string REST;
+			static const std::string TREST;
             static const std::string HOST;
             static const int PORT = 8338;
 
@@ -68,7 +69,8 @@ namespace SubutaiLauncher
             ~Downloader();
             void reset();
             void setFilename(const std::string& filename);
-            bool retrieveFileInfo();
+            bool retrieveFileInfo(bool tmpl = false);
+			bool retrieveTemplateInfo();
             SubutaiFile info();
             std::thread download();
             void downloadImpl();

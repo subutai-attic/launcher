@@ -170,7 +170,8 @@ int SubutaiLauncher::SSH::verifyHost()
     return 0;
 }
 
-std::string SubutaiLauncher::SSH::execute(const std::string& command){
+std::string SubutaiLauncher::SSH::execute(const std::string& command)
+{
     ssh_channel chan;
     int rc;
     char buffer[1024];
