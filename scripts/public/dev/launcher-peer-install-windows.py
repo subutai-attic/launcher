@@ -21,7 +21,7 @@ def subutaistart():
         subutai.Shutdown()
         return
 
-    subutai.SetProgress(4.0)
+    subutai.SetProgress(0.04)
     sleep(6)
     startVm(machineName)
     sleep(60)
@@ -29,22 +29,34 @@ def subutaistart():
     sleep(60)
     setupSSH()
     installSnapFromStore()
-    subutai.SetProgress(10.0)
+    subutai.SetProgress(0.10)
     sleep(60)
     initBtrfs()
-    subutai.SetProgress(20.0)
-    sleep(60)
+    subutai.SetProgress(0.20)
+    sleep(5)
     setAlias()
-    subutai.SetProgress(30.0)
+    subutai.SetProgress(0.30)
     sleep(10)
     installManagement()
-    subutai.SetProgress(80.0)
-    sleep(60)
+    subutai.SetProgress(0.80)
+    #subutai.AddStatus("Waiting for management container to download")
+    #rc = waitManagementInstall()
+    #if rc == 1:
+    #    subutai.RaiseError("Failed to install management: Operating timed out")
+    #    sleep(10)
+    #    subutai.Shutdown()
+    #    return
+
+    subutai.SetProgress(0.42)
+    sleep(30)
     stopVm(machineName)
+    subutai.SetProgress(0.82)
     sleep(5)
     reconfigureNic(machineName)
+    subutai.SetProgress(0.9)
     sleep(5)
     startVm(machineName)
+    subutai.SetProgress(1.0)
 
     subutai.Shutdown()
 
@@ -65,11 +77,35 @@ def waitSSH():
 
 
 def installManagement():
+    subutai.AddStatus("Downloading Ubuntu")
+    subutai.SSHRun("sudo subutai -d import ubuntu16 1>/tmp/ubuntu16-1.log 2>/tmp/ubuntu16-2.log")
+
+    subutai.AddStatus("Downloading JVM")
+    subutai.SSHRun("sudo subutai -d import openjre16 1>/tmp/openjre16-1.log 2>/tmp/openjre16-2.log")
+
     subutai.AddStatus("Installing Management Container")
-    subutai.log("info", "Installing management")
-    subutai.SSHRun("sudo subutai -d import management")
+    subutai.SSHRun("sudo subutai -d import management 1>/tmp/management-1.log 2>/tmp/management-2.log")
 
     return
+
+
+def waitManagementInstall():
+    rsize = subutai.GetRemoteTemplateSize("management-subutai-template_4.0.16-dev_amd64.tar.gz")
+    dsize = subutai.GetPeerFileSize("/var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_4.0.16-dev_amd64.tar.gz")
+
+    timeout = datetime.datetime.now() + datetime.timedelta(0, 120)
+
+    if rsize <= 0:
+        return 1
+
+    while rsize + 10 < dsize:
+        sleep(0.1)
+        percent = dsize / rsize * 100
+        subutai.SetProgress(percent / 100)
+        if datetime.datetime.now() > timeout:
+            return 1
+
+    return 0
 
 
 def installSnapFromStore():
