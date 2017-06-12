@@ -39,7 +39,8 @@ namespace SubutaiLauncher
     static char const* sl_desc = "";
     static char const* sl_destination = "";
 
-    static double const* sl_double;
+    //static double const* sl_double;
+	static double sl_double;
 
     // SSH
     static char const* ssh_user;        // SSH User
@@ -70,6 +71,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_HelloWorld(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_HelloWorld");
         return Py_BuildValue("s", "Hello, World!");
     }
@@ -78,6 +80,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_GetScheme(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //std::printf("GetScheme: %s\n", BUILD_SCHEME);
         //Poco::Logger::get("subutai").information("SL_GetScheme");
         return Py_BuildValue("s", "Hello, World!");
@@ -87,6 +90,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_Debug(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_Debug");
         return Py_BuildValue("s", "Debug");
     }
@@ -95,6 +99,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_Version(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_Version");
         return Py_BuildValue("s", "Version: 0.1.0");
     }
@@ -103,6 +108,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_GetMasterVersion(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_GetMasterVersion");
         return Py_BuildValue("s", "4.0.15");
     }
@@ -111,6 +117,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_GetDevVersion(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_GetDevVersion");
         return Py_BuildValue("s", "4.0.16");
     }
@@ -119,6 +126,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_Shutdown(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_Shutdown");
         Session::instance()->getNotificationCenter()->add(SCRIPT_FINISHED);
         return Py_BuildValue("i", 1);
@@ -128,6 +136,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_CheckDirectories(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_CheckDirectories");
         Session::instance()->getNotificationCenter()->add(SCRIPT_FINISHED);
         auto settings = Session::instance()->getSettings();
@@ -179,6 +188,7 @@ namespace SubutaiLauncher
             PyObject* args, 
             PyObject* keywords) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_Download");
         if (!PyArg_ParseTupleAndKeywords(
                     args, keywords, "s|i", download_keywords, &sl_filename))
@@ -210,6 +220,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_IsDownloaded(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_IsDownloaded");
         auto downloader = Session::instance()->getDownloader();
         if (downloader->isDone())
@@ -227,6 +238,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_GetProgress(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_GetProgress");
         auto downloader = Session::instance()->getDownloader();
         auto percent = downloader->getPercent();
@@ -237,6 +249,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_GetTmpDir(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_GetTmpDir");
         auto settings = Session::instance()->getSettings();
         auto path = settings->getTmpPath().c_str();
@@ -247,6 +260,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_GetInstallDir(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_GetInstallDir");
         auto settings = Session::instance()->getSettings();
         auto path = settings->getInstallationPath().c_str();
@@ -257,6 +271,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_SetTmpDir(PyObject* self, PyObject* args, PyObject* keywords) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_SetTmpDir");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", tmpdir_keywords, &sl_tmpdir))
             return NULL;
@@ -272,10 +287,11 @@ namespace SubutaiLauncher
 
     static PyObject* SL_RaiseError(PyObject* self, PyObject* args, PyObject* keywords) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_RaiseError");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
-        Poco::DynamicAny v(sl_string);
+        Poco::Dynamic::Var v = sl_string;
         Session::instance()->getNotificationCenter()->notificationRaised(N_ERROR, v);
         return Py_BuildValue("i", 1);
     }
@@ -284,10 +300,11 @@ namespace SubutaiLauncher
 
     static PyObject* SL_RaiseWarning(PyObject* self, PyObject* args, PyObject* keywords) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_RaiseWarning");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
-        Poco::DynamicAny v(sl_string);
+        Poco::Dynamic::Var v = sl_string;
         Session::instance()->getNotificationCenter()->notificationRaised(N_WARNING, v);
         return Py_BuildValue("i", 1);
     }
@@ -296,10 +313,11 @@ namespace SubutaiLauncher
 
     static PyObject* SL_RaiseInfo(PyObject* self, PyObject* args, PyObject* keywords) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_RaiseInfo");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
-        Poco::DynamicAny v(sl_string);
+        Poco::Dynamic::Var v = sl_string;
         Session::instance()->getNotificationCenter()->notificationRaised(N_INFO, v);
         return Py_BuildValue("i", 1);
     }
@@ -308,6 +326,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_VBox(PyObject* self, PyObject* args, PyObject* keywords) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_VBox");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
@@ -324,6 +343,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_VBoxS(PyObject* self, PyObject* args, PyObject* keywords) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_VBoxS");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
@@ -338,6 +358,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_GetDefaultRoutingInterface(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_GetDefaultRoutingInterface");
         Environment env;
         return Py_BuildValue("s", env.getDefaultGateway().c_str());
@@ -351,6 +372,7 @@ namespace SubutaiLauncher
             PyObject* keywords
             ) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_GetVBoxBridgedInterface");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
@@ -366,6 +388,7 @@ namespace SubutaiLauncher
             PyObject* keywords
             ) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_SetSSHCredentials");
         if (!PyArg_ParseTupleAndKeywords(
                     args, 
@@ -388,6 +411,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_TestSSH(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_TestSSH");
         SSH *p = new SubutaiLauncher::SSH();
         auto s = Session::instance();
@@ -407,6 +431,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_InstallSSHKey(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_InstallSSHKey");
         auto s = Session::instance();
 
@@ -449,6 +474,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_SSHRun(PyObject* self, PyObject* args, PyObject* keywords) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_SSHRun");
         if (!PyArg_ParseTupleAndKeywords(
                     args, 
@@ -477,6 +503,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_StartProcedure(PyObject* self, PyObject* args, PyObject* keywords) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_StartProcedure");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
             return NULL;
@@ -487,6 +514,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_StopProcedure(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_StopProcedure");
         return Py_BuildValue("i", 0);
     }
@@ -497,6 +525,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_CheckVMExists(PyObject* self, PyObject* args, PyObject* keywords) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_CheckVMExists");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
             return NULL;
@@ -512,6 +541,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_CheckVMRunning(PyObject* self, PyObject* args, PyObject* keywords) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_CheckVMRunning");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
             return NULL;
@@ -527,6 +557,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_AddStatus(PyObject* self, PyObject* args, PyObject* keywords) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_AddStatus");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
             return NULL;
@@ -539,6 +570,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_GetDownloadProgress(PyObject* self, PyObject* args) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_GetDownloadProgress");
         auto pProgress = Session::instance()->getDownloader()->getPercent();
         return Py_BuildValue("d", pProgress);
@@ -548,11 +580,15 @@ namespace SubutaiLauncher
 
     static PyObject* SL_SetProgress(PyObject* self, PyObject* args, PyObject* keywords)
     {  
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+		
         //Poco::Logger::get("subutai").information("SL_SetProgress");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "d", double_keywords, &sl_double))
             return NULL;
 
-        Session::instance()->getNotificationCenter()->notificationRaised(N_DOUBLE_DATA, sl_double);
+		std::printf("DOUBLE: %f\n", sl_double);
+		Poco::Dynamic::Var pProgress = sl_double;
+        Session::instance()->getNotificationCenter()->notificationRaised(N_DOUBLE_DATA, pProgress);
         return Py_BuildValue("i", 0);
     }
 
@@ -560,6 +596,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_GetFileSize(PyObject* self, PyObject* args, PyObject* keywords) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_GetFileSize");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
             return NULL;
@@ -578,6 +615,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_MakeLink(PyObject* self, PyObject* args, PyObject* keywords) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_MakeLink");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
             return NULL;
@@ -610,6 +648,7 @@ namespace SubutaiLauncher
 
     static PyObject* SL_Log(PyObject* self, PyObject* args, PyObject* keywords) 
     {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_Log");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
             return NULL;
@@ -622,6 +661,7 @@ namespace SubutaiLauncher
 
 	static PyObject* SL_RegisterService(PyObject* self, PyObject* args, PyObject* keywords)
 	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
 		if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
 			return NULL;
 
@@ -655,6 +695,7 @@ namespace SubutaiLauncher
 
 	static PyObject* SL_UnregisterService(PyObject* self, PyObject* args, PyObject* keywords)
 	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
 		if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
 			return NULL;
 
@@ -671,6 +712,7 @@ namespace SubutaiLauncher
 
 	static PyObject* SL_CreateDesktopShortcut(PyObject* self, PyObject* args, PyObject* keywords)
 	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
 		if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
 			return NULL;
 
@@ -683,6 +725,7 @@ namespace SubutaiLauncher
 
 	static PyObject* SL_UpdatePath(PyObject* self, PyObject* args)
 	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
 		Environment e;
 		e.updatePath();
 		return Py_BuildValue("i", 0);
@@ -692,6 +735,7 @@ namespace SubutaiLauncher
 
 	static PyObject* SL_ProcessKill(PyObject* self, PyObject* args, PyObject* keywords)
 	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
 		if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
 			return NULL;
 
@@ -702,6 +746,81 @@ namespace SubutaiLauncher
 			return Py_BuildValue("i", 0);
 		}
 		return Py_BuildValue("i", 1);
+	}
+
+	// ========================================================================
+
+	static PyObject* SL_GetRemoteFileSize(PyObject* self, PyObject* args, PyObject* keywords)
+	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+		if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+			return NULL;
+
+		auto downloader = Session::instance()->getDownloader();
+
+		downloader->setFilename(std::string(sl_string));
+		if (!downloader->retrieveFileInfo())
+		{
+			Session::instance()
+				->getNotificationCenter()
+				->notificationRaised(
+					N_ERROR,
+					Poco::DynamicAny("Failed to retrieve file data"));
+			return Py_BuildValue("i", -1);
+		}
+		auto info = downloader->info();
+		
+		return Py_BuildValue("i", info.size);
+	}
+
+	// ========================================================================
+
+	static PyObject* SL_GetRemoteTemplateSize(PyObject* self, PyObject* args, PyObject* keywords)
+	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+		if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+			return NULL;
+
+		auto downloader = Session::instance()->getDownloader();
+
+		downloader->setFilename(std::string(sl_string));
+		if (!downloader->retrieveTemplateInfo())
+		{
+			Session::instance()
+				->getNotificationCenter()
+				->notificationRaised(
+					N_ERROR,
+					Poco::DynamicAny("Failed to retrieve file data"));
+			return Py_BuildValue("i", -1);
+		}
+		auto info = downloader->info();
+
+		return Py_BuildValue("i", info.size);
+	}
+
+	// ========================================================================
+
+	static PyObject* SL_GetPeerFileSize(PyObject* self, PyObject* args, PyObject* keywords)
+	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+		if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+			return NULL;
+
+		auto s = Session::instance();
+
+		SSH *p = new SubutaiLauncher::SSH();
+		p->setHost(s->getSSHHostname(), s->getSSHPort());
+		p->setUsername(s->getSSHUser(), s->getSSHPass());
+		p->connect();
+		p->authenticate();
+		std::string cmd("ls -l ");
+		cmd.append(sl_string);
+		cmd.append(" | awk '{print $5}'");
+		auto ret = p->execute(sl_string);
+		p->disconnect();
+		delete p;
+		Poco::Dynamic::Var v(ret);
+		return Py_BuildValue("i", v.convert<int>());
 	}
 
     // ========================================================================
@@ -752,6 +871,9 @@ namespace SubutaiLauncher
 		{ "CreateDesktopShortcut", (PyCFunction)SL_CreateDesktopShortcut, METH_VARARGS | METH_KEYWORDS, "Creates a shortcut on a desktop" },
 		{ "UpdatePath", SL_UpdatePath, METH_VARARGS, "Updates path variables on windows" },
 		{ "ProcessKill", (PyCFunction)SL_ProcessKill, METH_VARARGS | METH_KEYWORDS, "Kills a Windows process" },
+		{ "GetRemoteFileSize", (PyCFunction)SL_GetRemoteFileSize, METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for kurjun file" },
+		{ "GetRemoteTemplateSize", (PyCFunction)SL_GetRemoteTemplateSize, METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for kurjun file" },
+		{ "GetPeerFileSize", (PyCFunction)SL_GetPeerFileSize, METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for a file inside a peer over SSH" },
         { NULL, NULL, 0, NULL }
     };
 

@@ -4,14 +4,17 @@
 #ifdef BUILD_SCHEME_DEV
 const std::string SubutaiLauncher::Downloader::URL = "https://devcdn.subut.ai:8338";
 const std::string SubutaiLauncher::Downloader::REST = "/kurjun/rest/raw";
+const std::string SubutaiLauncher::Downloader::TREST = "/kurjun/rest/template";
 const std::string SubutaiLauncher::Downloader::HOST = "devcdn.subut.ai";
 #elif BUILD_SCHEME_MASTER
 const std::string SubutaiLauncher::Downloader::URL = "https://mastercdn.subut.ai:8338";
 const std::string SubutaiLauncher::Downloader::REST = "/kurjun/rest/raw";
+const std::string SubutaiLauncher::Downloader::TREST = "/kurjun/rest/template";
 const std::string SubutaiLauncher::Downloader::HOST = "mastercdn.subut.ai";
 #elif BUILD_SCHEME_PRODUCTION
 const std::string SubutaiLauncher::Downloader::URL = "https://cdn.subut.ai:8338";
 const std::string SubutaiLauncher::Downloader::REST = "/kurjun/rest/raw";
+const std::string SubutaiLauncher::Downloader::TREST = "/kurjun/rest/template";
 const std::string SubutaiLauncher::Downloader::HOST = "cdn.subut.ai";
 #else
 #error Build scheme was not specified
@@ -70,13 +73,21 @@ std::string SubutaiLauncher::Downloader::buildRequest(std::string path, std::str
     return std::string(r);
 }
 
-bool SubutaiLauncher::Downloader::retrieveFileInfo()
+bool SubutaiLauncher::Downloader::retrieveFileInfo(bool tmpl)
 {
     std::string output;
     std::string path;
     try {
         Poco::Net::HTTPSClientSession s(HOST, PORT);
-        path.append(REST);
+		if (tmpl) 
+		{
+			path.append(TREST);
+		}
+		else
+		{
+			path.append(REST);
+		}
+        
         path.append("/info");
         _logger->debug("Requesting file info for %s", path);
         Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_GET, path);
@@ -144,6 +155,11 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo()
     _logger->debug("Size: %ld", _file.size);
 
     return true;
+}
+
+bool SubutaiLauncher::Downloader::retrieveTemplateInfo()
+{
+	return retrieveFileInfo(true);
 }
 
 std::thread SubutaiLauncher::Downloader::download()
