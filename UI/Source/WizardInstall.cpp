@@ -171,23 +171,37 @@ void WizardInstall::runImpl()
                 download = false;
             }
 
-            if (!nc->notificationEmpty()) 
-            {
-                auto pNotification = nc->dispatchNotification();
-                if (pNotification.type == SubutaiLauncher::N_DOUBLE_DATA) 
-                {
+			if (!nc->notificationEmpty())
+			{
+				auto pNotification = nc->dispatchNotification();
+				if (pNotification.type == SubutaiLauncher::N_DOUBLE_DATA)
+				{
 					double val = 0.0;
-                    try 
-                    {
+					try
+					{
 						pNotification.message.convert(val);
-                    } 
-                    catch (Poco::BadCastException& e) 
-                    {
-                        _logger->error("Failed to convert progress value: %s", e.displayText());
-                        _progress = -1.0;
-                    }
+					}
+					catch (Poco::BadCastException& e)
+					{
+						_logger->error("Failed to convert progress value: %s", e.displayText());
+						_progress = -1.0;
+					}
 					_progress = val;
-                }
+				}
+				else if (pNotification.type == SubutaiLauncher::N_ERROR)
+				{
+					std::string msg("");
+					try
+					{
+						pNotification.message.convert(msg);
+					}
+					catch (Poco::BadCastException& e)
+					{
+						_logger->error("Failed to convert error: %s", e.displayText());
+						msg = "Unknown error occured"; 
+					}
+					addLine(msg, true);
+				}
             }
 #if LAUNCHER_LINUX || LAUNCHER_MACOS
             usleep(100);

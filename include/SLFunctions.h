@@ -291,7 +291,7 @@ namespace SubutaiLauncher
         //Poco::Logger::get("subutai").information("SL_RaiseError");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
-        Poco::DynamicAny v(sl_string);
+        Poco::Dynamic::Var v = sl_string;
         Session::instance()->getNotificationCenter()->notificationRaised(N_ERROR, v);
         return Py_BuildValue("i", 1);
     }
@@ -304,7 +304,7 @@ namespace SubutaiLauncher
         //Poco::Logger::get("subutai").information("SL_RaiseWarning");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
-        Poco::DynamicAny v(sl_string);
+        Poco::Dynamic::Var v = sl_string;
         Session::instance()->getNotificationCenter()->notificationRaised(N_WARNING, v);
         return Py_BuildValue("i", 1);
     }
@@ -317,7 +317,7 @@ namespace SubutaiLauncher
         //Poco::Logger::get("subutai").information("SL_RaiseInfo");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
-        Poco::DynamicAny v(sl_string);
+        Poco::Dynamic::Var v = sl_string;
         Session::instance()->getNotificationCenter()->notificationRaised(N_INFO, v);
         return Py_BuildValue("i", 1);
     }
@@ -580,9 +580,8 @@ namespace SubutaiLauncher
 
     static PyObject* SL_SetProgress(PyObject* self, PyObject* args, PyObject* keywords)
     {  
-		std::printf("111\n");
 		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-		std::printf("222\n");
+		
         //Poco::Logger::get("subutai").information("SL_SetProgress");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "d", double_keywords, &sl_double))
             return NULL;
@@ -749,6 +748,81 @@ namespace SubutaiLauncher
 		return Py_BuildValue("i", 1);
 	}
 
+	// ========================================================================
+
+	static PyObject* SL_GetRemoteFileSize(PyObject* self, PyObject* args, PyObject* keywords)
+	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+		if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+			return NULL;
+
+		auto downloader = Session::instance()->getDownloader();
+
+		downloader->setFilename(std::string(sl_string));
+		if (!downloader->retrieveFileInfo())
+		{
+			Session::instance()
+				->getNotificationCenter()
+				->notificationRaised(
+					N_ERROR,
+					Poco::DynamicAny("Failed to retrieve file data"));
+			return Py_BuildValue("i", -1);
+		}
+		auto info = downloader->info();
+		
+		return Py_BuildValue("i", info.size);
+	}
+
+	// ========================================================================
+
+	static PyObject* SL_GetRemoteTemplateSize(PyObject* self, PyObject* args, PyObject* keywords)
+	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+		if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+			return NULL;
+
+		auto downloader = Session::instance()->getDownloader();
+
+		downloader->setFilename(std::string(sl_string));
+		if (!downloader->retrieveTemplateInfo())
+		{
+			Session::instance()
+				->getNotificationCenter()
+				->notificationRaised(
+					N_ERROR,
+					Poco::DynamicAny("Failed to retrieve file data"));
+			return Py_BuildValue("i", -1);
+		}
+		auto info = downloader->info();
+
+		return Py_BuildValue("i", info.size);
+	}
+
+	// ========================================================================
+
+	static PyObject* SL_GetPeerFileSize(PyObject* self, PyObject* args, PyObject* keywords)
+	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+		if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+			return NULL;
+
+		auto s = Session::instance();
+
+		SSH *p = new SubutaiLauncher::SSH();
+		p->setHost(s->getSSHHostname(), s->getSSHPort());
+		p->setUsername(s->getSSHUser(), s->getSSHPass());
+		p->connect();
+		p->authenticate();
+		std::string cmd("ls -l ");
+		cmd.append(sl_string);
+		cmd.append(" | awk '{print $5}'");
+		auto ret = p->execute(sl_string);
+		p->disconnect();
+		delete p;
+		Poco::Dynamic::Var v(ret);
+		return Py_BuildValue("i", v.convert<int>());
+	}
+
     // ========================================================================
     // Module bindings
     // ========================================================================
@@ -797,6 +871,9 @@ namespace SubutaiLauncher
 		{ "CreateDesktopShortcut", (PyCFunction)SL_CreateDesktopShortcut, METH_VARARGS | METH_KEYWORDS, "Creates a shortcut on a desktop" },
 		{ "UpdatePath", SL_UpdatePath, METH_VARARGS, "Updates path variables on windows" },
 		{ "ProcessKill", (PyCFunction)SL_ProcessKill, METH_VARARGS | METH_KEYWORDS, "Kills a Windows process" },
+		{ "GetRemoteFileSize", (PyCFunction)SL_GetRemoteFileSize, METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for kurjun file" },
+		{ "GetRemoteTemplateSize", (PyCFunction)SL_GetRemoteTemplateSize, METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for kurjun file" },
+		{ "GetPeerFileSize", (PyCFunction)SL_GetPeerFileSize, METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for a file inside a peer over SSH" },
         { NULL, NULL, 0, NULL }
     };
 

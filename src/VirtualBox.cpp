@@ -246,7 +246,7 @@ std::string SubutaiLauncher::VirtualBox::execute(const std::string& command, int
 
 std::string SubutaiLauncher::VirtualBox::getBridgedInterface(const std::string& iface) 
 {
-    auto out = this->execute("list bridgedifs");
+    //auto out = this->execute("list bridgedifs");
     return iface;
 }
 

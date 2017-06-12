@@ -246,10 +246,10 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
 			// TODO: Make sure we are returning default one here
 			
 			std::string pName = std::string(pAdapter->AdapterName);
-			
+			std::string pDescription = std::string(pAdapter->Description);
 			
 			_logger->information("Network adapter name: %s", pName);
-			_logger->information("Adapter description: %s", std::string(pAdapter->Description));
+			_logger->information("Adapter description: %s", std::string(pDescription));
 
 			_logger->debug("Retrievin adapetr infor from windows registry");
 			std::string baseKey = "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Network\\{4d36e972-e325-11ce-bfc1-08002be10318}";
@@ -277,7 +277,7 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
 			_logger->information("Adapter name: %s", pNiceName);
 
 			if (pAdapterInfo) ENV_FREE(pAdapterInfo);
-			return pNiceName;
+			return pDescription;
 
 			// This is unreachiable due to previous TODO
 			pAdapter = pAdapter->Next;
