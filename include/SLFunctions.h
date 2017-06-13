@@ -380,6 +380,22 @@ namespace SubutaiLauncher
         return Py_BuildValue("s", vb.getBridgedInterface(sl_string).c_str());
     }
 
+	// ========================================================================
+
+	static PyObject* SL_GetVBoxHostOnlyInterface(
+		PyObject* self,
+		PyObject* args,
+		PyObject* keywords
+		)
+	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+		//Poco::Logger::get("subutai").information("SL_GetVBoxBridgedInterface");
+		if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
+			return NULL;
+		VirtualBox vb;
+		return Py_BuildValue("s", vb.getHostOnlyAdapter().c_str());
+	}
+
     // ========================================================================
 
     static PyObject* SL_SetSSHCredentials(
@@ -850,6 +866,7 @@ namespace SubutaiLauncher
 		//{"ImportVirtualMachine", SL_importVirtualMachine, METH_VARARGS | METH_KEYWORDS, "Import a virtual machine into VB"},
 		{ "GetDefaultRoutingInterface", SL_GetDefaultRoutingInterface, METH_VARARGS, "Returns name of default network interface" },
 		{ "GetVBoxBridgedInterface", (PyCFunction)SL_GetVBoxBridgedInterface, METH_VARARGS | METH_KEYWORDS, "Returns name of default network interface" },
+		{ "GetVBoxHostOnlyInterface", (PyCFunction)SL_GetVBoxHostOnlyInterface, METH_VARARGS | METH_KEYWORDS, "Returns name of default network interface" },
 		{ "SetSSHCredentials", (PyCFunction)SL_SetSSHCredentials, METH_VARARGS | METH_KEYWORDS, "Set SSH Connection credentials" },
 		{ "TestSSH", (PyCFunction)SL_TestSSH, METH_VARARGS, "Test if SSH connection is alive" },
 		{ "InstallSSHKey", (PyCFunction)SL_InstallSSHKey, METH_VARARGS, "Install SSH public key" },

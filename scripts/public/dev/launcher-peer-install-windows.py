@@ -205,16 +205,17 @@ def reconfigureNic(machineName):
     subutai.VBox("modifyvm " + machineName + " --cableconnected2 on")
     subutai.VBox("modifyvm " + machineName + ' --natpf2 ssh-fwd,tcp,,4567,,22 --natpf2 https-fwd,tcp,,9999,,8443')
 
-    adapterName = "VirtualBox+++Host-Only+++Ethernet+++Adapter"
-    ret = subutai.VBoxS("hostonlyif ipconfig " + adapterName + " --ip 192.168.56.1")
+    adapterName = subutai.GetVBoxHostOnlyInterface()
+    adapterName = adapterName.replace(' ', '+++')
+    ret = subutai.VBoxS("hostonlyif ipconfig '" + adapterName + "' --ip 192.168.56.1")
 
     if ret == 1:
         subutai.VBox("hostonlyif create")
-        subutai.VBox("hostonlyif ipconfig " + adapterName + " --ip 192.168.56.1")
-        subutai.VBox("dhcpserver add --ifname " + adapterName + " --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
-        subutai.VBox("dhcpserver modify --ifname " + adapterName + " --enable")
+        subutai.VBox("hostonlyif ipconfig '" + adapterName + "' --ip 192.168.56.1")
+        subutai.VBox("dhcpserver add --ifname '" + adapterName + "' --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
+        subutai.VBox("dhcpserver modify --ifname '" + adapterName + "' --enable")
 
-    subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
+    subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 '" + adapterName + "'")
 
     return
 
