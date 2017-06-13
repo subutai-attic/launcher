@@ -74,7 +74,7 @@ def subutaistart():
 
     subutai.Shutdown()
 
-    return
+    return 0
 
 
 def waitSSH():

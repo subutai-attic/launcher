@@ -36,3 +36,5 @@ def subutaistart():
     sleep(10)
 
     subutai.Shutdown()
+
+    return 0

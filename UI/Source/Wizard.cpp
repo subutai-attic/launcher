@@ -186,7 +186,7 @@ void Wizard::buttonClicked(juce::Button* button)
                 _step = 4;
                 _back.setEnabled(false);
                 _next.setEnabled(false);
-                runInstall();
+				runInstall();
                 break;
             default:
                 _introPage->setVisible(true);
@@ -232,49 +232,40 @@ void Wizard::runInstall()
     _logger->debug("Collecting choosen components");
     auto c = _componentChooserPage->getComponents();
     cleanInstallers();
-    try 
+
+    if (c.ptp && !_ptpInstalled) 
     {
-        if (c.ptp && !_ptpInstalled) 
-        {
-            _ptpInstall->activate();
-            _logger->debug("P2P Component has been choosen");
-            _ptpInstall->start("P2P");
-            _ptpInstall->run();
-            return;
-        }
-        if (c.tray && !_trayInstalled) 
-        {
-            _trayInstall->activate();
-            _logger->debug("Tray Component has been choosen");
-            _trayInstall->start("Tray");
-            _trayInstall->run();
-            return;
-        }
-        if (c.ete && !_eteInstalled) 
-        {
-            _eteInstall->activate();
-            _logger->debug("Browser Plugin Component has been choosen");
-            _eteInstall->start("Browser Plugin");
-            _eteInstall->run();
-            return;
-        }
-        if (c.peer && !_peerInstalled) 
-        {
-            _peerInstall->activate();
-            _logger->debug("Peer Component has been choosen");
-            _peerInstall->start("Peer");
-            _peerInstall->run();
-            return;
-        } 
+        _ptpInstall->activate();
+        _logger->debug("P2P Component has been choosen");
+        _ptpInstall->start("P2P");
+        _ptpInstall->run();
+        return;
+    }
+    if (c.tray && !_trayInstalled) 
+    {
+        _trayInstall->activate();
+        _logger->debug("Tray Component has been choosen");
+        _trayInstall->start("Tray");
+        _trayInstall->run();
+        return;
+    }
+    if (c.ete && !_eteInstalled) 
+    {
+        _eteInstall->activate();
+        _logger->debug("Browser Plugin Component has been choosen");
+        _eteInstall->start("Browser Plugin");
+        _eteInstall->run();
+        return;
+    }
+    if (c.peer && !_peerInstalled) 
+    {
+        _peerInstall->activate();
+        _logger->debug("Peer Component has been choosen");
+        _peerInstall->start("Peer");
+        _peerInstall->run();
+        return;
     } 
-    catch (SubutaiLauncher::SLException& e)
-    {
-        _logger->error(e.displayText());
-    }
-    catch (SubutaiLauncher::SubutaiException& e)
-    {
-        _logger->error(e.displayText());
-    }
+
     _logger->debug("Nothing to install");
     finish();
 }
@@ -333,6 +324,12 @@ void Wizard::finish()
     _next.setVisible(false);
     _back.setEnabled(false);
     _back.setVisible(false);
+
+	auto c = _componentChooserPage->getComponents();
+	_finishPage->addPTPResult(c.ptp, _ptpInstall->succeed());
+	_finishPage->addTrayResult(c.tray, _trayInstall->succeed());
+	_finishPage->addETEResult(c.ete, _eteInstall->succeed());
+	_finishPage->addPeerResult(c.peer, _peerInstall->succeed());
     _finishPage->setVisible(true);
 
     _stepFinal.setColour(Label::textColourId, juce::Colour(7, 141, 208));
@@ -390,5 +387,4 @@ void Wizard::runCancelConfirmation()
 
     juce::DialogWindow::LaunchOptions options;
     _cancelMessage.setText(message, juce::dontSendNotification);
-
 }
