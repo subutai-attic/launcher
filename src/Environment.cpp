@@ -405,6 +405,12 @@ void SubutaiLauncher::Environment::CreateShortcut(const std::string& source, con
 
 	_logger->debug("Shortcut for %s located in %s with name %s", pPath.getFileName(), pPath.parent().toString(), pName.append(".lnk"));
 
+	Poco::File pExistLink(pName);
+	if (pExistLink.exists())
+	{
+		pExistLink.remove();
+	}
+
 	std::string pLinkFile = std::string(pName).append("");
 
 	//LPCSTR pszTargetfile = pPath.getFileName().c_str();
@@ -495,6 +501,11 @@ void SubutaiLauncher::Environment::CreateShortcut(const std::string& source, con
 				}
 				else
 				{
+					Poco::File pDesktopLink(std::string(filePath) + "\\" + pName);
+					if (pDesktopLink.exists())
+					{
+						pDesktopLink.remove();
+					}
 					Poco::File f(pLinkFile);
 					f.moveTo(std::string(filePath));
 				}
