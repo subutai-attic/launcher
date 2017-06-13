@@ -188,8 +188,9 @@ def setupVm(machineName):
         subutai.VBox("modifyvm " + machineName + " --cableconnected1 on")
         subutai.VBox("modifyvm " + machineName + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
         subutai.VBox("modifyvm " + machineName + " --rtcuseutc on")
-        adapterName = "VirtualBox+++Host-Only+++Ethernet+++Adapter"
-        subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 "+adapterName)
+        adapterName = subutai.GetVBoxHostOnlyInterface()
+        adapterName = adapterName.replace(' ', '+++')
+        subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 '" + adapterName + "'")
 
     return 0
 
