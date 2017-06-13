@@ -276,8 +276,15 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
 			std::string pNiceName = pConnectionKey.getString("Name");
 			_logger->information("Adapter name: %s", pNiceName);
 
-			if (pAdapterInfo) ENV_FREE(pAdapterInfo);
-			return pDescription;
+			std::string pGateway(pAdapter->GatewayList.IpAddress.String);
+			std::string pIp(pAdapter->IpAddressList.IpAddress.String);
+
+			if (!pIp.empty() && !pGateway.empty())
+			{
+				_logger->debug("IP: %s Gateway: %s", pIp, pGateway);
+				if (pAdapterInfo) ENV_FREE(pAdapterInfo);
+				return pDescription;
+			}
 
 			// This is unreachiable due to previous TODO
 			pAdapter = pAdapter->Next;
