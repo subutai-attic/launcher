@@ -3,9 +3,23 @@ import hashlib
 from time import sleep
 import datetime
 from subprocess import call
+import zipfile
 
 
 def subutaistart():
+
+    sshlib = "ssh.zip"
+
+    subutai.download(sshlib)
+    while subutai.isDownloadComplete() != 1:
+        sleep(0.05)
+
+    tmpDir = subutai.GetTmpDir()
+    installDir = subutai.GetInstallDir()
+
+    zfl = zipfile.ZipFile(tmpDir+"/"+sshlib, 'r')
+    zfl.extractall(installDir+"/bin")
+    zfl.close()
 
     m = hashlib.md5()
     m.update(datetime.datetime.now().isoformat().encode('utf-8'))
