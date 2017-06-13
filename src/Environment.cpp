@@ -279,7 +279,7 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
 			std::string pGateway(pAdapter->GatewayList.IpAddress.String);
 			std::string pIp(pAdapter->IpAddressList.IpAddress.String);
 
-			if (!pIp.empty() && !pGateway.empty())
+			if (!pIp.empty() && pIp != "0.0.0.0" && !pGateway.empty() && pGateway != "0.0.0.0")
 			{
 				_logger->debug("IP: %s Gateway: %s", pIp, pGateway);
 				if (pAdapterInfo) ENV_FREE(pAdapterInfo);
