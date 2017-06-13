@@ -44,7 +44,7 @@ void SLTest::testFailedScript()
 	}
 	catch (SubutaiLauncher::SLException& e)
 	{
-		std::printf("%s", e.displayText());
+		std::printf("%s", e.displayText().c_str());
 	}
 	/*
 	std::thread t;
