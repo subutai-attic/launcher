@@ -26,6 +26,7 @@ def subutaistart():
     subutai.AddStatus("Download finished. Installing P2P")
     copyfile(tmpDir+"/p2p.exe", installDir+"/bin/p2p.exe")
     subutai.AddStatus("Installing Service Manageer")
+    subutai.ProcessKill("nssm.exe")
     copyfile(tmpDir+"/nssm.exe", installDir+"/bin/nssm.exe")
 
     subutai.AddStatus("Making P2P binary executable")
