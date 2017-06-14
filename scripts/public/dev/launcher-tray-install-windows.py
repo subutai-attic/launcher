@@ -35,3 +35,5 @@ def subutaistart():
                                   "Subutai Tray")
 
     subutai.Shutdown()
+
+    return 0

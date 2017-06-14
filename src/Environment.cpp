@@ -131,7 +131,7 @@ bool SubutaiLauncher::Environment::vtxEnabled()
     return false;
 
 #elif LAUNCHER_WINDOWS
-    return false;
+	return IsProcessorFeaturePresent(PF_VIRT_FIRMWARE_ENABLED);
 #elif LAUNCHER_MACOS
     return true;
 #endif
@@ -276,8 +276,15 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
 			std::string pNiceName = pConnectionKey.getString("Name");
 			_logger->information("Adapter name: %s", pNiceName);
 
-			if (pAdapterInfo) ENV_FREE(pAdapterInfo);
-			return pDescription;
+			std::string pGateway(pAdapter->GatewayList.IpAddress.String);
+			std::string pIp(pAdapter->IpAddressList.IpAddress.String);
+
+			if (!pIp.empty() && pIp != "0.0.0.0" && !pGateway.empty() && pGateway != "0.0.0.0")
+			{
+				_logger->debug("IP: %s Gateway: %s", pIp, pGateway);
+				if (pAdapterInfo) ENV_FREE(pAdapterInfo);
+				return pDescription;
+			}
 
 			// This is unreachiable due to previous TODO
 			pAdapter = pAdapter->Next;
@@ -398,6 +405,12 @@ void SubutaiLauncher::Environment::CreateShortcut(const std::string& source, con
 
 	_logger->debug("Shortcut for %s located in %s with name %s", pPath.getFileName(), pPath.parent().toString(), pName.append(".lnk"));
 
+	Poco::File pExistLink(pName);
+	if (pExistLink.exists())
+	{
+		pExistLink.remove();
+	}
+
 	std::string pLinkFile = std::string(pName).append("");
 
 	//LPCSTR pszTargetfile = pPath.getFileName().c_str();
@@ -488,6 +501,11 @@ void SubutaiLauncher::Environment::CreateShortcut(const std::string& source, con
 				}
 				else
 				{
+					Poco::File pDesktopLink(std::string(filePath) + "\\" + pName);
+					if (pDesktopLink.exists())
+					{
+						pDesktopLink.remove();
+					}
 					Poco::File f(pLinkFile);
 					f.moveTo(std::string(filePath));
 				}

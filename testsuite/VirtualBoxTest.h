@@ -13,6 +13,7 @@ public:
 	void setUp();
 	void tearDown();
 
+	void testGetHostOnlyAdapter();
 
 	static CppUnit::Test* suite();
 };

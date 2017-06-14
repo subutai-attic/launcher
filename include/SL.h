@@ -35,7 +35,9 @@ namespace SubutaiLauncher {
             std::thread executeInThread();
             std::thread executeInThread(const std::string& module);
             long exitCode();
+			bool running();
         private:
+			bool _running;
             Poco::Logger* _logger;
             PyObject* _name;
             PyObject* _module;
