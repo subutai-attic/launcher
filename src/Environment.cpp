@@ -131,7 +131,7 @@ bool SubutaiLauncher::Environment::vtxEnabled()
     return false;
 
 #elif LAUNCHER_WINDOWS
-    return false;
+	return IsProcessorFeaturePresent(PF_VIRT_FIRMWARE_ENABLED);
 #elif LAUNCHER_MACOS
     return true;
 #endif
