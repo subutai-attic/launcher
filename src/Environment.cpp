@@ -389,7 +389,7 @@ bool SubutaiLauncher::Environment::unregisterService(const std::string & name)
 	}
 	else
 	{
-		_logger->information("Service was installed");
+		_logger->information("Service was uninstalled");
 		return true;
 	}
 
