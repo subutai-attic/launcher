@@ -408,6 +408,7 @@ void SubutaiLauncher::Environment::CreateShortcut(const std::string& source, con
 	Poco::File pExistLink(pName);
 	if (pExistLink.exists())
 	{
+		_logger->debug("Link file already exists localy. Removing it");
 		pExistLink.remove();
 	}
 
@@ -504,8 +505,10 @@ void SubutaiLauncher::Environment::CreateShortcut(const std::string& source, con
 					Poco::File pDesktopLink(std::string(filePath) + "\\" + pName);
 					if (pDesktopLink.exists())
 					{
+						_logger->debug("Link file exists. Removing it");
 						pDesktopLink.remove();
 					}
+					_logger->debug("Moving link file to desktop");
 					Poco::File f(pLinkFile);
 					f.moveTo(std::string(filePath));
 				}

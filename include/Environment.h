@@ -73,6 +73,7 @@ namespace SubutaiLauncher {
 			void CreateShortcut(const std::string& source, const std::string& name);
 			void updatePath();
 			bool killProcess(const std::string& name);
+			bool writeE2ERegistry(const std::string& name);
         private:
 #if LAUNCHER_WINDOWS
 			BOOL terminateWinProcess(DWORD dwProcessId, UINT uExitCode);
