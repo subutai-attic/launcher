@@ -5,6 +5,7 @@
 
 #include <string>
 #include <cstdlib>
+#include <sstream>
 #if LAUNCHER_LINUX
 #include <unistd.h>
 #endif
@@ -25,6 +26,7 @@
 #include "Session.h"
 
 #if LAUNCHER_WINDOWS
+
 #include <windows.h>
 #include <VersionHelpers.h>
 #include <WinSock2.h>
@@ -35,6 +37,9 @@
 #include <objidl.h>
 #include <shlguid.h>
 #include <tlhelp32.h>
+#include <KnownFolders.h>
+#include <wchar.h>
+
 //#include <atlbase.h>
 #include <IPHlpApi.h>
 #pragma comment(lib, "IPHLPAPI.LIB")
@@ -73,6 +78,7 @@ namespace SubutaiLauncher {
 			void CreateShortcut(const std::string& source, const std::string& name);
 			void updatePath();
 			bool killProcess(const std::string& name);
+			std::string getDesktopDirectory();
 			bool writeE2ERegistry(const std::string& name);
         private:
 #if LAUNCHER_WINDOWS

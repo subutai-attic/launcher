@@ -21,14 +21,31 @@ void EnvironmentTest::tearDown()
 {
 }
 
+void EnvironmentTest::testCreateShortcut()
+{
+	std::vector<std::string> args;
+	SubutaiLauncher::Core c(args);
+	SubutaiLauncher::Environment env;
+	env.CreateShortcut("TestSuite.exe", "Test Suite");
+}
+
 void EnvironmentTest::testGetDefaultGateway()
 {
 	std::vector<std::string> args;
 	SubutaiLauncher::Core c(args);
     SubutaiLauncher::Environment env;
     std::string result = env.getDefaultGateway();
-    std::printf("Gateway: %s", result.c_str());
+    std::printf("Gateway: %s\n", result.c_str());
     assert(result != "unknown");
+}
+
+void EnvironmentTest::testGetDesktopDirectory()
+{
+	std::vector<std::string> args;
+	SubutaiLauncher::Core c(args);
+	SubutaiLauncher::Environment env;
+	std::string result = env.getDesktopDirectory();
+	std::printf("Desktop: %s\n", result.c_str());
 }
 
 void EnvironmentTest::testUpdatePath()
@@ -41,7 +58,9 @@ CppUnit::Test * EnvironmentTest::suite()
 {
     CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("EnvironmentTest");
 
+	CppUnit_addTest(pSuite, EnvironmentTest, testCreateShortcut);
     CppUnit_addTest(pSuite, EnvironmentTest, testGetDefaultGateway);
+	CppUnit_addTest(pSuite, EnvironmentTest, testGetDesktopDirectory);
 	CppUnit_addTest(pSuite, EnvironmentTest, testUpdatePath);
 
     return pSuite;
