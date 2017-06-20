@@ -13,7 +13,9 @@ public:
 	void setUp();
 	void tearDown();
 
+	void testCreateShortcut();
     void testGetDefaultGateway();
+	void testGetDesktopDirectory();
 	void testUpdatePath();
 
 	static CppUnit::Test* suite();
