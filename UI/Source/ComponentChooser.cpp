@@ -279,31 +279,37 @@ void ComponentChooser::buttonClicked(juce::Button* button)
     {
         _ptpLabel.setColour(Label::textColourId, Colours::white);
         _ptp = true;
+		return;
     } 
     else if (button == _ptpNo) 
     {
         _ptpLabel.setColour(Label::textColourId, Colours::grey);
         _ptp = false;
+		return;
     } 
     else if (button == _trayYes) 
     {
         _trayLabel.setColour(Label::textColourId, Colours::white);
         _tray = true;
+		return;
     }
     else if (button == _trayNo) 
     {
         _trayLabel.setColour(Label::textColourId, Colours::grey);
         _tray = false;
+		return;
     }
     else if (button == _eteYes)
     {
         _eteLabel.setColour(Label::textColourId, Colours::white);
         _ete = true;
+		return;
     }
     else if (button == _eteNo)
     {
         _eteLabel.setColour(Label::textColourId, Colours::grey);
         _ete = false;
+		return;
     }
     else if (button == _peerYes)
     {
@@ -317,6 +323,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
         _memSize->setEnabled(true);
         _memPlus->setEnabled(true);
         _memMinus->setEnabled(true);
+		return;
     }
     else if (button == _peerNo)
     {
@@ -330,6 +337,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
         _memSize->setEnabled(false);
         _memPlus->setEnabled(false);
         _memMinus->setEnabled(false);
+		return;
     }
     else if (button == _cpuPlus) 
     {
@@ -337,6 +345,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
         char t[4];
         std::sprintf(t, "%d", _cpu);
         _cpuNum->setButtonText(t);
+		return;
     }
     else if (button == _cpuMinus)
     {
@@ -347,6 +356,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
         char t[4];
         std::sprintf(t, "%d", _cpu);
         _cpuNum->setButtonText(t);
+		return;
     }
     else if (button == _memPlus) 
     {
@@ -354,6 +364,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
         char t[4];
         std::sprintf(t, "%d", _mem);
         _memSize->setButtonText(t);
+		return;
     }
     else if (button == _memMinus)
     {
@@ -364,6 +375,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
         char t[4];
         std::sprintf(t, "%d", _mem);
         _memSize->setButtonText(t);
+		return;
     }
 }
 

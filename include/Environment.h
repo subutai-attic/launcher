@@ -79,7 +79,9 @@ namespace SubutaiLauncher {
 			void updatePath();
 			bool killProcess(const std::string& name);
 			std::string getDesktopDirectory();
+#if LAUNCHER_WINDOWS
 			bool writeE2ERegistry(const std::string& name);
+#endif
         private:
 #if LAUNCHER_WINDOWS
 			BOOL terminateWinProcess(DWORD dwProcessId, UINT uExitCode);

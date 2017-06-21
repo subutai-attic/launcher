@@ -54,6 +54,14 @@ void EnvironmentTest::testUpdatePath()
 	env.updatePath();
 }
 
+void EnvironmentTest::testWriteE2ERegistry()
+{
+	std::vector<std::string> args;
+	SubutaiLauncher::Core c(args);
+	SubutaiLauncher::Environment env;
+	env.writeE2ERegistry("");
+}
+
 CppUnit::Test * EnvironmentTest::suite()
 {
     CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("EnvironmentTest");
@@ -62,6 +70,7 @@ CppUnit::Test * EnvironmentTest::suite()
     CppUnit_addTest(pSuite, EnvironmentTest, testGetDefaultGateway);
 	CppUnit_addTest(pSuite, EnvironmentTest, testGetDesktopDirectory);
 	CppUnit_addTest(pSuite, EnvironmentTest, testUpdatePath);
+	CppUnit_addTest(pSuite, EnvironmentTest, testWriteE2ERegistry);
 
     return pSuite;
 }
