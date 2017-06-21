@@ -20,7 +20,8 @@ const std::string WizardInstall::PEER_INSTALL = "launcher-peer-install-darwin";
 
 WizardInstall::WizardInstall() : 
     _running(false),
-    _active(false)
+    _active(false),
+	_succeed(false)
 {
     _pb = nullptr;
     _logger = &Poco::Logger::get("subutai");
@@ -154,13 +155,14 @@ void WizardInstall::runImpl()
             auto st = SubutaiLauncher::Session::instance()->getStatus();
             if (st != "") addLine(st);
             auto e = nc->dispatch();
-            if (e == SubutaiLauncher::SCRIPT_FINISHED || SubutaiLauncher::Session::instance()->isTerminating()) 
+            if (e == SubutaiLauncher::SCRIPT_FINISHED || SubutaiLauncher::Session::instance()->isTerminating() || !sl.running()) 
             {
                 //pScriptThread.join();
                 addLine("Script execution completed");
                 _logger->information("%s script execution completed", script);
                 _progress = 100.0;
                 _running = false;
+				if (sl.exitCode() == 0) _succeed = true;
             } 
             else if (e == SubutaiLauncher::DOWNLOAD_STARTED) 
             {
@@ -209,16 +211,15 @@ void WizardInstall::runImpl()
             Sleep(100);
 #endif
         }
+		pScriptThread.join();
     } 
     catch (SubutaiLauncher::SLException& e)
     {
-		//pScriptThread.join();
+		pScriptThread.join();
 		_running = false;
 		_progress = 100.0;
         _logger->error(e.displayText());
     }
-
-    pScriptThread.join();
 
     _logger->debug("Stopping installation process and notifying parent");
     _running = false;
@@ -274,4 +275,9 @@ void WizardInstall::deactivate()
     }
     _active = false;
     this->setVisible(false);
+}
+
+bool WizardInstall::succeed()
+{
+	return _succeed;
 }

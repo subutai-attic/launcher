@@ -100,6 +100,11 @@ bool SubutaiLauncher::VirtualBox::isUpdateRequired()
     return false;
 }
 
+std::string SubutaiLauncher::VirtualBox::getBinaryLocation()
+{
+    return _path;
+}
+
 std::string SubutaiLauncher::VirtualBox::extractVersion()
 {
     if (_version != "") 
@@ -306,4 +311,21 @@ bool SubutaiLauncher::VirtualBox::isMachineRunning(const std::string& name)
         }
     }
     return false;
+}
+
+std::string SubutaiLauncher::VirtualBox::getHostOnlyAdapter()
+{
+	_logger->debug("Looking for Host-Only adapter");
+	std::string result = execute("list hostonlyifs");
+
+	Poco::StringTokenizer st(result, "\n", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+	for (auto it = st.begin(); it != st.end(); it++)
+	{
+		if ((*it).substr(0, 4) == "Name")
+		{
+			return Poco::trim((*it).substr(5, (*it).length()));
+		}
+	}
+
+	return "undefined";
 }

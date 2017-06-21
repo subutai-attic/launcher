@@ -1,4 +1,7 @@
+#define WINVER 0x0601 // Allow use of features specific to Windows 7 or later.
+#define _WIN32_WINNT 0x0601
 #include "Environment.h"
+#include <Shlobj.h>
 
 //USES_CONVERSION;
 
@@ -131,7 +134,7 @@ bool SubutaiLauncher::Environment::vtxEnabled()
     return false;
 
 #elif LAUNCHER_WINDOWS
-    return false;
+	return IsProcessorFeaturePresent(PF_VIRT_FIRMWARE_ENABLED);
 #elif LAUNCHER_MACOS
     return true;
 #endif
@@ -276,8 +279,15 @@ std::string SubutaiLauncher::Environment::getDefaultGateway()
 			std::string pNiceName = pConnectionKey.getString("Name");
 			_logger->information("Adapter name: %s", pNiceName);
 
-			if (pAdapterInfo) ENV_FREE(pAdapterInfo);
-			return pDescription;
+			std::string pGateway(pAdapter->GatewayList.IpAddress.String);
+			std::string pIp(pAdapter->IpAddressList.IpAddress.String);
+
+			if (!pIp.empty() && pIp != "0.0.0.0" && !pGateway.empty() && pGateway != "0.0.0.0")
+			{
+				_logger->debug("IP: %s Gateway: %s", pIp, pGateway);
+				if (pAdapterInfo) ENV_FREE(pAdapterInfo);
+				return pDescription;
+			}
 
 			// This is unreachiable due to previous TODO
 			pAdapter = pAdapter->Next;
@@ -382,7 +392,7 @@ bool SubutaiLauncher::Environment::unregisterService(const std::string & name)
 	}
 	else
 	{
-		_logger->information("Service was installed");
+		_logger->information("Service was uninstalled");
 		return true;
 	}
 
@@ -397,6 +407,24 @@ void SubutaiLauncher::Environment::CreateShortcut(const std::string& source, con
 	std::string pName = name;
 
 	_logger->debug("Shortcut for %s located in %s with name %s", pPath.getFileName(), pPath.parent().toString(), pName.append(".lnk"));
+
+	Poco::File pExistLink(pName);
+	if (pExistLink.exists())
+	{
+		_logger->debug("Link file already exists localy. Removing it");
+		pExistLink.remove();
+	}
+
+	// Determine desktop directory
+	// Moving newly created link to desktop FOLDERID_Desktop
+	std::string pDesktopPath = getDesktopDirectory();
+	
+	Poco::File pDesktopLink(pDesktopPath + "\\" + pName);
+	if (pDesktopLink.exists())
+	{
+		_logger->debug("Link file exists. Removing it");
+		pDesktopLink.remove();
+	}
 
 	std::string pLinkFile = std::string(pName).append("");
 
@@ -475,22 +503,10 @@ void SubutaiLauncher::Environment::CreateShortcut(const std::string& source, con
 					wszLinkfile, MAX_PATH);
 				hRes = pPersistFile->Save(wszLinkfile, TRUE);
 				pPersistFile->Release();
-
-				// Moving newly created link to desktop FOLDERID_Desktop
-				PTCHAR filePath;
-				if (FAILED(SHGetFolderPath(NULL,
-					CSIDL_DESKTOPDIRECTORY | CSIDL_FLAG_CREATE,
-					NULL,
-					SHGFP_TYPE_CURRENT,
-					filePath))) // Store the path of the desktop in filePath.
-				{
-					_logger->error("Failed to find Desktop directory");
-				}
-				else
-				{
-					Poco::File f(pLinkFile);
-					f.moveTo(std::string(filePath));
-				}
+				
+				_logger->debug("Moving link file (%s) to %s", std::string(pLinkFile), std::string(pDesktopPath));
+				Poco::File f(pLinkFile);
+				f.moveTo(std::string(pDesktopPath));
 			}
 			pShellLink->Release();
 		}
@@ -580,6 +596,24 @@ bool SubutaiLauncher::Environment::killProcess(const std::string & name)
 	CloseHandle(hProcessSnap);
 	return(TRUE);
 #endif
+}
+
+std::string SubutaiLauncher::Environment::getDesktopDirectory()
+{
+	_logger->debug("Retrieving desktop directory");
+	wchar_t* pDesktopPath = 0;
+	
+	HRESULT hr = SHGetKnownFolderPath(FOLDERID_Desktop, 0, NULL, &pDesktopPath);
+	if (SUCCEEDED(hr))
+	{
+		std::wstring ws(pDesktopPath);
+		std::string pResult(ws.begin(), ws.end());
+		CoTaskMemFree(static_cast<void*>(pDesktopPath));
+		return pResult;
+	}
+	_logger->error("Failed to retrieve desktop path");
+	CoTaskMemFree(static_cast<void*>(pDesktopPath));
+	return "";
 }
 
 #if LAUNCHER_WINDOWS

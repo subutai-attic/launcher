@@ -3,9 +3,23 @@ import hashlib
 from time import sleep
 import datetime
 from subprocess import call
+import zipfile
 
 
 def subutaistart():
+
+    sshlib = "ssh.zip"
+
+    subutai.download(sshlib)
+    while subutai.isDownloadComplete() != 1:
+        sleep(0.05)
+
+    tmpDir = subutai.GetTmpDir()
+    installDir = subutai.GetInstallDir()
+
+    zfl = zipfile.ZipFile(tmpDir+"/"+sshlib, 'r')
+    zfl.extractall(installDir+"/bin")
+    zfl.close()
 
     m = hashlib.md5()
     m.update(datetime.datetime.now().isoformat().encode('utf-8'))
@@ -60,7 +74,7 @@ def subutaistart():
 
     subutai.Shutdown()
 
-    return
+    return 0
 
 
 def waitSSH():
@@ -148,6 +162,7 @@ def startVm(machineName):
 
 
 def stopVm(machineName):
+    subutai.SSHRun("sync")
     subutai.log("info", "Stopping Virtual machine")
     if subutai.CheckVMRunning(machineName) != 0:
         subutai.VBox("controlvm " + machineName + " poweroff soft")
@@ -174,8 +189,9 @@ def setupVm(machineName):
         subutai.VBox("modifyvm " + machineName + " --cableconnected1 on")
         subutai.VBox("modifyvm " + machineName + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
         subutai.VBox("modifyvm " + machineName + " --rtcuseutc on")
-        adapterName = "VirtualBox+++Host-Only+++Ethernet+++Adapter"
-        subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 "+adapterName)
+        adapterName = subutai.GetVBoxHostOnlyInterface()
+        adapterName = adapterName.replace(' ', '+++')
+        subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
 
     return 0
 
@@ -191,7 +207,8 @@ def reconfigureNic(machineName):
     subutai.VBox("modifyvm " + machineName + " --cableconnected2 on")
     subutai.VBox("modifyvm " + machineName + ' --natpf2 ssh-fwd,tcp,,4567,,22 --natpf2 https-fwd,tcp,,9999,,8443')
 
-    adapterName = "VirtualBox+++Host-Only+++Ethernet+++Adapter"
+    adapterName = subutai.GetVBoxHostOnlyInterface()
+    adapterName = adapterName.replace(' ', '+++')
     ret = subutai.VBoxS("hostonlyif ipconfig " + adapterName + " --ip 192.168.56.1")
 
     if ret == 1:

@@ -45,6 +45,7 @@ namespace SubutaiLauncher {
             bool isInstalled();
             bool isRunning();
             bool isUpdateRequired();
+            std::string getBinaryLocation();
             std::string extractVersion();
             void getVms();
             std::vector<SubutaiVM> parseVms(const std::string& buffer);
@@ -59,6 +60,7 @@ namespace SubutaiLauncher {
             std::string getMachineInfo(const std::string& name);
             bool isMachineExists(const std::string& name);
             bool isMachineRunning(const std::string& name);
+			std::string getHostOnlyAdapter();
 
         private:
             Poco::Logger* _logger;
