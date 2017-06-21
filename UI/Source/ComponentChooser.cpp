@@ -283,13 +283,11 @@ void ComponentChooser::buttonClicked(juce::Button* button)
     else if (button == _ptpNo) 
     {
         _ptpLabel.setColour(Label::textColourId, Colours::grey);
-        _trayNo->triggerClick();
         _ptp = false;
     } 
     else if (button == _trayYes) 
     {
         _trayLabel.setColour(Label::textColourId, Colours::white);
-        _ptpYes->triggerClick();
         _tray = true;
     }
     else if (button == _trayNo) 
