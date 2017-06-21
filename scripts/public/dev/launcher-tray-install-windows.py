@@ -1,6 +1,5 @@
 import subutai
 from time import sleep
-import os
 import zipfile
 
 
@@ -33,6 +32,14 @@ def subutaistart():
 
     subutai.CreateDesktopShortcut(installDir+"/tray/SubutaiTray.exe",
                                   "Subutai Tray")
+
+    subutai.AddStatus("Writing configuration")
+    f = open(installDir+"/subutai_tray.conf", "w")
+    f.write("P2P_Path="+installDir+"/bin/p2p.exe")
+    f.write("VBoxManage_Path="+subutai.GetVBoxPath())
+    f.write("Ssh_Path="+installDir+"/bin/ssh.exe")
+    f.write("Ssh_Keygen_Cmd="+installDir+"/bin/ssh-keygen.exe")
+    f.close()
 
     subutai.Shutdown()
 

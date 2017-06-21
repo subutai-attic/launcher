@@ -842,6 +842,20 @@ namespace SubutaiLauncher
 		return Py_BuildValue("i", v.convert<int>());
 	}
 
+	// ========================================================================
+
+	static PyObject* SL_GetVBoxPath(PyObject* self, PyObject* args)
+    {
+        VirtualBox vb;
+        if (!vb.findInstallation())
+        {
+            return Py_BuildValue("s", "")
+        }
+
+        std::string pLocation = vb.getBinaryLocation();
+        return Py_BuildValue("s", pLocation.c_str());
+    }
+
     // ========================================================================
     // Module bindings
     // ========================================================================
@@ -894,6 +908,7 @@ namespace SubutaiLauncher
 		{ "GetRemoteFileSize", (PyCFunction)SL_GetRemoteFileSize, METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for kurjun file" },
 		{ "GetRemoteTemplateSize", (PyCFunction)SL_GetRemoteTemplateSize, METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for kurjun file" },
 		{ "GetPeerFileSize", (PyCFunction)SL_GetPeerFileSize, METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for a file inside a peer over SSH" },
+        { "GetVBoxPath", SL_GetVBoxPath, METH_VARARGS, "Returns path to a vboxmanage binary" },
         { NULL, NULL, 0, NULL }
     };
 

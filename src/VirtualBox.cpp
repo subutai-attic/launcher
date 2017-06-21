@@ -100,6 +100,11 @@ bool SubutaiLauncher::VirtualBox::isUpdateRequired()
     return false;
 }
 
+std::string SubutaiLauncher::VirtualBox::getBinaryLocation()
+{
+    return _path;
+}
+
 std::string SubutaiLauncher::VirtualBox::extractVersion()
 {
     if (_version != "") 

@@ -45,6 +45,7 @@ namespace SubutaiLauncher {
             bool isInstalled();
             bool isRunning();
             bool isUpdateRequired();
+            std::string getBinaryLocation();
             std::string extractVersion();
             void getVms();
             std::vector<SubutaiVM> parseVms(const std::string& buffer);
