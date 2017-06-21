@@ -849,7 +849,7 @@ namespace SubutaiLauncher
         VirtualBox vb;
         if (!vb.findInstallation())
         {
-            return Py_BuildValue("s", "")
+			return Py_BuildValue("s", "");
         }
 
         std::string pLocation = vb.getBinaryLocation();
