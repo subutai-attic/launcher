@@ -619,7 +619,7 @@ std::string SubutaiLauncher::Environment::getDesktopDirectory()
 #if LAUNCHER_WINDOWS
 bool SubutaiLauncher::Environment::writeE2ERegistry(const std::string & name)
 {
-	Poco::Util::WinRegistryKey tkey("HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Google\\Chrome\\Extensions\\kpmiofpmlciacjblommkcinncmneeoaa");
+	Poco::Util::WinRegistryKey tkey("HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Google\\Chrome\\Extensions\\kpmiofpmlciacjblommkcinncmneeoaa", false, REG_OPTION_NON_VOLATILE);
 	if (!tkey.exists())
 	{
 		_logger->error("Specified windows key doesn't exists");

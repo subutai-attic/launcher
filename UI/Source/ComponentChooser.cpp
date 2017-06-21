@@ -277,42 +277,49 @@ void ComponentChooser::buttonClicked(juce::Button* button)
 {
     if (button == _ptpYes) 
     {
+		_logger->trace("Activating P2P");
         _ptpLabel.setColour(Label::textColourId, Colours::white);
         _ptp = true;
 		return;
     } 
     else if (button == _ptpNo) 
     {
+		_logger->trace("Deactivating P2P");
         _ptpLabel.setColour(Label::textColourId, Colours::grey);
         _ptp = false;
 		return;
     } 
     else if (button == _trayYes) 
     {
+		_logger->trace("Activating Tray");
         _trayLabel.setColour(Label::textColourId, Colours::white);
         _tray = true;
 		return;
     }
     else if (button == _trayNo) 
     {
+		_logger->trace("Deactivating Tray");
         _trayLabel.setColour(Label::textColourId, Colours::grey);
         _tray = false;
 		return;
     }
     else if (button == _eteYes)
     {
+		_logger->trace("Activating E2E");
         _eteLabel.setColour(Label::textColourId, Colours::white);
         _ete = true;
 		return;
     }
     else if (button == _eteNo)
     {
+		_logger->trace("Deactivating E2E");
         _eteLabel.setColour(Label::textColourId, Colours::grey);
         _ete = false;
 		return;
     }
     else if (button == _peerYes)
     {
+		_logger->trace("Activating Peer");
         _peer = true;
         _peerLabel.setColour(Label::textColourId, Colours::white);
         _cpuLabel.setColour(Label::textColourId, Colours::white);
@@ -327,6 +334,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
     }
     else if (button == _peerNo)
     {
+		_logger->trace("Deactivating Peer");
         _peer = false;
         _peerLabel.setColour(Label::textColourId, Colours::grey);
         _cpuLabel.setColour(Label::textColourId, Colours::grey);
