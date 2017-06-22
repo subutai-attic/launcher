@@ -51,6 +51,8 @@ UI/Builds/VisualStudio2015/Debug/
 /testsuite/x64
 build/launcher-windows/subutai-launcher/x64/
 build/launcher-windows/UI/x64
+package/windows/Debug
+package/windows/Release
 
 # python
 __pycache__

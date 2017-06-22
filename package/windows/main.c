@@ -39,8 +39,8 @@ main(int argc, char** argv) {
 	};
 
 	static const char* table_to_check[] = {
-		vc2013x64Code, "vc2013x64", 
-		"https://cdn.subut.ai:8338/kurjun/rest/raw/download?id=96b61b8e069832e6b809f24ea74567ba&token=null", "vc_redist_x64_2013.exe",
+		/*vc2013x64Code, "vc2013x64", 
+		"https://cdn.subut.ai:8338/kurjun/rest/raw/download?id=96b61b8e069832e6b809f24ea74567ba&token=null", "vc_redist_x64_2013.exe",*/
 		
 		vc2013x86Code, "vc2013x86", 
 		"https://cdn.subut.ai:8338/kurjun/rest/raw/download?id=0fc525b6b7b96a87523daa7a0013c69d&token=null", "vc_redist_x86_2013.exe",
