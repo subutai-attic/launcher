@@ -1,6 +1,7 @@
 import subutai
 from time import sleep
 from shutil import copyfile
+from subprocess import call
 import os
 import stat
 
@@ -20,13 +21,17 @@ def subutaistart():
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
 
+    subutai.download("tap-windows-9.21.2.exe")
+    while subutai.isDownloadComplete() != 1:
+        sleep(0.05)
+
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
 
     subutai.ProcessKill("p2p.exe")
     subutai.AddStatus("Download finished. Installing P2P")
     copyfile(tmpDir+"/p2p.exe", installDir+"/bin/p2p.exe")
-    
+
     subutai.AddStatus("Installing Service Manageer")
     subutai.ProcessKill("nssm.exe")
     copyfile(tmpDir+"/nssm.exe", installDir+"/bin/nssm.exe")
@@ -37,6 +42,11 @@ def subutaistart():
 
     subutai.AddStatus("Registering P2P as a Windows service")
     subutai.RegisterService("Subutai P2P", installDir+"bin/p2p.exe|daemon")
+
+    subutai.AddStatus("Install TUN/TAP driver")
+    call([tmpDir+'tap-windows-9.21.2.exe', '/S'])
+
+    subutai.AddStatus("Post Install Checks")
 
     sleep(10)
 
