@@ -51,7 +51,7 @@ void EnvironmentTest::testGetDesktopDirectory()
 void EnvironmentTest::testUpdatePath()
 {
 	SubutaiLauncher::Environment env;
-	env.updatePath();
+	env.updatePath(SubutaiLauncher::Session::instance()->getSettings()->getInstallationPath() + "bin");
 }
 
 void EnvironmentTest::testWriteE2ERegistry()

@@ -746,7 +746,7 @@ namespace SubutaiLauncher
 	{
 		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
 		Environment e;
-		e.updatePath();
+		e.updatePath(Session::instance()->getSettings()->getInstallationPath() + "bin");
 		return Py_BuildValue("i", 0);
 	}
 
