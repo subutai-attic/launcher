@@ -860,6 +860,7 @@ namespace SubutaiLauncher
 
 	static PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
 	{
+#if LAUNCHER_WINDOWS
 		Environment e;
 		if (e.writeE2ERegistry(""))
 		{
@@ -869,6 +870,9 @@ namespace SubutaiLauncher
 		{
 			return Py_BuildValue("i", 1);
 		}
+#else
+		return Py_BuildValue("i", 1);
+#endif
 	}
 
     // ========================================================================

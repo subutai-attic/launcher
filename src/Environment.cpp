@@ -1,7 +1,9 @@
 #define WINVER 0x0601 // Allow use of features specific to Windows 7 or later.
 #define _WIN32_WINNT 0x0601
 #include "Environment.h"
+#if LAUNCHER_WINDOWS
 #include <Shlobj.h>
+#endif
 
 //USES_CONVERSION;
 
@@ -519,6 +521,7 @@ void SubutaiLauncher::Environment::CreateShortcut(const std::string& source, con
 
 int32_t SubutaiLauncher::Environment::updatePath(const std::string& path)
 {
+#if LAUNCHER_WINDOWS
 	_logger->trace("Environment::updatePath");
 
 	std::wstring name(path.begin(), path.end());
@@ -645,6 +648,7 @@ int32_t SubutaiLauncher::Environment::updatePath(const std::string& path)
 	}
 	_logger->information("PATH variable is up-to-date");
 	*/
+#endif
 }
 
 bool SubutaiLauncher::Environment::killProcess(const std::string & name)
@@ -691,6 +695,7 @@ bool SubutaiLauncher::Environment::killProcess(const std::string & name)
 
 std::string SubutaiLauncher::Environment::getDesktopDirectory()
 {
+#if LAUNCHER_WINDOWS
 	_logger->debug("Retrieving desktop directory");
 	wchar_t* pDesktopPath = 0;
 	
@@ -704,6 +709,7 @@ std::string SubutaiLauncher::Environment::getDesktopDirectory()
 	}
 	_logger->error("Failed to retrieve desktop path");
 	CoTaskMemFree(static_cast<void*>(pDesktopPath));
+#endif
 	return "";
 }
 
