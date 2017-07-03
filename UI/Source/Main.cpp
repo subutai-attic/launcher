@@ -30,7 +30,7 @@ UIApplication::UIApplication()
 		Poco::Logger::get("subutai").error(e.displayText());
 	}
 	SubutaiLauncher::Environment env;
-	env.updatePath();
+	env.updatePath(SubutaiLauncher::Session::instance()->getSettings()->getInstallationPath() + "bin");
 }
 
 const juce::String UIApplication::getApplicationName()

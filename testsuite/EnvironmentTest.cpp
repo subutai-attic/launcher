@@ -51,7 +51,15 @@ void EnvironmentTest::testGetDesktopDirectory()
 void EnvironmentTest::testUpdatePath()
 {
 	SubutaiLauncher::Environment env;
-	env.updatePath();
+	env.updatePath(SubutaiLauncher::Session::instance()->getSettings()->getInstallationPath() + "bin");
+}
+
+void EnvironmentTest::testWriteE2ERegistry()
+{
+	std::vector<std::string> args;
+	SubutaiLauncher::Core c(args);
+	SubutaiLauncher::Environment env;
+	env.writeE2ERegistry("");
 }
 
 CppUnit::Test * EnvironmentTest::suite()
@@ -62,6 +70,7 @@ CppUnit::Test * EnvironmentTest::suite()
     CppUnit_addTest(pSuite, EnvironmentTest, testGetDefaultGateway);
 	CppUnit_addTest(pSuite, EnvironmentTest, testGetDesktopDirectory);
 	CppUnit_addTest(pSuite, EnvironmentTest, testUpdatePath);
+	CppUnit_addTest(pSuite, EnvironmentTest, testWriteE2ERegistry);
 
     return pSuite;
 }

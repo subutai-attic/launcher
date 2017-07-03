@@ -746,7 +746,7 @@ namespace SubutaiLauncher
 	{
 		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
 		Environment e;
-		e.updatePath();
+		e.updatePath(Session::instance()->getSettings()->getInstallationPath() + "bin");
 		return Py_BuildValue("i", 0);
 	}
 
@@ -856,6 +856,21 @@ namespace SubutaiLauncher
         return Py_BuildValue("s", pLocation.c_str());
     }
 
+	// ========================================================================
+
+	static PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
+	{
+		Environment e;
+		if (e.writeE2ERegistry(""))
+		{
+			return Py_BuildValue("i", 0);
+		}
+		else
+		{
+			return Py_BuildValue("i", 1);
+		}
+	}
+
     // ========================================================================
     // Module bindings
     // ========================================================================
@@ -909,6 +924,9 @@ namespace SubutaiLauncher
 		{ "GetRemoteTemplateSize", (PyCFunction)SL_GetRemoteTemplateSize, METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for kurjun file" },
 		{ "GetPeerFileSize", (PyCFunction)SL_GetPeerFileSize, METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for a file inside a peer over SSH" },
         { "GetVBoxPath", SL_GetVBoxPath, METH_VARARGS, "Returns path to a vboxmanage binary" },
+#if LAUNCHER_WINDOWS
+		{ "RegisterPlugin", SL_RegisterPlugin, METH_VARARGS, "Registers a plugin in windows registry" },
+#endif
         { NULL, NULL, 0, NULL }
     };
 
