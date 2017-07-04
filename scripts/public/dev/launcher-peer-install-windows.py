@@ -184,7 +184,11 @@ def setupVm(machineName):
         if ret != 0:
             return 1
 
-        subutai.VBox("modifyvm " + machineName + " --cpus 2")
+        cpus = subutai.GetCpuNum()
+        mem = subutai.GetMemSize() * 1024
+
+        subutai.VBox("modifyvm " + machineName + " --cpus " + str(cpus))
+        subutai.VBox("modifyvm " + machineName + " --memory " + str(mem))
         subutai.VBox("modifyvm " + machineName + " --nic1 nat")
         subutai.VBox("modifyvm " + machineName + " --cableconnected1 on")
         subutai.VBox("modifyvm " + machineName + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
