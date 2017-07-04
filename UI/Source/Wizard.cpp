@@ -231,6 +231,9 @@ void Wizard::runInstall()
 {
     _logger->debug("Collecting choosen components");
     auto c = _componentChooserPage->getComponents();
+	SubutaiLauncher::Session::instance()->getSettings()->setCoreNum(c.cpu);
+	SubutaiLauncher::Session::instance()->getSettings()->setMemSize(c.mem);
+
     cleanInstallers();
 
     if (c.ptp && !_ptpInstalled) 

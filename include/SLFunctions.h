@@ -858,6 +858,22 @@ namespace SubutaiLauncher
 
 	// ========================================================================
 
+	static PyObject* SL_GetCoreNum(PyObject* self, PyObject* args)
+	{
+		int num = Session::instance()->getSettings()->getCoreNum();
+		return Py_BuildValue("i", num);
+	}
+
+	// ========================================================================
+
+	static PyObject* SL_GetMemSize(PyObject* self, PyObject* args)
+	{
+		int size = Session::instance()->getSettings()->getMemSize();
+		return Py_BuildValue("i", size);
+	}
+
+	// ========================================================================
+
 	static PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
 	{
 #if LAUNCHER_WINDOWS
@@ -928,6 +944,8 @@ namespace SubutaiLauncher
 		{ "GetRemoteTemplateSize", (PyCFunction)SL_GetRemoteTemplateSize, METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for kurjun file" },
 		{ "GetPeerFileSize", (PyCFunction)SL_GetPeerFileSize, METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for a file inside a peer over SSH" },
         { "GetVBoxPath", SL_GetVBoxPath, METH_VARARGS, "Returns path to a vboxmanage binary" },
+		{ "GetCoreNum", SL_GetCoreNum, METH_VARARGS, "Returns choosen amount of cores" },
+		{ "GetMemSize", SL_GetMemSize, METH_VARARGS, "Return amount of memory" },
 #if LAUNCHER_WINDOWS
 		{ "RegisterPlugin", SL_RegisterPlugin, METH_VARARGS, "Registers a plugin in windows registry" },
 #endif
