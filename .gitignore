@@ -87,3 +87,5 @@ lnchr.conf
 /package/linux/debian/SubutaiLauncher
 /package/linux/debian/python
 
+qt_launcher.pro
+qt_launcher.pro.user
