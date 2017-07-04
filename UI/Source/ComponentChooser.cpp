@@ -17,6 +17,7 @@ ComponentChooser::ComponentChooser() :
     // P2P
     
     _ptpNo = new juce::TextButton("-");
+	_ptpNo->setTooltip("Exclude P2P");
     _ptpNo->setClickingTogglesState(true);
     _ptpNo->setRadioGroupId(20001);
     _ptpNo->setColour(TextButton::buttonColourId, Colours::white);
@@ -25,6 +26,7 @@ ComponentChooser::ComponentChooser() :
     _ptpNo->setConnectedEdges(Button::ConnectedOnRight);
     _ptpNo->addListener(this);
     _ptpYes = new juce::TextButton("+");
+	_ptpYes->setTooltip("Include P2P");
     _ptpYes->setClickingTogglesState(true);
     _ptpYes->setRadioGroupId(20001);
     _ptpYes->setColour(TextButton::buttonColourId, Colours::white);
@@ -166,6 +168,7 @@ ComponentChooser::ComponentChooser() :
     // CPUs
 
     _cpuMinus = new juce::TextButton("-");
+	_cpuMinus->setTooltip("Remove one core");
     _cpuMinus->setColour(TextButton::buttonColourId, Colours::white);
     _cpuMinus->setBounds(20, 175, 36, 30);
     _cpuMinus->setConnectedEdges(Button::ConnectedOnRight);

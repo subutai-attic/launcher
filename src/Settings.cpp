@@ -11,7 +11,10 @@ const std::string SubutaiLauncher::Settings::DEFAULT_PATH = "/usr/local/share/su
 
 const std::string SubutaiLauncher::Settings::DEFAULT_TMP = "/tmp/subutai";
 
-SubutaiLauncher::Settings::Settings() {
+SubutaiLauncher::Settings::Settings() :
+	_coreNum(2),
+	_memSize(2)
+{
     setInstallationPath(getDefaultInstallationPath());
     setTmpPath(getDefaultTmpPath());
     return;
@@ -127,4 +130,24 @@ void SubutaiLauncher::Settings::setInstallationPath(const std::string& path) {
 
 void SubutaiLauncher::Settings::setTmpPath(const std::string& path) {
     _tmpPath = path;
+}
+
+void SubutaiLauncher::Settings::setCoreNum(int num)
+{
+	_coreNum = num;
+}
+
+void SubutaiLauncher::Settings::setMemSize(int size)
+{
+	_memSize = size;
+}
+
+int SubutaiLauncher::Settings::getCoreNum()
+{
+	return _coreNum;
+}
+
+int SubutaiLauncher::Settings::getMemSize()
+{
+	return _memSize;
 }
