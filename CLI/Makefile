@@ -1,7 +1,7 @@
 CC=g++
 TARGET = sl-cli
 INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(OPENSSL_DIR)/include -I../include
-LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -lcurl -lssh -lsubutai-launcher -L../bin -L$(PYLIB_DIR) -lPocoNet
+LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -lssh -lsubutai-launcher -L../bin -L$(PYLIB_DIR) -lPocoNet -lPocoFoundation
 CFLAGS = -L/lib/x86_64-linux-gnu -Wno-write-strings $(INCLUDES) $(LIBS) -std=c++11 -DRT_OS_LINUX
 
 SRC_DIR = src
