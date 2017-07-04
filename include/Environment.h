@@ -53,6 +53,16 @@
 
 namespace SubutaiLauncher {
 
+	typedef enum error_codes {
+		ec_success = 0,
+		ec_wrong_key_type,
+		ec_cant_open_reg_key,
+		ec_cant_query_reg_value,
+		ec_cant_change_registry,
+		ec_need_to_realloc,
+		ec_existing_val
+	} error_codes_t;
+
     class Environment {
         public:
 #if LAUNCHER_MACOS
@@ -76,10 +86,12 @@ namespace SubutaiLauncher {
 			bool registerService(const std::string& name, const std::string& path, std::vector<std::string> args);
 			bool unregisterService(const std::string& name);
 			void CreateShortcut(const std::string& source, const std::string& name);
-			void updatePath();
+			int32_t updatePath(const std::string& path);
 			bool killProcess(const std::string& name);
 			std::string getDesktopDirectory();
+#if LAUNCHER_WINDOWS
 			bool writeE2ERegistry(const std::string& name);
+#endif
         private:
 #if LAUNCHER_WINDOWS
 			BOOL terminateWinProcess(DWORD dwProcessId, UINT uExitCode);

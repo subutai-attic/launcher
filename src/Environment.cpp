@@ -1,7 +1,9 @@
 #define WINVER 0x0601 // Allow use of features specific to Windows 7 or later.
 #define _WIN32_WINNT 0x0601
 #include "Environment.h"
+#if LAUNCHER_WINDOWS
 #include <Shlobj.h>
+#endif
 
 //USES_CONVERSION;
 
@@ -517,8 +519,99 @@ void SubutaiLauncher::Environment::CreateShortcut(const std::string& source, con
 #endif
 }
 
-void SubutaiLauncher::Environment::updatePath()
+int32_t SubutaiLauncher::Environment::updatePath(const std::string& path)
 {
+#if LAUNCHER_WINDOWS
+	_logger->trace("Environment::updatePath");
+
+	std::wstring name(path.begin(), path.end());
+	const wchar_t* str_template = name.c_str();
+
+	enum { BUFF_SIZE = 1024 * 4 };
+	//int8_t* buffer = (int8_t*)malloc(BUFF_SIZE);
+	LPBYTE buffer = (LPBYTE)malloc(BUFF_SIZE);
+
+	DWORD buff_len = BUFF_SIZE;
+	wchar_t *str_tmp;
+
+	int32_t i, tmp_res, result;
+	LPCWSTR key_path = L"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment";
+	HKEY root_key = HKEY_LOCAL_MACHINE;
+	HKEY key;
+	DWORD key_type;
+	wchar_t* key_value = L"Path";
+
+	result = ec_success;
+
+	memset(buffer, 0, buff_len);
+	setlocale(LC_ALL, ""); //todo remove
+
+	do {
+		if ((tmp_res = RegOpenKeyExW(root_key, key_path,
+			0, KEY_ALL_ACCESS, &key)) != ERROR_SUCCESS) {
+			printf("RegOpenKey %d ret %d failed with err : %d\r\n", i,
+				tmp_res, GetLastError());
+			result = ec_cant_open_reg_key;
+			break;
+		}
+
+		tmp_res = RegQueryValueExW(key, key_value,
+			NULL, &key_type,
+			buffer, &buff_len);
+
+		if (tmp_res != ERROR_SUCCESS) {
+			printf("Failed to query value. %d -> %d\r\n", tmp_res, GetLastError());
+			result = ec_cant_query_reg_value;
+			break;
+		}
+
+		if (key_type != REG_SZ && key_type != REG_EXPAND_SZ) {
+			result = ec_wrong_key_type;
+			break;
+		}
+
+		if ((str_tmp = wcsstr((wchar_t*)buffer, str_template)) != NULL) {
+			printf("found value : %ls\r\n", str_template);
+			result = ec_existing_val;
+			break;
+		}
+
+		if (wcslen(str_template) + buff_len + 2 * sizeof(wchar_t) > BUFF_SIZE) {
+			//int8_t *tmp_buff = malloc(wcslen(str_template) + buff_len + 2 * sizeof(wchar_t));
+			LPBYTE tmp_buff = (LPBYTE)malloc(wcslen(str_template) + buff_len + 2 * sizeof(wchar_t));
+			memset(tmp_buff, 0, wcslen(str_template) + buff_len + 2 * sizeof(wchar_t));
+			memcpy(tmp_buff, buffer, buff_len);
+			free(buffer);
+			buffer = tmp_buff;
+			//      result = ec_need_to_realloc;
+			//      break; //after realloc remove this break
+		}
+
+		buff_len -= sizeof(wchar_t);
+		memcpy(&buffer[buff_len], L";", sizeof(wchar_t));
+		buff_len += sizeof(wchar_t);
+		memcpy(&buffer[buff_len], str_template,
+			wcslen(str_template) * sizeof(wchar_t));
+		buff_len += wcslen(str_template) * sizeof(wchar_t);
+		printf("\r\n%.*ls\r\n", buff_len, buffer);
+		tmp_res = RegSetValueExW(key, key_value, 0, key_type,
+			buffer, buff_len);
+
+		if (tmp_res != ERROR_SUCCESS) {
+			printf("RegSetValueEx failed . res : %d, last error : %d \r\n",
+				tmp_res, GetLastError());
+			result = ec_cant_change_registry;
+			break;
+		}
+	} while (0);
+
+	RegCloseKey(key);
+
+	free(buffer);
+	return result;
+
+	_logger->trace("Environment::updatePath ~");
+	/*
 	std::string pPath = Poco::Environment::get("PATH");
 	_logger->debug("PATH: %s", pPath);
 	Poco::StringTokenizer st(pPath, ";", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
@@ -554,6 +647,8 @@ void SubutaiLauncher::Environment::updatePath()
 		return;
 	}
 	_logger->information("PATH variable is up-to-date");
+	*/
+#endif
 }
 
 bool SubutaiLauncher::Environment::killProcess(const std::string & name)
@@ -600,6 +695,7 @@ bool SubutaiLauncher::Environment::killProcess(const std::string & name)
 
 std::string SubutaiLauncher::Environment::getDesktopDirectory()
 {
+#if LAUNCHER_WINDOWS
 	_logger->debug("Retrieving desktop directory");
 	wchar_t* pDesktopPath = 0;
 	
@@ -613,8 +709,77 @@ std::string SubutaiLauncher::Environment::getDesktopDirectory()
 	}
 	_logger->error("Failed to retrieve desktop path");
 	CoTaskMemFree(static_cast<void*>(pDesktopPath));
+#endif
 	return "";
 }
+
+#if LAUNCHER_WINDOWS
+bool SubutaiLauncher::Environment::writeE2ERegistry(const std::string & name)
+{
+	char* e2e_id = "kpmiofpmlciacjblommkcinncmneeoaa";
+
+	char* key_x86[] = { "Software", "Google", "Chrome", "Extensions", e2e_id, NULL };
+	char* key_x64[] = { "Software", "Wow6432Node", "Google",
+		"Chrome", "Extensions", e2e_id, NULL };
+	char** keys[] = { key_x86, key_x64, NULL };
+	int32_t i, j, err;
+
+	HKEY root_key, sub_key;
+	DWORD disposition;
+	const char* property = "update_url";
+	const char* property_val = "https://clients2.google.com/service/update2/crx";
+
+	setlocale(LC_ALL, "");
+
+	for (i = 0; keys[i]; ++i) {
+		root_key = HKEY_LOCAL_MACHINE;
+		for (j = 0; keys[i][j]; ++j) {
+			if ((err = RegCreateKeyExA(root_key, keys[i][j],
+				0, NULL,
+				REG_OPTION_NON_VOLATILE,
+				KEY_ALL_ACCESS, NULL,
+				&sub_key, &disposition)) != ERROR_SUCCESS) {
+				printf("RegCreateKeyEx failed. res : %d, le : %d\r\n", err,
+					GetLastError());
+				break;
+			}
+
+			if (disposition == REG_OPENED_EXISTING_KEY) {
+				printf("existing key : %s\r\n", keys[i][j]);
+			}
+
+			RegCloseKey(root_key);
+			root_key = sub_key;
+		}
+
+		err = RegSetValueExA(root_key, property,
+			0, REG_SZ,
+			(BYTE*)property_val,
+			strlen(property_val)*sizeof(char));
+
+		RegCloseKey(root_key);
+		if (err != ERROR_SUCCESS) {
+			printf("Can't set value. Err : %d, LE : %d\r\n",
+				err, GetLastError());
+			continue;
+		}
+	}
+	return true;
+	/*
+	Poco::Util::WinRegistryKey tkey("HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Google\\Chrome\\Extensions\\kpmiofpmlciacjblommkcinncmneeoaa", false, REG_OPTION_NON_VOLATILE);
+	if (!tkey.exists())
+	{
+		_logger->error("Specified windows key doesn't exists");
+		//tkey.key();
+		return false;
+	}
+
+	tkey.setString("update_url", "https://clients2.google.com/service/update2/crx");
+
+	return false;
+	*/
+}
+#endif
 
 #if LAUNCHER_WINDOWS
 BOOL SubutaiLauncher::Environment::terminateWinProcess(DWORD dwProcessId, UINT uExitCode)

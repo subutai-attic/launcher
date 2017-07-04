@@ -17,6 +17,7 @@ public:
     void testGetDefaultGateway();
 	void testGetDesktopDirectory();
 	void testUpdatePath();
+	void testWriteE2ERegistry();
 
 	static CppUnit::Test* suite();
 };
