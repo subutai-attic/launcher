@@ -17,15 +17,15 @@ UIApplication::UIApplication()
 	{
 		_core->run();
 	}
+    catch (Poco::OpenFileException& e)
+    {
+        Poco::Logger::get("subutai").error(e.displayText());
+    }
 	catch (Poco::FileException& e)
 	{
 		Poco::Logger::get("subutai").error(e.displayText());
 	}
 	catch (Poco::PathSyntaxException& e)
-	{
-		Poco::Logger::get("subutai").error(e.displayText());
-	}
-	catch (Poco::OpenFileException& e)
 	{
 		Poco::Logger::get("subutai").error(e.displayText());
 	}

@@ -2,9 +2,9 @@
 #include "LibraryComponent.h"
 
 LibraryItemTab::LibraryItemTab(const std::string& title, int order, bool highlight) :
+    _selected(highlight),
     _title(title),
-    _order(order),
-    _selected(highlight)
+    _order(order)
 {
     auto font = Font(16);
     _titleLabel.setText(_title, dontSendNotification);
