@@ -78,7 +78,7 @@ int MainContentComponent::getNumRows() {
 }
 
 void MainContentComponent::paintListBoxItem(int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) {
-    if (rowNumber > _menuItems.size()) {
+    if ((size_t)rowNumber > _menuItems.size()) {
         return;
     }
 

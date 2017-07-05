@@ -129,12 +129,18 @@ void SubutaiLauncher::SSH::authenticate()
 
 int SubutaiLauncher::SSH::verifyHost()
 {
-    int state, hlen;
+    int state;
+    size_t hlen;
     unsigned char* hash = NULL;
+    int gpkh_res;
 
     state = ssh_is_server_known(_ssh);
 
-    hlen = ssh_get_pubkey_hash(_ssh, &hash);
+//    hlen = ssh_get_pubkey_hash(_ssh, &hash);
+    if ((gpkh_res = ssh_get_publickey_hash(_ssh_key, SSH_PUBLICKEY_HASH_SHA1, &hash, &hlen)))
+      return gpkh_res;
+
+
     if (hlen < 0) {
         return -1;
     }

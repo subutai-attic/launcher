@@ -44,6 +44,7 @@ namespace SubutaiLauncher {
         private:
             Poco::Logger* _logger;
             ssh_session _ssh;
+            ssh_key _ssh_key;
             std::string _path;
             std::string _location;
             std::string _username;

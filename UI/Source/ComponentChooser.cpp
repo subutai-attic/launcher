@@ -1,12 +1,12 @@
 #include "ComponentChooser.h"
 
 ComponentChooser::ComponentChooser() :
-    _cpu(2),
-    _mem(2),
     _ptp(true),
     _tray(true),
     _ete(true),
-    _peer(true)
+    _peer(true),
+    _cpu(2),
+    _mem(2)
 {
     _logger = &Poco::Logger::get("subutai");
     _logger->trace("Creating Component Chooser UI Component");
