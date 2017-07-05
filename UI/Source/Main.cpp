@@ -17,6 +17,10 @@ UIApplication::UIApplication()
 	{
 		_core->run();
 	}
+    catch (Poco::OpenFileException& e)
+    {
+        Poco::Logger::get("subutai").error(e.displayText());
+    }
 	catch (Poco::FileException& e)
 	{
 		Poco::Logger::get("subutai").error(e.displayText());
@@ -25,12 +29,8 @@ UIApplication::UIApplication()
 	{
 		Poco::Logger::get("subutai").error(e.displayText());
 	}
-	catch (Poco::OpenFileException& e)
-	{
-		Poco::Logger::get("subutai").error(e.displayText());
-	}
 	SubutaiLauncher::Environment env;
-	env.updatePath();
+	env.updatePath(SubutaiLauncher::Session::instance()->getSettings()->getInstallationPath() + "bin");
 }
 
 const juce::String UIApplication::getApplicationName()

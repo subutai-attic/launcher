@@ -23,11 +23,13 @@ class WizardInstall : public juce::Component
         bool isActive();
         void activate();
         void deactivate();
+		bool succeed();
     private:
         std::thread runThread();
         void runImpl();
         void addLine(const std::string& text, bool error = false);
     private:
+		bool _succeed;
         Poco::Logger* _logger;
         bool _running;
         bool _active;

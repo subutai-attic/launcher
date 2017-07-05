@@ -37,7 +37,7 @@ namespace SubutaiLauncher
     static char const* sl_tmpdir = "";
     static char const* sl_string = "";
     static char const* sl_desc = "";
-    static char const* sl_destination = "";
+//    static char const* sl_destination = "";
 
     //static double const* sl_double;
 	static double sl_double;
@@ -127,7 +127,7 @@ namespace SubutaiLauncher
     static PyObject* SL_Shutdown(PyObject* self, PyObject* args) 
     {
 		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        //Poco::Logger::get("subutai").information("SL_Shutdown");
+        Poco::Logger::get("subutai").trace("SL_Shutdown");
         Session::instance()->getNotificationCenter()->add(SCRIPT_FINISHED);
         return Py_BuildValue("i", 1);
     }
@@ -195,6 +195,7 @@ namespace SubutaiLauncher
         {
             return NULL;
         }
+		Poco::Logger::get("subutai").trace("SL_Download ~ %s", std::string(sl_filename));
         auto downloader = Session::instance()->getDownloader();
         PyErr_Print();
         downloader->setFilename(sl_filename);
@@ -250,7 +251,7 @@ namespace SubutaiLauncher
     static PyObject* SL_GetTmpDir(PyObject* self, PyObject* args) 
     {
 		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        //Poco::Logger::get("subutai").information("SL_GetTmpDir");
+        Poco::Logger::get("subutai").trace("SL_GetTmpDir");
         auto settings = Session::instance()->getSettings();
         auto path = settings->getTmpPath().c_str();
         return Py_BuildValue("s", path);
@@ -261,7 +262,7 @@ namespace SubutaiLauncher
     static PyObject* SL_GetInstallDir(PyObject* self, PyObject* args) 
     {
 		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        //Poco::Logger::get("subutai").information("SL_GetInstallDir");
+		Poco::Logger::get("subutai").trace("SL_GetInstallDir");
         auto settings = Session::instance()->getSettings();
         auto path = settings->getInstallationPath().c_str();
         return Py_BuildValue("s", path);
@@ -327,7 +328,6 @@ namespace SubutaiLauncher
     static PyObject* SL_VBox(PyObject* self, PyObject* args, PyObject* keywords) 
     {
 		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        //Poco::Logger::get("subutai").information("SL_VBox");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", string_keywords, &sl_string))
             return NULL;
 
@@ -379,6 +379,19 @@ namespace SubutaiLauncher
         VirtualBox vb;
         return Py_BuildValue("s", vb.getBridgedInterface(sl_string).c_str());
     }
+
+	// ========================================================================
+
+	static PyObject* SL_GetVBoxHostOnlyInterface(
+		PyObject* self,
+		PyObject* args
+		)
+	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+		
+		VirtualBox vb;
+		return Py_BuildValue("s", vb.getHostOnlyAdapter().c_str());
+	}
 
     // ========================================================================
 
@@ -558,9 +571,11 @@ namespace SubutaiLauncher
     static PyObject* SL_AddStatus(PyObject* self, PyObject* args, PyObject* keywords) 
     {
 		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        //Poco::Logger::get("subutai").information("SL_AddStatus");
+        
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
             return NULL;
+
+		Poco::Logger::get("subutai").trace("SL_AddStatus ~ %s", std::string(sl_string));
 
         Session::instance()->addStatus(sl_string);
         return Py_BuildValue("i", 0);
@@ -665,6 +680,8 @@ namespace SubutaiLauncher
 		if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
 			return NULL;
 
+		Poco::Logger::get("subutai").trace("SL_RegisterService ~ %s %s", std::string(sl_string), std::string(sl_desc));
+
 		// sl_string - name of service
 		// sl_desc - path_to_exe|arguments
 
@@ -699,6 +716,8 @@ namespace SubutaiLauncher
 		if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
 			return NULL;
 
+		Poco::Logger::get("subutai").trace("SL_UnregisterService ~ %s", std::string(sl_string));
+
 		Environment e;
 		bool rc = e.unregisterService(std::string(sl_string));
 		if (rc)
@@ -727,7 +746,7 @@ namespace SubutaiLauncher
 	{
 		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
 		Environment e;
-		e.updatePath();
+		e.updatePath(Session::instance()->getSettings()->getInstallationPath() + "bin");
 		return Py_BuildValue("i", 0);
 	}
 
@@ -823,6 +842,55 @@ namespace SubutaiLauncher
 		return Py_BuildValue("i", v.convert<int>());
 	}
 
+	// ========================================================================
+
+	static PyObject* SL_GetVBoxPath(PyObject* self, PyObject* args)
+    {
+        VirtualBox vb;
+        if (!vb.findInstallation())
+        {
+			return Py_BuildValue("s", "");
+        }
+
+        std::string pLocation = vb.getBinaryLocation();
+        return Py_BuildValue("s", pLocation.c_str());
+    }
+
+	// ========================================================================
+
+	static PyObject* SL_GetCoreNum(PyObject* self, PyObject* args)
+	{
+		int num = Session::instance()->getSettings()->getCoreNum();
+		return Py_BuildValue("i", num);
+	}
+
+	// ========================================================================
+
+	static PyObject* SL_GetMemSize(PyObject* self, PyObject* args)
+	{
+		int size = Session::instance()->getSettings()->getMemSize();
+		return Py_BuildValue("i", size);
+	}
+
+	// ========================================================================
+
+//	static PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
+//	{
+//#if LAUNCHER_WINDOWS
+//		Environment e;
+//		if (e.writeE2ERegistry(""))
+//		{
+//			return Py_BuildValue("i", 0);
+//		}
+//		else
+//		{
+//			return Py_BuildValue("i", 1);
+//		}
+//#else
+//		return Py_BuildValue("i", 1);
+//#endif
+//	}
+
     // ========================================================================
     // Module bindings
     // ========================================================================
@@ -850,6 +918,7 @@ namespace SubutaiLauncher
 		//{"ImportVirtualMachine", SL_importVirtualMachine, METH_VARARGS | METH_KEYWORDS, "Import a virtual machine into VB"},
 		{ "GetDefaultRoutingInterface", SL_GetDefaultRoutingInterface, METH_VARARGS, "Returns name of default network interface" },
 		{ "GetVBoxBridgedInterface", (PyCFunction)SL_GetVBoxBridgedInterface, METH_VARARGS | METH_KEYWORDS, "Returns name of default network interface" },
+		{ "GetVBoxHostOnlyInterface", (PyCFunction)SL_GetVBoxHostOnlyInterface, METH_VARARGS, "Returns name of the VB HO interface" },
 		{ "SetSSHCredentials", (PyCFunction)SL_SetSSHCredentials, METH_VARARGS | METH_KEYWORDS, "Set SSH Connection credentials" },
 		{ "TestSSH", (PyCFunction)SL_TestSSH, METH_VARARGS, "Test if SSH connection is alive" },
 		{ "InstallSSHKey", (PyCFunction)SL_InstallSSHKey, METH_VARARGS, "Install SSH public key" },
@@ -874,6 +943,12 @@ namespace SubutaiLauncher
 		{ "GetRemoteFileSize", (PyCFunction)SL_GetRemoteFileSize, METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for kurjun file" },
 		{ "GetRemoteTemplateSize", (PyCFunction)SL_GetRemoteTemplateSize, METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for kurjun file" },
 		{ "GetPeerFileSize", (PyCFunction)SL_GetPeerFileSize, METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for a file inside a peer over SSH" },
+        { "GetVBoxPath", SL_GetVBoxPath, METH_VARARGS, "Returns path to a vboxmanage binary" },
+		{ "GetCoreNum", SL_GetCoreNum, METH_VARARGS, "Returns choosen amount of cores" },
+		{ "GetMemSize", SL_GetMemSize, METH_VARARGS, "Return amount of memory" },
+#if LAUNCHER_WINDOWS
+		{ "RegisterPlugin", SL_RegisterPlugin, METH_VARARGS, "Registers a plugin in windows registry" },
+#endif
         { NULL, NULL, 0, NULL }
     };
 
@@ -883,7 +958,13 @@ namespace SubutaiLauncher
         NULL, NULL, NULL, NULL
     };
 
-    static PyObject* PyInit_Subutai(void)
+#ifdef __GNUC__
+#define SUPPRESS_NOT_USED_WARN __attribute__ ((unused))
+#else
+#define SUPPRESS_NOT_USED_WARN
+#endif
+
+    SUPPRESS_NOT_USED_WARN static PyObject* PyInit_Subutai(void)
     {
         return PyModule_Create(&SubutaiModule);
     }

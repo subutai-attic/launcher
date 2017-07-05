@@ -428,6 +428,7 @@ namespace Visuals
                 {
                     if (XRenderPictFormat* pictFormat = XRender::findPictureFormat())
                     {
+                        (void)pictFormat;
                         int numVisuals = 0;
                         XVisualInfo desiredVisual;
                         desiredVisual.screen = DefaultScreen (display);
