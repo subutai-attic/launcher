@@ -184,7 +184,7 @@ def setupVm(machineName):
         if ret != 0:
             return 1
 
-        cpus = subutai.GetCpuNum()
+        cpus = subutai.GetCoreNum()
         mem = subutai.GetMemSize() * 1024
 
         subutai.VBox("modifyvm " + machineName + " --cpus " + str(cpus))
