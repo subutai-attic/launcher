@@ -29,9 +29,12 @@ namespace SubutaiLauncher
 	public:
 		SS(const std::string& url);
 		~SS();
+		bool checkPeerInstall();
 	private:
 		std::string _url;
 		Poco::Logger* _logger;
+		Poco::Net::HTTPSClientSession _session;
+		Poco::Net::NameValueCollection _cookies;
 	};
 }
 

@@ -37,7 +37,7 @@ namespace SubutaiLauncher
     static char const* sl_tmpdir = "";
     static char const* sl_string = "";
     static char const* sl_desc = "";
-    static char const* sl_destination = "";
+//    static char const* sl_destination = "";
 
     //static double const* sl_double;
 	static double sl_double;
@@ -871,25 +871,43 @@ namespace SubutaiLauncher
 		int size = Session::instance()->getSettings()->getMemSize();
 		return Py_BuildValue("i", size);
 	}
+	
+	// ========================================================================
+
+	static PyObject* SL_GetPeerIP(PyObject* self, PyObject* args)
+	{
+		auto s = Session::instance();
+
+		SSH *p = new SubutaiLauncher::SSH();
+		p->setHost(s->getSSHHostname(), s->getSSHPort());
+		p->setUsername(s->getSSHUser(), s->getSSHPass());
+		p->connect();
+		p->authenticate();
+		std::string cmd("sudo subutai info ipaddr");
+		auto ret = p->execute(sl_string);
+		p->disconnect();
+		delete p;
+		return Py_BuildValue("s", ret);
+	}
 
 	// ========================================================================
 
-	static PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
-	{
-#if LAUNCHER_WINDOWS
-		Environment e;
-		if (e.writeE2ERegistry(""))
-		{
-			return Py_BuildValue("i", 0);
-		}
-		else
-		{
-			return Py_BuildValue("i", 1);
-		}
-#else
-		return Py_BuildValue("i", 1);
-#endif
-	}
+//	static PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
+//	{
+//#if LAUNCHER_WINDOWS
+//		Environment e;
+//		if (e.writeE2ERegistry(""))
+//		{
+//			return Py_BuildValue("i", 0);
+//		}
+//		else
+//		{
+//			return Py_BuildValue("i", 1);
+//		}
+//#else
+//		return Py_BuildValue("i", 1);
+//#endif
+//	}
 
     // ========================================================================
     // Module bindings
@@ -946,6 +964,7 @@ namespace SubutaiLauncher
         { "GetVBoxPath", SL_GetVBoxPath, METH_VARARGS, "Returns path to a vboxmanage binary" },
 		{ "GetCoreNum", SL_GetCoreNum, METH_VARARGS, "Returns choosen amount of cores" },
 		{ "GetMemSize", SL_GetMemSize, METH_VARARGS, "Return amount of memory" },
+		{ "GetPeerIP", SL_GetPeerIP, METH_VARARGS, "Returns Peer IP address" },
 #if LAUNCHER_WINDOWS
 		{ "RegisterPlugin", SL_RegisterPlugin, METH_VARARGS, "Registers a plugin in windows registry" },
 #endif
@@ -958,7 +977,13 @@ namespace SubutaiLauncher
         NULL, NULL, NULL, NULL
     };
 
-    static PyObject* PyInit_Subutai(void)
+#ifdef __GNUC__
+#define SUPPRESS_NOT_USED_WARN __attribute__ ((unused))
+#else
+#define SUPPRESS_NOT_USED_WARN
+#endif
+
+    SUPPRESS_NOT_USED_WARN static PyObject* PyInit_Subutai(void)
     {
         return PyModule_Create(&SubutaiModule);
     }

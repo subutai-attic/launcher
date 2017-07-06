@@ -1,10 +1,10 @@
 #include "Wizard.h"
 
 Wizard::Wizard() :
-    _next("Next"),
-    _back("Back"),
-    _cancel("Cancel"),
     _step(1),
+    _next("Next"),
+    _cancel("Cancel"),
+    _back("Back"),
     _shutdown(false)
 {
     _logger = &Poco::Logger::get("subutai");
