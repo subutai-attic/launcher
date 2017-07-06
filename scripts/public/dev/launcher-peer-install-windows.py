@@ -91,6 +91,8 @@ def waitSSH():
 
 
 def installManagement():
+    ip = subutai.GetPeerIP()
+
     subutai.AddStatus("Downloading Ubuntu")
     subutai.SSHRun("sudo subutai -d import ubuntu16 1>/tmp/ubuntu16-1.log 2>/tmp/ubuntu16-2.log")
 
@@ -99,6 +101,13 @@ def installManagement():
 
     subutai.AddStatus("Installing Management Container")
     subutai.SSHRun("sudo subutai -d import management 1>/tmp/management-1.log 2>/tmp/management-2.log")
+
+    attempts = 0
+    while subutai.IsPeerReady(ip) != 0:
+        sleep(2)
+        attempts = attempts + 1
+        if attempts >= 30:
+            break
 
     return
 
