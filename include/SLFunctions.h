@@ -37,7 +37,7 @@ namespace SubutaiLauncher
     static char const* sl_tmpdir = "";
     static char const* sl_string = "";
     static char const* sl_desc = "";
-    static char const* sl_destination = "";
+//    static char const* sl_destination = "";
 
     //static double const* sl_double;
 	static double sl_double;
@@ -892,22 +892,22 @@ namespace SubutaiLauncher
 
 	// ========================================================================
 
-	static PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
-	{
-#if LAUNCHER_WINDOWS
-		Environment e;
-		if (e.writeE2ERegistry(""))
-		{
-			return Py_BuildValue("i", 0);
-		}
-		else
-		{
-			return Py_BuildValue("i", 1);
-		}
-#else
-		return Py_BuildValue("i", 1);
-#endif
-	}
+//	static PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
+//	{
+//#if LAUNCHER_WINDOWS
+//		Environment e;
+//		if (e.writeE2ERegistry(""))
+//		{
+//			return Py_BuildValue("i", 0);
+//		}
+//		else
+//		{
+//			return Py_BuildValue("i", 1);
+//		}
+//#else
+//		return Py_BuildValue("i", 1);
+//#endif
+//	}
 
     // ========================================================================
     // Module bindings
@@ -977,7 +977,13 @@ namespace SubutaiLauncher
         NULL, NULL, NULL, NULL
     };
 
-    static PyObject* PyInit_Subutai(void)
+#ifdef __GNUC__
+#define SUPPRESS_NOT_USED_WARN __attribute__ ((unused))
+#else
+#define SUPPRESS_NOT_USED_WARN
+#endif
+
+    SUPPRESS_NOT_USED_WARN static PyObject* PyInit_Subutai(void)
     {
         return PyModule_Create(&SubutaiModule);
     }

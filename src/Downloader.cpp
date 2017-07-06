@@ -79,6 +79,7 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo(bool tmpl)
     std::string path;
     try {
         Poco::Net::HTTPSClientSession s(HOST, PORT);
+
 		if (tmpl) 
 		{
 			path.append(TREST);
@@ -124,10 +125,14 @@ bool SubutaiLauncher::Downloader::retrieveFileInfo(bool tmpl)
 
     try {
         result = parser.parse(output);
-    } catch (Poco::JSON::JSONException e) {
+    } catch (Poco::JSON::JSONException& e) {
         _logger->error("Failed to parse JSON while getting information about remote file: %s", _filename);
         _logger->debug("Failing JSON: %s", output);
         return false;
+    } catch (Poco::SyntaxException& e) {
+      _logger->error("Failed to parse JSON while getting information about remote file: %s", _filename);
+      _logger->debug("Failing JSON: %s", output);
+      return false;
     }
 
     if (result.isEmpty()) {
@@ -196,7 +201,7 @@ void SubutaiLauncher::Downloader::downloadImpl()
     std::string path;
     try 
 	{
-        std::auto_ptr<std::istream> pStr(Poco::URIStreamOpener::defaultOpener().open(uri));
+        std::unique_ptr<std::istream> pStr(Poco::URIStreamOpener::defaultOpener().open(uri));
         path.append(_outputDir);
         path.append(PATH_DELIM);
         path.append(_filename.c_str());
