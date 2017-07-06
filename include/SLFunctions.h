@@ -871,6 +871,24 @@ namespace SubutaiLauncher
 		int size = Session::instance()->getSettings()->getMemSize();
 		return Py_BuildValue("i", size);
 	}
+	
+	// ========================================================================
+
+	static PyObject* SL_GetPeerIP(PyObject* self, PyObject* args)
+	{
+		auto s = Session::instance();
+
+		SSH *p = new SubutaiLauncher::SSH();
+		p->setHost(s->getSSHHostname(), s->getSSHPort());
+		p->setUsername(s->getSSHUser(), s->getSSHPass());
+		p->connect();
+		p->authenticate();
+		std::string cmd("sudo subutai info ipaddr");
+		auto ret = p->execute(sl_string);
+		p->disconnect();
+		delete p;
+		return Py_BuildValue("s", ret);
+	}
 
 	// ========================================================================
 
@@ -946,6 +964,7 @@ namespace SubutaiLauncher
         { "GetVBoxPath", SL_GetVBoxPath, METH_VARARGS, "Returns path to a vboxmanage binary" },
 		{ "GetCoreNum", SL_GetCoreNum, METH_VARARGS, "Returns choosen amount of cores" },
 		{ "GetMemSize", SL_GetMemSize, METH_VARARGS, "Return amount of memory" },
+		{ "GetPeerIP", SL_GetPeerIP, METH_VARARGS, "Returns Peer IP address" },
 #if LAUNCHER_WINDOWS
 		{ "RegisterPlugin", SL_RegisterPlugin, METH_VARARGS, "Registers a plugin in windows registry" },
 #endif
