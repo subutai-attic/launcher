@@ -178,6 +178,7 @@ int SubutaiLauncher::SSH::verifyHost()
 
 std::string SubutaiLauncher::SSH::execute(const std::string& command)
 {
+	_logger->trace("Executing SSH command: %s", command);
     ssh_channel chan;
     int rc;
     char buffer[1024];
@@ -185,13 +186,17 @@ std::string SubutaiLauncher::SSH::execute(const std::string& command)
     memset(buffer, 0, 1024);
 
     chan = ssh_channel_new(_ssh);
-    if (chan == NULL) 
-        return "Error: Failed to open channel ";
+	if (chan == NULL)
+	{
+		_logger->error("Failed to open channel");
+		return "Error: Failed to open channel ";
+	}
 
     rc = ssh_channel_open_session(chan);
     if (rc != SSH_OK) {
         ssh_channel_close(chan);
         ssh_channel_free(chan);
+		_logger->error("Failed to open SSH session");
         return "Error: Failed to open SSH session ";
     }
 
@@ -199,12 +204,14 @@ std::string SubutaiLauncher::SSH::execute(const std::string& command)
     if (rc != SSH_OK) {
         ssh_channel_close(chan);
         ssh_channel_free(chan);
+		_logger->error("Failed to execute command");
         return "Error: Failed to execute command ";
     }
 
     nbytes = ssh_channel_read(chan, buffer, sizeof(buffer), 1);
 
     while (nbytes > 0) {
+		_logger->trace("SSH some bytes");
 #if LAUNCHER_WINDOWS
         if (_write(1, buffer, nbytes) != (unsigned int)nbytes) {
 #else
@@ -212,14 +219,17 @@ std::string SubutaiLauncher::SSH::execute(const std::string& command)
 #endif
                 ssh_channel_close(chan);
                 ssh_channel_free(chan);
+				_logger->error("Failed to write to channel");
                 return "Error: Failed to wtite to channel ";
             }
             nbytes = ssh_channel_read(chan, buffer, sizeof(buffer), 1);
+			_logger->trace("SSH: %d bytes written", nbytes);
         }
 
         if (nbytes < 0) {
             ssh_channel_close(chan);
             ssh_channel_free(chan);
+			_logger->error("Output channel is empty");
             return "Error: Output channel is empty ";
         }
 

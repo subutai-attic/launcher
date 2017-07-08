@@ -29,6 +29,7 @@
 #include "Environment.h"
 #include "VirtualBox.h"
 #include "RootProcess.h"
+#include "SS.h"
 
 namespace SubutaiLauncher 
 {
@@ -37,7 +38,7 @@ namespace SubutaiLauncher
     static char const* sl_tmpdir = "";
     static char const* sl_string = "";
     static char const* sl_desc = "";
-//    static char const* sl_destination = "";
+    static char const* sl_destination = "";
 
     //static double const* sl_double;
 	static double sl_double;
@@ -860,6 +861,8 @@ namespace SubutaiLauncher
 
 	static PyObject* SL_GetCoreNum(PyObject* self, PyObject* args)
 	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+
 		int num = Session::instance()->getSettings()->getCoreNum();
 		return Py_BuildValue("i", num);
 	}
@@ -868,6 +871,8 @@ namespace SubutaiLauncher
 
 	static PyObject* SL_GetMemSize(PyObject* self, PyObject* args)
 	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+
 		int size = Session::instance()->getSettings()->getMemSize();
 		return Py_BuildValue("i", size);
 	}
@@ -876,6 +881,8 @@ namespace SubutaiLauncher
 
 	static PyObject* SL_GetPeerIP(PyObject* self, PyObject* args)
 	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+		Poco::Logger::get("subutai").trace("SL_GetPeerIP");
 		auto s = Session::instance();
 
 		SSH *p = new SubutaiLauncher::SSH();
@@ -884,7 +891,7 @@ namespace SubutaiLauncher
 		p->connect();
 		p->authenticate();
 		std::string cmd("sudo subutai info ipaddr");
-		auto ret = p->execute(sl_string);
+		auto ret = p->execute(cmd);
 		p->disconnect();
 		delete p;
 		return Py_BuildValue("s", ret);
@@ -892,22 +899,41 @@ namespace SubutaiLauncher
 
 	// ========================================================================
 
-//	static PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
-//	{
-//#if LAUNCHER_WINDOWS
-//		Environment e;
-//		if (e.writeE2ERegistry(""))
-//		{
-//			return Py_BuildValue("i", 0);
-//		}
-//		else
-//		{
-//			return Py_BuildValue("i", 1);
-//		}
-//#else
-//		return Py_BuildValue("i", 1);
-//#endif
-//	}
+	static PyObject* SL_IsPeerReady(PyObject* self, PyObject* args, PyObject* keywords)
+	{
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+		Poco::Logger::get("subutai").trace("SL_IsPeerReady");
+		if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+			return NULL;
+
+		SS* subutai = new SS(std::string(sl_string));
+		if (subutai->checkPeerInstall())
+		{
+			delete subutai;
+			return Py_BuildValue("i", 0);
+		}
+		delete subutai;
+		return Py_BuildValue("i", 1);
+	}
+
+	// ========================================================================
+
+	static PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
+	{
+#if LAUNCHER_WINDOWS
+		Environment e;
+		if (e.writeE2ERegistry(""))
+		{
+			return Py_BuildValue("i", 0);
+		}
+		else
+		{
+			return Py_BuildValue("i", 1);
+		}
+#else
+		return Py_BuildValue("i", 1);
+#endif
+	}
 
     // ========================================================================
     // Module bindings
@@ -965,6 +991,7 @@ namespace SubutaiLauncher
 		{ "GetCoreNum", SL_GetCoreNum, METH_VARARGS, "Returns choosen amount of cores" },
 		{ "GetMemSize", SL_GetMemSize, METH_VARARGS, "Return amount of memory" },
 		{ "GetPeerIP", SL_GetPeerIP, METH_VARARGS, "Returns Peer IP address" },
+		{ "IsPeerReady", (PyCFunction)SL_IsPeerReady, METH_VARARGS | METH_KEYWORDS, "Returns 0 if peer is ready or 1 if it's not" },
 #if LAUNCHER_WINDOWS
 		{ "RegisterPlugin", SL_RegisterPlugin, METH_VARARGS, "Registers a plugin in windows registry" },
 #endif
@@ -977,13 +1004,7 @@ namespace SubutaiLauncher
         NULL, NULL, NULL, NULL
     };
 
-#ifdef __GNUC__
-#define SUPPRESS_NOT_USED_WARN __attribute__ ((unused))
-#else
-#define SUPPRESS_NOT_USED_WARN
-#endif
-
-    SUPPRESS_NOT_USED_WARN static PyObject* PyInit_Subutai(void)
+    static PyObject* PyInit_Subutai(void)
     {
         return PyModule_Create(&SubutaiModule);
     }
