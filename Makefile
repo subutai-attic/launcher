@@ -130,6 +130,9 @@ $(BUILD_DIR)/Tray.o: $(SRC_DIR)/Tray.cpp $(INCLUDE_DIR)/Tray.h
 $(BUILD_DIR)/VirtualBox.o: $(SRC_DIR)/VirtualBox.cpp $(INCLUDE_DIR)/VirtualBox.h
 	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
 
+$(BUILD_DIR)/SS.o: $(SRC_DIR)/SS.cpp $(INCLUDE_DIR)/SS.h
+	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
+
 OBJS = $(BUILD_DIR)/Core.o \
 								 	 $(BUILD_DIR)/Downloader.o \
 									 $(BUILD_DIR)/Environment.o \
@@ -147,7 +150,8 @@ OBJS = $(BUILD_DIR)/Core.o \
 									 $(BUILD_DIR)/SubutaiException.o \
 									 $(BUILD_DIR)/SubutaiString.o \
 									 $(BUILD_DIR)/Tray.o \
-									 $(BUILD_DIR)/VirtualBox.o	 
+									 $(BUILD_DIR)/VirtualBox.o \
+									 $(BUILD_DIR)/SS.o
 
 $(OUTPUT_DIR)/$(SHARED_TARGET): $(OBJS)
 	$(CC) -shared $^ $(LDFLAGS) -o $@
