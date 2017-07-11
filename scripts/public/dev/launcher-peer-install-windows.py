@@ -93,6 +93,10 @@ def waitSSH():
 def installManagement():
     ip = subutai.GetPeerIP()
 
+    if ip == "":
+        subutai.RaiseError("Failed to determine peer IP address")
+        return
+
     subutai.AddStatus("Downloading Ubuntu")
     subutai.SSHRun("sudo subutai -d import ubuntu16 1>/tmp/ubuntu16-1.log 2>/tmp/ubuntu16-2.log")
 
