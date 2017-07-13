@@ -890,11 +890,10 @@ namespace SubutaiLauncher
 		p->setUsername(s->getSSHUser(), s->getSSHPass());
 		p->connect();
 		p->authenticate();
-		std::string cmd("sudo subutai info ipaddr");
-		auto ret = p->execute(cmd);
+		auto ret = p->execute("sudo subutai info ipaddr");
 		p->disconnect();
 		delete p;
-		return Py_BuildValue("s", ret);
+		return Py_BuildValue("s", ret.c_str());
 	}
 
 	// ========================================================================
