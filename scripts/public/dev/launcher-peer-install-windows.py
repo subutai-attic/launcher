@@ -93,6 +93,12 @@ def waitSSH():
 def installManagement():
     ip = subutai.GetPeerIP()
 
+    if ip == "":
+        subutai.RaiseError("Failed to determine peer IP address")
+        return
+
+    ip = "127.0.0.1"
+
     subutai.AddStatus("Downloading Ubuntu")
     subutai.SSHRun("sudo subutai -d import ubuntu16 1>/tmp/ubuntu16-1.log 2>/tmp/ubuntu16-2.log")
 
@@ -193,7 +199,11 @@ def setupVm(machineName):
         if ret != 0:
             return 1
 
-        subutai.VBox("modifyvm " + machineName + " --cpus 2")
+        cpus = subutai.GetCoreNum()
+        mem = subutai.GetMemSize() * 1024
+
+        subutai.VBox("modifyvm " + machineName + " --cpus " + str(cpus))
+        subutai.VBox("modifyvm " + machineName + " --memory " + str(mem))
         subutai.VBox("modifyvm " + machineName + " --nic1 nat")
         subutai.VBox("modifyvm " + machineName + " --cableconnected1 on")
         subutai.VBox("modifyvm " + machineName + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")

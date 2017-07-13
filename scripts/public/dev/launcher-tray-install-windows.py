@@ -38,11 +38,13 @@ def subutaistart():
                                   "Subutai Tray")
 
     subutai.AddStatus("Writing configuration")
-    f = open(installDir+"/subutai_tray.conf", "w")
-    f.write("P2P_Path="+installDir+"/bin/p2p.exe\n")
-    f.write("VBoxManage_Path="+subutai.GetVBoxPath()+"\n")
-    f.write("Ssh_Path="+installDir+"/bin/ssh.exe\n")
-    f.write("Ssh_Keygen_Cmd="+installDir+"/bin/ssh-keygen.exe\n")
+    unPath = installDir.replace('\\', '/')
+    unVBoxPath = subutai.GetVBoxPath().replace('\\', '/')
+    f = open(unPath+"/tray/subutai_tray.ini", "w")
+    f.write("P2P_Path="+unPath+"/bin/p2p.exe\n")
+    f.write("VBoxManage_Path="+unVBoxPath+"\n")
+    f.write("Ssh_Path="+unPath+"/bin/ssh.exe\n")
+    f.write("Ssh_Keygen_Cmd="+unPath+"/bin/ssh-keygen.exe\n")
     f.close()
 
     subutai.Shutdown()
