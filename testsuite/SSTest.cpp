@@ -23,7 +23,9 @@ void SSTest::tearDown()
 
 void SSTest::testCheckPeerInstall()
 {
-
+	SubutaiLauncher::SS* subutai = new SubutaiLauncher::SS(std::string("127.0.0.1"));
+	bool rs = subutai->checkPeerInstall();
+	assert(rs);
 }
 
 CppUnit::Test * SSTest::suite()

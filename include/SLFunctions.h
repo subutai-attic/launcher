@@ -905,14 +905,21 @@ namespace SubutaiLauncher
 		if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
 			return NULL;
 
-		SS* subutai = new SS(std::string(sl_string));
-		if (subutai->checkPeerInstall())
+		try
 		{
+			SS* subutai = new SS(std::string(sl_string));
+			if (subutai->checkPeerInstall())
+			{
+				delete subutai;
+				return Py_BuildValue("i", 0);
+			}
 			delete subutai;
-			return Py_BuildValue("i", 0);
+			return Py_BuildValue("i", 1);
+		} 
+		catch (std::exception& e)
+		{
+			return Py_BuildValue("i", 2);
 		}
-		delete subutai;
-		return Py_BuildValue("i", 1);
 	}
 
 	// ========================================================================
