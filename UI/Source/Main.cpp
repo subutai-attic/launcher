@@ -31,6 +31,9 @@ UIApplication::UIApplication()
 	}
 	SubutaiLauncher::Environment env;
 	env.updatePath(SubutaiLauncher::Session::instance()->getSettings()->getInstallationPath() + "bin");
+
+    SubutaiLauncher::AssetsManager pAssets;
+    pAssets.verify();
 }
 
 const juce::String UIApplication::getApplicationName()
