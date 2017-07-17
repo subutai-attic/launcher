@@ -282,48 +282,48 @@ void ComponentChooser::buttonClicked(juce::Button* button)
     {
 		_logger->trace("Activating P2P");
         _ptpLabel.setColour(Label::textColourId, Colours::white);
-        _ptp = true;
+        SubutaiLauncher::Session::instance()->getSettings()->setInstallationP2P(true);
 		return;
     } 
     else if (button == _ptpNo) 
     {
 		_logger->trace("Deactivating P2P");
         _ptpLabel.setColour(Label::textColourId, Colours::grey);
-        _ptp = false;
+        SubutaiLauncher::Session::instance()->getSettings()->setInstallationP2P(false);
 		return;
     } 
     else if (button == _trayYes) 
     {
 		_logger->trace("Activating Tray");
         _trayLabel.setColour(Label::textColourId, Colours::white);
-        _tray = true;
+        SubutaiLauncher::Session::instance()->getSettings()->setInstallationTray(true);
 		return;
     }
     else if (button == _trayNo) 
     {
 		_logger->trace("Deactivating Tray");
         _trayLabel.setColour(Label::textColourId, Colours::grey);
-        _tray = false;
+        SubutaiLauncher::Session::instance()->getSettings()->setInstallationTray(false);
 		return;
     }
     else if (button == _eteYes)
     {
 		_logger->trace("Activating E2E");
         _eteLabel.setColour(Label::textColourId, Colours::white);
-        _ete = true;
+        SubutaiLauncher::Session::instance()->getSettings()->setInstallationE2E(true);
 		return;
     }
     else if (button == _eteNo)
     {
 		_logger->trace("Deactivating E2E");
         _eteLabel.setColour(Label::textColourId, Colours::grey);
-        _ete = false;
+        SubutaiLauncher::Session::instance()->getSettings()->setInstallationE2E(false);
 		return;
     }
     else if (button == _peerYes)
     {
 		_logger->trace("Activating Peer");
-        _peer = true;
+        SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(true);
         _peerLabel.setColour(Label::textColourId, Colours::white);
         _cpuLabel.setColour(Label::textColourId, Colours::white);
         _memLabel.setColour(Label::textColourId, Colours::white);
@@ -338,7 +338,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
     else if (button == _peerNo)
     {
 		_logger->trace("Deactivating Peer");
-        _peer = false;
+        SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(false);
         _peerLabel.setColour(Label::textColourId, Colours::grey);
         _cpuLabel.setColour(Label::textColourId, Colours::grey);
         _memLabel.setColour(Label::textColourId, Colours::grey);
@@ -353,6 +353,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
     else if (button == _cpuPlus) 
     {
         _cpu++;
+        SubutaiLauncher::Session::instance()->getSettings()->setInstallationCpuNum(_cpu);
         char t[4];
         std::sprintf(t, "%d", _cpu);
         _cpuNum->setButtonText(t);
@@ -364,6 +365,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
         if (_cpu <= 1) {
             _cpu = 1;
         }
+        SubutaiLauncher::Session::instance()->getSettings()->setInstallationCpuNum(_cpu);
         char t[4];
         std::sprintf(t, "%d", _cpu);
         _cpuNum->setButtonText(t);
@@ -372,6 +374,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
     else if (button == _memPlus) 
     {
         _mem++;
+        SubutaiLauncher::Session::instance()->getSettings()->setInstallationMemSize(_mem);
         char t[4];
         std::sprintf(t, "%d", _mem);
         _memSize->setButtonText(t);
@@ -383,6 +386,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
         if (_mem <= 1) {
             _mem = 1;
         }
+        SubutaiLauncher::Session::instance()->getSettings()->setInstallationMemSize(_mem);
         char t[4];
         std::sprintf(t, "%d", _mem);
         _memSize->setButtonText(t);

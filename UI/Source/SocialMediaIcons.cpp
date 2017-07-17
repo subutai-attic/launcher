@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    SocialMediaIcons.cpp
-    Created: 23 Aug 2016 7:32:40pm
-    Author:  crioto
-
-  ==============================================================================
-*/
-
 #include "SocialMediaIcons.h"
 
 SocialMediaIcons::SocialMediaIcons() {

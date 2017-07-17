@@ -1,15 +1,5 @@
-/*
-   ==============================================================================
-
-   This file was auto-generated!
-
-   ==============================================================================
-   */
-
 #include "MainComponent.h"
 
-
-//==============================================================================
 MainContentComponent::MainContentComponent() 
 {
 
@@ -41,11 +31,9 @@ MainContentComponent::MainContentComponent()
     addChildComponent(_community);
 }
 
-
 MainContentComponent::~MainContentComponent()
 {
 }
-
 
 void MainContentComponent::paint (Graphics& g)
 {

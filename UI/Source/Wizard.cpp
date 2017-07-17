@@ -230,13 +230,14 @@ void Wizard::buttonClicked(juce::Button* button)
 void Wizard::runInstall()
 {
     _logger->debug("Collecting choosen components");
-    auto c = _componentChooserPage->getComponents();
-	SubutaiLauncher::Session::instance()->getSettings()->setCoreNum(c.cpu);
-	SubutaiLauncher::Session::instance()->getSettings()->setMemSize(c.mem);
+    //auto c = _componentChooserPage->getComponents();
+    SubutaiLauncher::InstallationSettings pSettings = SubutaiLauncher::Session::instance()->getSettings()->getInstallationSettings();
+	SubutaiLauncher::Session::instance()->getSettings()->setCoreNum(pSettings.cpuNum);
+	SubutaiLauncher::Session::instance()->getSettings()->setMemSize(pSettings.memSize);
 
     cleanInstallers();
 
-    if (c.ptp && !_ptpInstalled) 
+    if (pSettings.installP2P && !_ptpInstalled) 
     {
         _ptpInstall->activate();
         _logger->debug("P2P Component has been choosen");
@@ -244,7 +245,7 @@ void Wizard::runInstall()
         _ptpInstall->run();
         return;
     }
-    if (c.tray && !_trayInstalled) 
+    if (pSettings.installTray && !_trayInstalled) 
     {
         _trayInstall->activate();
         _logger->debug("Tray Component has been choosen");
@@ -252,7 +253,7 @@ void Wizard::runInstall()
         _trayInstall->run();
         return;
     }
-    if (c.ete && !_eteInstalled) 
+    if (pSettings.installE2E && !_eteInstalled) 
     {
         _eteInstall->activate();
         _logger->debug("Browser Plugin Component has been choosen");
@@ -260,7 +261,7 @@ void Wizard::runInstall()
         _eteInstall->run();
         return;
     }
-    if (c.peer && !_peerInstalled) 
+    if (pSettings.installPeer && !_peerInstalled) 
     {
         _peerInstall->activate();
         _logger->debug("Peer Component has been choosen");

@@ -4,8 +4,11 @@
 #include <vector>
 #include <string>
 
+#include "Poco/Logger.h"
+
 #include "Vars.h"
 #include "Session.h"
+#include "Downloader.h"
 
 namespace SubutaiLauncher
 {
@@ -17,6 +20,7 @@ namespace SubutaiLauncher
             ~AssetsManager();
             void verify();
         private:
+            Poco::Logger* _logger;
         protected:
     };
 }

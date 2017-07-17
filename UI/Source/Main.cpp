@@ -32,8 +32,17 @@ UIApplication::UIApplication()
 	SubutaiLauncher::Environment env;
 	env.updatePath(SubutaiLauncher::Session::instance()->getSettings()->getInstallationPath() + "bin");
 
+	Poco::Logger::get("subutai").information("Downloading assets");
     SubutaiLauncher::AssetsManager pAssets;
-    pAssets.verify();
+    try 
+    {
+        pAssets.verify();
+    }
+    catch (std::exception& e)
+    {
+        Poco::Logger::get("subutai").error("Failed to download assets");
+        SubutaiLauncher::Session::instance()->getDownloader()->reset();
+    }
 }
 
 const juce::String UIApplication::getApplicationName()

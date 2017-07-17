@@ -36,7 +36,7 @@ LibraryComponent::~LibraryComponent()
 }
 
 void LibraryComponent::paint(Graphics& g) {
-    g.fillAll (Colour (0xff222222));
+    g.fillAll (Colour (0xffffffff));
     g.setFont (Font (16.0f));
     g.setColour (Colours::white);
 }
