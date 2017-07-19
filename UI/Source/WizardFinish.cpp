@@ -7,12 +7,69 @@ WizardFinish::WizardFinish() :
     _logger = &Poco::Logger::get("subutai");
     _logger->trace("Creating Wizard Finish UI Component");
     auto font = juce::Font(17);
+
     _thanks.setText("Thank you for using Subutai", juce::dontSendNotification);
     _thanks.setColour(juce::Label::textColourId, juce::Colours::white);
-    _thanks.setBounds(15, 15, 150, 40);
+    _thanks.setBounds(15, 15, 400, 40);
     _thanks.setFont(font);
     _thanks.setJustificationType(juce::Justification::top);
     addAndMakeVisible(_thanks);
+
+	_ptp.setText("P2P Installation", juce::dontSendNotification);
+	_ptp.setColour(juce::Label::textColourId, juce::Colours::white);
+	_ptp.setBounds(15, 35, 150, 40);
+	_ptp.setFont(font);
+	_ptp.setJustificationType(juce::Justification::top);
+	addAndMakeVisible(_ptp);
+
+	_ptpResult.setText("Undefined", juce::dontSendNotification);
+	_ptpResult.setColour(juce::Label::textColourId, juce::Colours::white);
+	_ptpResult.setBounds(150, 35, 500, 40);
+	_ptpResult.setFont(font);
+	_ptpResult.setJustificationType(juce::Justification::top);
+	addAndMakeVisible(_ptpResult);
+
+	_tray.setText("Tray Installation", juce::dontSendNotification);
+	_tray.setColour(juce::Label::textColourId, juce::Colours::white);
+	_tray.setBounds(15, 55, 150, 40);
+	_tray.setFont(font);
+	_tray.setJustificationType(juce::Justification::top);
+	addAndMakeVisible(_tray);
+
+	_trayResult.setText("Undefined", juce::dontSendNotification);
+	_trayResult.setColour(juce::Label::textColourId, juce::Colours::white);
+	_trayResult.setBounds(150, 55, 500, 40);
+	_trayResult.setFont(font);
+	_trayResult.setJustificationType(juce::Justification::top);
+	addAndMakeVisible(_trayResult);
+
+	_ete.setText("E2E Installation", juce::dontSendNotification);
+	_ete.setColour(juce::Label::textColourId, juce::Colours::white);
+	_ete.setBounds(15, 75, 150, 40);
+	_ete.setFont(font);
+	_ete.setJustificationType(juce::Justification::top);
+	addAndMakeVisible(_ete);
+
+	_eteResult.setText("Undefined", juce::dontSendNotification);
+	_eteResult.setColour(juce::Label::textColourId, juce::Colours::white);
+	_eteResult.setBounds(150, 75, 500, 40);
+	_eteResult.setFont(font);
+	_eteResult.setJustificationType(juce::Justification::top);
+	addAndMakeVisible(_eteResult);
+
+	_peer.setText("Peer Installation", juce::dontSendNotification);
+	_peer.setColour(juce::Label::textColourId, juce::Colours::white);
+	_peer.setBounds(15, 95, 150, 40);
+	_peer.setFont(font);
+	_peer.setJustificationType(juce::Justification::top);
+	addAndMakeVisible(_peer);
+
+	_peerResult.setText("Undefined", juce::dontSendNotification);
+	_peerResult.setColour(juce::Label::textColourId, juce::Colours::white);
+	_peerResult.setBounds(150, 95, 500, 40);
+	_peerResult.setFont(font);
+	_peerResult.setJustificationType(juce::Justification::top);
+	addAndMakeVisible(_peerResult);
 
     _finish.setBounds(400, 560, 86, 25);
     _finish.setColour(juce::TextButton::buttonColourId, juce::Colour(7,141,208));
@@ -44,4 +101,72 @@ void WizardFinish::buttonClicked(juce::Button* button)
         WizardWindow* window = (WizardWindow*)getParentComponent()->getParentComponent();
         window->closeButtonPressed();
     }
+}
+
+void WizardFinish::addPTPResult(bool installed, bool succeed)
+{
+	if (!installed)
+	{
+		_ptpResult.setText("Not Installed", juce::dontSendNotification);
+		return;
+	}
+	if (succeed)
+	{
+		_ptpResult.setText("Installed", juce::dontSendNotification);
+	}
+	else
+	{
+		_ptpResult.setText("Failed", juce::dontSendNotification);
+	}
+}
+
+void WizardFinish::addTrayResult(bool installed, bool succeed)
+{
+	if (!installed)
+	{
+		_trayResult.setText("Not Installed", juce::dontSendNotification);
+		return;
+	}
+	if (succeed)
+	{
+		_trayResult.setText("Installed", juce::dontSendNotification);
+	}
+	else
+	{
+		_trayResult.setText("Failed", juce::dontSendNotification);
+	}
+}
+
+void WizardFinish::addETEResult(bool installed, bool succeed)
+{
+	if (!installed)
+	{
+		_eteResult.setText("Not Installed", juce::dontSendNotification);
+		return;
+	}
+	if (succeed)
+	{
+		_eteResult.setText("Installed", juce::dontSendNotification);
+	}
+	else
+	{
+		_eteResult.setText("Failed", juce::dontSendNotification);
+	}
+}
+
+void WizardFinish::addPeerResult(bool installed, bool succeed)
+{
+	if (!installed)
+	{
+		_peerResult.setText("Not Installed", juce::dontSendNotification);
+		return;
+	}
+	if (succeed)
+	{
+		_peerResult.setText("Installed", juce::dontSendNotification);
+	}
+	else
+	{
+		_peerResult.setText("Failed", juce::dontSendNotification);
+	}
 }

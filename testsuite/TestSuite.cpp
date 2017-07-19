@@ -11,6 +11,7 @@ CppUnit::Test* SubutaiLauncherTestSuite::suite()
     pSuite->addTest(HubTest::suite());
     pSuite->addTest(VirtualBoxTest::suite());
     pSuite->addTest(EnvironmentTest::suite());
+	pSuite->addTest(SSTest::suite());
 
     return pSuite;
 }

@@ -13,8 +13,11 @@ public:
 	void setUp();
 	void tearDown();
 
+	void testCreateShortcut();
     void testGetDefaultGateway();
+	void testGetDesktopDirectory();
 	void testUpdatePath();
+	void testWriteE2ERegistry();
 
 	static CppUnit::Test* suite();
 };

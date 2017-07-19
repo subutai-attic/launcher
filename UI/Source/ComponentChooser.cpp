@@ -1,12 +1,12 @@
 #include "ComponentChooser.h"
 
 ComponentChooser::ComponentChooser() :
-    _cpu(2),
-    _mem(2),
     _ptp(true),
     _tray(true),
     _ete(true),
-    _peer(true)
+    _peer(true),
+    _cpu(2),
+    _mem(2)
 {
     _logger = &Poco::Logger::get("subutai");
     _logger->trace("Creating Component Chooser UI Component");
@@ -17,6 +17,7 @@ ComponentChooser::ComponentChooser() :
     // P2P
     
     _ptpNo = new juce::TextButton("-");
+	_ptpNo->setTooltip("Exclude P2P");
     _ptpNo->setClickingTogglesState(true);
     _ptpNo->setRadioGroupId(20001);
     _ptpNo->setColour(TextButton::buttonColourId, Colours::white);
@@ -25,6 +26,7 @@ ComponentChooser::ComponentChooser() :
     _ptpNo->setConnectedEdges(Button::ConnectedOnRight);
     _ptpNo->addListener(this);
     _ptpYes = new juce::TextButton("+");
+	_ptpYes->setTooltip("Include P2P");
     _ptpYes->setClickingTogglesState(true);
     _ptpYes->setRadioGroupId(20001);
     _ptpYes->setColour(TextButton::buttonColourId, Colours::white);
@@ -166,6 +168,7 @@ ComponentChooser::ComponentChooser() :
     // CPUs
 
     _cpuMinus = new juce::TextButton("-");
+	_cpuMinus->setTooltip("Remove one core");
     _cpuMinus->setColour(TextButton::buttonColourId, Colours::white);
     _cpuMinus->setBounds(20, 175, 36, 30);
     _cpuMinus->setConnectedEdges(Button::ConnectedOnRight);
@@ -277,38 +280,49 @@ void ComponentChooser::buttonClicked(juce::Button* button)
 {
     if (button == _ptpYes) 
     {
+		_logger->trace("Activating P2P");
         _ptpLabel.setColour(Label::textColourId, Colours::white);
         _ptp = true;
+		return;
     } 
     else if (button == _ptpNo) 
     {
+		_logger->trace("Deactivating P2P");
         _ptpLabel.setColour(Label::textColourId, Colours::grey);
-        _trayNo->triggerClick();
         _ptp = false;
+		return;
     } 
     else if (button == _trayYes) 
     {
+		_logger->trace("Activating Tray");
         _trayLabel.setColour(Label::textColourId, Colours::white);
-        _ptpYes->triggerClick();
         _tray = true;
+		return;
     }
     else if (button == _trayNo) 
     {
+		_logger->trace("Deactivating Tray");
         _trayLabel.setColour(Label::textColourId, Colours::grey);
         _tray = false;
+		return;
     }
     else if (button == _eteYes)
     {
+		_logger->trace("Activating E2E");
         _eteLabel.setColour(Label::textColourId, Colours::white);
         _ete = true;
+		return;
     }
     else if (button == _eteNo)
     {
+		_logger->trace("Deactivating E2E");
         _eteLabel.setColour(Label::textColourId, Colours::grey);
         _ete = false;
+		return;
     }
     else if (button == _peerYes)
     {
+		_logger->trace("Activating Peer");
         _peer = true;
         _peerLabel.setColour(Label::textColourId, Colours::white);
         _cpuLabel.setColour(Label::textColourId, Colours::white);
@@ -319,9 +333,11 @@ void ComponentChooser::buttonClicked(juce::Button* button)
         _memSize->setEnabled(true);
         _memPlus->setEnabled(true);
         _memMinus->setEnabled(true);
+		return;
     }
     else if (button == _peerNo)
     {
+		_logger->trace("Deactivating Peer");
         _peer = false;
         _peerLabel.setColour(Label::textColourId, Colours::grey);
         _cpuLabel.setColour(Label::textColourId, Colours::grey);
@@ -332,6 +348,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
         _memSize->setEnabled(false);
         _memPlus->setEnabled(false);
         _memMinus->setEnabled(false);
+		return;
     }
     else if (button == _cpuPlus) 
     {
@@ -339,6 +356,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
         char t[4];
         std::sprintf(t, "%d", _cpu);
         _cpuNum->setButtonText(t);
+		return;
     }
     else if (button == _cpuMinus)
     {
@@ -349,6 +367,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
         char t[4];
         std::sprintf(t, "%d", _cpu);
         _cpuNum->setButtonText(t);
+		return;
     }
     else if (button == _memPlus) 
     {
@@ -356,6 +375,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
         char t[4];
         std::sprintf(t, "%d", _mem);
         _memSize->setButtonText(t);
+		return;
     }
     else if (button == _memMinus)
     {
@@ -366,6 +386,7 @@ void ComponentChooser::buttonClicked(juce::Button* button)
         char t[4];
         std::sprintf(t, "%d", _mem);
         _memSize->setButtonText(t);
+		return;
     }
 }
 

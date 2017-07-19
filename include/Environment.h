@@ -5,6 +5,7 @@
 
 #include <string>
 #include <cstdlib>
+#include <sstream>
 #if LAUNCHER_LINUX
 #include <unistd.h>
 #endif
@@ -25,6 +26,7 @@
 #include "Session.h"
 
 #if LAUNCHER_WINDOWS
+
 #include <windows.h>
 #include <VersionHelpers.h>
 #include <WinSock2.h>
@@ -35,6 +37,9 @@
 #include <objidl.h>
 #include <shlguid.h>
 #include <tlhelp32.h>
+#include <KnownFolders.h>
+#include <wchar.h>
+
 //#include <atlbase.h>
 #include <IPHlpApi.h>
 #pragma comment(lib, "IPHLPAPI.LIB")
@@ -47,6 +52,16 @@
 #endif
 
 namespace SubutaiLauncher {
+
+	typedef enum error_codes {
+		ec_success = 0,
+		ec_wrong_key_type,
+		ec_cant_open_reg_key,
+		ec_cant_query_reg_value,
+		ec_cant_change_registry,
+		ec_need_to_realloc,
+		ec_existing_val
+	} error_codes_t;
 
     class Environment {
         public:
@@ -71,8 +86,12 @@ namespace SubutaiLauncher {
 			bool registerService(const std::string& name, const std::string& path, std::vector<std::string> args);
 			bool unregisterService(const std::string& name);
 			void CreateShortcut(const std::string& source, const std::string& name);
-			void updatePath();
+			int32_t updatePath(const std::string& path);
 			bool killProcess(const std::string& name);
+			std::string getDesktopDirectory();
+#if LAUNCHER_WINDOWS
+			bool writeE2ERegistry(const std::string& name);
+#endif
         private:
 #if LAUNCHER_WINDOWS
 			BOOL terminateWinProcess(DWORD dwProcessId, UINT uExitCode);

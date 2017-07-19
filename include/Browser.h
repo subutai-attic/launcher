@@ -20,16 +20,14 @@ namespace SubutaiLauncher {
             static const std::string BIN;
             Browser();
             ~Browser();
-	    bool findInstallation();
+			bool findInstallation();
             bool isInstalled();
             bool isRunning();
             bool isUpdateRequired();
             std::string extractVersion();
             std::string execute(const std::string& command);
-	    std::string sysExecute(const std::string& command, const std::string& cargs);
-	    std::string sysExecute(const std::string& command, const std::vector<std::string>& cargs);
-
-        protected:
+			std::string sysExecute(const std::string& command, const std::string& cargs);
+			std::string sysExecute(const std::string& command, const std::vector<std::string>& cargs);
         private:
             std::string _version;
             std::string _path;
@@ -38,7 +36,6 @@ namespace SubutaiLauncher {
             bool _running;
             bool _updateRequired;
     };
-
 }
 
 #endif

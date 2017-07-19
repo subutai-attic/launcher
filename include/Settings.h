@@ -28,9 +28,15 @@ namespace SubutaiLauncher {
 			std::string getDefaultInstallationPath() const;
             void setInstallationPath(const std::string& path);
             void setTmpPath(const std::string& path);
+			void setCoreNum(int num);
+			void setMemSize(int size);
+			int getCoreNum();
+			int getMemSize();
         private:
             std::string _installationPath;
             std::string _tmpPath;
+			int _coreNum;
+			int _memSize;
     };
 }
 

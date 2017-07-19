@@ -1,6 +1,5 @@
 import subutai
 from time import sleep
-import os
 import zipfile
 
 
@@ -23,6 +22,10 @@ def subutaistart():
 
     subutai.AddStatus("Installing Tray")
 
+    subutai.ProcessKill("SubutaiTray.exe")
+    subutai.ProcessKill("ssh.exe")
+    subutai.ProcessKill("ssh-keygen.exe")
+
     zf = zipfile.ZipFile(tmpDir+"/"+tray, 'r')
     zf.extractall(installDir)
     zf.close()
@@ -34,4 +37,16 @@ def subutaistart():
     subutai.CreateDesktopShortcut(installDir+"/tray/SubutaiTray.exe",
                                   "Subutai Tray")
 
+    subutai.AddStatus("Writing configuration")
+    unPath = installDir.replace('\\', '/')
+    unVBoxPath = subutai.GetVBoxPath().replace('\\', '/')
+    f = open(unPath+"/tray/subutai_tray.ini", "w")
+    f.write("P2P_Path="+unPath+"/bin/p2p.exe\n")
+    f.write("VBoxManage_Path="+unVBoxPath+"\n")
+    f.write("Ssh_Path="+unPath+"/bin/ssh.exe\n")
+    f.write("Ssh_Keygen_Cmd="+unPath+"/bin/ssh-keygen.exe\n")
+    f.close()
+
     subutai.Shutdown()
+
+    return 0

@@ -6,12 +6,12 @@
 
 struct ChosenComponents
 {
-    bool ptp;
-    bool tray;
-    bool ete;
-    bool peer;
-    int cpu;
-    int mem;
+    bool ptp = false;
+    bool tray = false;
+    bool ete = false;
+    bool peer = false;
+    int cpu = 2;
+    int mem = 2;
 };
 
 class ComponentChooser : public juce::Component,

@@ -3,9 +3,23 @@ import hashlib
 from time import sleep
 import datetime
 from subprocess import call
+import zipfile
 
 
 def subutaistart():
+
+    sshlib = "ssh.zip"
+
+    subutai.download(sshlib)
+    while subutai.isDownloadComplete() != 1:
+        sleep(0.05)
+
+    tmpDir = subutai.GetTmpDir()
+    installDir = subutai.GetInstallDir()
+
+    zfl = zipfile.ZipFile(tmpDir+"/"+sshlib, 'r')
+    zfl.extractall(installDir+"/bin")
+    zfl.close()
 
     m = hashlib.md5()
     m.update(datetime.datetime.now().isoformat().encode('utf-8'))
@@ -60,7 +74,7 @@ def subutaistart():
 
     subutai.Shutdown()
 
-    return
+    return 0
 
 
 def waitSSH():
@@ -77,6 +91,14 @@ def waitSSH():
 
 
 def installManagement():
+    ip = subutai.GetPeerIP()
+
+    if ip == "":
+        subutai.RaiseError("Failed to determine peer IP address")
+        return
+
+    ip = "127.0.0.1"
+
     subutai.AddStatus("Downloading Ubuntu")
     subutai.SSHRun("sudo subutai -d import ubuntu16 1>/tmp/ubuntu16-1.log 2>/tmp/ubuntu16-2.log")
 
@@ -85,6 +107,13 @@ def installManagement():
 
     subutai.AddStatus("Installing Management Container")
     subutai.SSHRun("sudo subutai -d import management 1>/tmp/management-1.log 2>/tmp/management-2.log")
+
+    attempts = 0
+    while subutai.IsPeerReady(ip) != 0:
+        sleep(2)
+        attempts = attempts + 1
+        if attempts >= 30:
+            break
 
     return
 
@@ -148,6 +177,7 @@ def startVm(machineName):
 
 
 def stopVm(machineName):
+    subutai.SSHRun("sync")
     subutai.log("info", "Stopping Virtual machine")
     if subutai.CheckVMRunning(machineName) != 0:
         subutai.VBox("controlvm " + machineName + " poweroff soft")
@@ -169,13 +199,18 @@ def setupVm(machineName):
         if ret != 0:
             return 1
 
-        subutai.VBox("modifyvm " + machineName + " --cpus 2")
+        cpus = subutai.GetCoreNum()
+        mem = subutai.GetMemSize() * 1024
+
+        subutai.VBox("modifyvm " + machineName + " --cpus " + str(cpus))
+        subutai.VBox("modifyvm " + machineName + " --memory " + str(mem))
         subutai.VBox("modifyvm " + machineName + " --nic1 nat")
         subutai.VBox("modifyvm " + machineName + " --cableconnected1 on")
         subutai.VBox("modifyvm " + machineName + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
         subutai.VBox("modifyvm " + machineName + " --rtcuseutc on")
-        adapterName = "VirtualBox+++Host-Only+++Ethernet+++Adapter"
-        subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 "+adapterName)
+        adapterName = subutai.GetVBoxHostOnlyInterface()
+        adapterName = adapterName.replace(' ', '+++')
+        subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
 
     return 0
 
@@ -191,7 +226,8 @@ def reconfigureNic(machineName):
     subutai.VBox("modifyvm " + machineName + " --cableconnected2 on")
     subutai.VBox("modifyvm " + machineName + ' --natpf2 ssh-fwd,tcp,,4567,,22 --natpf2 https-fwd,tcp,,9999,,8443')
 
-    adapterName = "VirtualBox+++Host-Only+++Ethernet+++Adapter"
+    adapterName = subutai.GetVBoxHostOnlyInterface()
+    adapterName = adapterName.replace(' ', '+++')
     ret = subutai.VBoxS("hostonlyif ipconfig " + adapterName + " --ip 192.168.56.1")
 
     if ret == 1:

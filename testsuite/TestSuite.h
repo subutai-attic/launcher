@@ -8,6 +8,7 @@
 #include "HubTest.h"
 #include "VirtualBoxTest.h"
 #include "EnvironmentTest.h"
+#include "SSTest.h"
 
 class SubutaiLauncherTestSuite
 {

@@ -5,7 +5,7 @@ SHARED_TARGET = libsubutai-launcher.$(LIB_EXT)
 STATIC_TARGET = libsubutai-launcher.a
 TEST_TARGET=testsuite
 INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_DIR)/include -I/usr/local/include
-LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -lcurl -lssh -L$(PYLIB_DIR) -lPocoNet -lPocoNetSSL -lPocoFoundation -lPocoJSON
+LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -lssh -L$(PYLIB_DIR) -lPocoNet -lPocoNetSSL -lPocoFoundation -lPocoJSON
 CXXFLAGS = -g $(INCLUDES) -std=c++11 -DRT_OS_LINUX $(BUILD_SCHEME_DEF) $(EXTRA_DEFINES)
 LDFLAGS = -s $(LIBS)
 
@@ -130,6 +130,9 @@ $(BUILD_DIR)/Tray.o: $(SRC_DIR)/Tray.cpp $(INCLUDE_DIR)/Tray.h
 $(BUILD_DIR)/VirtualBox.o: $(SRC_DIR)/VirtualBox.cpp $(INCLUDE_DIR)/VirtualBox.h
 	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
 
+$(BUILD_DIR)/SS.o: $(SRC_DIR)/SS.cpp $(INCLUDE_DIR)/SS.h
+	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
+
 OBJS = $(BUILD_DIR)/Core.o \
 								 	 $(BUILD_DIR)/Downloader.o \
 									 $(BUILD_DIR)/Environment.o \
@@ -147,7 +150,8 @@ OBJS = $(BUILD_DIR)/Core.o \
 									 $(BUILD_DIR)/SubutaiException.o \
 									 $(BUILD_DIR)/SubutaiString.o \
 									 $(BUILD_DIR)/Tray.o \
-									 $(BUILD_DIR)/VirtualBox.o	 
+									 $(BUILD_DIR)/VirtualBox.o \
+									 $(BUILD_DIR)/SS.o
 
 $(OUTPUT_DIR)/$(SHARED_TARGET): $(OBJS)
 	$(CC) -shared $^ $(LDFLAGS) -o $@
