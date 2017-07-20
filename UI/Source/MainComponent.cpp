@@ -2,6 +2,8 @@
 
 MainContentComponent::MainContentComponent() 
 {
+    _logger = &Poco::Logger::get("subutai");
+    auto font = juce::Font(15);
 
     _menuItems.push_back("Subutai");
     _menuItems.push_back("Library");
@@ -15,6 +17,18 @@ MainContentComponent::MainContentComponent()
     // TODO: Add screen detection size and relative value at startup
     setSize(getParentWidth(), getParentHeight());
 
+    //_logoImage = new Logo();
+    //_logo.setImage(*_logoImage->getImage());
+    std::string pLogoFile(SubutaiLauncher::Session::instance()->getSettings()->getTmpPath() + "launcher-logo.png");
+    Poco::File pLogo(pLogoFile);
+    if (pLogo.exists())
+    {
+        _logo.setImage(juce::ImageCache::getFromFile(juce::File(pLogoFile)));
+    }
+    else
+    {
+        _logger->error("launcher-logo.png doesn't exists");
+    }
     addAndMakeVisible(_logo);
 
     _mainMenu.setModel(this);
@@ -29,10 +43,33 @@ MainContentComponent::MainContentComponent()
     addChildComponent(_hub);
     addChildComponent(_marketplace);
     addChildComponent(_community);
+
+    // Welcome words
+    _welcome.setText("Welcome to", dontSendNotification);
+    _welcome.setColour(Label::textColourId, juce::Colour(255, 255, 255));
+    _welcome.setBounds(0, 90, 250, 25);
+    _welcome.setFont(font);
+    _welcome.setJustificationType(Justification::centred);
+    addAndMakeVisible(_welcome);
+
+    _title.setText("Subutai Launcher", dontSendNotification);
+    _title.setColour(Label::textColourId, juce::Colour(255, 255, 255));
+    _title.setBounds(0, 110, 250, 25);
+    _title.setFont(font);
+    _title.setJustificationType(Justification::centred);
+    addAndMakeVisible(_title);
+
+    _version.setText("Version 4.0.16", dontSendNotification);
+    _version.setColour(Label::textColourId, juce::Colour(255, 255, 255));
+    _version.setBounds(0, 130, 250, 25);
+    _version.setFont(font);
+    _version.setJustificationType(Justification::centred);
+    addAndMakeVisible(_version);
 }
 
 MainContentComponent::~MainContentComponent()
 {
+    delete _logoImage;
 }
 
 void MainContentComponent::paint (Graphics& g)
@@ -48,9 +85,13 @@ void MainContentComponent::paint (Graphics& g)
 
 void MainContentComponent::resized()
 {
+    int pLogoWidth = 64;
+    int pLogoHeight = 64;
+    pLogoWidth = _logo.getImage().getWidth();
+    pLogoHeight = _logo.getImage().getHeight();
     juce::Rectangle<int> r (getLocalBounds().reduced (0));
-    _mainMenu.setBounds (0, 120, MENU_WIDTH, 500);
-    _logo.setBounds(0, 20, MENU_WIDTH, 100);
+    _mainMenu.setBounds (0, 160, MENU_WIDTH, 500);
+    _logo.setBounds(int((MENU_WIDTH / 2) - (pLogoWidth / 2)), 20, pLogoWidth, pLogoHeight);
     _sidebar.setBounds(0, 0, 250, getParentHeight());
     //_header.setBounds(r.withSize(1024, HEADER_HEIGHT));
     //_library.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());

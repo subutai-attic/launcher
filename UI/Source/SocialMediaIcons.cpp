@@ -1,6 +1,7 @@
 #include "SocialMediaIcons.h"
 
 SocialMediaIcons::SocialMediaIcons() {
+
     _facebook = new DrawableButton("Facebook", DrawableButton::ImageFitted);
     _twitter = new DrawableButton("Twitter", DrawableButton::ImageFitted);
     _linkedin = new DrawableButton("LinkedIn", DrawableButton::ImageFitted);
@@ -23,7 +24,6 @@ SocialMediaIcons::SocialMediaIcons() {
     fb.setFill(ft);
     fbHover.setPath(getFacebook());
     fbHover.setFill(fth);
-
 
     twitter.setPath(getTwitter());
     twitter.setFill(ft);
@@ -64,7 +64,6 @@ SocialMediaIcons::SocialMediaIcons() {
     _linkedinLink.setURL(URL("https://www.linkedin.com"));
     _githubLink.setBounds(-1, -1, 1, 1);
     _githubLink.setURL(URL("https://www.github.com"));
-
 }
 
 SocialMediaIcons::~SocialMediaIcons() {

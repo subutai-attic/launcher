@@ -232,6 +232,7 @@ void Wizard::runInstall()
     _logger->debug("Collecting choosen components");
     //auto c = _componentChooserPage->getComponents();
     SubutaiLauncher::InstallationSettings pSettings = SubutaiLauncher::Session::instance()->getSettings()->getInstallationSettings();
+    // TODO: Replace this with Installation Settings
 	SubutaiLauncher::Session::instance()->getSettings()->setCoreNum(pSettings.cpuNum);
 	SubutaiLauncher::Session::instance()->getSettings()->setMemSize(pSettings.memSize);
 
