@@ -10,11 +10,11 @@ LibraryItemTab::LibraryItemTab(const std::string& title, int order, bool highlig
     _titleLabel.setText(_title, dontSendNotification);
     if (_selected) 
     {
-        _titleLabel.setColour(Label::textColourId, Colours::white);
+        _titleLabel.setColour(Label::textColourId, juce::Colour::fromRGB(86, 96, 125));
     } 
     else 
     {
-        _titleLabel.setColour(Label::textColourId, Colours::grey);
+        _titleLabel.setColour(Label::textColourId, juce::Colour::fromRGB(86, 96, 125));
     }
     _titleLabel.setBounds(0, 0, _title.length() * 12, 30);
     _titleLabel.setFont(font);
@@ -35,7 +35,6 @@ void LibraryItemTab::paint(juce::Graphics& g)
     if (_selected) {
 	    g.setColour(Colour(7, 141, 208));
         g.drawLine(0, 28, getWidth(), 28, 3);
-        _titleLabel.setColour(Label::textColourId, Colours::white);
     } else if (_hover) {
 	    g.setColour(Colour(200, 200, 200));
         g.drawLine(0, 28, getWidth(), 28, 3);
@@ -67,7 +66,7 @@ void LibraryItemTab::mouseExit(const juce::MouseEvent& e)
 void LibraryItemTab::mouseUp(const juce::MouseEvent& e)
 {
     auto p = (LibraryComponent*)getParentComponent();
-        p->tabClick(_title);
+    p->tabClick(_title);
 }
 
 void LibraryItemTab::select()
