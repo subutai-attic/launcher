@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    SocialMediaIcons.h
-    Created: 23 Aug 2016 7:32:40pm
-    Author:  crioto
-
-  ==============================================================================
-*/
-
 #ifndef SOCIALMEDIAICONS_H_INCLUDED
 #define SOCIALMEDIAICONS_H_INCLUDED
 
@@ -22,6 +12,11 @@ class SocialMediaIcons : public juce::Component, public juce::ButtonListener {
         void buttonClicked(juce::Button* button) override;
 
     private:
+        juce::ImageButton _facebookButton;
+        juce::ImageButton _twitterButton;
+        juce::ImageButton _linkedinButton;
+        juce::ImageButton _githubButton;
+
         juce::Path getFacebook();
         juce::Path getTwitter();
         juce::Path getLinkedin();

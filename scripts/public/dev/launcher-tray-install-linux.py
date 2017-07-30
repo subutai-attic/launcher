@@ -2,6 +2,7 @@ import subutai
 import tarfile
 from time import sleep
 
+
 def subutaistart():
     subutai.AddStatus("Download Tray application")
 
