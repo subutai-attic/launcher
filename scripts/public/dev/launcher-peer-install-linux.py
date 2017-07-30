@@ -177,11 +177,8 @@ def setupVm(machineName):
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
         subutai.VBox("import " +
-                     subutai.GetTmpDir().replace(" ", "+++") + "core.ova")
+                     subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname " + machineName)
         sleep(10)
-        ret = subutai.VBoxS("modifyvm core --name " + machineName)
-        if ret != 0:
-            return 1
 
         cpus = subutai.GetCoreNum()
         mem = subutai.GetMemSize() * 1024
