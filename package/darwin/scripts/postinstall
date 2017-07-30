@@ -13,3 +13,5 @@ mkdir -p /usr/local/share/subutai/python
 mkdir -p /usr/local/share/subutai/log
 chown -R $USER /usr/local/bin
 chown -R $USER /usr/local/share/subutai
+
+cp -r /Applications/SubutaiLauncher.app/Contents/Resources/*.ttf /Library/Fonts

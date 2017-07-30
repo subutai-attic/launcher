@@ -13,16 +13,15 @@ LibraryComponent::LibraryComponent() : _installButton("Install")
 
     for (auto it = _componentTabs.begin(); it != _componentTabs.end(); it++) 
     {
-        (*it)->setBounds(pWidth, 0, (*it)->getWidth(), 30);
+        (*it)->setBounds(pWidth, 0, (*it)->getWidth(), 60);
         addAndMakeVisible((*it));
         pWidth += (*it)->getWidth() + 20;
     }
 
+    addChildComponent(_installButton);
     _installButton.addListener(this);
-    _installButton.setColour(juce::TextButton::buttonColourId, juce::Colour(7,141,208));
-    _installButton.toFront(true);
-    _installButton.setBounds(getParentWidth() - 110 - 250, 10, 100, 35);
-    addAndMakeVisible(_installButton);
+    //_installButton.toFront(true);
+    _installButton.setBounds(0, 0, 1, 1);
     resized();
 }
 
@@ -35,14 +34,19 @@ LibraryComponent::~LibraryComponent()
     _logger->trace("Destroying Library UI Component");    
 }
 
-void LibraryComponent::paint(Graphics& g) {
-    g.fillAll (Colour (0xff222222));
-    g.setFont (Font (16.0f));
+void LibraryComponent::paint(Graphics& g) 
+{
     g.setColour (Colours::white);
+    g.fillRoundedRectangle(0, 0, getWidth(), getHeight(), 4.0);
 }
 
-void LibraryComponent::resized() {
-    _installButton.setBounds(getParentWidth() - 110 - 250, 10, 100, 35);
+void LibraryComponent::resized() 
+{
+    _logger->trace("LibraryComponent::resized()");
+    _logger->trace("Width: %d, Install Button width: %d height: %d", getWidth(), _installButton.getWidth(), _installButton.getHeight());
+    _installButton.resized();
+    _installButton.setBounds(getWidth() - _installButton.getWidth() - 30, 60 / 2 - _installButton.getHeight() / 2, _installButton.getWidth(), _installButton.getHeight());
+    _installButton.setVisible(true);
 }
 
 void LibraryComponent::buttonClicked(Button* button) 

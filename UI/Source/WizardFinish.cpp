@@ -9,63 +9,63 @@ WizardFinish::WizardFinish() :
     auto font = juce::Font(17);
 
     _thanks.setText("Thank you for using Subutai", juce::dontSendNotification);
-    _thanks.setColour(juce::Label::textColourId, juce::Colours::white);
+    _thanks.setColour(juce::Label::textColourId, juce::Colour(105, 116, 144));
     _thanks.setBounds(15, 15, 400, 40);
     _thanks.setFont(font);
     _thanks.setJustificationType(juce::Justification::top);
     addAndMakeVisible(_thanks);
 
 	_ptp.setText("P2P Installation", juce::dontSendNotification);
-	_ptp.setColour(juce::Label::textColourId, juce::Colours::white);
+	_ptp.setColour(juce::Label::textColourId, juce::Colour(105, 116, 144));
 	_ptp.setBounds(15, 35, 150, 40);
 	_ptp.setFont(font);
 	_ptp.setJustificationType(juce::Justification::top);
 	addAndMakeVisible(_ptp);
 
 	_ptpResult.setText("Undefined", juce::dontSendNotification);
-	_ptpResult.setColour(juce::Label::textColourId, juce::Colours::white);
+	_ptpResult.setColour(juce::Label::textColourId, juce::Colour(105, 116, 144));
 	_ptpResult.setBounds(150, 35, 500, 40);
 	_ptpResult.setFont(font);
 	_ptpResult.setJustificationType(juce::Justification::top);
 	addAndMakeVisible(_ptpResult);
 
 	_tray.setText("Tray Installation", juce::dontSendNotification);
-	_tray.setColour(juce::Label::textColourId, juce::Colours::white);
+	_tray.setColour(juce::Label::textColourId, juce::Colour(105, 116, 144));
 	_tray.setBounds(15, 55, 150, 40);
 	_tray.setFont(font);
 	_tray.setJustificationType(juce::Justification::top);
 	addAndMakeVisible(_tray);
 
 	_trayResult.setText("Undefined", juce::dontSendNotification);
-	_trayResult.setColour(juce::Label::textColourId, juce::Colours::white);
+	_trayResult.setColour(juce::Label::textColourId, juce::Colour(105, 116, 144));
 	_trayResult.setBounds(150, 55, 500, 40);
 	_trayResult.setFont(font);
 	_trayResult.setJustificationType(juce::Justification::top);
 	addAndMakeVisible(_trayResult);
 
 	_ete.setText("E2E Installation", juce::dontSendNotification);
-	_ete.setColour(juce::Label::textColourId, juce::Colours::white);
+	_ete.setColour(juce::Label::textColourId, juce::Colour(105, 116, 144));
 	_ete.setBounds(15, 75, 150, 40);
 	_ete.setFont(font);
 	_ete.setJustificationType(juce::Justification::top);
 	addAndMakeVisible(_ete);
 
 	_eteResult.setText("Undefined", juce::dontSendNotification);
-	_eteResult.setColour(juce::Label::textColourId, juce::Colours::white);
+	_eteResult.setColour(juce::Label::textColourId, juce::Colour(105, 116, 144));
 	_eteResult.setBounds(150, 75, 500, 40);
 	_eteResult.setFont(font);
 	_eteResult.setJustificationType(juce::Justification::top);
 	addAndMakeVisible(_eteResult);
 
 	_peer.setText("Peer Installation", juce::dontSendNotification);
-	_peer.setColour(juce::Label::textColourId, juce::Colours::white);
+	_peer.setColour(juce::Label::textColourId, juce::Colour(105, 116, 144));
 	_peer.setBounds(15, 95, 150, 40);
 	_peer.setFont(font);
 	_peer.setJustificationType(juce::Justification::top);
 	addAndMakeVisible(_peer);
 
 	_peerResult.setText("Undefined", juce::dontSendNotification);
-	_peerResult.setColour(juce::Label::textColourId, juce::Colours::white);
+	_peerResult.setColour(juce::Label::textColourId, juce::Colour(105, 116, 144));
 	_peerResult.setBounds(150, 95, 500, 40);
 	_peerResult.setFont(font);
 	_peerResult.setJustificationType(juce::Justification::top);
@@ -84,7 +84,7 @@ WizardFinish::~WizardFinish()
 
 void WizardFinish::paint(juce::Graphics& g)
 {
-    g.fillAll(Colour::greyLevel (0.2f));
+    g.fillAll(Colour(255, 255, 255));
 }
 
 void WizardFinish::resized()
