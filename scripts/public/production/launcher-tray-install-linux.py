@@ -1,11 +1,11 @@
 import subutai
-import zipfile
 from time import sleep
+import tarfile
 
 def subutaistart():
     subutai.AddStatus("Download Tray application")
 
-    tray = "SubutaiTray_libs.zip"
+    tray = "SubutaiTray_libs.tar.gz"
 
     subutai.download(tray)
     while subutai.isDownloadComplete() != 1:
@@ -16,9 +16,9 @@ def subutaistart():
 
     subutai.AddStatus("Unpacking Tray")
 
-    zf = zipfile.ZipFile(tmpDir+"/"+tray, 'r')
-    zf.extractall(insatllDir+"/bin/")
-    zf.close()
+    tar = tarfile.open(tmpDir+"/"+tray, "r:gz")
+    tar.extractall(installDir+"/bin/")
+    tar.close()
 
     subutai.AddStatus("Creating Symlink")
     subutai.MakeLink(installDir+"/bin/SubutaiTray", "/usr/local/bin/SubutaiTray")
