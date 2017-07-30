@@ -30,7 +30,7 @@ cp PkgInfo.tmpl root/Applications/SubutaiLauncher.app/Contents/PkgInfo
 cp Info.plist.tmpl root/Applications/SubutaiLauncher.app/Contents/Info.plist
 
 cp ./SubutaiLauncher.icns root/Applications/SubutaiLauncher.app/Contents/Resources/
-
+cp ../../assets/dev/*.ttf root/Applications/SubutaiLauncher.app/Contents/Resources/
 
 # Determine sizes and modify PackageInfo
 rootfiles=`find root | wc -l`
