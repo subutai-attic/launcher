@@ -19,6 +19,7 @@ namespace SubutaiLauncher
             AssetsManager();
             ~AssetsManager();
             void verify();
+            void download(const std::string& name);
         private:
             Poco::Logger* _logger;
         protected:

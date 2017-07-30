@@ -29,7 +29,7 @@ WizardInstall::WizardInstall() :
   auto font = juce::Font(20);
   _title = new juce::Label();
   _title->setText("Initializing", juce::dontSendNotification);
-  _title->setColour(juce::Label::textColourId, juce::Colours::white);
+  _title->setColour(juce::Label::textColourId, juce::Colour(105, 116, 144));
   _title->setBounds(20, 20, 480, 40);
   _title->setFont(font);
   _title->setJustificationType(juce::Justification::top);
@@ -61,7 +61,7 @@ WizardInstall::~WizardInstall()
 
 void WizardInstall::paint(juce::Graphics& g)
 {
-  g.fillAll(juce::Colour::greyLevel (0.2f));
+  g.fillAll(juce::Colour(255, 255, 255));
 }
 
 void WizardInstall::resized()
@@ -238,7 +238,7 @@ void WizardInstall::addLine(const std::string& text, bool error)
   t.append(text);
   line->setText(t, dontSendNotification);
   if (error) line->setColour(Label::textColourId, Colours::red);
-  else line->setColour(Label::textColourId, Colours::white);
+  else line->setColour(Label::textColourId, Colour(105, 116, 144));
   line->setBounds(20, 100 + (_lines.size() * 30), 480, 30);
   line->setFont(font);
   line->setJustificationType(Justification::top);
@@ -271,7 +271,7 @@ void WizardInstall::deactivate()
 {
   if (!_active)
   {
-    _logger->error("Tried to deactivate installation screen that is inactive");
+   _logger->error("Tried to deactivate installation screen that is inactive");
     return;
   }
   _active = false;

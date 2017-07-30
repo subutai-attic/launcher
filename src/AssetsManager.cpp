@@ -20,7 +20,8 @@ namespace SubutaiLauncher
             "launcher-templates-active.png",
             "launcher-templates-inactive.png",
             "launcher-community-active.png",
-            "launcher-community-inactive.png"
+            "launcher-community-inactive.png",
+            "launcher-robot.png"
             });
 
     AssetsManager::AssetsManager()
@@ -46,6 +47,8 @@ namespace SubutaiLauncher
         }
         for (auto it = ASSETS_LIST.begin(); it != ASSETS_LIST.end(); it++)
         {
+            // Uncomment this to bypass verification
+            continue;
             _logger->trace("Downloading %s", (*it));
             pDownloader->reset();
             pDownloader->setFilename((*it));
@@ -60,5 +63,29 @@ namespace SubutaiLauncher
                 _logger->debug("Skipping %s", (*it));
             }
         }
+    }
+
+    void AssetsManager::download(const std::string& name)
+    {
+        Downloader *pDownloader = Session::instance()->getDownloader();
+        if (!pDownloader)
+        {
+            _logger->error("Failed to retrieve downloader for assets manager");
+            return;
+        }
+        _logger->trace("Downloading %s", name);
+        pDownloader->reset();
+        pDownloader->setFilename(name);
+        if (pDownloader->retrieveFileInfo())
+        {
+            _logger->trace("Downloading asset: %s", name);
+            auto t = pDownloader->download();
+            t.join();
+        }
+        else
+        {
+            _logger->debug("Skipping %s", name);
+        }
+
     }
 };

@@ -35,34 +35,34 @@ Wizard::Wizard() :
 #endif
 
     setSize(800, 600);
-    auto font = juce::Font(15);
+    auto font = juce::Font("Encode Sans", 17, 1);
 
     _stepIntro.setText("Welcome", dontSendNotification);
-    _stepIntro.setColour(Label::textColourId, juce::Colour(7, 141, 208));
+    _stepIntro.setColour(Label::textColourId, juce::Colour(105, 116, 144));
     _stepIntro.setBounds(15, 50, 300, 40);
     _stepIntro.setFont(font);
     _stepIntro.setJustificationType(Justification::top);
 
     _stepSystemCheck.setText("System Check", dontSendNotification);
-    _stepSystemCheck.setColour(Label::textColourId, Colours::grey);
+    _stepSystemCheck.setColour(Label::textColourId, juce::Colour(105, 116, 144));
     _stepSystemCheck.setBounds(15, 80, 300, 40);
     _stepSystemCheck.setFont(font);
     _stepSystemCheck.setJustificationType(Justification::top);
 
     _stepComponentChooser.setText("Choose Components", dontSendNotification);
-    _stepComponentChooser.setColour(Label::textColourId, Colours::grey);
+    _stepComponentChooser.setColour(Label::textColourId, juce::Colour(105, 116, 144));
     _stepComponentChooser.setBounds(15, 110, 300, 40);
     _stepComponentChooser.setFont(font);
     _stepComponentChooser.setJustificationType(Justification::top);
 
     _stepInstall.setText("Install", dontSendNotification);
-    _stepInstall.setColour(Label::textColourId, Colours::grey);
+    _stepInstall.setColour(Label::textColourId, juce::Colour(105, 116, 144));
     _stepInstall.setBounds(15, 140, 300, 40);
     _stepInstall.setFont(font);
     _stepInstall.setJustificationType(Justification::top);
 
     _stepFinal.setText("Finish", dontSendNotification);
-    _stepFinal.setColour(Label::textColourId, Colours::grey);
+    _stepFinal.setColour(Label::textColourId, juce::Colour(105, 116, 144));
     _stepFinal.setBounds(15, 170, 300, 40);
     _stepFinal.setFont(font);
     _stepFinal.setJustificationType(Justification::top);
@@ -149,7 +149,7 @@ Wizard::~Wizard()
 
 void Wizard::paint(juce::Graphics& g)
 {
-    g.fillAll (Colour (0xff222222));
+    g.fillAll (Colour(247, 249, 252));
 }
 
 void Wizard::resized()

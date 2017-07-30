@@ -1,21 +1,26 @@
 #include "MarketplaceComponent.h"
 
-MarketplaceComponent::MarketplaceComponent() {
+MarketplaceComponent::MarketplaceComponent() 
+{
+    std::string pDir = SubutaiLauncher::Session::instance()->getSettings()->getTmpPath();
+    _robot.setImage(juce::ImageCache::getFromFile(juce::File(pDir + "launcher-robot.png")));
+    _robot.setBounds(getWidth() / 2 - 128, getHeight() / 2 - 83, 256, 167);
+    addAndMakeVisible(_robot);
+}
+
+MarketplaceComponent::~MarketplaceComponent() 
+{
 
 }
 
-MarketplaceComponent::~MarketplaceComponent() {
-
+void MarketplaceComponent::paint(Graphics& g) 
+{
+    g.setFont(Font("Encode Sans", 23, 1));
+    g.setColour(Colour::fromRGB(105, 116, 144));
+    g.drawText("We are launching soon!", Rectangle<int>(0, getHeight() / 2 + 115, getWidth(), 40), Justification::centred, true);
 }
 
-void MarketplaceComponent::paint(Graphics& g) {
-    g.fillAll (Colour (0xffffffff));
-
-    g.setFont (Font (16.0f));
-    g.setColour (Colours::white);
-    g.drawText ("Coming soon", getLocalBounds(), Justification::centred, true);
-}
-
-void MarketplaceComponent::resized() {
-
+void MarketplaceComponent::resized() 
+{
+    _robot.setBounds(getWidth() / 2 - 128, getHeight() / 2 - 83, 256, 167);
 }

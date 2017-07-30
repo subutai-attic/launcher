@@ -196,38 +196,40 @@ void MainContentComponent::paintListBoxItem(int rowNumber, Graphics& g, int widt
 
 void MainContentComponent::selectedRowsChanged(int row) {
     auto item = _menuItems.at(row);
-    if (item == "Library") {
+    if (item == "Library") 
+    {
         _sidebar.activateLibrary();
         _community.setVisible(false);
         _hub.setVisible(false);
         _marketplace.setVisible(false);
         _library.setVisible(true);
-        //addAndMakeVisible(_library);
-        //_library.setBounds(MENU_WIDTH, 0, getParentWidth() - MENU_WIDTH, getParentHeight());
         _library.setBounds(MENU_WIDTH, 30, getParentWidth() - MENU_WIDTH - 40, getParentHeight() - 60);
-    } else if (item == "News") {
+    } 
+    else if (item == "News") 
+    {
         _sidebar.activateNews();
         _hub.setVisible(false);
         _library.setVisible(false);
         _marketplace.setVisible(false);
         _community.setVisible(true);
-        //addAndMakeVisible(_community);
         _community.setBounds(MENU_WIDTH, 30, getParentWidth() - MENU_WIDTH - 40, getParentHeight() - 60);
-    } else if (item == "Templates") {
+    } 
+    else if (item == "Templates") 
+    {
         _sidebar.activateTemplates();
         _community.setVisible(false);
         _hub.setVisible(false);
         _library.setVisible(false);
         _marketplace.setVisible(true);
-        //addAndMakeVisible(_marketplace);
         _marketplace.setBounds(MENU_WIDTH, 30, getParentWidth() - MENU_WIDTH - 40, getParentHeight() - 60);
-    } else if (item == "Community") {
+    } 
+    else if (item == "Community") 
+    {
         _sidebar.activateCommunity();
         _library.setVisible(false);
         _marketplace.setVisible(false);
         _community.setVisible(false);
         _hub.setVisible(true);
-        //addAndMakeVisible(_hub);
         _hub.setBounds(MENU_WIDTH, 30, getParentWidth() - MENU_WIDTH - 40, getParentHeight() - 60);
     }
 }
