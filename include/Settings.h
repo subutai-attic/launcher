@@ -11,6 +11,7 @@
 #include "Vars.h"
 #include "FileSystem.h"
 #include "Poco/Environment.h"
+#include "Poco/Logger.h"
 
 namespace SubutaiLauncher {
 
@@ -57,6 +58,7 @@ namespace SubutaiLauncher {
             std::string _tmpPath;
 			int _coreNum;
 			int _memSize;
+            Poco::Logger* _logger;
     };
 }
 

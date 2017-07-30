@@ -48,7 +48,6 @@ class MainContentComponent : public juce::Component, public juce::ButtonListener
         Logo* _logoImage;
         juce::ImageComponent _logo;
         SidebarComponent _sidebar;
-        juce::Label _welcome;
         juce::Label _title;
         juce::Label _version;
 

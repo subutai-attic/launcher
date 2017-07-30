@@ -8,7 +8,6 @@ class LauncherButton : public juce::TextButton
     public:
         LauncherButton(const juce::String& buttonName);
 
-
     private:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LauncherButton)
 };

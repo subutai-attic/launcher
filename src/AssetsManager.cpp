@@ -4,8 +4,23 @@ namespace SubutaiLauncher
 {
     const std::vector<std::string> AssetsManager::ASSETS_LIST({
             "launcher-logo.png",
-            "launcher-facebook.png",
-            "launcher-github.png"
+            "launcher-facebook-active.png",
+            "launcher-facebook-inactive.png",
+            "launcher-twitter-active.png",
+            "launcher-twitter-inactive.png",
+            "launcher-github-active.png",
+            "launcher-github-inactive.png",
+            "launcher-linkedin-active.png",
+            "launcher-linkedin-inactive.png",
+            "launcher-github.png",
+            "launcher-news-active.png",
+            "launcher-news-inactive.png",
+            "launcher-library-active.png",
+            "launcher-library-inactive.png",
+            "launcher-templates-active.png",
+            "launcher-templates-inactive.png",
+            "launcher-community-active.png",
+            "launcher-community-inactive.png"
             });
 
     AssetsManager::AssetsManager()

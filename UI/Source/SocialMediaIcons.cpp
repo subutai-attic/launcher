@@ -46,10 +46,24 @@ SocialMediaIcons::SocialMediaIcons() {
     _github->setImages(&github, &github, 0);
     _github->setBounds(170, 5, 30, 30);
 
+    /*
     addAndMakeVisible(_facebook);
     addAndMakeVisible(_twitter);
     addAndMakeVisible(_linkedin);
     addAndMakeVisible(_github);
+    */
+
+    std::string pDir = SubutaiLauncher::Session::instance()->getSettings()->getTmpPath();
+    _facebookButton.setImages(true, true, true, 
+           juce::ImageCache::getFromFile(juce::File(pDir + "launcher-facebook-inactive.png")),
+           0.0f, juce::Colours::white,
+           juce::ImageCache::getFromFile(juce::File(pDir + "launcher-facebook-active.png")),
+           0.0f, juce::Colours::white,
+           juce::ImageCache::getFromFile(juce::File(pDir + "launcher-facebook-active.png")),
+           0.0f, juce::Colours::white);
+    _facebookButton.setBounds(50, 5, 30, 30);
+
+    addAndMakeVisible(_facebookButton);
 
     addAndMakeVisible(_facebookLink);
     addAndMakeVisible(_twitterLink);

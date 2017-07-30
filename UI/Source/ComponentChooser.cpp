@@ -8,6 +8,12 @@ ComponentChooser::ComponentChooser() :
     _cpu(2),
     _mem(2)
 {
+    SubutaiLauncher::Session::instance()->getSettings()->setInstallationP2P(true);
+    SubutaiLauncher::Session::instance()->getSettings()->setInstallationTray(true);
+    SubutaiLauncher::Session::instance()->getSettings()->setInstallationE2E(true);
+    SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(true);
+    SubutaiLauncher::Session::instance()->getSettings()->setCoreNum(2);
+    SubutaiLauncher::Session::instance()->getSettings()->setMemSize(2);
     _logger = &Poco::Logger::get("subutai");
     _logger->trace("Creating Component Chooser UI Component");
 

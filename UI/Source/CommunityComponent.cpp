@@ -13,7 +13,7 @@ CommunityComponent::~CommunityComponent() {
 }
 
 void CommunityComponent::paint(Graphics& g) {
-    g.fillAll (Colour (0xffffffff));
+    //g.fillAll (Colour (0xffffffff));
     g.setFont (Font (16.0f));
     g.setColour (Colours::white);
 }

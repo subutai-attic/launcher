@@ -21,7 +21,7 @@ LibraryComponent::LibraryComponent() : _installButton("Install")
     _installButton.addListener(this);
     _installButton.setColour(juce::TextButton::buttonColourId, juce::Colour(7,141,208));
     _installButton.toFront(true);
-    _installButton.setBounds(getParentWidth() - 110 - 250, 10, 100, 35);
+    _installButton.setBounds(getParentWidth() - 150 - 250, 10, 100, 35);
     addAndMakeVisible(_installButton);
     resized();
 }
@@ -36,7 +36,9 @@ LibraryComponent::~LibraryComponent()
 }
 
 void LibraryComponent::paint(Graphics& g) {
-    g.fillAll (Colour (0xffffffff));
+    //g.fillAll (Colour (0xffffffff));
+    g.setColour (Colours::white);
+    g.fillRoundedRectangle(0, 0, getWidth(), getHeight(), 4.0);
     g.setFont (Font (16.0f));
     g.setColour (Colours::white);
 }

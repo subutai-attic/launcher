@@ -46,6 +46,7 @@ OBJS = $(BUILD_DIR)/BannerComponent.o \
 	   $(BUILD_DIR)/WizardFinish.o \
 	   $(BUILD_DIR)/WizardInstall.o \
 	   $(BUILD_DIR)/WizardIntro.o \
+	   $(BUILD_DIR)/LauncherButton.o \
 	   $(BUILD_DIR)/WizardWindow.o
 
 $(BUILD_DIR)/BannerComponent.o: $(SRC_DIR)/BannerComponent.cpp $(SRC_DIR)/BannerComponent.h
@@ -115,6 +116,9 @@ $(BUILD_DIR)/WizardInstall.o: $(SRC_DIR)/WizardInstall.cpp $(SRC_DIR)/WizardInst
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/WizardIntro.o: $(SRC_DIR)/WizardIntro.cpp $(SRC_DIR)/WizardIntro.h
+	$(CC) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/LauncherButton.o: $(SRC_DIR)/LauncherButton.cpp $(SRC_DIR)/LauncherButton.h
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/WizardWindow.o: $(SRC_DIR)/WizardWindow.cpp $(SRC_DIR)/WizardWindow.h

@@ -18,6 +18,7 @@ namespace SubutaiLauncher
         _coreNum(2),
         _memSize(2)
     {
+        _logger = &Poco::Logger::get("subutai");
         _installSettings.installP2P = false;
         _installSettings.installTray = false;
         _installSettings.installE2E = false;
@@ -163,31 +164,65 @@ namespace SubutaiLauncher
 
     void Settings::setInstallationP2P(bool p2p)
     {
+        if (p2p)
+        {
+            _logger->trace("Settings -> Activating P2P");
+        }
+        else
+        {
+            _logger->trace("Settings -> Deactivating P2P");
+        }
         _installSettings.installP2P = p2p;
     }
 
     void Settings::setInstallationTray(bool tray)
     {
+        if (tray)
+        {
+            _logger->trace("Settings -> Activating Tray");
+        }
+        else
+        {
+            _logger->trace("Settings -> Deactivating Tray");
+        }
         _installSettings.installTray = tray;
     }
 
     void Settings::setInstallationE2E(bool e2e)
     {
+        if (e2e)
+        {
+            _logger->trace("Settings -> Activating E2E");
+        }
+        else
+        {
+            _logger->trace("Settings -> Deactivating E2E");
+        }
         _installSettings.installE2E = e2e;
     }
 
     void Settings::setInstallationPeer(bool peer)
     {
+        if (peer)
+        {
+            _logger->trace("Settings -> Activating Peer");
+        }
+        else
+        {
+            _logger->trace("Settings -> Deactivating Peer");
+        }
         _installSettings.installPeer = peer;
     }
 
     void Settings::setInstallationCpuNum(int num)
     {
+        _logger->trace("Settings -> Setting CPU to %d", num);
         _installSettings.cpuNum = num;
     }
 
     void Settings::setInstallationMemSize(int size)
     {
+        _logger->trace("Settings -> Setting memory size ot %d", size);
         _installSettings.memSize = size;
     }
 
