@@ -16,5 +16,3 @@ def subutaistart():
     f.close()
 
     subutai.Shutdown()
-
-    return 0

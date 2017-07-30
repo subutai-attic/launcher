@@ -7,15 +7,21 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
 {
 	_logger = &Poco::Logger::get("subutai");
 	_logger->debug("Starting scripting language interface");
-	/*
+#if LAUNCHER_LINUX
+	std::string some_path = "/opt/subutai/bin/Lib";
+#elif LAUNCHER_MACOS
 	std::string some_path = "/Users/mike/projects/launcher/bin/Lib";
+#endif
+
+#if LAUNCHER_MACOS || LAUNCHER_LINUX
 	PyObject *pSearchPathList = PyList_New(0);
 	PyObject *pPath = PyUnicode_FromString(some_path.c_str());
 	PyList_Append(pSearchPathList, pPath);
 	Py_DECREF(pPath);
 	PySys_SetObject("prefix", pSearchPathList);
 	Py_DECREF(pSearchPathList);
-	*/
+#endif
+
 	if (dir != "/")
 	{
 #if PY_MAJOR_VERSION >= 3
@@ -177,8 +183,10 @@ void SubutaiLauncher::SL::execute()
 	}
 
 	//Py_DECREF(_name);
+    /*
 	Py_DECREF(PyImport_ImportModule("threading"));
 	PyEval_InitThreads();
+    */
 
 	PyObject *pFunc, *pArgs, *pValue;
 	if (!(_module == NULL || _module == 0))
@@ -229,7 +237,7 @@ void SubutaiLauncher::SL::execute()
 		PyErr_Print();
 		throw SLException("Cannot find specified module", 7);
 	}
-	_logger->information("Script execution completed without any errors");
+	_logger->information("Script execution completed without any errors: %ld", _exitCode);
 	ncenter->stop();
 	_running = false;
 }

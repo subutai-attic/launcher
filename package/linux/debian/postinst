@@ -6,8 +6,31 @@ chmod -R 0777 /opt/subutai/log
 if [ -L /usr/bin/SubutaiLauncher ]; then
 rm -rf /usr/bin/SubutaiLauncher
 fi
+chmod +x /opt/subutai/bin/SubutaiLauncher
 ln -s /opt/subutai/bin/SubutaiLauncher /usr/bin/SubutaiLauncher
 mkdir -p /opt/subutai/python/Lib
-cp -r /opt/subutai/python/lib/python3.7/* /opt/subutai/python/Lib/
+cp -r /opt/subutai/python/lib/python3.6/* /opt/subutai/python/Lib/
 mkdir -p /opt/subutai/bin/Lib
-cp -r /opt/subutai/python/lib/python3.7/* /opt/subutai/bin/Lib/
+cp -r /opt/subutai/python/lib/python3.6/* /opt/subutai/bin/Lib/
+
+#ln -s /usr/local/lib/libpython3.6m.so.1.0 /usr/local/lib/libpython3.6m.so
+#ln -s /usr/local/lib/libPocoCryptod.so.60 /usr/local/lib/libPocoCryptod.so
+#ln -s /usr/local/lib/libPocoCrypto.so.60 /usr/local/lib/libPocoCrypto.so
+#ln -s /usr/local/lib/libPocoDatad.so.60 /usr/local/lib/libPocoDatad.so
+#ln -s /usr/local/lib/libPocoData.so.60 /usr/local/lib/libPocoData.so
+#ln -s /usr/local/lib/libPocoFoundationd.so.60 /usr/local/lib/libPocoFoundationd.so
+#ln -s /usr/local/lib/libPocoFoundation.so.60 /usr/local/lib/libPocoFoundation.so
+#ln -s /usr/local/lib/libPocoJSONd.so.60 /usr/local/lib/libPocoJSONd.so
+#ln -s /usr/local/lib/libPocoJSON.so.60 /usr/local/lib/libPocoJSON.so
+#ln -s /usr/local/lib/libPocoNetd.so.60 /usr/local/lib/libPocoNetd.so
+#ln -s /usr/local/lib/libPocoNet.so.60 /usr/local/lib/libPocoNet.so
+#ln -s /usr/local/lib/libPocoNetSSLd.so.60 /usr/local/lib/libPocoNetSSLd.so
+#ln -s /usr/local/lib/libPocoNetSSL.so.60 /usr/local/lib/libPocoNetSSL.so
+#ln -s /usr/local/lib/libPocoUtild.so.60 /usr/local/lib/libPocoUtild.so
+#ln -s /usr/local/lib/libPocoUtil.so.60 /usr/local/lib/libPocoUtil.so
+#ln -s /usr/local/lib/libPocoXMLd.so.60 /usr/local/lib/libPocoXMLd.so
+#ln -s /usr/local/lib/libPocoXML.so.60 /usr/local/lib/libPocoXML.so
+#ln -s /usr/local/lib/libPocoZipd.so.60 /usr/local/lib/libPocoZipd.so
+#ln -s /usr/local/lib/libPocoZip.so.60 /usr/local/lib/libPocoZip.so
+
+ldconfig
