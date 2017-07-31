@@ -163,8 +163,8 @@ def startVm(machineName):
 def stopVm(machineName):
     subutai.SSHRun("sync")
     subutai.log("info", "Stopping Virtual machine")
-    if subutai.CheckVMRunning(machineName) != 0:
-        subutai.VBox("controlvm " + machineName + " poweroff soft")
+    #if subutai.CheckVMRunning(machineName) != 0:
+    subutai.VBox("controlvm " + machineName + " poweroff soft")
 
     return
 
