@@ -15,13 +15,16 @@ fi
 rm -rf debian/python
 rm -rf debian/SubutaiLauncher
 rm -rf debian/subutai-launcher
+rm -rf debian/fonts
 #rm -rf debian/poco
 
 mkdir -p debian/python
+mkdir -p debian/fonts
 #mkdir -p debian/poco
 
 cp $launcher debian/SubutaiLauncher
 #cp ../../bin/libsubutai-launcher.so debian/libsubutai-launcher.so
+cp -r ../../assets/dev/*.ttf debian/fonts
 cp -r $pythondir/* debian/python/
 #cp -r /usr/local/lib/libPoco*.so* debian/poco
 

@@ -24,6 +24,7 @@ config.make
 UI/Builds/LinuxMakefile/build
 deploy.sh
 package/subutai*
+package/linux/debian/fonts
 *.deb
 
 # windows build

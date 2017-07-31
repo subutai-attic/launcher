@@ -17,8 +17,8 @@ ComponentChooser::ComponentChooser() :
     _logger = &Poco::Logger::get("subutai");
     _logger->trace("Creating Component Chooser UI Component");
 
-    auto font = juce::Font(15);
-    auto font2 = juce::Font(13);
+    auto font = juce::Font("Encode Sans", 15, 0);
+    auto font2 = juce::Font("Encode Sans", 13, 0);
 
     // P2P
     
@@ -26,8 +26,8 @@ ComponentChooser::ComponentChooser() :
 	_ptpNo->setTooltip("Exclude P2P");
     _ptpNo->setClickingTogglesState(true);
     _ptpNo->setRadioGroupId(20001);
-    _ptpNo->setColour(TextButton::buttonColourId, Colour(105, 116, 144));
-    _ptpNo->setColour(TextButton::buttonOnColourId, Colours::blueviolet.brighter());
+    _ptpNo->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
+    _ptpNo->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
     _ptpNo->setBounds(20, 15, 55, 30);
     _ptpNo->setConnectedEdges(Button::ConnectedOnRight);
     _ptpNo->addListener(this);
@@ -35,8 +35,8 @@ ComponentChooser::ComponentChooser() :
 	_ptpYes->setTooltip("Include P2P");
     _ptpYes->setClickingTogglesState(true);
     _ptpYes->setRadioGroupId(20001);
-    _ptpYes->setColour(TextButton::buttonColourId, Colour(105, 116, 144));
-    _ptpYes->setColour(TextButton::buttonOnColourId, Colours::blueviolet.brighter());
+    _ptpYes->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
+    _ptpYes->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
     _ptpYes->setBounds(75, 15, 55, 30);
     _ptpYes->setConnectedEdges(Button::ConnectedOnLeft);
     _ptpYes->setToggleState(true, dontSendNotification);
@@ -64,16 +64,16 @@ ComponentChooser::ComponentChooser() :
     _trayNo = new juce::TextButton("-");
     _trayNo->setClickingTogglesState(true);
     _trayNo->setRadioGroupId(20002);
-    _trayNo->setColour(TextButton::buttonColourId, Colour(105, 116, 144));
-    _trayNo->setColour(TextButton::buttonOnColourId, Colours::blueviolet.brighter());
+    _trayNo->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
+    _trayNo->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
     _trayNo->setBounds(20, 55, 55, 30);
     _trayNo->setConnectedEdges(Button::ConnectedOnRight);
     _trayNo->addListener(this);
     _trayYes = new juce::TextButton("+");
     _trayYes->setClickingTogglesState(true);
     _trayYes->setRadioGroupId(20002);
-    _trayYes->setColour(TextButton::buttonColourId, Colour(105, 116, 144));
-    _trayYes->setColour(TextButton::buttonOnColourId, Colours::blueviolet.brighter());
+    _trayYes->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
+    _trayYes->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
     _trayYes->setBounds(75, 55, 55, 30);
     _trayYes->setConnectedEdges(Button::ConnectedOnLeft);
     _trayYes->setToggleState(true, dontSendNotification);
@@ -102,16 +102,16 @@ ComponentChooser::ComponentChooser() :
     _eteNo = new juce::TextButton("-");
     _eteNo->setClickingTogglesState(true);
     _eteNo->setRadioGroupId(20003);
-    _eteNo->setColour(TextButton::buttonColourId, Colour(105, 116, 144));
-    _eteNo->setColour(TextButton::buttonOnColourId, Colours::blueviolet.brighter());
+    _eteNo->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
+    _eteNo->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
     _eteNo->setBounds(20, 95, 55, 30);
     _eteNo->setConnectedEdges(Button::ConnectedOnRight);
     _eteNo->addListener(this);
     _eteYes = new juce::TextButton("+");
     _eteYes->setClickingTogglesState(true);
     _eteYes->setRadioGroupId(20003);
-    _eteYes->setColour(TextButton::buttonColourId, Colour(105, 116, 144));
-    _eteYes->setColour(TextButton::buttonOnColourId, Colours::blueviolet.brighter());
+    _eteYes->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
+    _eteYes->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
     _eteYes->setBounds(75, 95, 55, 30);
     _eteYes->setConnectedEdges(Button::ConnectedOnLeft);
     _eteYes->setToggleState(true, dontSendNotification);
@@ -139,16 +139,16 @@ ComponentChooser::ComponentChooser() :
     _peerNo = new juce::TextButton("-");
     _peerNo->setClickingTogglesState(true);
     _peerNo->setRadioGroupId(20004);
-    _peerNo->setColour(TextButton::buttonColourId, Colour(105, 116, 144));
-    _peerNo->setColour(TextButton::buttonOnColourId, Colours::blueviolet.brighter());
+    _peerNo->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
+    _peerNo->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
     _peerNo->setBounds(20, 135, 55, 30);
     _peerNo->setConnectedEdges(Button::ConnectedOnRight);
     _peerNo->addListener(this);
     _peerYes = new juce::TextButton("+");
     _peerYes->setClickingTogglesState(true);
     _peerYes->setRadioGroupId(20004);
-    _peerYes->setColour(TextButton::buttonColourId, Colour(105, 116, 144));
-    _peerYes->setColour(TextButton::buttonOnColourId, Colours::blueviolet.brighter());
+    _peerYes->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
+    _peerYes->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
     _peerYes->setBounds(75, 135, 55, 30);
     _peerYes->setConnectedEdges(Button::ConnectedOnLeft);
     _peerYes->setToggleState(true, dontSendNotification);
@@ -175,20 +175,20 @@ ComponentChooser::ComponentChooser() :
 
     _cpuMinus = new juce::TextButton("-");
 	_cpuMinus->setTooltip("Remove one core");
-    _cpuMinus->setColour(TextButton::buttonColourId, Colour(105, 116, 144));
+    _cpuMinus->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
     _cpuMinus->setBounds(20, 175, 36, 30);
     _cpuMinus->setConnectedEdges(Button::ConnectedOnRight);
     _cpuMinus->addListener(this);
 
     _cpuNum = new juce::TextButton("2");
-    _cpuNum->setColour(TextButton::buttonColourId, Colour::greyLevel(0.2f));
+    _cpuNum->setColour(TextButton::buttonColourId, Colour(255, 255, 255));
     _cpuNum->setColour(TextButton::textColourOffId, Colour(105, 116, 144));
     _cpuNum->setColour(TextButton::textColourOnId, Colour(105, 116, 144));
     _cpuNum->setBounds(56, 175, 36, 30);
     _cpuNum->setConnectedEdges(Button::ConnectedOnRight | Button::ConnectedOnLeft);
 
     _cpuPlus = new juce::TextButton("+");
-    _cpuPlus->setColour(TextButton::buttonColourId, Colour(105, 116, 144));
+    _cpuPlus->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
     _cpuPlus->setBounds(92, 175, 36, 30);
     _cpuPlus->setConnectedEdges(Button::ConnectedOnLeft);
     _cpuPlus->addListener(this);
@@ -214,20 +214,20 @@ ComponentChooser::ComponentChooser() :
     // Memory
     
     _memMinus = new juce::TextButton("-");
-    _memMinus->setColour(TextButton::buttonColourId, Colour(105, 116, 144));
+    _memMinus->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
     _memMinus->setBounds(20, 215, 36, 30);
     _memMinus->setConnectedEdges(Button::ConnectedOnRight);
     _memMinus->addListener(this);
 
     _memSize = new juce::TextButton("2");
-    _memSize->setColour(TextButton::buttonColourId, Colour::greyLevel(0.2f));
+    _memSize->setColour(TextButton::buttonColourId, Colour(255, 255, 255));
     _memSize->setColour(TextButton::textColourOffId, Colour(105, 116, 144));
     _memSize->setColour(TextButton::textColourOnId, Colour(105, 116, 144));
     _memSize->setBounds(56, 215, 36, 30);
     _memSize->setConnectedEdges(Button::ConnectedOnRight | Button::ConnectedOnLeft);
 
     _memPlus = new juce::TextButton("+");
-    _memPlus->setColour(TextButton::buttonColourId, Colour(105, 116, 144));
+    _memPlus->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
     _memPlus->setBounds(92, 215, 36, 30);
     _memPlus->setConnectedEdges(Button::ConnectedOnLeft);
     _memPlus->addListener(this);
