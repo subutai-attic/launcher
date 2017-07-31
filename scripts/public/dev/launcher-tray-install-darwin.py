@@ -31,6 +31,6 @@ def subutaistart():
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
 
-    call(['installer', '-pkg', tmpDir+'/'+libssh, '-target', installDir])
+    call(['installer', '-pkg', tmpDir+'/'+libssh, '-target', "/Applications/Subutai"])
 
     subutai.Shutdown()

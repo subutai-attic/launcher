@@ -1,16 +1,7 @@
-/*
-  ==============================================================================
-
-    SocialMediaIcons.cpp
-    Created: 23 Aug 2016 7:32:40pm
-    Author:  crioto
-
-  ==============================================================================
-*/
-
 #include "SocialMediaIcons.h"
 
 SocialMediaIcons::SocialMediaIcons() {
+
     _facebook = new DrawableButton("Facebook", DrawableButton::ImageFitted);
     _twitter = new DrawableButton("Twitter", DrawableButton::ImageFitted);
     _linkedin = new DrawableButton("LinkedIn", DrawableButton::ImageFitted);
@@ -34,7 +25,6 @@ SocialMediaIcons::SocialMediaIcons() {
     fbHover.setPath(getFacebook());
     fbHover.setFill(fth);
 
-
     twitter.setPath(getTwitter());
     twitter.setFill(ft);
 
@@ -56,10 +46,59 @@ SocialMediaIcons::SocialMediaIcons() {
     _github->setImages(&github, &github, 0);
     _github->setBounds(170, 5, 30, 30);
 
+    /*
     addAndMakeVisible(_facebook);
     addAndMakeVisible(_twitter);
     addAndMakeVisible(_linkedin);
     addAndMakeVisible(_github);
+    */
+
+    std::string pDir = SubutaiLauncher::Session::instance()->getSettings()->getTmpPath();
+    _facebookButton.setImages(false, false, true, 
+           juce::ImageCache::getFromFile(juce::File(pDir + "launcher-facebook-inactive.png")),
+           1.0f, juce::Colours::transparentWhite,
+           juce::ImageCache::getFromFile(juce::File(pDir + "launcher-facebook-active.png")),
+           1.0f, juce::Colours::transparentWhite,
+           juce::ImageCache::getFromFile(juce::File(pDir + "launcher-facebook-active.png")),
+           1.0f, juce::Colours::transparentWhite);
+    _facebookButton.setBounds(50, 0, 30, 30);
+    _facebookButton.addListener(this);
+
+    addAndMakeVisible(_facebookButton);
+
+    _twitterButton.setImages(false, false, true, 
+           juce::ImageCache::getFromFile(juce::File(pDir + "launcher-twitter-inactive.png")),
+           1.0f, juce::Colours::transparentWhite,
+           juce::ImageCache::getFromFile(juce::File(pDir + "launcher-twitter-active.png")),
+           1.0f, juce::Colours::transparentWhite,
+           juce::ImageCache::getFromFile(juce::File(pDir + "launcher-twitter-active.png")),
+           1.0f, juce::Colours::transparentWhite);
+    _twitterButton.setBounds(90, 0, 30, 30);
+
+    addAndMakeVisible(_twitterButton);
+
+    _githubButton.setImages(false, false, true, 
+           juce::ImageCache::getFromFile(juce::File(pDir + "launcher-github-inactive.png")),
+           1.0f, juce::Colours::transparentWhite,
+           juce::ImageCache::getFromFile(juce::File(pDir + "launcher-github-active.png")),
+           1.0f, juce::Colours::transparentWhite,
+           juce::ImageCache::getFromFile(juce::File(pDir + "launcher-github-active.png")),
+           1.0f, juce::Colours::transparentWhite);
+    _githubButton.setBounds(130, 0, 30, 30);
+
+    addAndMakeVisible(_githubButton);
+
+    _linkedinButton.setImages(false, false, true, 
+           juce::ImageCache::getFromFile(juce::File(pDir + "launcher-linkedin-inactive.png")),
+           1.0f, juce::Colours::transparentWhite,
+           juce::ImageCache::getFromFile(juce::File(pDir + "launcher-linkedin-active.png")),
+           1.0f, juce::Colours::transparentWhite,
+           juce::ImageCache::getFromFile(juce::File(pDir + "launcher-linkedin-active.png")),
+           1.0f, juce::Colours::transparentWhite);
+    _linkedinButton.setBounds(170, 0, 30, 30);
+
+    addAndMakeVisible(_linkedinButton);
+
 
     addAndMakeVisible(_facebookLink);
     addAndMakeVisible(_twitterLink);
@@ -74,7 +113,6 @@ SocialMediaIcons::SocialMediaIcons() {
     _linkedinLink.setURL(URL("https://www.linkedin.com"));
     _githubLink.setBounds(-1, -1, 1, 1);
     _githubLink.setURL(URL("https://www.github.com"));
-
 }
 
 SocialMediaIcons::~SocialMediaIcons() {

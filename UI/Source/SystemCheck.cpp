@@ -10,14 +10,14 @@ SystemCheck::SystemCheck()
     SubutaiLauncher::Environment env;
 
     _osLabel.setText("Operating System", dontSendNotification);
-    _osLabel.setColour(Label::textColourId, Colours::white);
+    _osLabel.setColour(Label::textColourId, Colour(105, 116, 144));
     _osLabel.setBounds(15, 15, 150, 40);
     _osLabel.setFont(font);
     _osLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_osLabel);
 
     _osValue.setText(env.versionOS(), dontSendNotification);
-    _osValue.setColour(Label::textColourId, Colours::white);
+    _osValue.setColour(Label::textColourId, Colour(105, 116, 144));
     _osValue.setBounds(150, 15, 500, 40);
     _osValue.setFont(font);
     _osValue.setJustificationType(Justification::top);
@@ -31,14 +31,14 @@ SystemCheck::SystemCheck()
     addAndMakeVisible(_osInfo);
 
     _archLabel.setText("CPU Architecture", dontSendNotification);
-    _archLabel.setColour(Label::textColourId, Colours::white);
+    _archLabel.setColour(Label::textColourId, Colour(105, 116, 144));
     _archLabel.setBounds(15, 55, 150, 40);
     _archLabel.setFont(font);
     _archLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_archLabel);
 
     _archValue.setText(env.cpuArch(), dontSendNotification);
-    _archValue.setColour(Label::textColourId, Colours::white);
+    _archValue.setColour(Label::textColourId, Colour(105, 116, 144));
     _archValue.setBounds(150, 55, 500, 40);
     _archValue.setFont(font);
     _archValue.setJustificationType(Justification::top);
@@ -52,7 +52,7 @@ SystemCheck::SystemCheck()
     addAndMakeVisible(_archInfo);
 
     _cpuLabel.setText("CPU Cores", dontSendNotification);
-    _cpuLabel.setColour(Label::textColourId, Colours::white);
+    _cpuLabel.setColour(Label::textColourId, Colour(105, 116, 144));
     _cpuLabel.setBounds(15, 95, 150, 40);
     _cpuLabel.setFont(font);
     _cpuLabel.setJustificationType(Justification::top);
@@ -61,7 +61,7 @@ SystemCheck::SystemCheck()
     std::string cores = Poco::format("%u", env.cpuNum());
 
     _cpuValue.setText(cores, dontSendNotification);
-    _cpuValue.setColour(Label::textColourId, Colours::white);
+    _cpuValue.setColour(Label::textColourId, Colour(105, 116, 144));
     _cpuValue.setBounds(150, 95, 500, 40);
     _cpuValue.setFont(font);
     _cpuValue.setJustificationType(Justification::top);
@@ -75,7 +75,7 @@ SystemCheck::SystemCheck()
     addAndMakeVisible(_cpuInfo);
 
     _memLabel.setText("Total Memory", dontSendNotification);
-    _memLabel.setColour(Label::textColourId, Colours::white);
+    _memLabel.setColour(Label::textColourId, Colour(105, 116, 144));
     _memLabel.setBounds(15, 135, 150, 40);
     _memLabel.setFont(font);
     _memLabel.setJustificationType(Justification::top);
@@ -84,7 +84,7 @@ SystemCheck::SystemCheck()
     std::string memValue = Poco::format("%lu MB", env.ramSize() / 1024 / 1024);
 
     _memValue.setText(memValue, dontSendNotification);
-    _memValue.setColour(Label::textColourId, Colours::white);
+    _memValue.setColour(Label::textColourId, Colour(105, 116, 144));
     _memValue.setBounds(150, 135, 500, 40);
     _memValue.setFont(font);
     _memValue.setJustificationType(Justification::top);
@@ -98,7 +98,7 @@ SystemCheck::SystemCheck()
     addAndMakeVisible(_memInfo);
 
     _vtxLabel.setText("Virtualization support", dontSendNotification);
-    _vtxLabel.setColour(Label::textColourId, Colours::white);
+    _vtxLabel.setColour(Label::textColourId, Colour(105, 116, 144));
     _vtxLabel.setBounds(15, 175, 150, 40);
     _vtxLabel.setFont(font);
     _vtxLabel.setJustificationType(Justification::top);
@@ -108,7 +108,7 @@ SystemCheck::SystemCheck()
     if (env.vtxEnabled()) vtxStatus = "Enabled";
 
     _vtxValue.setText(vtxStatus, dontSendNotification);
-    _vtxValue.setColour(Label::textColourId, Colours::white);
+    _vtxValue.setColour(Label::textColourId, Colour(105, 116, 144));
     _vtxValue.setBounds(150, 175, 500, 40);
     _vtxValue.setFont(font);
     _vtxValue.setJustificationType(Justification::top);
@@ -122,7 +122,7 @@ SystemCheck::SystemCheck()
     addAndMakeVisible(_vtxInfo);
 
     _vbLabel.setText("VirtualBox version", dontSendNotification);
-    _vbLabel.setColour(Label::textColourId, Colours::white);
+    _vbLabel.setColour(Label::textColourId, Colour(105, 116, 144));
     _vbLabel.setBounds(15, 215, 150, 40);
     _vbLabel.setFont(font);
     _vbLabel.setJustificationType(Justification::top);
@@ -134,7 +134,7 @@ SystemCheck::SystemCheck()
 		if (vb.isInstalled())
 		{
 			_vbValue.setText(vb.extractVersion(), dontSendNotification);
-			_vbValue.setColour(Label::textColourId, Colours::white);
+			_vbValue.setColour(Label::textColourId, Colour(105, 116, 144));
 		}
 		else
 		{
@@ -174,7 +174,7 @@ SystemCheck::~SystemCheck()
 
 void SystemCheck::paint(juce::Graphics& g)
 {
-    g.fillAll(Colour::greyLevel (0.2f));
+    g.fillAll(Colour(255, 255, 255));
     _logger->trace("SystemCheck::paint");
 }
 

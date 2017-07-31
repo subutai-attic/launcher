@@ -75,6 +75,7 @@ namespace SubutaiLauncher
             std::thread download();
             void downloadImpl();
             bool isDone();
+            bool isRunning();
             double getPercent();
             bool verifyDownload();
             long currentProgress();
@@ -90,6 +91,7 @@ namespace SubutaiLauncher
             SubutaiFile _file;
             long _progress;
             bool _done;
+            bool _running;
             Poco::Logger* _logger;
 	};
 

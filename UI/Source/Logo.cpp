@@ -1,7 +1,18 @@
 #include "Logo.h"
 
 Logo::Logo() {
-
+    _logger = &Poco::Logger::get("subutai");
+    std::string pFile(SubutaiLauncher::Session::instance()->getSettings()->getTmpPath() + "launcher-logo.png");
+    Poco::File f(pFile);
+    if (f.exists())
+    {
+        _logger->debug("Logo file exists");
+        _logo = juce::ImageCache::getFromFile(juce::File(pFile));
+    }
+    else
+    {
+        _logger->error("launcher-logo.png doesn't exists");
+    }
 }
 
 void Logo::paint(Graphics& g) {
@@ -99,4 +110,9 @@ Path Logo::getLogo() {
             "M119.2,20.1h-0.3c-0.1,0-0.2,0-0.2,0.2v7.5c0,0.1,0,0.2,0.2,0.2h0.3c0.1,0,0.2,0,0.2-0.2v-7.5"
             "C119.4,20.1,119.4,20.1,119.2,20.1z"
             );
+}
+
+Image* Logo::getImage()
+{
+    return &_logo;
 }

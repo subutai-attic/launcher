@@ -1,15 +1,8 @@
-/*
-   ==============================================================================
-
-   This file was auto-generated!
-
-   ==============================================================================
-   */
-
 #ifndef MAINCOMPONENT_H_INCLUDED
 #define MAINCOMPONENT_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "Poco/Logger.h"
 #include "LoginScreen.h"
 #include "LibraryComponent.h"
 #include "CommunityComponent.h"
@@ -18,11 +11,6 @@
 #include "Logo.h"
 #include "Sidebar.h"
 
-//==============================================================================
-/*
-   This component lives inside our window, and this is where you should put all
-   your controls and content.
-   */
 class MainContentComponent : public juce::Component, public juce::ButtonListener, public juce::ListBoxModel
 {
     public:
@@ -31,7 +19,6 @@ class MainContentComponent : public juce::Component, public juce::ButtonListener
         static const int HEADER_HEIGHT = 22;
         static const int MENU_WIDTH = 250;
 
-        //==============================================================================
         MainContentComponent();
         ~MainContentComponent();
 
@@ -57,10 +44,16 @@ class MainContentComponent : public juce::Component, public juce::ButtonListener
         MarketplaceComponent _marketplace;
         CommunityComponent _community;
 
-        Logo _logo;
+        //Logo _logo;
+        Logo* _logoImage;
+        juce::ImageComponent _logo;
         SidebarComponent _sidebar;
+        juce::Label _title;
+        juce::Label _version;
 
         std::vector<std::string> _menuItems;
+
+        Poco::Logger* _logger;
 
         //==============================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)

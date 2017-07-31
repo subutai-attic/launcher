@@ -11,6 +11,7 @@
 #include "LibraryItemTab.h"
 #include "LibrarySystemCheck.h"
 #include "WizardWindow.h"
+#include "LauncherButton.h"
 
 class LibraryComponent : 
     public juce::Component, 
@@ -29,7 +30,8 @@ class LibraryComponent :
         Poco::Logger* _logger;
         juce::Label _componentsSectionLabel;
         juce::Label _peersSectionLabel;
-        juce::TextButton _installButton;
+        //juce::TextButton _installButton;
+        LauncherButton _installButton;
         std::vector<LibraryItem*> _components;
         std::vector<LibraryItemTab*> _componentTabs;
         std::vector<LibraryItem*> _peers;

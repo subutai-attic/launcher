@@ -25,3 +25,5 @@ def subutaistart():
     subutai.MakeLink(installDir+"/bin/p2p", "/usr/bin/p2p")
 
     subutai.Shutdown()
+
+    return 0

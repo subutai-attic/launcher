@@ -3,7 +3,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Main.h"
 
-UIApplication::UIApplication()
+UIApplication::UIApplication() : _assetsReady(false)
 {
 	try 
 	{
@@ -31,6 +31,20 @@ UIApplication::UIApplication()
 	}
 	SubutaiLauncher::Environment env;
 	env.updatePath(SubutaiLauncher::Session::instance()->getSettings()->getInstallationPath() + "bin");
+
+	Poco::Logger::get("subutai").information("Downloading assets");
+    /*
+    SubutaiLauncher::AssetsManager pAssets;
+    try 
+    {
+        pAssets.verify();
+    }
+    catch (std::exception& e)
+    {
+        Poco::Logger::get("subutai").error("Failed to download assets");
+        SubutaiLauncher::Session::instance()->getDownloader()->reset();
+    }
+    */
 }
 
 const juce::String UIApplication::getApplicationName()
@@ -61,9 +75,12 @@ void UIApplication::initialise(const juce::String& commandLine)
     //if (cuser !=0) {
 
     //}
+    SubutaiLauncher::AssetsManager pAssets;
+    pAssets.download("launcher-logo.png");
 
-    mainWindow = new MainWindow(pTitle);
-    _logger->debug("UI Initialization completed");
+    splash = new Splash(pTitle);
+    getAssets(pTitle).detach();
+    //_logger->debug("UI Initialization completed");
 }
 
 void UIApplication::shutdown()
@@ -85,6 +102,35 @@ void UIApplication::systemRequestedQuit()
 void UIApplication::anotherInstanceStarted(const juce::String& commandLine)
 {
 
+}
+
+void UIApplication::startMainWindow(const std::string& title)
+{
+    splash->setVisible(false);
+    mainWindow = new MainWindow(title);
+}
+
+std::thread UIApplication::getAssets(const std::string& title)
+{
+    return std::thread([=] { getAssetsImpl(title); });
+}
+
+void UIApplication::getAssetsImpl(const std::string& title)
+{
+    SubutaiLauncher::AssetsManager pAssets;
+
+    try 
+    {
+        pAssets.verify();
+    }
+    catch (std::exception& e)
+    {
+        Poco::Logger::get("subutai").error("Failed to download assets");
+        SubutaiLauncher::Session::instance()->getDownloader()->reset();
+    }
+    
+    _assetsReady = true;
+    startMainWindow(title);
 }
 
 START_JUCE_APPLICATION (UIApplication)

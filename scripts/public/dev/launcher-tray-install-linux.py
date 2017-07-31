@@ -1,6 +1,7 @@
 import subutai
-from time import sleep
 import tarfile
+from time import sleep
+
 
 def subutaistart():
     subutai.AddStatus("Download Tray application")
@@ -24,3 +25,5 @@ def subutaistart():
     subutai.MakeLink(installDir+"/bin/SubutaiTray", "/usr/local/bin/SubutaiTray")
 
     subutai.Shutdown()
+
+    return 0

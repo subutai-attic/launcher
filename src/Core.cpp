@@ -11,8 +11,9 @@ SubutaiLauncher::Core::~Core()
 {
     Poco::Logger::get("subutai").information("Stopping Subutai Launcher Core");
     if (_running) {
-        while (!Session::instance()->getDownloader()->isDone()) {
+        while (Session::instance()->getDownloader()->isRunning() && !Session::instance()->getDownloader()->isDone()) {
             // Waiting
+            // TODO: Put timeout here
         };
     }
     Poco::Logger::get("subutai").information("Subutai Launcher Core stopped");
@@ -44,6 +45,7 @@ void SubutaiLauncher::Core::initializePython()
     PyImport_AppendInittab("subutai", &PyInit_Subutai);
 #endif
 
+    Py_SetProgramName(L"SubutaiLauncher");
     Py_Initialize();
 
 
