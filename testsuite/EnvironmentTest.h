@@ -17,7 +17,9 @@ public:
     void testGetDefaultGateway();
 	void testGetDesktopDirectory();
 	void testUpdatePath();
+#if LAUNCHER_WINDOWS
 	void testWriteE2ERegistry();
+#endif
 
 	static CppUnit::Test* suite();
 };

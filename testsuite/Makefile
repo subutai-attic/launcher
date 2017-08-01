@@ -20,7 +20,8 @@ OBJECTS = $(BUILD_DIR)/DownloaderTest.o \
 		  $(BUILD_DIR)/TestSuite.o \
 		  $(BUILD_DIR)/HubTest.o \
 		  $(BUILD_DIR)/EnvironmentTest.o \
-		  $(BUILD_DIR)/VirtualBoxTest.o
+		  $(BUILD_DIR)/VirtualBoxTest.o \
+		  $(BUILD_DIR)/SSTest.o
 
 $(OUTPUT_DIR)/$(TARGET): $(OBJECTS)
 	$(CC) $^ $(LDFLAGS) -o $@
@@ -47,6 +48,9 @@ $(BUILD_DIR)/EnvironmentTest.o: EnvironmentTest.cpp EnvironmentTest.h
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/VirtualBoxTest.o: VirtualBoxTest.cpp VirtualBoxTest.h
+	$(CC) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/SSTest.o: SSTest.cpp SSTest.h
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
 directories:
