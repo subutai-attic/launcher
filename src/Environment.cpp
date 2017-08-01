@@ -44,7 +44,7 @@ unsigned SubutaiLauncher::Environment::is64()
 #elif LAUNCHER_WINDOWS
     SYSTEM_INFO si;
     GetSystemInfo(&si);
-    return 0; //Change 4Win! 
+    return si->wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64; //kuku
 #elif LAUNCHER_MACOS
     return 1;
 #endif
@@ -82,9 +82,9 @@ unsigned long SubutaiLauncher::Environment::ramSize()
 #endif
     */
 #elif LAUNCHER_WINDOWS
-    SYSTEM_INFO si;
-    GetSystemInfo(&si);
-    return si.dwNumberOfProcessors;
+    MEMORYSTATUSEX ms;
+    GlobalMemoryStatusEx (&ms);
+    return ms.ullTotalPhys;
 #elif LAUNCHER_MACOS
     int mib [] = { CTL_HW, HW_MEMSIZE };
     int64_t value = 0;
@@ -163,9 +163,28 @@ std::string SubutaiLauncher::Environment::versionOS()
 
 std::string SubutaiLauncher::Environment::cpuArch() 
 {
+#ifndef LAUNCHER_WINDOWS
     _logger->trace("Environment: Getting OS Architecture");
     std::string ar = Poco::Environment::osArchitecture();
     return ar;
+#else
+  SYSTEM_INFO si;
+  GetSystemInfo(&si);
+  switch (si->wProcessorArchitecture) {
+    /**/
+    case PROCESSOR_ARCHITECTURE_AMD64:
+      return "x64";
+    case PROCESSOR_ARCHITECTURE_ARM:
+      return "ARM";
+    case PROCESSOR_ARCHITECTURE_IA64:
+      return "IA64";
+    case PROCESSOR_ARCHITECTURE_INTEL:
+      return "x86";
+    case PROCESSOR_ARCHITECTURE_UNKNOWN:
+    default:
+      return "Unknown arch";
+  }
+#endif
 }
 
 unsigned int SubutaiLauncher::Environment::cpuNum() 
