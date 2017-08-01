@@ -8,6 +8,7 @@
 #include <sstream>
 #if LAUNCHER_LINUX
 #include <unistd.h>
+#include <sys/sysinfo.h>
 #endif
 #include <limits.h>
 

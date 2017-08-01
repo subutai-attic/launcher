@@ -25,7 +25,9 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
-UIApplication::UIApplication() : _initTimer(nullptr)
+UIApplication::UIApplication() :
+  _core(nullptr),
+  _initTimer(nullptr)
 {
   try
   {
@@ -115,17 +117,9 @@ void UIApplication::initialise(const juce::String& commandLine)
 void UIApplication::shutdown()
 {
   _logger->debug("Started UI shutdown procedure");
-
-  if (_initTimer) {
-    _logger->debug("Started UI shutdown procedure1");
-    delete _initTimer;
-    _logger->debug("Started UI shutdown procedure2");
-  }
+  if (_initTimer) delete _initTimer;
+  if (_core) delete _core;
   _mainWindow = nullptr;
-  _logger->debug("Started UI shutdown procedure3");
-  delete _core;
-  _logger->debug("Started UI shutdown procedure4");
-//  delete _splashScreen;
   _logger->debug("UI Destruction completed");
 }
 

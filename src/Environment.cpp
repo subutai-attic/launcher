@@ -3,6 +3,8 @@
 #include "Environment.h"
 #if LAUNCHER_WINDOWS
 #include <Shlobj.h>
+#include <VersionHelpers.h>
+#include <Windows.h>
 #endif
 
 //USES_CONVERSION;
@@ -44,7 +46,25 @@ unsigned SubutaiLauncher::Environment::is64()
 #elif LAUNCHER_WINDOWS
     SYSTEM_INFO si;
     GetSystemInfo(&si);
-    return 0; //Change 4Win! 
+    switch (si.wProcessorArchitecture) {
+      /**/
+      case PROCESSOR_ARCHITECTURE_AMD64:
+        _logger->trace("x64");
+        break;
+      case PROCESSOR_ARCHITECTURE_ARM:
+        _logger->trace("ARM");
+        break;
+      case PROCESSOR_ARCHITECTURE_IA64:
+        _logger->trace("IA64 (intel itanium based) ");
+        break;
+      case PROCESSOR_ARCHITECTURE_INTEL:
+        _logger->trace("x86");
+        break;
+      case PROCESSOR_ARCHITECTURE_UNKNOWN:
+      default:
+        _logger->trace("Unknown arch");
+    }
+    return si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64; //kuku
 #elif LAUNCHER_MACOS
     return 1;
 #endif
@@ -53,8 +73,17 @@ unsigned SubutaiLauncher::Environment::is64()
 
 unsigned long SubutaiLauncher::Environment::ramSize() 
 {
-    _logger->trace("Environment: Retrieving RAM size");
+    _logger->debug("Environment: Retrieving RAM size");
 #if LAUNCHER_LINUX
+    struct sysinfo info;
+    _logger->trace("Running sysinfo");
+    int rc = sysinfo(&info);
+    if (rc == 0)
+    {
+        _logger->debug("Total mem size: %lu", info.totalram);
+        return info.totalram;
+    }
+    /* 
 #if defined _SC_PHYS_PAGES
 #if defined _SC_PAGESIZE
     int pages = sysconf(_SC_PHYS_PAGES);
@@ -71,10 +100,12 @@ unsigned long SubutaiLauncher::Environment::ramSize()
     return pages * pageSize / 1024;
 #endif
 #endif
+    */
 #elif LAUNCHER_WINDOWS
-    SYSTEM_INFO si;
-    GetSystemInfo(&si);
-    return si.dwNumberOfProcessors;
+    MEMORYSTATUSEX ms;
+    GlobalMemoryStatusEx (&ms);
+    _logger->debug("Total mem size: %lu", ms.ullTotalPhys);
+    return ms.ullTotalPhys;
 #elif LAUNCHER_MACOS
     int mib [] = { CTL_HW, HW_MEMSIZE };
     int64_t value = 0;
@@ -144,18 +175,117 @@ bool SubutaiLauncher::Environment::vtxEnabled()
 
 std::string SubutaiLauncher::Environment::versionOS() 
 {
+#ifndef LAUNCHER_WINDOWS
     _logger->trace("Environment: Getting operating system information");
     std::string os;
     //os = Poco::Environment::osDisplayName() + " " + Poco::Environment::osVersion();
 	os = Poco::Environment::osDisplayName();
     return os;
+#else
+  char* version = "Can't detect version, sorry";
+
+   do {
+     if (IsWindowsXPOrGreater()) {
+       version = "XP Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindowsXPSP1OrGreater()) {
+       version = "XPSP1 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindowsXPSP2OrGreater()) {
+       version = "XPSP2 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindowsXPSP3OrGreater()) {
+       version = "XPSP3 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindowsVistaOrGreater()) {
+       version = "Vista Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindowsVistaSP1OrGreater()) {
+       version = "VistaSP1 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindowsVistaSP2OrGreater()) {
+       version = "VistaSP2 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindows7OrGreater()) {
+       version = "Windows7 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindows7SP1OrGreater()) {
+       version = "Windows7SP1 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindows8OrGreater()) {
+       version = "Windows8 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindows8Point1OrGreater()) {
+       version = "Windows8.1 Or Greater";
+     } else {
+       break;
+     }
+
+//     if (IsWindows10OrGreater())
+//     {
+//        version = "Windows10 Or Greater";
+//     } else {
+//       break;
+//     }
+   } while (0);
+  return std::string(version);
+#endif
 }
 
 std::string SubutaiLauncher::Environment::cpuArch() 
 {
+#ifndef LAUNCHER_WINDOWS
     _logger->trace("Environment: Getting OS Architecture");
     std::string ar = Poco::Environment::osArchitecture();
     return ar;
+#else
+  SYSTEM_INFO si;
+  GetSystemInfo(&si);
+  switch (si.wProcessorArchitecture) {
+    /**/
+    case PROCESSOR_ARCHITECTURE_AMD64:
+      return "x64";
+    case PROCESSOR_ARCHITECTURE_ARM:
+      return "ARM";
+    case PROCESSOR_ARCHITECTURE_IA64:
+      return "IA64";
+    case PROCESSOR_ARCHITECTURE_INTEL:
+      return "x86";
+    case PROCESSOR_ARCHITECTURE_UNKNOWN:
+    default:
+      return "Unknown arch";
+  }
+#endif
 }
 
 unsigned int SubutaiLauncher::Environment::cpuNum() 

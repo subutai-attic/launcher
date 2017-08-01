@@ -6,6 +6,10 @@
 #include "SocialMediaIcons.h"
 #include "Poco/Logger.h"
 
+#if LAUNCHER_LINUX
+#include <unistd.h>
+#endif
+
 class SidebarComponent : public juce::Component {
     public:
         SidebarComponent();
@@ -23,6 +27,9 @@ class SidebarComponent : public juce::Component {
         juce::Label _library;
         juce::Label _templates;
         juce::Label _community;
+
+        juce::DrawableText _rootWarning;
+        bool _root;
 
         juce::ImageComponent _newsActive;
         juce::ImageComponent _newsInactive;
