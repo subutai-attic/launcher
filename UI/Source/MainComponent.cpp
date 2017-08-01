@@ -1,6 +1,6 @@
 #include "MainComponent.h"
 
-MainContentComponent::MainContentComponent() 
+MainContentComponent::MainContentComponent() : _logoImage(nullptr)
 {
     _logger = &Poco::Logger::get("subutai");
     auto font = juce::Font("Encode Sans", 20, 1);
@@ -62,7 +62,8 @@ MainContentComponent::MainContentComponent()
 
 MainContentComponent::~MainContentComponent()
 {
-    delete _logoImage;
+    if (_logoImage) delete _logoImage;
+
 }
 
 void MainContentComponent::paint (Graphics& g)

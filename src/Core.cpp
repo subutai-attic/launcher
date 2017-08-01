@@ -147,7 +147,7 @@ void SubutaiLauncher::Core::setupLogger()
     pSplitter->addChannel(cConsole);
 	Poco::DateTime dt;
 	Poco::Timestamp now;
-	std::string filename = "subutai-launcer-" + Poco::DateTimeFormatter::format(now, "%Y-%m-%d_%H-%M-%S") + ".log";
+	std::string filename = "subutai-launcher-" + Poco::DateTimeFormatter::format(now, "%Y-%m-%d_%H-%M-%S") + ".log";
 #if LAUNCHER_MACOS
     pChannel->setProperty("path", "/usr/local/share/subutai/log/" + filename);
 #elif LAUNCHER_LINUX

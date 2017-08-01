@@ -4,7 +4,7 @@ WizardIntro::WizardIntro()
 {
     _logger = &Poco::Logger::get("subutai");
     _logger->trace("Creating Wizard Intro UI Component");
-    auto font = juce::Font(17);
+    auto font = juce::Font("Encode Sans", 17, 1);
     _text.setText("Welcome to Subutai Installation Wizard!\n\nThis application will help you to setup Subutai Peer and all necessary components.\n\n");
     _text.setJustification(juce::Justification::topLeft);
     _text.setBounds(10, 10, getParentWidth(), getParentHeight());

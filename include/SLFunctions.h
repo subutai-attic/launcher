@@ -38,7 +38,6 @@ namespace SubutaiLauncher
     static char const* sl_tmpdir = "";
     static char const* sl_string = "";
     static char const* sl_desc = "";
-    static char const* sl_destination = "";
 
     //static double const* sl_double;
 	static double sl_double;
@@ -924,7 +923,7 @@ namespace SubutaiLauncher
 
 	// ========================================================================
 
-	static PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
+  static __attribute_used__ PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
 	{
 #if LAUNCHER_WINDOWS
 		Environment e;
@@ -1010,7 +1009,7 @@ namespace SubutaiLauncher
         NULL, NULL, NULL, NULL
     };
 
-    static PyObject* PyInit_Subutai(void)
+    static __attribute_used__ PyObject* PyInit_Subutai(void)
     {
         return PyModule_Create(&SubutaiModule);
     }

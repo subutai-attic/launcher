@@ -6,7 +6,7 @@ WizardFinish::WizardFinish() :
 {
     _logger = &Poco::Logger::get("subutai");
     _logger->trace("Creating Wizard Finish UI Component");
-    auto font = juce::Font(17);
+    auto font = juce::Font("Encode Sans", 17, 0);
 
     _thanks.setText("Thank you for using Subutai", juce::dontSendNotification);
     _thanks.setColour(juce::Label::textColourId, juce::Colour(105, 116, 144));

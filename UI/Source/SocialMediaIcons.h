@@ -17,16 +17,6 @@ class SocialMediaIcons : public juce::Component, public juce::ButtonListener {
         juce::ImageButton _linkedinButton;
         juce::ImageButton _githubButton;
 
-        juce::Path getFacebook();
-        juce::Path getTwitter();
-        juce::Path getLinkedin();
-        juce::Path getGithub();
-
-        juce::DrawableButton* _facebook;
-        juce::DrawableButton* _twitter;
-        juce::DrawableButton* _linkedin;
-        juce::DrawableButton* _github;
-
         juce::HyperlinkButton _facebookLink;
         juce::HyperlinkButton _twitterLink;
         juce::HyperlinkButton _linkedinLink;
