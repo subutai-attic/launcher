@@ -202,7 +202,7 @@ def reconfigureNic(machineName):
     gateway = subutai.GetDefaultRoutingInterface()
     bridged = subutai.GetVBoxBridgedInterface(gateway)
     bridged = bridged.replace(' ', '+++')
-    subutai.VBox("modifyvm " + machineName + ' --nic1 bridged --bridgeadapter1 "' + bridged + '"')
+    subutai.VBox("modifyvm " + machineName + ' --nic1 bridged --bridgeadapter1 ' + bridged)
     subutai.VBox("modifyvm " + machineName + " --nic2 nat")
     subutai.VBox("modifyvm " + machineName + " --cableconnected2 on")
     subutai.VBox("modifyvm " + machineName + ' --natpf2 ssh-fwd,tcp,,4567,,22 --natpf2 https-fwd,tcp,,9999,,8443')
