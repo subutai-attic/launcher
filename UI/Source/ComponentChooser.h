@@ -3,6 +3,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Poco/Logger.h"
+#include "LauncherButton.h"
 
 struct ChosenComponents
 {

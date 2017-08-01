@@ -4,6 +4,7 @@
 #include "Vars.h"
 #include "Core.h"
 #include "Downloader.h"
+#include "AssetsManager.h"
 #include "E2E.h"
 #include "Environment.h"
 #include "FileSystem.h"

@@ -10,10 +10,8 @@ class HubComponent : public juce::Component {
         void paint (juce::Graphics&) override;
         void resized() override;
     private:
+        juce::ImageComponent _robot;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HubComponent)
 };
-
-
-
 
 #endif  // HUBCOMPONENT_H_INCLUDED

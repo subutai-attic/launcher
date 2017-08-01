@@ -11,8 +11,9 @@ SubutaiLauncher::Core::~Core()
 {
     Poco::Logger::get("subutai").information("Stopping Subutai Launcher Core");
     if (_running) {
-        while (!Session::instance()->getDownloader()->isDone()) {
+        while (Session::instance()->getDownloader()->isRunning() && !Session::instance()->getDownloader()->isDone()) {
             // Waiting
+            // TODO: Put timeout here
         };
     }
     Poco::Logger::get("subutai").information("Subutai Launcher Core stopped");
@@ -146,7 +147,7 @@ void SubutaiLauncher::Core::setupLogger()
     pSplitter->addChannel(cConsole);
 	Poco::DateTime dt;
 	Poco::Timestamp now;
-	std::string filename = "subutai-launcer-" + Poco::DateTimeFormatter::format(now, "%Y-%m-%d_%H-%M-%S") + ".log";
+	std::string filename = "subutai-launcher-" + Poco::DateTimeFormatter::format(now, "%Y-%m-%d_%H-%M-%S") + ".log";
 #if LAUNCHER_MACOS
     pChannel->setProperty("path", "/usr/local/share/subutai/log/" + filename);
 #elif LAUNCHER_LINUX

@@ -1,2 +1,3 @@
 debian/SubutaiLauncher /opt/subutai/bin
 debian/python /opt/subutai
+debian/fonts/*.ttf /usr/local/share/fonts/
