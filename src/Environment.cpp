@@ -3,6 +3,8 @@
 #include "Environment.h"
 #if LAUNCHER_WINDOWS
 #include <Shlobj.h>
+#include <VersionHelpers.h>
+#include <Windows.h>
 #endif
 
 //USES_CONVERSION;
@@ -154,11 +156,91 @@ bool SubutaiLauncher::Environment::vtxEnabled()
 
 std::string SubutaiLauncher::Environment::versionOS() 
 {
+#ifndef LAUNCHER_WINDOWS
     _logger->trace("Environment: Getting operating system information");
     std::string os;
     //os = Poco::Environment::osDisplayName() + " " + Poco::Environment::osVersion();
 	os = Poco::Environment::osDisplayName();
     return os;
+#else
+  char* version = "Can't detect version, sorry";
+
+   do {
+     if (IsWindowsXPOrGreater()) {
+       version = "XP Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindowsXPSP1OrGreater()) {
+       version = "XPSP1 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindowsXPSP2OrGreater()) {
+       version = "XPSP2 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindowsXPSP3OrGreater()) {
+       version = "XPSP3 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindowsVistaOrGreater()) {
+       version = "Vista Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindowsVistaSP1OrGreater()) {
+       version = "VistaSP1 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindowsVistaSP2OrGreater()) {
+       version = "VistaSP2 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindows7OrGreater()) {
+       version = "Windows7 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindows7SP1OrGreater()) {
+       version = "Windows7SP1 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindows8OrGreater()) {
+       version = "Windows8 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindows8Point1OrGreater()) {
+       version = "Windows8.1 Or Greater";
+     } else {
+       break;
+     }
+
+     if (IsWindows10OrGreater())
+     {
+        version = "Windows10 Or Greater";
+     } else {
+       break;
+     }
+   } while (0);
+  return std::string(version);
+#endif
 }
 
 std::string SubutaiLauncher::Environment::cpuArch() 
