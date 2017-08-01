@@ -46,7 +46,25 @@ unsigned SubutaiLauncher::Environment::is64()
 #elif LAUNCHER_WINDOWS
     SYSTEM_INFO si;
     GetSystemInfo(&si);
-    return si->wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64; //kuku
+    switch (si.wProcessorArchitecture) {
+      /**/
+      case PROCESSOR_ARCHITECTURE_AMD64:
+        _logger->trace("x64");
+        break;
+      case PROCESSOR_ARCHITECTURE_ARM:
+        _logger->trace("ARM");
+        break;
+      case PROCESSOR_ARCHITECTURE_IA64:
+        _logger->trace("IA64 (intel itanium based) ");
+        break;
+      case PROCESSOR_ARCHITECTURE_INTEL:
+        _logger->trace("x86");
+        break;
+      case PROCESSOR_ARCHITECTURE_UNKNOWN:
+      default:
+        _logger->trace("Unknown arch");
+    }
+    return si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64; //kuku
 #elif LAUNCHER_MACOS
     return 1;
 #endif
@@ -86,6 +104,7 @@ unsigned long SubutaiLauncher::Environment::ramSize()
 #elif LAUNCHER_WINDOWS
     MEMORYSTATUSEX ms;
     GlobalMemoryStatusEx (&ms);
+    _logger->debug("Total mem size: %lu", ms.ullTotalPhys);
     return ms.ullTotalPhys;
 #elif LAUNCHER_MACOS
     int mib [] = { CTL_HW, HW_MEMSIZE };
@@ -232,12 +251,12 @@ std::string SubutaiLauncher::Environment::versionOS()
        break;
      }
 
-     if (IsWindows10OrGreater())
-     {
-        version = "Windows10 Or Greater";
-     } else {
-       break;
-     }
+//     if (IsWindows10OrGreater())
+//     {
+//        version = "Windows10 Or Greater";
+//     } else {
+//       break;
+//     }
    } while (0);
   return std::string(version);
 #endif
@@ -252,7 +271,7 @@ std::string SubutaiLauncher::Environment::cpuArch()
 #else
   SYSTEM_INFO si;
   GetSystemInfo(&si);
-  switch (si->wProcessorArchitecture) {
+  switch (si.wProcessorArchitecture) {
     /**/
     case PROCESSOR_ARCHITECTURE_AMD64:
       return "x64";
