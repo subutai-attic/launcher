@@ -5,6 +5,7 @@
 #include <Shlobj.h>
 #include <VersionHelpers.h>
 #include <Windows.h>
+#pragma comment (lib, "Ntdll.lib")
 #endif
 
 //USES_CONVERSION;
@@ -46,7 +47,7 @@ unsigned SubutaiLauncher::Environment::is64()
 #elif LAUNCHER_WINDOWS
     SYSTEM_INFO si;
     GetSystemInfo(&si);
-    return si->wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64; //kuku
+    return si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64; //kuku
 #elif LAUNCHER_MACOS
     return 1;
 #endif
@@ -232,12 +233,12 @@ std::string SubutaiLauncher::Environment::versionOS()
        break;
      }
 
-     if (IsWindows10OrGreater())
+     /*if (IsWindows10OrGreater())
      {
         version = "Windows10 Or Greater";
      } else {
        break;
-     }
+     }*/
    } while (0);
   return std::string(version);
 #endif
@@ -252,7 +253,7 @@ std::string SubutaiLauncher::Environment::cpuArch()
 #else
   SYSTEM_INFO si;
   GetSystemInfo(&si);
-  switch (si->wProcessorArchitecture) {
+  switch (si.wProcessorArchitecture) {
     /**/
     case PROCESSOR_ARCHITECTURE_AMD64:
       return "x64";

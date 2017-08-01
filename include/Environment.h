@@ -47,6 +47,8 @@
 #define ENV_MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
 #define ENV_FREE(x) HeapFree(GetProcessHeap(), 0, (x))
 
+#pragma comment(lib, "user32.lib")
+
 #include "Poco/Util/WinRegistryKey.h"
 #elif LAUNCHER_MACOS
 #include <sys/sysctl.h>

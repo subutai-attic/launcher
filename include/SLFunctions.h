@@ -923,7 +923,7 @@ namespace SubutaiLauncher
 
 	// ========================================================================
 
-  static __attribute_used__ PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
+  static PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
 	{
 #if LAUNCHER_WINDOWS
 		Environment e;
@@ -1009,7 +1009,7 @@ namespace SubutaiLauncher
         NULL, NULL, NULL, NULL
     };
 
-    static __attribute_used__ PyObject* PyInit_Subutai(void)
+    static PyObject* PyInit_Subutai(void)
     {
         return PyModule_Create(&SubutaiModule);
     }
