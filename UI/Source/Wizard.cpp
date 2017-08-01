@@ -166,7 +166,7 @@ void Wizard::buttonClicked(juce::Button* button)
             case 1:
                 _introPage->setVisible(false);
                 _systemCheckPage->setVisible(true);
-                _stepIntro.setColour(Label::textColourId, Colours::white);
+                _stepIntro.setColour(Label::textColourId, Colours::black);
                 _stepSystemCheck.setColour(Label::textColourId, juce::Colour(7, 141, 208));
                 _back.setEnabled(true);
                 _step = 2;
@@ -174,14 +174,14 @@ void Wizard::buttonClicked(juce::Button* button)
             case 2:
                 _systemCheckPage->setVisible(false);
                 _componentChooserPage->setVisible(true);
-                _stepSystemCheck.setColour(Label::textColourId, Colours::white);
+                _stepSystemCheck.setColour(Label::textColourId, Colours::black);
                 _stepComponentChooser.setColour(Label::textColourId, juce::Colour(7, 141, 208));
                 _step = 3;
                 break;
             case 3:
                 _componentChooserPage->setVisible(false);
                 _ptpInstall->setVisible(true);
-                _stepComponentChooser.setColour(Label::textColourId, Colours::white);
+                _stepComponentChooser.setColour(Label::textColourId, Colours::black);
                 _stepInstall.setColour(Label::textColourId, juce::Colour(7, 141, 208));
                 _step = 4;
                 _back.setEnabled(false);
