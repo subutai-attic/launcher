@@ -1,9 +1,13 @@
 #include "Sidebar.h"
 #include "MainComponent.h"
 
-SidebarComponent::SidebarComponent()
+SidebarComponent::SidebarComponent() :
+    _root(false)
 {
     _logger = &Poco::Logger::get("subutai");
+#if LAUNCHER_LINUX
+    if (!getuid()) _root = true;
+#endif
     _social = new SocialMediaIcons();
     _social->setBounds(0, getParentHeight()-20-40, getParentWidth(), 40);
     _social->toFront(true);
@@ -98,6 +102,17 @@ SidebarComponent::SidebarComponent()
     addChildComponent(_templatesActive);
     addChildComponent(_communityActive);
 
+    auto warningFont = juce::Font("Encode Sans", 17, 1);
+    _rootWarning.setText("Warning!\n\nRunning as root may harm\nyour system!");
+    _rootWarning.setJustification(juce::Justification::centred);
+    _rootWarning.setBounds(10, 450, 240, 80);
+    _rootWarning.setColour(Colours::white);
+    _rootWarning.setFont(warningFont, true);
+    _rootWarning.setBoundingBox(RelativeParallelogram(Point<float>(10, 450),
+                Point<float>(240, 450),
+                Point<float>(0, 540)));
+    if (_root) addAndMakeVisible(_rootWarning);
+
     resized();
 }
 
@@ -110,6 +125,11 @@ void SidebarComponent::paint(Graphics& g) {
     //g.fillAll(Colour(0xff222222));
     //g.fillAll (Colour::greyLevel (0.2f));
     //g.fillAll(Colour::fromRGB(19, 31, 51));
+    if (_root)
+    {
+        g.setColour(Colours::maroon);
+        g.fillRoundedRectangle(5, 450, 240, 100, 4.0);
+    }
 }
 
 void SidebarComponent::resized() {
