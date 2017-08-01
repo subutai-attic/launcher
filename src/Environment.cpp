@@ -53,8 +53,17 @@ unsigned SubutaiLauncher::Environment::is64()
 
 unsigned long SubutaiLauncher::Environment::ramSize() 
 {
-    _logger->trace("Environment: Retrieving RAM size");
+    _logger->debug("Environment: Retrieving RAM size");
 #if LAUNCHER_LINUX
+    struct sysinfo info;
+    _logger->trace("Running sysinfo");
+    int rc = sysinfo(&info);
+    if (rc == 0)
+    {
+        _logger->debug("Total mem size: %lu", info.totalram);
+        return info.totalram;
+    }
+    /* 
 #if defined _SC_PHYS_PAGES
 #if defined _SC_PAGESIZE
     int pages = sysconf(_SC_PHYS_PAGES);
@@ -71,6 +80,7 @@ unsigned long SubutaiLauncher::Environment::ramSize()
     return pages * pageSize / 1024;
 #endif
 #endif
+    */
 #elif LAUNCHER_WINDOWS
     SYSTEM_INFO si;
     GetSystemInfo(&si);
