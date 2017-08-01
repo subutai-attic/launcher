@@ -4,6 +4,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../JuceLibraryCode/modules/juce_gui_basics/juce_gui_basics.h"
 #include "Poco/Logger.h"
+#include "LauncherButton.h"
 
 class WizardFinish : 
     public juce::Component,
