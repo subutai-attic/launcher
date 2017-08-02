@@ -319,7 +319,7 @@ void Wizard::stepCompleted(const std::string& name)
     finish();
 }
 
-void Wizard::finish()
+void Wizard::finish(bool canceled)
 {
     cleanInstallers();
     // Show final page
@@ -329,6 +329,11 @@ void Wizard::finish()
     _next.setVisible(false);
     _back.setEnabled(false);
     _back.setVisible(false);
+
+	if (canceled)
+	{
+		_finishPage->finalize();
+	}
 
 	auto c = _componentChooserPage->getComponents();
 	_finishPage->addPTPResult(c.ptp, _ptpInstall->succeed());
@@ -388,8 +393,11 @@ void Wizard::cleanInstallers()
 
 void Wizard::runCancelConfirmation()
 {
+    juce::String title = "Cancel installation";
     juce::String message = "Are you sure you want to cancel installation?";
 
-    juce::DialogWindow::LaunchOptions options;
-    _cancelMessage.setText(message, juce::dontSendNotification);
+    if (NativeMessageBox::showOkCancelBox(AlertWindow::QuestionIcon, title,
+                                      message, nullptr, nullptr)) {
+      this->finish(true);
+    }
 }

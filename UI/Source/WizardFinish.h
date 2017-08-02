@@ -20,6 +20,7 @@ class WizardFinish :
 		void addTrayResult(bool installed, bool succeed);
 		void addETEResult(bool installed, bool succeed);
 		void addPeerResult(bool installed, bool succeed);
+		void finalize();
     private:
         Poco::Logger* _logger;
         juce::Label _thanks;

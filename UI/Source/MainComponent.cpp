@@ -58,6 +58,8 @@ MainContentComponent::MainContentComponent() : _logoImage(nullptr)
     _version.setFont(fontVersion);
     _version.setJustificationType(Justification::centred);
     addAndMakeVisible(_version);
+
+	//showLoginScreen();
 }
 
 MainContentComponent::~MainContentComponent()
@@ -72,7 +74,7 @@ void MainContentComponent::paint (Graphics& g)
     g.setFont (Font (16.0f));
     g.setColour (juce::Colour::fromRGB(105, 116, 144));
 
-    // showLoginScreen();
+    
 }
 
 void MainContentComponent::resized()
@@ -108,14 +110,6 @@ void MainContentComponent::paintListBoxItem(int rowNumber, Graphics& g, int widt
     auto item = _menuItems.at(rowNumber);
     AttributedString t;
     t.append(item);
-    //t.append("");
-    /*
-    if (!rowIsSelected) {
-        t.setColour (juce::Colour::fromRGB(105, 116, 144));
-    } else {
-        //t.setColour(Colour(176, 224, 230));
-    }
-    */
     t.setLineSpacing(0);
     t.setJustification(Justification::left);
 
@@ -127,72 +121,19 @@ void MainContentComponent::paintListBoxItem(int rowNumber, Graphics& g, int widt
     if (rowNumber == 0)
     {
         g.drawRect(40, 180, 210, 40);
-        //t.draw(g, juce::Rectangle<int>(0, 0, 250, 40).toFloat());
     }
     else if (rowNumber == 1)
     {
         g.drawRect(40, 235, 210, 40);
-        //t.draw(g, juce::Rectangle<int>(0, 20, 250, 40).toFloat());
     }
     else if (rowNumber == 2)
     {
         g.drawRect(40, 290, 210, 40);
-        //t.draw(g, juce::Rectangle<int>(0, 60, 250, 40).toFloat());
     }
     else if (rowNumber == 3)
     {
         g.drawRect(40, 345, 210, 40);
-        //t.draw(g, juce::Rectangle<int>(0, 160, 250, 40).toFloat());
     }
-
-    /*
-    if (rowNumber == 0)
-    {
-        t.draw(g, juce::Rectangle<int>(0, 0, 250, 40).toFloat());
-    }
-    else if (rowNumber == 1)
-    {
-        t.draw(g, juce::Rectangle<int>(0, 20, 250, 40).toFloat());
-    }
-    else if (rowNumber == 2)
-    {
-        t.draw(g, juce::Rectangle<int>(0, 60, 250, 40).toFloat());
-    }
-    else if (rowNumber == 3)
-    {
-        t.draw(g, juce::Rectangle<int>(0, 160, 250, 40).toFloat());
-    }
-    */
-
-    /*
-    if (rowNumber == 0)
-    {
-        t.draw(g, juce::Rectangle<int>(40, 180, 250, 40).toFloat());
-    }
-    else if (rowNumber == 1)
-    {
-        t.draw(g, juce::Rectangle<int>(40, 235, 250, 40).toFloat());
-    }
-    else if (rowNumber == 2)
-    {
-        t.draw(g, juce::Rectangle<int>(40, 290, 250, 40).toFloat());
-    }
-    else if (rowNumber == 3)
-    {
-        t.draw(g, juce::Rectangle<int>(40, 345, 250, 40).toFloat());
-    }
-    */
-
-    /*
-    if (rowNumber == 2)
-    {
-        t.draw(g, juce::Rectangle<int>(40, 290, 250, 40).toFloat());
-    }
-    else
-    {
-        t.draw(g, juce::Rectangle<int>(width + 8, 40).reduced(20, 0).toFloat());
-    }
-    */
 }
 
 void MainContentComponent::selectedRowsChanged(int row) {
@@ -236,20 +177,21 @@ void MainContentComponent::selectedRowsChanged(int row) {
 }
 
 void MainContentComponent::showLoginScreen() {
-    /* 
-       _login = new LoginScreen();
-       _login->addToDesktop(ComponentPeer::windowIsTemporary);
-       Rectangle<int> area (0, 0, 200, 300);
+	_login.setBounds(0, 0, getWidth(), getHeight());
+	addAndMakeVisible(_login);
+	/*
+    _login = new LoginScreen();
+    _login->addToDesktop(ComponentPeer::windowIsTemporary);
+    juce::Rectangle<int> area (0, 0, getWidth(), getHeight());
 
-       RectanglePlacement placement (RectanglePlacement::xMid
-       | RectanglePlacement::yMid
-       | RectanglePlacement::doNotResize);
+    RectanglePlacement placement (RectanglePlacement::xMid
+    | RectanglePlacement::yMid
+    | RectanglePlacement::doNotResize);
 
-       Rectangle<int> result (placement.appliedTo (area, Desktop::getInstance().getDisplays() 
-       .getMainDisplay().userArea.reduced (20)));
-       _login->setBounds (result);
-       _login->setVisible(true);
-       */
+    juce::Rectangle<int> result (placement.appliedTo (area, Desktop::getInstance().getDisplays() 
+    .getMainDisplay().userArea.reduced (20)));
+    _login->setBounds (result);
+    _login->setVisible(true);*/
 }
 
 void MainContentComponent::buttonClicked(Button* button) {

@@ -137,7 +137,7 @@ void UIApplication::anotherInstanceStarted(const juce::String& commandLine)
 
 void UIApplication::startMainWindow()
 {    
-  std::string pTitle = "SubutaiLauncher ";
+  std::string pTitle = "SubutaiLauncher -> ";
   pTitle.append(BUILD_SCHEME);
 
   _splashScreen->deleteAfterDelay(juce::RelativeTime::seconds(1), false);

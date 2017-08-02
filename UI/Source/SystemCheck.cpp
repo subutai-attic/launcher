@@ -23,7 +23,7 @@ SystemCheck::SystemCheck()
     _osValue.setJustificationType(Justification::top);
     addAndMakeVisible(_osValue);
 
-    _osInfo.setText("We support Windows (7+), Mac OS and Linux (Ubuntu 16.04+)", dontSendNotification);
+    _osInfo.setText("We support Windows (8+), MacOS and Linux (Ubuntu 16.04+)", dontSendNotification);
     _osInfo.setColour(Label::textColourId, Colours::grey);
     _osInfo.setBounds(150, 35, 500, 40);
     _osInfo.setFont(font2);
@@ -81,7 +81,7 @@ SystemCheck::SystemCheck()
     _memLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_memLabel);
 
-    std::string memValue = Poco::format("%lu MB", env.ramSize() / 1024 / 1024);
+    std::string memValue = Poco::format("%Lu MB", env.ramSize() / 1024 / 1024);
 
     _memValue.setText(memValue, dontSendNotification);
     _memValue.setColour(Label::textColourId, Colour(105, 116, 144));

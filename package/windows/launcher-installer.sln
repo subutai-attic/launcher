@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "launcher-installer", "launcher-installer\launcher-installer.vdproj", "{695ACFAA-E865-4706-B4EC-E00EC08ABA01}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Default = Debug|Default
+		Release|Default = Release|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{695ACFAA-E865-4706-B4EC-E00EC08ABA01}.Debug|Default.ActiveCfg = Debug
+		{695ACFAA-E865-4706-B4EC-E00EC08ABA01}.Debug|Default.Build.0 = Debug
+		{695ACFAA-E865-4706-B4EC-E00EC08ABA01}.Release|Default.ActiveCfg = Release
+		{695ACFAA-E865-4706-B4EC-E00EC08ABA01}.Release|Default.Build.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

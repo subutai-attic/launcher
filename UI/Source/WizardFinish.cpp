@@ -4,6 +4,7 @@
 WizardFinish::WizardFinish() :
     _finish("Finish")
 {
+	
     _logger = &Poco::Logger::get("subutai");
     _logger->trace("Creating Wizard Finish UI Component");
     auto font = juce::Font("Encode Sans", 17, 0);
@@ -169,4 +170,12 @@ void WizardFinish::addPeerResult(bool installed, bool succeed)
 	{
 		_peerResult.setText("Failed", juce::dontSendNotification);
 	}
+}
+
+void WizardFinish::finalize()
+{
+	WizardWindow* window = (WizardWindow*)getParentComponent()->getParentComponent();
+	window->closeButtonPressed();
+	return;
+
 }

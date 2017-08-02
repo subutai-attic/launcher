@@ -25,7 +25,9 @@ UI/Builds/LinuxMakefile/build
 deploy.sh
 package/subutai*
 package/linux/debian/fonts
+package/linux/debian/icons
 *.deb
+*.debhelper
 
 # windows build
 *.sdf
@@ -56,6 +58,8 @@ build/launcher-windows/UI/Win32
 build/launcher-windows/TestSuite/Debug
 package/windows/Debug
 package/windows/Release
+package/windows/launcher-installer/Debug
+package/windows/launcher-installer/Release
 
 # python
 __pycache__

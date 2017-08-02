@@ -4,6 +4,8 @@ namespace SubutaiLauncher {
     
     RootProcess::RootProcess()
     {
+        _logger = &Poco::Logger::get("subutai");
+        _logger->debug("Starting root process");
         Poco::UUIDGenerator u;
         auto uuid = u.create();
         _filename = "/tmp/";
@@ -18,6 +20,7 @@ namespace SubutaiLauncher {
 
     void RootProcess::addCommand(const std::string& cmd)
     {
+        _logger->debug("Adding root command: %s", cmd);
         _commands.push_back(cmd);
     }
 
@@ -26,7 +29,8 @@ namespace SubutaiLauncher {
         Poco::FileOutputStream of(_filename);
         of << "#!/bin/bash";
         of << std::endl;
-        for (auto it = _commands.begin(); it != _commands.end(); it++) {
+        for (auto it = _commands.begin(); it != _commands.end(); it++) 
+        {
             of << (*it) << std::endl;
         }
         of.close();
@@ -34,6 +38,7 @@ namespace SubutaiLauncher {
         Poco::File f(_filename);
         f.setExecutable(true);
 
+        _logger->debug("Running gksudo");
         Poco::Process p;
         Poco::Process::Args args;
         args.push_back("--message");

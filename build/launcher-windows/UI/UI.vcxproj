@@ -134,15 +134,15 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>POCO_STATIC;BUILD_SCHEME="dev";-D_WINSOCK_=;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PreprocessorDefinitions>BUILD_SCHEME_DEV;POCO_STATIC;BUILD_SCHEME="dev";-D_WINSOCK_=;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>python37.lib;ssh.lib;libeay32md.lib;PocoFoundationmd.lib;PocoNetmd.lib;PocoNetSSLmd.lib;PocoUtilmd.lib;PocoJSONmd.lib;iphlpapi.lib;subutai-launcher.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>python37.lib;ssh.lib;libeay32mt.lib;ssleay32mt.lib;PocoFoundationmt.lib;PocoNetmt.lib;PocoNetSSLmt.lib;PocoUtilmt.lib;PocoJSONmt.lib;iphlpapi.lib;subutai-launcher.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
@@ -177,6 +177,7 @@
     <ClCompile Include="..\..\..\UI\Source\HubComponent.cpp" />
     <ClCompile Include="..\..\..\UI\Source\InstallationComponent.cpp" />
     <ClCompile Include="..\..\..\UI\Source\InstallationDialog.cpp" />
+    <ClCompile Include="..\..\..\UI\Source\LauncherButton.cpp" />
     <ClCompile Include="..\..\..\UI\Source\LibraryComponent.cpp" />
     <ClCompile Include="..\..\..\UI\Source\LibraryItem.cpp" />
     <ClCompile Include="..\..\..\UI\Source\LibraryItemTab.cpp" />
@@ -189,6 +190,7 @@
     <ClCompile Include="..\..\..\UI\Source\MarketplaceComponent.cpp" />
     <ClCompile Include="..\..\..\UI\Source\Sidebar.cpp" />
     <ClCompile Include="..\..\..\UI\Source\SocialMediaIcons.cpp" />
+    <ClCompile Include="..\..\..\UI\Source\Splash.cpp" />
     <ClCompile Include="..\..\..\UI\Source\SystemCheck.cpp" />
     <ClCompile Include="..\..\..\UI\Source\Wizard.cpp" />
     <ClCompile Include="..\..\..\UI\Source\WizardFinish.cpp" />
@@ -204,6 +206,7 @@
     <ClInclude Include="..\..\..\UI\Source\HubComponent.h" />
     <ClInclude Include="..\..\..\UI\Source\InstallationComponent.h" />
     <ClInclude Include="..\..\..\UI\Source\InstallationDialog.h" />
+    <ClInclude Include="..\..\..\UI\Source\LauncherButton.h" />
     <ClInclude Include="..\..\..\UI\Source\LibraryComponent.h" />
     <ClInclude Include="..\..\..\UI\Source\LibraryItem.h" />
     <ClInclude Include="..\..\..\UI\Source\LibraryItemTab.h" />
@@ -216,6 +219,7 @@
     <ClInclude Include="..\..\..\UI\Source\MarketplaceComponent.h" />
     <ClInclude Include="..\..\..\UI\Source\Sidebar.h" />
     <ClInclude Include="..\..\..\UI\Source\SocialMediaIcons.h" />
+    <ClInclude Include="..\..\..\UI\Source\Splash.h" />
     <ClInclude Include="..\..\..\UI\Source\SystemCheck.h" />
     <ClInclude Include="..\..\..\UI\Source\Wizard.h" />
     <ClInclude Include="..\..\..\UI\Source\WizardFinish.h" />
@@ -232,6 +236,10 @@
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="SubutaiLauncher.exe.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\assets\dev\launcher-logo.ico" />
+    <Image Include="..\..\..\assets\dev\launcher-logo.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,10 +2,12 @@
 #define LOGINSCREEN_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "LauncherButton.h"
 
 class LoginScreen : 
     public juce::Component, 
-    public juce::ButtonListener 
+    public juce::ButtonListener,
+	public juce::TextEditor::Listener
 {
     public:
         LoginScreen();
@@ -13,9 +15,12 @@ class LoginScreen :
         void paint(juce::Graphics& g) override;
         void buttonClicked(juce::Button* button) override;
     private:
-        juce::TextButton _button;
+		juce::Label _emailText;
+		juce::Label _passwordText;
+        LauncherButton _button;
         juce::TextEditor _login;
         juce::TextEditor _password;
+		juce::ImageComponent _logo;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LoginScreen)
 };
