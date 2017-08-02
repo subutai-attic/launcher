@@ -25,7 +25,9 @@ UI/Builds/LinuxMakefile/build
 deploy.sh
 package/subutai*
 package/linux/debian/fonts
+package/linux/debian/icons
 *.deb
+*.debhelper
 
 # windows build
 *.sdf
