@@ -237,6 +237,10 @@
   <ItemGroup>
     <Manifest Include="SubutaiLauncher.exe.manifest" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\assets\dev\launcher-logo.ico" />
+    <Image Include="..\..\..\assets\dev\launcher-logo.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
