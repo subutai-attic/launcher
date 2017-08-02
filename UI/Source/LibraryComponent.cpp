@@ -49,13 +49,24 @@ void LibraryComponent::resized()
     _installButton.setVisible(true);
 }
 
+#define JUCE_MODAL_LOOPS_PERMITTED
 void LibraryComponent::buttonClicked(Button* button) 
 {
     if (button == &_installButton) {
         _logger->trace("Install button clicked");
         // Starting Wizard
-        WizardWindow *wizard = new WizardWindow();
-        wizard->setVisible(true);
+        DialogWindow::LaunchOptions options;
+        options.dialogTitle = "Installation Wizard";
+        options.dialogBackgroundColour = juce::Colours::lightgrey;
+        options.escapeKeyTriggersCloseButton = true;
+        options.useNativeTitleBar = true;
+        options.useBottomRightCornerResizer = true;
+        juce::OptionalScopedPointer<Component> content(new Wizard, true);
+        options.content = content;
+        options.runModal();
+        SubutaiLauncher::Session::instance()->terminate();
+//        WizardWindow *wizard = new WizardWindow();
+//        wizard->setVisible(true);
     }
 }
 
