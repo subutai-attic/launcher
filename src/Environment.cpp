@@ -11,6 +11,7 @@
 //USES_CONVERSION;
 
 #if LAUNCHER_MACOS
+#include <cpuid.h>
 const std::string SubutaiLauncher::Environment::EXTRA_PATH="/usr/local/bin:";
 #endif
 
@@ -74,7 +75,11 @@ unsigned SubutaiLauncher::Environment::is64()
     return 0;
 }
 
+#if LAUNCHER_WINDOWS
+unsigned long long SubutaiLauncher::Environment::ramSize() 
+#else
 unsigned long SubutaiLauncher::Environment::ramSize() 
+#endif
 {
     _logger->debug("Environment: Retrieving RAM size");
 #if LAUNCHER_LINUX
@@ -106,8 +111,9 @@ unsigned long SubutaiLauncher::Environment::ramSize()
     */
 #elif LAUNCHER_WINDOWS
     MEMORYSTATUSEX ms;
+	ms.dwLength = sizeof(MEMORYSTATUSEX);
     GlobalMemoryStatusEx (&ms);
-    _logger->debug("Total mem size: %lu", ms.ullTotalPhys);
+    _logger->debug("Total mem size: %Lu", ms.ullTotalPhys);
     return ms.ullTotalPhys;
 #elif LAUNCHER_MACOS
     int mib [] = { CTL_HW, HW_MEMSIZE };
@@ -172,7 +178,15 @@ bool SubutaiLauncher::Environment::vtxEnabled()
 #elif LAUNCHER_WINDOWS
 	return IsProcessorFeaturePresent(PF_VIRT_FIRMWARE_ENABLED);
 #elif LAUNCHER_MACOS
-    return true;
+  enum { eax = 0, ebx, ecx, edx};
+  enum { cpuid_sig = 0, cpuid_pifb = 1 } ;
+  uint32_t regs[4] = {0};
+
+  if (__get_cpuid(cpuid_pifb, &regs[eax], &regs[ebx], &regs[ecx], &regs[edx])) {
+    return regs[ecx] & 0x10;
+  } else {
+    return false;
+  }
 #endif
 }
 
@@ -274,7 +288,7 @@ std::string SubutaiLauncher::Environment::cpuArch()
     return ar;
 #else
   SYSTEM_INFO si;
-  GetSystemInfo(&si);
+  GetNativeSystemInfo(&si);
   switch (si.wProcessorArchitecture) {
     /**/
     case PROCESSOR_ARCHITECTURE_AMD64:
@@ -865,39 +879,40 @@ int32_t SubutaiLauncher::Environment::updatePath(const std::string& path)
 bool SubutaiLauncher::Environment::killProcess(const std::string & name)
 {
 #if LAUNCHER_WINDOWS
+	_logger->debug("Killing %s process", name);
 	HANDLE hProcessSnap;
 	HANDLE hProcess;
 	PROCESSENTRY32 pe32;
 	DWORD dwPriorityClass;
 
-	// Take a snapshot of all processes in the system.
 	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (hProcessSnap == INVALID_HANDLE_VALUE)
 	{
+		_logger->error("Failed to take snapshot of all processes in the system");
 		return(FALSE);
 	}
 
-	// Set the size of the structure before using it.
 	pe32.dwSize = sizeof(PROCESSENTRY32);
 
-	// Retrieve information about the first process,
-	// and exit if unsuccessful
 	if (!Process32First(hProcessSnap, &pe32))
 	{
-		CloseHandle(hProcessSnap);  // clean the snapshot object
+		_logger->error("Failed to retrieve information about the first process");
+		CloseHandle(hProcessSnap);  
 		return(FALSE);
 	}
 
-	// Now walk the snapshot of processes 
+	_logger->trace("Iterating processes snapshot");
 	do
 	{
 		std::string str(pe32.szExeFile);
 
-		if (str == name) // put the name of your process you want to kill
+		if (str == name) 
 		{
+			_logger->trace("Target process [%s] found", name);
 			terminateWinProcess(pe32.th32ProcessID, 1);
 		}
 	} while (Process32Next(hProcessSnap, &pe32));
+
 
 	CloseHandle(hProcessSnap);
 	return(TRUE);
@@ -995,16 +1010,21 @@ bool SubutaiLauncher::Environment::writeE2ERegistry(const std::string & name)
 #if LAUNCHER_WINDOWS
 BOOL SubutaiLauncher::Environment::terminateWinProcess(DWORD dwProcessId, UINT uExitCode)
 {
+	_logger->information("Terminating process");
 	DWORD dwDesiredAccess = PROCESS_TERMINATE;
 	BOOL  bInheritHandle = FALSE;
 	HANDLE hProcess = OpenProcess(dwDesiredAccess, bInheritHandle, dwProcessId);
 	if (hProcess == NULL)
+	{
+		_logger->error("Couldn't open process");
 		return FALSE;
+	}
 
 	BOOL result = TerminateProcess(hProcess, uExitCode);
 
 	CloseHandle(hProcess);
 
+	_logger->information("Process termination successful");
 	return result;
 }
 #endif
