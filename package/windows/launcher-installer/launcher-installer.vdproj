@@ -2859,6 +2859,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_38725A78E0CC494C913213564E9BB250"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_387681762FF34D79B3C29238B28561E8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -8661,6 +8667,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_B04C565D945C4451BFE58D4C327C7C1A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_B0720F54AFED459987FF3F589CF6CB17"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -11097,6 +11109,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_E4CC7E9A85044883AB07A666D85DA083"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_E4D71F09705D43058C333B2E64E7830E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -12356,6 +12374,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.5"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.5 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.5"
+                    }
+                }
             }
         }
         "Release"
@@ -21886,6 +21912,26 @@
             "TargetName" = "8:log10.decTest"
             "Tag" = "8:"
             "Folder" = "8:_D27BB22BC6884AFB8E0B0458EEACE1D5"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_38725A78E0CC494C913213564E9BB250"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\msvcr120.dll"
+            "TargetName" = "8:msvcr120.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -41240,6 +41286,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B04C565D945C4451BFE58D4C327C7C1A"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\vcruntime140.dll"
+            "TargetName" = "8:vcruntime140.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B0720F54AFED459987FF3F589CF6CB17"
             {
             "SourcePath" = "8:D:\\SubutaiLauncher-dev\\Lib\\encodings\\cp856.py"
@@ -49346,6 +49412,26 @@
             "TargetName" = "8:trace_at_recursion_limit.py"
             "Tag" = "8:"
             "Folder" = "8:_DE3C91502CB24192926B2A00BB59A614"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E4CC7E9A85044883AB07A666D85DA083"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\msvcp140.dll"
+            "TargetName" = "8:msvcp140.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
