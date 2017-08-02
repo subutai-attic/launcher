@@ -388,8 +388,11 @@ void Wizard::cleanInstallers()
 
 void Wizard::runCancelConfirmation()
 {
+    juce::String title = "Cancel installation";
     juce::String message = "Are you sure you want to cancel installation?";
 
-    juce::DialogWindow::LaunchOptions options;
-    _cancelMessage.setText(message, juce::dontSendNotification);
+    if (NativeMessageBox::showOkCancelBox(AlertWindow::QuestionIcon, title,
+                                      message, nullptr, nullptr)) {
+      this->finish();
+    }
 }
