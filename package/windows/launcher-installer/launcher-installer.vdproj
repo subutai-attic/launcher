@@ -5091,6 +5091,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_6462B53CB94C4AEAB822E9B858DD10C0"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_64BC69B4A08A49EE879B2384C13F9B13"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -12343,6 +12349,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -29312,6 +29326,26 @@
             "TargetName" = "8:quopri.py"
             "Tag" = "8:"
             "Folder" = "8:_8DFD3FAB613448F999D2BCAE4116D756"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6462B53CB94C4AEAB822E9B858DD10C0"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\launcher-logo.ico"
+            "TargetName" = "8:launcher-logo.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -54834,12 +54868,12 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Subutai Launcher"
         "ProductCode" = "8:{1309B311-FDC0-46F3-AFF1-D1EC713DED67}"
-        "PackageCode" = "8:{DBA554D8-2BEE-443C-A351-6BD1BFF1A00E}"
+        "PackageCode" = "8:{98485149-F7B4-4083-B668-50D9271301C8}"
         "UpgradeCode" = "8:{5230E7AA-85A5-42FF-9B10-1DA50580C4A2}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:TRUE"
-        "DetectNewerInstalledVersion" = "11:TRUE"
+        "RemovePreviousVersions" = "11:FALSE"
+        "DetectNewerInstalledVersion" = "11:FALSE"
         "InstallAllUsers" = "11:FALSE"
         "ProductVersion" = "8:1.0.0"
         "Manufacturer" = "8:Subutai"
@@ -54954,21 +54988,7 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_8166DB834E1142E0BC8E65510A3D6588"
-            {
-            "Name" = "8:Subutai Launcher"
-            "Arguments" = "8:"
-            "Description" = "8:"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
-            "Transitive" = "11:FALSE"
-            "Target" = "8:_E9C62B7A1D2C41A7B6316F71DEF6E327"
-            "Folder" = "8:_F2AFF38EE68E41DAB1B54AE4CD6B0854"
-            "WorkingFolder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
-            "Icon" = "8:"
-            "Feature" = "8:"
-            }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_FD055611F9B149C2AF8601FC8FBEDB72"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_6F81DAB09BDC4A7589F7C12F1D9C76BB"
             {
             "Name" = "8:Subutai Launcher"
             "Arguments" = "8:"
@@ -54979,7 +54999,21 @@
             "Target" = "8:_E9C62B7A1D2C41A7B6316F71DEF6E327"
             "Folder" = "8:_EFFFE85CB0FB40118E71B51E8182A6D3"
             "WorkingFolder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
-            "Icon" = "8:"
+            "Icon" = "8:_6462B53CB94C4AEAB822E9B858DD10C0"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_87214A46F61049A0862B084D3B8EF078"
+            {
+            "Name" = "8:Subuai Launcher"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_E9C62B7A1D2C41A7B6316F71DEF6E327"
+            "Folder" = "8:_F2AFF38EE68E41DAB1B54AE4CD6B0854"
+            "WorkingFolder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
+            "Icon" = "8:_6462B53CB94C4AEAB822E9B858DD10C0"
             "Feature" = "8:"
             }
         }
