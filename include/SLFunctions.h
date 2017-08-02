@@ -944,6 +944,48 @@ namespace SubutaiLauncher
         delete rp;
         return Py_BuildValue("i", 0);
     }
+
+	// ========================================================================
+
+    static PyObject* SL_RemoveSystemdUnit(PyObject* self, PyObject* args, PyObject* keywords)
+    {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+		Poco::Logger::get("subutai").trace("SL_RemoveSystemdUnit");
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+			return NULL;
+
+        char cmd[1024];
+
+        RootProcess* rp = new RootProcess();
+        std::sprintf(cmd, "systemctl stop %s", sl_string);
+        rp->addCommand(std::string(cmd));
+        std::sprintf(cmd, "systemctl disable %s", sl_string);
+        rp->addCommand(std::string(cmd));
+        std::sprintf(cmd, "rm -rf /etc/systemd/system/%s", sl_string);
+        rp->addCommand(std::string(cmd));
+        rp->execute("Uninstall P2P systemd unit");
+        delete rp;
+        return Py_BuildValue("i", 0);
+    }
+
+	// ========================================================================
+
+    static PyObject* SL_DesktopFileInstall(PyObject* self, PyObject* args, PyObject* keywords)
+    {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+		Poco::Logger::get("subutai").trace("SL_DesktopFileInstall");
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+			return NULL;
+
+        char cmd[1024];
+
+        RootProcess* rp = new RootProcess();
+        std::sprintf(cmd, "desktop-file-install %s", sl_string);
+        rp->addCommand(std::string(cmd));
+        rp->execute("Setup Tray");
+        delete rp;
+        return Py_BuildValue("i", 0);
+    }
 #endif
 
 	// ========================================================================
@@ -1023,7 +1065,9 @@ namespace SubutaiLauncher
 		{ "GetPeerIP", SL_GetPeerIP, METH_VARARGS, "Returns Peer IP address" },
 		{ "IsPeerReady", (PyCFunction)SL_IsPeerReady, METH_VARARGS | METH_KEYWORDS, "Returns 0 if peer is ready or 1 if it's not" },
 #if LAUNCHER_LINUX
-        { "AddSystemdUnit", (PyCFunction)SL_AddSystemdUnit, METH_VARARGS | METH_KEYWORDS, "Adds new system unit" },
+        { "AddSystemdUnit", (PyCFunction)SL_AddSystemdUnit, METH_VARARGS | METH_KEYWORDS, "Adds new systemd unit" },
+        { "RemoveSystemdUnit", (PyCFunction)SL_RemoveSystemdUnit, METH_VARARGS | METH_KEYWORDS, "Removes systemd unit" },
+        { "DesktopFileInstall", (PyCFunction)SL_DesktopFileInstall, METH_VARARGS | METH_KEYWORDS, "Runs desktop-file-install" },
 #endif
 #if LAUNCHER_WINDOWS
 		{ "RegisterPlugin", SL_RegisterPlugin, METH_VARARGS, "Registers a plugin in windows registry" },
