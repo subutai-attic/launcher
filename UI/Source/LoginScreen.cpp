@@ -35,9 +35,7 @@ LoginScreen::~LoginScreen()
 
 void LoginScreen::paint(juce::Graphics& g) 
 {
-    g.fillAll(juce::Colour(0xffffffff));
-
-    
+	g.fillAll(juce::Colour::fromRGB(247, 249, 252));
 }
 
 void LoginScreen::buttonClicked(juce::Button* button) 

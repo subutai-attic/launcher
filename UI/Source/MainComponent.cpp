@@ -58,6 +58,8 @@ MainContentComponent::MainContentComponent() : _logoImage(nullptr)
     _version.setFont(fontVersion);
     _version.setJustificationType(Justification::centred);
     addAndMakeVisible(_version);
+
+	//showLoginScreen();
 }
 
 MainContentComponent::~MainContentComponent()
@@ -72,7 +74,7 @@ void MainContentComponent::paint (Graphics& g)
     g.setFont (Font (16.0f));
     g.setColour (juce::Colour::fromRGB(105, 116, 144));
 
-    showLoginScreen();
+    
 }
 
 void MainContentComponent::resized()
@@ -175,18 +177,21 @@ void MainContentComponent::selectedRowsChanged(int row) {
 }
 
 void MainContentComponent::showLoginScreen() {
-       _login = new LoginScreen();
-       _login->addToDesktop(ComponentPeer::windowIsTemporary);
-       juce::Rectangle<int> area (0, 0, 200, 300);
+	_login.setBounds(0, 0, getWidth(), getHeight());
+	addAndMakeVisible(_login);
+	/*
+    _login = new LoginScreen();
+    _login->addToDesktop(ComponentPeer::windowIsTemporary);
+    juce::Rectangle<int> area (0, 0, getWidth(), getHeight());
 
-       RectanglePlacement placement (RectanglePlacement::xMid
-       | RectanglePlacement::yMid
-       | RectanglePlacement::doNotResize);
+    RectanglePlacement placement (RectanglePlacement::xMid
+    | RectanglePlacement::yMid
+    | RectanglePlacement::doNotResize);
 
-       juce::Rectangle<int> result (placement.appliedTo (area, Desktop::getInstance().getDisplays() 
-       .getMainDisplay().userArea.reduced (20)));
-       _login->setBounds (result);
-       _login->setVisible(true);
+    juce::Rectangle<int> result (placement.appliedTo (area, Desktop::getInstance().getDisplays() 
+    .getMainDisplay().userArea.reduced (20)));
+    _login->setBounds (result);
+    _login->setVisible(true);*/
 }
 
 void MainContentComponent::buttonClicked(Button* button) {
