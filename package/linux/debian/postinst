@@ -33,4 +33,20 @@ cp -r /opt/subutai/python/lib/python3.6/* /opt/subutai/bin/Lib/
 #ln -s /usr/local/lib/libPocoZipd.so.60 /usr/local/lib/libPocoZipd.so
 #ln -s /usr/local/lib/libPocoZip.so.60 /usr/local/lib/libPocoZip.so
 
+desktop_file=/tmp/SubutaiLauncher.desktop
+
+echo "[Desktop Entry]" > $desktop_file
+echo "Version=1.0" >> $desktop_file
+echo "Name=Subutai Launcher" >> $desktop_file
+echo "Comment=Subutai Installation Manager" >> $desktop_file
+echo "Keywords=Internet" >> $desktop_file
+echo "Exec=SubutaiLauncher" >> $desktop_file
+echo "Terminal=false" >> $desktop_file
+echo "Type=Application" >> $desktop_file
+echo "Icon=/usr/share/icons/launcher-logo.png" >> $desktop_file
+echo "Categories=GNOME;Network" >> $desktop_file
+echo "StartupNotify=true" >> $desktop_file
+
+desktop-file-install $desktop_file
+
 ldconfig
