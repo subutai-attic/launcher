@@ -88,6 +88,8 @@ namespace SubutaiLauncher {
 			bool isNSSMInstalled();
 			bool registerService(const std::string& name, const std::string& path, std::vector<std::string> args);
 			bool unregisterService(const std::string& name);
+			bool startService(const std::string& name);
+			bool stopService(const std::string& name);
 			void CreateShortcut(const std::string& source, const std::string& name);
 			int32_t updatePath(const std::string& path);
 			bool killProcess(const std::string& name);

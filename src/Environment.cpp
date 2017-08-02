@@ -47,8 +47,28 @@ unsigned SubutaiLauncher::Environment::is64()
 #elif LAUNCHER_WINDOWS
     SYSTEM_INFO si;
     GetSystemInfo(&si);
+
+    switch (si.wProcessorArchitecture) {
+      /**/
+      case PROCESSOR_ARCHITECTURE_AMD64:
+        _logger->trace("x64");
+        break;
+      case PROCESSOR_ARCHITECTURE_ARM:
+        _logger->trace("ARM");
+        break;
+      case PROCESSOR_ARCHITECTURE_IA64:
+        _logger->trace("IA64 (intel itanium based) ");
+        break;
+      case PROCESSOR_ARCHITECTURE_INTEL:
+        _logger->trace("x86");
+        break;
+      case PROCESSOR_ARCHITECTURE_UNKNOWN:
+      default:
+        _logger->trace("Unknown arch");
+    }
+
     return si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64; //kuku
-#elif LAUNCHER_MACOS
+
     return 1;
 #endif
     return 0;
@@ -87,6 +107,7 @@ unsigned long SubutaiLauncher::Environment::ramSize()
 #elif LAUNCHER_WINDOWS
     MEMORYSTATUSEX ms;
     GlobalMemoryStatusEx (&ms);
+    _logger->debug("Total mem size: %lu", ms.ullTotalPhys);
     return ms.ullTotalPhys;
 #elif LAUNCHER_MACOS
     int mib [] = { CTL_HW, HW_MEMSIZE };
@@ -239,6 +260,7 @@ std::string SubutaiLauncher::Environment::versionOS()
      } else {
        break;
      }*/
+
    } while (0);
   return std::string(version);
 #endif
@@ -469,6 +491,7 @@ bool SubutaiLauncher::Environment::registerService(const std::string& name, cons
 	else
 	{
 		_logger->information("Service was installed");
+		startService(name);
 		return true;
 	}
 
@@ -507,6 +530,82 @@ bool SubutaiLauncher::Environment::unregisterService(const std::string & name)
 	else
 	{
 		_logger->information("Service was uninstalled");
+		return true;
+	}
+
+	return false;
+}
+
+bool SubutaiLauncher::Environment::startService(const std::string& name)
+{
+	_logger->information("Starting %s Windows Service", name);
+	if (!isNSSMInstalled())
+	{
+		_logger->error("NSSM tool is not installed");
+		return false;
+	}
+	_logger->debug("NSSM tool found");
+
+	std::string pPath = Session::instance()->getSettings()->getInstallationPath() + "\\bin\\nssm.exe";
+	Poco::Process::Args pArgs;
+	pArgs.push_back("start");
+	pArgs.push_back("\"" + name + "\"");
+	
+	_logger->trace("Executing NSSM Start: Name: %s ", name);
+	std::string cmdLine = "nssm.exe ";
+	for (auto it = pArgs.begin(); it != pArgs.end(); it++)
+	{
+		cmdLine.append((*it) + " ");
+	}
+	_logger->debug("Running command: %s", cmdLine);
+	Poco::ProcessHandle ph = Poco::Process::launch(pPath, pArgs, 0, 0, 0);
+	int exitCode = ph.wait();
+	_logger->trace("NSSM has been executed");
+	if (exitCode != 0)
+	{
+		_logger->error("Service start failed. Exit code: %d", exitCode);
+	}
+	else
+	{
+		_logger->information("Service was started");
+		return true;
+	}
+
+	return false;
+}
+
+bool SubutaiLauncher::Environment::stopService(const std::string& name)
+{
+	_logger->information("Stopping %s Windows Service", name);
+	if (!isNSSMInstalled())
+	{
+		_logger->error("NSSM tool is not installed");
+		return false;
+	}
+	_logger->debug("NSSM tool found");
+
+	std::string pPath = Session::instance()->getSettings()->getInstallationPath() + "\\bin\\nssm.exe";
+	Poco::Process::Args pArgs;
+	pArgs.push_back("stop");
+	pArgs.push_back("\"" + name + "\"");
+
+	_logger->trace("Executing NSSM Stop: Name: %s ", name);
+	std::string cmdLine = "nssm.exe ";
+	for (auto it = pArgs.begin(); it != pArgs.end(); it++)
+	{
+		cmdLine.append((*it) + " ");
+	}
+	_logger->debug("Running command: %s", cmdLine);
+	Poco::ProcessHandle ph = Poco::Process::launch(pPath, pArgs, 0, 0, 0);
+	int exitCode = ph.wait();
+	_logger->trace("NSSM has been executed");
+	if (exitCode != 0)
+	{
+		_logger->error("Service stop failed. Exit code: %d", exitCode);
+	}
+	else
+	{
+		_logger->information("Service was stopped");
 		return true;
 	}
 
