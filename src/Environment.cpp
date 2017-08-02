@@ -6,12 +6,13 @@
 #include <VersionHelpers.h>
 #include <Windows.h>
 #pragma comment (lib, "Ntdll.lib")
+#else
+#include <cpuid.h>
 #endif
 
 //USES_CONVERSION;
 
 #if LAUNCHER_MACOS
-#include <cpuid.h>
 const std::string SubutaiLauncher::Environment::EXTRA_PATH="/usr/local/bin:";
 #endif
 
@@ -153,31 +154,7 @@ unsigned SubutaiLauncher::Environment::versionVBox()
 
 bool SubutaiLauncher::Environment::vtxEnabled() 
 {
-#if LAUNCHER_LINUX
-    _logger->trace("Environment: Checking VT-x support");
-
-    Poco::Process::Args args;
-    
-    Poco::Pipe pOut;
-
-    Poco::ProcessHandle ph = Poco::Process::launch("/usr/bin/lscpu", args, 0, &pOut, 0);
-    ph.wait();
-
-    Poco::PipeInputStream istr(pOut);
-    std::string buffer;
-    Poco::StreamCopier::copyToString(istr, buffer);
-
-    size_t vmx = buffer.find("vmx");
-    size_t virt = buffer.find("Virtualization");
-    if (vmx != std::string::npos && virt != std::string::npos) 
-    {
-        return true;
-    }
-    return false;
-
-#elif LAUNCHER_WINDOWS
-	return IsProcessorFeaturePresent(PF_VIRT_FIRMWARE_ENABLED);
-#elif LAUNCHER_MACOS
+#ifndef LAUNCHER_WINDOWS
   enum { eax = 0, ebx, ecx, edx};
   enum { cpuid_sig = 0, cpuid_pifb = 1 } ;
   uint32_t regs[4] = {0};
@@ -187,6 +164,8 @@ bool SubutaiLauncher::Environment::vtxEnabled()
   } else {
     return false;
   }
+#else
+  return IsProcessorFeaturePresent(PF_VIRT_FIRMWARE_ENABLED);
 #endif
 }
 
