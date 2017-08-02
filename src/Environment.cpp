@@ -75,7 +75,11 @@ unsigned SubutaiLauncher::Environment::is64()
     return 0;
 }
 
+#if LAUNCHER_WINDOWS
 unsigned long long SubutaiLauncher::Environment::ramSize() 
+#else
+unsigned long SubutaiLauncher::Environment::ramSize() 
+#endif
 {
     _logger->debug("Environment: Retrieving RAM size");
 #if LAUNCHER_LINUX
