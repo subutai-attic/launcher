@@ -78,7 +78,7 @@ namespace SubutaiLauncher {
             unsigned int cpuNum();
             unsigned processorNum();
             unsigned is64();
-            unsigned long ramSize();
+            unsigned long long ramSize();
             unsigned versionVBox();
             bool vtxEnabled();
             std::string getVar(const std::string& name, const std::string& defaultValue);
