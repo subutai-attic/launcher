@@ -45,7 +45,11 @@ void SubutaiLauncher::Core::initializePython()
     PyImport_AppendInittab("subutai", &PyInit_Subutai);
 #endif
 
-    Py_SetProgramName(L"SubutaiLauncher");
+#if LAUNCHER_WINDOWS
+    Py_SetProgramName(L"SubutaiLauncher.exe");
+#else
+	Py_SetProgramName(L"SubutaiLauncher");
+#endif
     Py_Initialize();
 
 

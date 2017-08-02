@@ -34,7 +34,7 @@ class MainContentComponent : public juce::Component, public juce::ButtonListener
 
     private:
         void showLoginScreen();
-        //LoginScreen* _login;
+        LoginScreen* _login;
         juce::ListBox _mainMenu;
         juce::Toolbar _header;
 

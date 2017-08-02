@@ -5,7 +5,8 @@
 
 class LoginScreen : 
     public juce::Component, 
-    public juce::ButtonListener 
+    public juce::ButtonListener,
+	public juce::TextEditor::Listener
 {
     public:
         LoginScreen();
@@ -13,6 +14,8 @@ class LoginScreen :
         void paint(juce::Graphics& g) override;
         void buttonClicked(juce::Button* button) override;
     private:
+		juce::Label _emailText;
+		juce::Label _passwordText;
         juce::TextButton _button;
         juce::TextEditor _login;
         juce::TextEditor _password;
