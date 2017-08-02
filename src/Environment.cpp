@@ -11,6 +11,7 @@
 //USES_CONVERSION;
 
 #if LAUNCHER_MACOS
+#include <cpuid.h>
 const std::string SubutaiLauncher::Environment::EXTRA_PATH="/usr/local/bin:";
 #endif
 
@@ -173,7 +174,15 @@ bool SubutaiLauncher::Environment::vtxEnabled()
 #elif LAUNCHER_WINDOWS
 	return IsProcessorFeaturePresent(PF_VIRT_FIRMWARE_ENABLED);
 #elif LAUNCHER_MACOS
-    return true;
+  enum { eax = 0, ebx, ecx, edx};
+  enum { cpuid_sig = 0, cpuid_pifb = 1 } ;
+  uint32_t regs[4] = {0};
+
+  if (__get_cpuid(cpuid_pifb, &regs[eax], &regs[ebx], &regs[ecx], &regs[edx])) {
+    return regs[ecx] & 0x10;
+  } else {
+    return false;
+  }
 #endif
 }
 
