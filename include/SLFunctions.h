@@ -923,6 +923,31 @@ namespace SubutaiLauncher
 
 	// ========================================================================
 
+#if LAUNCHER_LINUX 
+    static PyObject* SL_AddSystemdUnit(PyObject* self, PyObject* args, PyObject* keywords)
+    {
+		if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+		Poco::Logger::get("subutai").trace("SL_AddSystemdUnit");
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
+			return NULL;
+
+        char cmd[1024];
+        std::sprintf(cmd, "cp %s %s/%s", sl_desc, "/etc/systemd/system/", sl_string);
+
+        RootProcess* rp = new RootProcess();
+        rp->addCommand(std::string(cmd));
+        std::sprintf(cmd, "systemctl enable %s", sl_string);
+        rp->addCommand(std::string(cmd));
+        std::sprintf(cmd, "systemctl start %s", sl_string);
+        rp->addCommand(std::string(cmd));
+        rp->execute("Install systemd unit");
+        delete rp;
+        return Py_BuildValue("i", 0);
+    }
+#endif
+
+	// ========================================================================
+
   static PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
 	{
 #if LAUNCHER_WINDOWS
@@ -997,6 +1022,9 @@ namespace SubutaiLauncher
 		{ "GetMemSize", SL_GetMemSize, METH_VARARGS, "Return amount of memory" },
 		{ "GetPeerIP", SL_GetPeerIP, METH_VARARGS, "Returns Peer IP address" },
 		{ "IsPeerReady", (PyCFunction)SL_IsPeerReady, METH_VARARGS | METH_KEYWORDS, "Returns 0 if peer is ready or 1 if it's not" },
+#if LAUNCHER_LINUX
+        { "AddSystemdUnit", (PyCFunction)SL_AddSystemdUnit, METH_VARARGS | METH_KEYWORDS, "Adds new system unit" },
+#endif
 #if LAUNCHER_WINDOWS
 		{ "RegisterPlugin", SL_RegisterPlugin, METH_VARARGS, "Registers a plugin in windows registry" },
 #endif
