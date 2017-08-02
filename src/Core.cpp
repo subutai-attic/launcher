@@ -1,5 +1,9 @@
 #include "Core.h"
 
+#if LAUNCHER_WINDOWS
+#pragma comment (lib, "crypt32");
+#endif
+
 SubutaiLauncher::Core::Core(std::vector<std::string> args) : 
     _args(args),
     _running(false)
@@ -45,7 +49,11 @@ void SubutaiLauncher::Core::initializePython()
     PyImport_AppendInittab("subutai", &PyInit_Subutai);
 #endif
 
-    Py_SetProgramName(L"SubutaiLauncher");
+#if LAUNCHER_WINDOWS
+    Py_SetProgramName(L"SubutaiLauncher.exe");
+#else
+	Py_SetProgramName(L"SubutaiLauncher");
+#endif
     Py_Initialize();
 
 

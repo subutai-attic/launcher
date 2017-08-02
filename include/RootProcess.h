@@ -11,6 +11,7 @@
 #include <Poco/FileStream.h>
 #include <Poco/File.h>
 #include <Poco/Process.h>
+#include "Poco/Logger.h"
 
 namespace SubutaiLauncher {
     class RootProcess {
@@ -20,6 +21,7 @@ namespace SubutaiLauncher {
             void addCommand(const std::string& cmd);
             void execute(const std::string& msg);
         private:
+            Poco::Logger* _logger;
             std::vector<std::string> _commands;
             std::string _filename;
     };
