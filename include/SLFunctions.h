@@ -31,6 +31,10 @@
 #include "RootProcess.h"
 #include "SS.h"
 
+#ifndef __attribute_used__
+#define __attribute_used__
+#endif
+
 namespace SubutaiLauncher 
 {
 
@@ -990,7 +994,7 @@ namespace SubutaiLauncher
 
 	// ========================================================================
 
-  static PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
+  static __attribute_used__ PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
 	{
 #if LAUNCHER_WINDOWS
 		Environment e;
@@ -1081,7 +1085,7 @@ namespace SubutaiLauncher
         NULL, NULL, NULL, NULL
     };
 
-    static PyObject* PyInit_Subutai(void)
+    static __attribute_used__ PyObject* PyInit_Subutai(void)
     {
         return PyModule_Create(&SubutaiModule);
     }
