@@ -6,7 +6,6 @@ Wizard::Wizard() :
   _cancel("Cancel"),
   _back("Back"),
   _shutdown(false),
-  _shutdown(false),
   _ptpInstalled(false),
   _eteInstalled(false),
   _peerInstalled(false),
