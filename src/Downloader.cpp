@@ -249,6 +249,16 @@ void SubutaiLauncher::Downloader::downloadImpl()
         _logger->information("Starting file downloads [%s]", _file.name);
         std::ofstream out(path, std::fstream::app | std::fstream::out | std::fstream::binary);
         Poco::StreamCopier::copyStream(*pStr.get(), out);
+
+		bool verified = verifyDownload();
+		if (!verified)
+		{
+			_logger->error("Downloaded file is corrupted");
+		} 
+		else
+		{
+			_logger->information("File verified");
+		}
     } 
     catch (Poco::Net::HTTPException e) 
     {
