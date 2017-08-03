@@ -49,7 +49,6 @@ void LibraryComponent::resized()
     _installButton.setVisible(true);
 }
 
-#define JUCE_MODAL_LOOPS_PERMITTED
 void LibraryComponent::buttonClicked(Button* button) 
 {
     if (button == &_installButton) {
