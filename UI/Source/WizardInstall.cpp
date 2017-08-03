@@ -21,7 +21,8 @@ const std::string WizardInstall::PEER_INSTALL = "launcher-peer-install-darwin";
 WizardInstall::WizardInstall() : 
     _succeed(false),
     _running(false),
-    _active(false)
+    _active(false),
+    _installThread(nullptr)
 {
     _pb = nullptr;
     _logger = &Poco::Logger::get("subutai");
@@ -39,15 +40,15 @@ WizardInstall::WizardInstall() :
 WizardInstall::~WizardInstall()
 {
     _logger->trace("Waiting for installation thread to complete");
-    int rc = wait();
-    if (rc == 0)
-    {
-        _logger->trace("Thread finished");
-    }
-    else
-    {
-        _logger->trace("Thread was not running");
-    }
+//    int rc = wait();
+//    if (rc == 0)
+//    {
+//        _logger->trace("Thread finished");
+//    }
+//    else
+//    {
+//        _logger->trace("Thread was not running");
+//    }
     _logger->trace("Destroying Wizard Install UI Component");
     for (auto it = _lines.begin(); it != _lines.end(); it++)
     {
@@ -57,6 +58,7 @@ WizardInstall::~WizardInstall()
     if (_title != nullptr) delete _title;
     if (_pb != nullptr) delete _pb;
     _logger->trace("Wizard Install UI Component has been destroyed");
+    if (_installThread) delete _installThread;
 }
 
 void WizardInstall::paint(juce::Graphics& g)
@@ -100,34 +102,47 @@ void WizardInstall::start(const std::string& name)
 int WizardInstall::wait()
 {
     _logger->trace("WizardInstall::wait()");
-    if (_installThread.joinable())
-    {
-        _installThread.join();
+//    if (_installThread.joinable())
+//    {
+        _installThread->Join();
         _logger->trace("Install thread has been stopped");
         return 0;
-    }
+//    }
     _logger->trace("Install thread is not running");
     return 1;
 }
 
 void WizardInstall::run()
 {
-    _installThread = runThread();
+  _logger->debug("********WizardInstall::run()0");
+  _installThread = runThread();
+  _running = true;
+  _logger->debug("********WizardInstall::run()1");
+  _installThread->Start();
+  _logger->debug("********WizardInstall::run()2");
 }
 
-std::thread WizardInstall::runThread()
+void WizardInstall::abort()
 {
-    return std::thread([=] { runImpl(); });
+  _logger->debug("********WizardInstall::abort()1");
+  _running = false;
+  _logger->debug("********WizardInstall::abort()2");
+  _installThread->Terminate(0);
+  _logger->debug("********WizardInstall::abort()3");
+}
+
+CThreadWrapper<WizardInstallThreadWorker>* WizardInstall::runThread()
+{
+  return new CThreadWrapper<WizardInstallThreadWorker>(new WizardInstallThreadWorker(this), true);
 }
 
 void WizardInstall::runImpl() 
 {
-    _running = true;
     _logger->information("%s installation started", _name);
     // Download installation script
     auto downloader = SubutaiLauncher::Session::instance()->getDownloader();
-
     auto script = _script;
+
     script.append(".py");
     downloader->reset();
     downloader->setFilename(script);
@@ -207,11 +222,7 @@ void WizardInstall::runImpl()
                     addLine(msg, true);
                 }
             }
-#if LAUNCHER_LINUX || LAUNCHER_MACOS
-            usleep(100);
-#else
-            Sleep(100);
-#endif
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
         pScriptThread.join();
     }
