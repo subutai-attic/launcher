@@ -292,6 +292,7 @@ void Wizard::runInstall()
 
 void Wizard::stepCompleted(const std::string& name)
 {
+  _logger->debug("********* stepCompleted : %s", name.c_str());
   if (_shutdown)
   {
     return;

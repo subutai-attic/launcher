@@ -32,8 +32,6 @@ namespace SubutaiLauncher {
             void open(const std::string& path);
             void execute();
             void execute(std::string module);
-            std::thread executeInThread();
-            std::thread executeInThread(const std::string& module);
             long exitCode();
 			bool running();
         private:

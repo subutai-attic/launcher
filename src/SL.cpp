@@ -14,80 +14,57 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
 #endif
 
 #if LAUNCHER_MACOS || LAUNCHER_LINUX
-  _logger->debug("0");
 	PyObject *pSearchPathList = PyList_New(0);
-  _logger->debug("1");
 	PyObject *pPath = PyUnicode_FromString(some_path.c_str());
-  _logger->debug("2");
 	PyList_Append(pSearchPathList, pPath);
-  _logger->debug("3");
 	Py_DECREF(pPath);
-  _logger->debug("4");
-  PySys_SetObject("prefix", pSearchPathList);
-  _logger->debug("5");
-  Py_DECREF(pSearchPathList);
+//  PySys_SetObject("prefix", pSearchPathList);
+//  Py_DECREF(pSearchPathList);
   _logger->debug("6");
 #endif
 
 	if (dir != "/")
 	{
-    _logger->debug("7");
 #if PY_MAJOR_VERSION >= 3
 		char dst[1024];
 		wchar_t *path, *newpath;
 
 		path = Py_GetPath();
-    _logger->debug("8");
 #if LAUNCHER_WINDOWS
 		size_t ret;
 		wcstombs_s(&ret, dst, path, sizeof(dst));
 #else
 		std::wcstombs(dst, path, sizeof(dst));
-    _logger->debug("9");
 #endif
 		newpath = new wchar_t[1024];
-    _logger->debug("10");
 #if LAUNCHER_WINDOWS
 		wcscpy_s(newpath, 1024, path);
 		wcscat_s(newpath, 1024, L":");
 #else
-    _logger->debug("11");
 		wcscpy(newpath, path);
-    _logger->debug("12");
 		wcscat(newpath, L":");
 #endif
-    _logger->debug("13");
 		auto d = std::wstring(dir.begin(), dir.end());
-    _logger->debug("14");
 #if LAUNCHER_WINDOWS
 		wcscat_s(newpath, 1024, d.c_str());
 		wcscat_s(newpath, 1024, L":.");
 		wcstombs_s(&ret, dst, newpath, sizeof(dst));
 #else
 		wcscat(newpath, d.c_str());
-    _logger->debug("15");
 		wcscat(newpath, L":.");
-    _logger->debug("16");
 		std::wcstombs(dst, newpath, sizeof(dst));
-    _logger->debug("17");
 #endif
 		std::wprintf(L"NEWPATH: %sl\n", newpath);
-    _logger->debug("18");
-    PySys_SetPath(newpath);
-    _logger->debug("19");
+//    PySys_SetPath(newpath);
 #else
 		char *path, *newpath;
 		path = Py_GetPath();
 		newpath = new char[strlen(path) + dir.length() + 6];
 #if LAUNCHER_LINUX || LAUNCHER_MACOS
 		strcpy(newpath, path);
-    _logger->debug("20");
 		strcat(newpath, ":");
-    _logger->debug("21");
 		strcat(newpath, dir.c_str());
-    _logger->debug("22");
 		strcat(newpath, ":.");
-    _logger->debug("23");
 #else
 		strcpy_s(newpath, 1024, path);
 		strcpy_s(newpath, 1024, ":");
@@ -95,13 +72,10 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
 		strcpy_s(newpath, 1024, ":.");
 #endif
 		PySys_SetPath(newpath);
-    _logger->debug("24");
 		delete[] newpath;
-    _logger->debug("25");
 #endif
 		// ":." for unix, or ";." for windows 
 	}
-_logger->debug("26");
 }
 
 SubutaiLauncher::SL::~SL()
@@ -156,13 +130,8 @@ void SubutaiLauncher::SL::execute()
 	std::string pErrorText("");
 	auto ncenter = Session::instance()->getNotificationCenter();
 	while (ncenter->isRunning())
-	{
-#if LAUNCHER_LINUX || LAUNCHER_MACOS
-		usleep(100);
-#else
-		Sleep(100);
-#endif
-}
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
 	ncenter->clear();
 	ncenter->start();
 	_running = true;
@@ -266,18 +235,6 @@ void SubutaiLauncher::SL::execute()
 	_logger->information("Script execution completed without any errors: %ld", _exitCode);
 	ncenter->stop();
 	_running = false;
-}
-
-std::thread SubutaiLauncher::SL::executeInThread()
-{
-	_logger->debug("Starting execution in thread");
-	return std::thread([=] { execute(); });
-}
-
-std::thread SubutaiLauncher::SL::executeInThread(const std::string& module)
-{
-	_logger->debug("Starting execution in thread with specific module");
-	return std::thread([=] { execute(module); });
 }
 
 long SubutaiLauncher::SL::exitCode() {

@@ -268,7 +268,7 @@ void WizardInstall::runImpl()
     }
     catch (SubutaiLauncher::SLException& e)
     {
-        _scriptThread->Join();
+        _scriptThread->Join(); //why?
         _running = false;
         _progress = 100.0;
         _logger->error(e.displayText());
@@ -277,7 +277,8 @@ void WizardInstall::runImpl()
     _logger->debug("Stopping installation process and notifying parent");
     _running = false;
     auto parent = (Wizard*)getParentComponent();
-    parent->stepCompleted(_name);
+    if (parent)
+      parent->stepCompleted(_name);
     _logger->trace("Parent notified");
 }
 

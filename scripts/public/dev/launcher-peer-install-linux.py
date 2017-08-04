@@ -6,6 +6,7 @@ from subprocess import call
 
 
 def subutaistart():
+    subutai.SetProgress(0.00)
     m = hashlib.md5()
     m.update(datetime.datetime.now().isoformat().encode('utf-8'))
     machineName = "subutai-l" + m.hexdigest()[:5]
