@@ -292,6 +292,7 @@ void Wizard::runInstall()
 
 void Wizard::stepCompleted(const std::string& name)
 {
+  _logger->debug("********* stepCompleted : %s", name.c_str());
   if (_shutdown)
   {
     return;
@@ -370,8 +371,9 @@ void Wizard::cleanInstallers()
     _ptpInstall->deactivate();
     if (_ptpInstall->isRunning())
     {
-      _logger->trace("Waiting for thread to complete");
-      _ptpInstall->wait();
+//      _logger->trace("Waiting for thread to complete");
+//      _ptpInstall->wait();
+      _ptpInstall->abort();
     }
   }
   if (_trayInstall->isActive())
@@ -380,8 +382,9 @@ void Wizard::cleanInstallers()
     _trayInstall->deactivate();
     if (_trayInstall->isRunning())
     {
-      _logger->trace("Waiting for thread to complete");
-      _trayInstall->wait();
+//      _logger->trace("Waiting for thread to complete");
+//      _trayInstall->wait();
+      _trayInstall->abort();
     }
   }
   if (_eteInstall->isActive())
@@ -390,8 +393,9 @@ void Wizard::cleanInstallers()
     _eteInstall->deactivate();
     if (_eteInstall->isRunning())
     {
-      _logger->trace("Waiting for thread to complete");
-      _eteInstall->wait();
+//      _logger->trace("Waiting for thread to complete");
+//      _eteInstall->wait();
+      _eteInstall->abort();
     }
   }
   if (_peerInstall->isActive())
@@ -400,8 +404,9 @@ void Wizard::cleanInstallers()
     _peerInstall->deactivate();
     if (_peerInstall->isRunning())
     {
-      _logger->trace("Waiting for thread to complete");
-      _peerInstall->wait();
+//      _logger->trace("Waiting for thread to complete");
+//      _peerInstall->wait();
+      _peerInstall->abort();
     }
   }
 }
@@ -411,6 +416,7 @@ void Wizard::runCancelConfirmation()
   juce::String title = "Cancel installation";
   juce::String message = "Are you sure you want to cancel installation?";
 
+  _logger->debug("runCancelConfirmation");
   if (NativeMessageBox::showOkCancelBox(AlertWindow::QuestionIcon, title,
                                         message, nullptr, nullptr)) {
     this->finish(true);

@@ -18,8 +18,9 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
 	PyObject *pPath = PyUnicode_FromString(some_path.c_str());
 	PyList_Append(pSearchPathList, pPath);
 	Py_DECREF(pPath);
-	PySys_SetObject("prefix", pSearchPathList);
-	Py_DECREF(pSearchPathList);
+//  PySys_SetObject("prefix", pSearchPathList);
+//  Py_DECREF(pSearchPathList);
+  _logger->debug("6");
 #endif
 
 	if (dir != "/")
@@ -54,7 +55,7 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
 		std::wcstombs(dst, newpath, sizeof(dst));
 #endif
 		std::wprintf(L"NEWPATH: %sl\n", newpath);
-		PySys_SetPath(newpath);
+//    PySys_SetPath(newpath);
 #else
 		char *path, *newpath;
 		path = Py_GetPath();
@@ -75,7 +76,6 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
 #endif
 		// ":." for unix, or ";." for windows 
 	}
-
 }
 
 SubutaiLauncher::SL::~SL()
@@ -130,13 +130,8 @@ void SubutaiLauncher::SL::execute()
 	std::string pErrorText("");
 	auto ncenter = Session::instance()->getNotificationCenter();
 	while (ncenter->isRunning())
-	{
-#if LAUNCHER_LINUX || LAUNCHER_MACOS
-		usleep(100);
-#else
-		Sleep(100);
-#endif
-}
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
 	ncenter->clear();
 	ncenter->start();
 	_running = true;
@@ -240,18 +235,6 @@ void SubutaiLauncher::SL::execute()
 	_logger->information("Script execution completed without any errors: %ld", _exitCode);
 	ncenter->stop();
 	_running = false;
-}
-
-std::thread SubutaiLauncher::SL::executeInThread()
-{
-	_logger->debug("Starting execution in thread");
-	return std::thread([=] { execute(); });
-}
-
-std::thread SubutaiLauncher::SL::executeInThread(const std::string& module)
-{
-	_logger->debug("Starting execution in thread with specific module");
-	return std::thread([=] { execute(module); });
 }
 
 long SubutaiLauncher::SL::exitCode() {
