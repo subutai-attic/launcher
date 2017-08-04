@@ -1,6 +1,47 @@
 #include "WizardInstall.h"
 #include "Wizard.h"
 
+class WizardInstallThreadWorker {
+private:
+  WizardInstall* _wi_instance;
+
+public:
+  WizardInstallThreadWorker(WizardInstall* instance) : _wi_instance(instance)  {
+  }
+  ~WizardInstallThreadWorker() {/*do nothing*/}
+
+  void Run() {
+    _wi_instance->runImpl();
+  }
+};
+////////////////////////////////////////////////////////////////////////////
+
+class DownloadThreadWorker {
+private:
+  SubutaiLauncher::Downloader* _downloader;
+public:
+  DownloadThreadWorker(SubutaiLauncher::Downloader* downloader) : _downloader(downloader) {
+  }
+  ~DownloadThreadWorker() {/*do nothing*/}
+
+  void Run() {
+    _downloader->downloadImpl();
+  }
+};
+////////////////////////////////////////////////////////////////////////////
+
+class ScriptThreadWorker {
+private:
+  SubutaiLauncher::SL* _sl;
+public:
+  ScriptThreadWorker(SubutaiLauncher::SL* sl) : _sl(sl){}
+  ~ScriptThreadWorker() {/*do nothing*/}
+  void Run() {
+    _sl->execute();
+  }
+};
+////////////////////////////////////////////////////////////////////////////
+
 #if LAUNCHER_LINUX
 const std::string WizardInstall::P2P_INSTALL = "launcher-p2p-install-linux";
 const std::string WizardInstall::TRAY_INSTALL = "launcher-tray-install-linux";
@@ -22,7 +63,9 @@ WizardInstall::WizardInstall() :
     _succeed(false),
     _running(false),
     _active(false),
-    _installThread(nullptr)
+    _installThread(nullptr),
+    _downloadThread(nullptr),
+    _scriptThread(nullptr)
 {
     _pb = nullptr;
     _logger = &Poco::Logger::get("subutai");
@@ -99,19 +142,6 @@ void WizardInstall::start(const std::string& name)
     _logger->debug("Installation initializator has been finished");
 }
 
-int WizardInstall::wait()
-{
-    _logger->trace("WizardInstall::wait()");
-//    if (_installThread.joinable())
-//    {
-        _installThread->Join();
-        _logger->trace("Install thread has been stopped");
-        return 0;
-//    }
-    _logger->trace("Install thread is not running");
-    return 1;
-}
-
 void WizardInstall::run()
 {
   _logger->debug("********WizardInstall::run()0");
@@ -128,6 +158,8 @@ void WizardInstall::abort()
   _running = false;
   _logger->debug("********WizardInstall::abort()2");
   _installThread->Terminate(0);
+  _scriptThread->Terminate(0);
+  _downloadThread->Terminate(0);
   _logger->debug("********WizardInstall::abort()3");
 }
 
@@ -156,15 +188,23 @@ void WizardInstall::runImpl()
         _logger->information("Downloaded %s installation script", script);
         addLine("Installation script downloaded");
     }
-    std::thread pDownloadThread = downloader->download();
-    pDownloadThread.join();
+
+    _downloadThread = new CThreadWrapper<DownloadThreadWorker>(new DownloadThreadWorker(downloader),
+                                                               true);
+    _downloadThread->Start();
+    _downloadThread->Join();
+//    std::thread pDownloadThread = downloader->download();
+//    pDownloadThread.join();
 
     SubutaiLauncher::SL sl(downloader->getOutputDirectory());
     sl.open(_script);
-    std::thread pScriptThread;
+
     try
     {
-        pScriptThread = sl.executeInThread();
+        _scriptThread = new CThreadWrapper<ScriptThreadWorker>(new ScriptThreadWorker(&sl),
+                                                               true);
+        _scriptThread->Start();
+
         auto nc = SubutaiLauncher::Session::instance()->getNotificationCenter();
         //        bool download = false;
         while (_running)
@@ -224,11 +264,11 @@ void WizardInstall::runImpl()
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-        pScriptThread.join();
+        _scriptThread->Join();
     }
     catch (SubutaiLauncher::SLException& e)
     {
-        pScriptThread.join();
+        _scriptThread->Join();
         _running = false;
         _progress = 100.0;
         _logger->error(e.displayText());

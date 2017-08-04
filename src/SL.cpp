@@ -23,9 +23,9 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
   _logger->debug("3");
 	Py_DECREF(pPath);
   _logger->debug("4");
-	PySys_SetObject("prefix", pSearchPathList);
+  PySys_SetObject("prefix", pSearchPathList);
   _logger->debug("5");
-	Py_DECREF(pSearchPathList);
+  Py_DECREF(pSearchPathList);
   _logger->debug("6");
 #endif
 
@@ -73,7 +73,7 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
 #endif
 		std::wprintf(L"NEWPATH: %sl\n", newpath);
     _logger->debug("18");
-		PySys_SetPath(newpath);
+    PySys_SetPath(newpath);
     _logger->debug("19");
 #else
 		char *path, *newpath;

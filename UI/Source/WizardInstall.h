@@ -8,7 +8,8 @@
 #include "ThreadWrapper.h"
 
 class WizardInstallThreadWorker;
-
+class DownloadThreadWorker;
+class ScriptThreadWorker;
 
 class WizardInstall : public juce::Component 
 {
@@ -23,7 +24,6 @@ public:
   void paint (juce::Graphics&) override;
   void resized() override;
   void start(const std::string& name);
-  int wait();
   void run();
   void abort();
   bool isRunning();
@@ -49,22 +49,12 @@ private:
   std::string _name;
 //  std::thread _installThread;
   CThreadWrapper<WizardInstallThreadWorker>* _installThread;
+  CThreadWrapper<DownloadThreadWorker>* _downloadThread;
+  CThreadWrapper<ScriptThreadWorker>* _scriptThread;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WizardInstall)
 };
 
-class WizardInstallThreadWorker {
-private:
-  WizardInstall* _wi_instance;
 
-public:
-  WizardInstallThreadWorker(WizardInstall* instance) : _wi_instance(instance)  {
-  }
-  ~WizardInstallThreadWorker() {/*do nothing*/}
-
-  void Run() {
-    _wi_instance->runImpl();
-  }
-};
 
 #endif
