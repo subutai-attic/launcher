@@ -155,7 +155,8 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::parseVms(co
 #if LAUNCHER_LINUX || LAUNCHER_MACOS
         sscanf(line, "\"%[^\"]\" {%s}", vmname, vmid);
 #elif LAUNCHER_WINDOWS
-        sscanf_s(line, "\"%s\" {%s}", vmname, bsize, vmid, bsize);
+        //sscanf_s(line, "\"%s\" {%s}", vmname, bsize, vmid, bsize);
+		sscanf_s(line, "\"%[^\"]\" {%s}", vmname, bsize, vmid, bsize);
 #endif
         SubutaiVM v;
         v.name = std::string(vmname);

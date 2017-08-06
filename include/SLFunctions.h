@@ -688,8 +688,8 @@ namespace SubutaiLauncher
     if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
       return NULL;
 
+	Poco::Logger::get("subutai").information("SL %s: %s", std::string(sl_string), std::string(sl_desc));
     return Py_BuildValue("i", 0);
-    //Poco::Logger::get("subutai").information("SL %s: %s", std::string(sl_string), std::string(sl_desc));
   }
 
   // ========================================================================

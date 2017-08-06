@@ -14,6 +14,7 @@ public:
 	void tearDown();
 
 	void testGetHostOnlyAdapter();
+	void testGetPeers();
 
 	static CppUnit::Test* suite();
 };
