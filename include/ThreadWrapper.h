@@ -1,7 +1,7 @@
 #ifndef THREADWRAPPER_H
 #define THREADWRAPPER_H
 
-#ifndef RT_OS_WINDOWS
+#ifndef LAUNCHER_WINDOWS
 #include <pthread.h>
 #include <signal.h>
 
