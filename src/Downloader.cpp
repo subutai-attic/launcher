@@ -237,7 +237,22 @@ void SubutaiLauncher::Downloader::downloadImpl()
       else
       {
         _logger->information("File %s is outdated. Removing it", _file.name);
-        f.remove();
+		try 
+		{
+			f.remove();
+		}
+		catch (Poco::FileException& e)
+		{
+			_logger->error("File exception: %s", e.displayText());
+		}
+		if (f.exists())
+		{
+			_logger->error("Failed to remove %s", _file.name);
+		}
+		else
+		{
+			_logger->information("%s removed", _file.name);
+		}
       }
     }
 

@@ -292,8 +292,10 @@ bool SubutaiLauncher::VirtualBox::isMachineRunning(const std::string& name)
     auto list = getPeers();
     for (auto it = list.begin(); it != list.end(); it++) 
 	{
+		_logger->trace("Checking machine %s", (*it).name);
         if ((*it).name == name) 
 		{
+			_logger->trace("Machine %s has been found", name);
             auto info = getMachineInfo(name);
             Poco::StringTokenizer lines(info, "\n", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
             for (auto line = lines.begin(); line != lines.end(); line++) 
@@ -303,13 +305,16 @@ bool SubutaiLauncher::VirtualBox::isMachineRunning(const std::string& name)
                     auto p = (*line).find("running", 0);
                     if (p != std::string::npos) 
 					{
+						_logger->trace("Machine %s is running", name);
                         return true;
                     } 
+					_logger->trace("Machine %s is stopped", name);
                     return false;
                 }
             }
         }
     }
+	_logger->error("Machine %s has not been found", name);
     return false;
 }
 

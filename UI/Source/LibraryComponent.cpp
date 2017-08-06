@@ -7,7 +7,7 @@ LibraryComponent::LibraryComponent() : _installButton("Install")
     _componentTabs.push_back(new LibraryItemTab("Peers", 0, true));
     _componentTabs.push_back(new LibraryItemTab("P2P", 1, false));
     _componentTabs.push_back(new LibraryItemTab("Tray", 2, false));
-    _componentTabs.push_back(new LibraryItemTab("E2E", 3, false));
+    //_componentTabs.push_back(new LibraryItemTab("E2E", 3, false));
 
     int pWidth = 20;
 

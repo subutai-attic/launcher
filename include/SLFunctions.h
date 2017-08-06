@@ -774,9 +774,12 @@ namespace SubutaiLauncher
 
   static PyObject* SL_ProcessKill(PyObject* self, PyObject* args, PyObject* keywords)
   {
+	  
     if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
     if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
       return NULL;
+
+	Poco::Logger::get("subutai").trace("SL_ProcessKill ~ %s", std::string(sl_string));
 
     Environment e;
     bool rc = e.killProcess(std::string(sl_string));

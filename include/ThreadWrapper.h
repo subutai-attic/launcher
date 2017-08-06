@@ -1,6 +1,7 @@
 #ifndef THREADWRAPPER_H
 #define THREADWRAPPER_H
 
+
 #include "Vars.h"
 
 #ifndef LAUNCHER_WINDOWS
