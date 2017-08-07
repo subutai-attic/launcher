@@ -80,6 +80,7 @@ namespace SubutaiLauncher
     bool retrieveFileInfo(bool tmpl = false);
     bool retrieveTemplateInfo();
     SubutaiFile info();
+	std::thread download();
     void downloadImpl();
     bool isDone();
     bool isRunning();

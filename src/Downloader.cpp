@@ -330,6 +330,15 @@ SubutaiLauncher::SubutaiFile SubutaiLauncher::Downloader::info()
   return _file;
 }
 
+std::thread SubutaiLauncher::Downloader::download()
+{
+	info();
+	_progress = 0;
+	_done = false;
+	_running = true;
+	return std::thread([=] { downloadImpl(); });
+}
+
 void SubutaiLauncher::Downloader::setOutputDirectory(const std::string& dir)
 {
   _logger->debug("Setting Download output directory to %s", dir);

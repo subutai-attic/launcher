@@ -25,23 +25,25 @@
 
 namespace SubutaiLauncher {
 
-    class SL {
-        public:
-            SL(const std::string& dir = "/");
-            ~SL();
-            void open(const std::string& path);
-            void execute();
-            void execute(std::string module);
-            long exitCode();
-			bool running();
-        private:
-			bool _running;
-            Poco::Logger* _logger;
-            PyObject* _name;
-            PyObject* _module;
-            long _exitCode;
-            std::string _dir;
-    };
+	class SL {
+	public:
+		SL(const std::string& dir = "/");
+		~SL();
+		void open(const std::string& path);
+		void execute();
+		void execute(std::string module);
+		std::thread executeInThread();
+		std::thread executeInThread(const std::string& module);
+		long exitCode();
+		bool running();
+	private:
+		bool _running;
+		Poco::Logger* _logger;
+		PyObject* _name;
+		PyObject* _module;
+		long _exitCode;
+		std::string _dir;
+	};
 
 }
 

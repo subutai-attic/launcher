@@ -18,9 +18,8 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
 	PyObject *pPath = PyUnicode_FromString(some_path.c_str());
 	PyList_Append(pSearchPathList, pPath);
 	Py_DECREF(pPath);
-//  PySys_SetObject("prefix", pSearchPathList);
-//  Py_DECREF(pSearchPathList);
-  _logger->debug("6");
+	PySys_SetObject("prefix", pSearchPathList);
+	Py_DECREF(pSearchPathList);
 #endif
 
 	if (dir != "/")
@@ -55,7 +54,7 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
 		std::wcstombs(dst, newpath, sizeof(dst));
 #endif
 		std::wprintf(L"NEWPATH: %sl\n", newpath);
-//    PySys_SetPath(newpath);
+		PySys_SetPath(newpath);
 #else
 		char *path, *newpath;
 		path = Py_GetPath();
@@ -76,6 +75,7 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
 #endif
 		// ":." for unix, or ";." for windows 
 	}
+
 }
 
 SubutaiLauncher::SL::~SL()
@@ -130,8 +130,13 @@ void SubutaiLauncher::SL::execute()
 	std::string pErrorText("");
 	auto ncenter = Session::instance()->getNotificationCenter();
 	while (ncenter->isRunning())
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
+	{
+#if LAUNCHER_LINUX || LAUNCHER_MACOS
+		usleep(100);
+#else
+		Sleep(100);
+#endif
+	}
 	ncenter->clear();
 	ncenter->start();
 	_running = true;
@@ -178,10 +183,10 @@ void SubutaiLauncher::SL::execute()
 	}
 
 	//Py_DECREF(_name);
-    /*
+	/*
 	Py_DECREF(PyImport_ImportModule("threading"));
 	PyEval_InitThreads();
-    */
+	*/
 
 	PyObject *pFunc, *pArgs, *pValue;
 	if (!(_module == NULL || _module == 0))
@@ -224,7 +229,7 @@ void SubutaiLauncher::SL::execute()
 		}
 		Py_XDECREF(pFunc);
 		Py_DECREF(_module);
-		}
+	}
 	else
 	{
 		PyErr_Print();
@@ -237,6 +242,18 @@ void SubutaiLauncher::SL::execute()
 	_running = false;
 }
 
+std::thread SubutaiLauncher::SL::executeInThread()
+{
+	_logger->debug("Starting execution in thread");
+	return std::thread([=] { execute(); });
+}
+
+std::thread SubutaiLauncher::SL::executeInThread(const std::string& module)
+{
+	_logger->debug("Starting execution in thread with specific module");
+	return std::thread([=] { execute(module); });
+}
+
 long SubutaiLauncher::SL::exitCode() {
 	return _exitCode;
 }
@@ -245,4 +262,3 @@ bool SubutaiLauncher::SL::running()
 {
 	return _running;
 }
-
