@@ -37,10 +37,12 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::getPeers()
 	_logger->trace("Executing %s", _path);
     Poco::Pipe pOut;
     Poco::ProcessHandle ph = Poco::Process::launch(_path, args, 0, &pOut, 0);
-    ph.wait();
+    int pExitCode = ph.wait();
+	_logger->trace("vboxmanage list vms completed with exit code %d", pExitCode);
     Poco::PipeInputStream istr(pOut);
     std::string buffer;
     Poco::StreamCopier::copyToString(istr, buffer);
+	_logger->trace("vboxmanage list vms output: %s", buffer);
 
     std::vector<SubutaiVM> peers = VirtualBox::parseVms(buffer);
     return peers;
@@ -257,16 +259,20 @@ std::string SubutaiLauncher::VirtualBox::getBridgedInterface(const std::string& 
 
 std::string SubutaiLauncher::VirtualBox::getMachineInfo(const std::string& name) 
 {
+	_logger->debug("Getting %s machine info", name);
     Poco::Process::Args args;
     args.push_back("showvminfo");
     args.push_back(name);
+	args.push_back("--machinereadable");
 
     Poco::Pipe pOut;
     Poco::ProcessHandle ph = Poco::Process::launch(_path, args, 0, &pOut, 0);
-    ph.wait();
+    int pExitCode = ph.wait();
+	_logger->trace("showvminfo executed with error code %d", pExitCode);
     Poco::PipeInputStream istr(pOut);
     std::string buffer;
     Poco::StreamCopier::copyToString(istr, buffer);
+	_logger->trace("showvminfo output: %s", buffer);
     return buffer;
 }
 
@@ -300,7 +306,7 @@ bool SubutaiLauncher::VirtualBox::isMachineRunning(const std::string& name)
             Poco::StringTokenizer lines(info, "\n", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
             for (auto line = lines.begin(); line != lines.end(); line++) 
 			{
-                if ((*line).substr(0, 6) == "State:") 
+                if ((*line).substr(0, 7) == "VMState") 
 				{
                     auto p = (*line).find("running", 0);
                     if (p != std::string::npos) 
@@ -312,6 +318,8 @@ bool SubutaiLauncher::VirtualBox::isMachineRunning(const std::string& name)
                     return false;
                 }
             }
+			_logger->error("State line was not found in output");
+			return false;
         }
     }
 	_logger->error("Machine %s has not been found", name);

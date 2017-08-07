@@ -15,6 +15,7 @@ public:
 
 	void testGetHostOnlyAdapter();
 	void testGetPeers();
+	void testIsMachineRunning();
 
 	static CppUnit::Test* suite();
 };

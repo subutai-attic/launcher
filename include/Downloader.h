@@ -45,6 +45,14 @@
 using Poco::Logger;
 using Poco::LogStream;
 
+typedef enum
+{
+	DL_OK = 0,
+	DL_FILE_NOT_FOUND,
+	DL_ACCESS_VIOLATION,
+	DL_NO_CONNECTION
+} DownloadError;
+
 namespace SubutaiLauncher 
 {
 
@@ -81,6 +89,7 @@ namespace SubutaiLauncher
     void setOutputDirectory(const std::string& dir);
     std::string getOutputDirectory() const;
     std::string getFullPath() const;
+	DownloadError getLastError();
   private:
     std::string buildRequest(std::string path, std::string key, std::string value);
     std::string _filename;
@@ -92,6 +101,7 @@ namespace SubutaiLauncher
     bool _done;
     bool _running;
     Poco::Logger* _logger;
+	DownloadError _lastError;
   };
 
 }

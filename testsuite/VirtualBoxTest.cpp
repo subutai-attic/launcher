@@ -39,12 +39,27 @@ void VirtualBoxTest::testGetPeers()
 	}
 }
 
+void VirtualBoxTest::testIsMachineRunning()
+{
+	SubutaiLauncher::Core c;
+	std::printf("!\n");
+	SubutaiLauncher::VirtualBox vb;
+	auto list = vb.getPeers();
+	for (auto it = list.begin(); it != list.end(); it++)
+	{
+		auto rc = vb.isMachineRunning((*it).name);
+		assert(rc);
+		assert(!rc);
+	}
+}
+
 CppUnit::Test * VirtualBoxTest::suite()
 {
     CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("VirtualBoxTest");
 
 	CppUnit_addTest(pSuite, VirtualBoxTest, testGetHostOnlyAdapter);
 	CppUnit_addTest(pSuite, VirtualBoxTest, testGetPeers);
+	CppUnit_addTest(pSuite, VirtualBoxTest, testIsMachineRunning);
 
     return pSuite;
 }

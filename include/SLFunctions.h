@@ -1036,6 +1036,7 @@ namespace SubutaiLauncher
 
   static PyMethodDef SubutaiSLMethods[] = {
     { "download", (PyCFunction)SL_Download, METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN" },
+	//{ "GetDownloadResult", SL_GetDownloadResult, METH_VARARGS, "Returns download last error" },
     { "setTmpDir", (PyCFunction)SL_SetTmpDir, METH_VARARGS | METH_KEYWORDS, "Sets tmp output directory" },
     { "isDownloadComplete", SL_IsDownloaded, METH_VARARGS, "Returns 1 if current download has been completed" },
     { "GetTmpDir", SL_GetTmpDir, METH_VARARGS, "Returns tmp directory" },

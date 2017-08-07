@@ -24,7 +24,8 @@ SubutaiLauncher::Downloader::Downloader() :
   _content(""),
   _done(true),
   _running(false),
-  _outputDir(".")
+  _outputDir("."),
+	_lastError(DL_OK)
 {
   _logger = &Poco::Logger::get("subutai");
   _logger->debug("Starting Downloader instance");
@@ -346,5 +347,10 @@ std::string SubutaiLauncher::Downloader::getFullPath() const
   path.append(PATH_DELIM);
   path.append(_file.name);
   return path;
+}
+
+DownloadError SubutaiLauncher::Downloader::getLastError()
+{
+	return _lastError;
 }
 
