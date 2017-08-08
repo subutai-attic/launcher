@@ -6,6 +6,7 @@ from subprocess import call
 
 
 def subutaistart():
+    subutai.SetProgress(0.00)
     m = hashlib.md5()
     m.update(datetime.datetime.now().isoformat().encode('utf-8'))
     machineName = "subutai-l" + m.hexdigest()[:5]
@@ -163,8 +164,8 @@ def startVm(machineName):
 def stopVm(machineName):
     subutai.SSHRun("sync")
     subutai.log("info", "Stopping Virtual machine")
-    if subutai.CheckVMRunning(machineName) != 0:
-        subutai.VBox("controlvm " + machineName + " poweroff soft")
+    #if subutai.CheckVMRunning(machineName) != 0:
+    subutai.VBox("controlvm " + machineName + " poweroff soft")
 
     return
 
@@ -177,11 +178,8 @@ def setupVm(machineName):
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
         subutai.VBox("import " +
-                     subutai.GetTmpDir().replace(" ", "+++") + "core.ova")
+                     subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname " + machineName)
         sleep(10)
-        ret = subutai.VBoxS("modifyvm core --name " + machineName)
-        if ret != 0:
-            return 1
 
         cpus = subutai.GetCoreNum()
         mem = subutai.GetMemSize() * 1024
@@ -205,7 +203,7 @@ def reconfigureNic(machineName):
     gateway = subutai.GetDefaultRoutingInterface()
     bridged = subutai.GetVBoxBridgedInterface(gateway)
     bridged = bridged.replace(' ', '+++')
-    subutai.VBox("modifyvm " + machineName + ' --nic1 bridged --bridgeadapter1 "' + bridged + '"')
+    subutai.VBox("modifyvm " + machineName + ' --nic1 bridged --bridgeadapter1 ' + bridged)
     subutai.VBox("modifyvm " + machineName + " --nic2 nat")
     subutai.VBox("modifyvm " + machineName + " --cableconnected2 on")
     subutai.VBox("modifyvm " + machineName + ' --natpf2 ssh-fwd,tcp,,4567,,22 --natpf2 https-fwd,tcp,,9999,,8443')
