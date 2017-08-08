@@ -48,15 +48,14 @@ namespace SubutaiLauncher
         for (auto it = ASSETS_LIST.begin(); it != ASSETS_LIST.end(); it++)
         {
             // Uncomment this to bypass verification
-            continue;
+            //continue;
             _logger->trace("Downloading %s", (*it));
             pDownloader->reset();
             pDownloader->setFilename((*it));
             if (pDownloader->retrieveFileInfo())
             {
                 _logger->trace("Downloading asset: %s", (*it));
-                auto t = pDownloader->download();
-                t.join();
+                pDownloader->downloadImpl(); // :-P
             }
             else
             {
@@ -79,8 +78,7 @@ namespace SubutaiLauncher
         if (pDownloader->retrieveFileInfo())
         {
             _logger->trace("Downloading asset: %s", name);
-            auto t = pDownloader->download();
-            t.join();
+            pDownloader->downloadImpl();
         }
         else
         {

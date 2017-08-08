@@ -21,5 +21,6 @@
 #include "SubutaiString.h"
 #include "Tray.h"
 #include "VirtualBox.h"
+#include "ThreadWrapper.h"
 
 #endif

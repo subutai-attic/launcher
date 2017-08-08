@@ -76,10 +76,13 @@ void DownloaderTest::testParseFileInfo()
 
 void DownloaderTest::testDownload()
 {
-    SubutaiLauncher::Downloader d;
-    d.setFilename("p2p");
-    auto t = d.download();
-    t.join();
+    SubutaiLauncher::Downloader* d = SubutaiLauncher::Session::instance()->getDownloader();
+    d->setFilename("p2p");
+	CThreadWrapper<SlDownloaderThreadWorker> *tw =
+		new CThreadWrapper<SlDownloaderThreadWorker>(new SlDownloaderThreadWorker(d), true);
+	tw->Start(); //todo delete after execution.
+    //auto t = d.download();
+    //t.join();
 }
 
 void DownloaderTest::testVerifyDownload()

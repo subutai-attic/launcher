@@ -136,7 +136,7 @@ void SubutaiLauncher::SL::execute()
 #else
 		Sleep(100);
 #endif
-}
+	}
 	ncenter->clear();
 	ncenter->start();
 	_running = true;
@@ -183,10 +183,10 @@ void SubutaiLauncher::SL::execute()
 	}
 
 	//Py_DECREF(_name);
-    /*
+	/*
 	Py_DECREF(PyImport_ImportModule("threading"));
 	PyEval_InitThreads();
-    */
+	*/
 
 	PyObject *pFunc, *pArgs, *pValue;
 	if (!(_module == NULL || _module == 0))
@@ -229,7 +229,7 @@ void SubutaiLauncher::SL::execute()
 		}
 		Py_XDECREF(pFunc);
 		Py_DECREF(_module);
-		}
+	}
 	else
 	{
 		PyErr_Print();
@@ -262,4 +262,3 @@ bool SubutaiLauncher::SL::running()
 {
 	return _running;
 }
-

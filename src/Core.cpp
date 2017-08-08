@@ -11,6 +11,13 @@ SubutaiLauncher::Core::Core(std::vector<std::string> args) :
     setupLogger();
 }
 
+SubutaiLauncher::Core::Core() :
+	_args(std::vector<std::string>()),
+	_running(false)
+{
+	setupLogger();
+}
+
 SubutaiLauncher::Core::~Core()
 {
     Poco::Logger::get("subutai").information("Stopping Subutai Launcher Core");

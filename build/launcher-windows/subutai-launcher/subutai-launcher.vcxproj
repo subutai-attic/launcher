@@ -193,6 +193,7 @@
     <ClInclude Include="..\..\..\include\SubutaiException.h" />
     <ClInclude Include="..\..\..\include\SubutaiLauncher.h" />
     <ClInclude Include="..\..\..\include\SubutaiString.h" />
+    <ClInclude Include="..\..\..\include\ThreadWrapper.h" />
     <ClInclude Include="..\..\..\include\Tray.h" />
     <ClInclude Include="..\..\..\include\Vars.h" />
     <ClInclude Include="..\..\..\include\VBox.h" />
