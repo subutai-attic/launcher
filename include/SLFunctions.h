@@ -207,34 +207,33 @@ namespace SubutaiLauncher
       PyObject* args,
       PyObject* keywords)
   {
-    if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-    //Poco::Logger::get("subutai").information("SL_Download");
-    if (!PyArg_ParseTupleAndKeywords(
-          args, keywords, "s|i", download_keywords, &sl_filename))
-    {
-      return NULL;
-    }
-    Poco::Logger::get("subutai").debug("SL_Download ~ %s", std::string(sl_filename));
-    SubutaiLauncher::Downloader* downloader = Session::instance()->getDownloader();
-    PyErr_Print();
-    downloader->setFilename(sl_filename);
-    if (!downloader->retrieveFileInfo())
-    {
-      Session::instance()
-          ->getNotificationCenter()
-          ->notificationRaised(
-            N_ERROR,
-            Poco::DynamicAny("Failed to retrieve file data"));
-    }
-    else
-    {
-      Session::instance()->getNotificationCenter()->add(DOWNLOAD_STARTED);
-      Poco::Logger::get("subutai").debug("File info retrieved");
-      CThreadWrapper<SlDownloaderThreadWorker> *tw =
-          new CThreadWrapper<SlDownloaderThreadWorker>(new SlDownloaderThreadWorker(downloader), true);
-      tw->Start(); //todo delete after execution.
-    }
-    return Py_BuildValue("s", sl_filename);
+	  if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+	  //Poco::Logger::get("subutai").information("SL_Download");
+	  if (!PyArg_ParseTupleAndKeywords(
+		  args, keywords, "s|i", download_keywords, &sl_filename))
+	  {
+		  return NULL;
+	  }
+	  Poco::Logger::get("subutai").trace("SL_Download ~ %s", std::string(sl_filename));
+	  auto downloader = Session::instance()->getDownloader();
+	  PyErr_Print();
+	  downloader->setFilename(sl_filename);
+	  if (!downloader->retrieveFileInfo())
+	  {
+		  Session::instance()
+			  ->getNotificationCenter()
+			  ->notificationRaised(
+				  N_ERROR,
+				  Poco::DynamicAny("Failed to retrieve file data"));
+	  }
+	  else
+	  {
+		  Session::instance()->getNotificationCenter()->add(DOWNLOAD_STARTED);
+		  std::printf("File info retrieved\n");
+		  auto t = downloader->download();
+		  t.detach();
+	  }
+	  return Py_BuildValue("s", sl_filename);
   }
 
   // ========================================================================
