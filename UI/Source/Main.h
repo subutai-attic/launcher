@@ -7,6 +7,7 @@
 #endif
 
 #include "MainWindow.h"
+#include "WizardWindow.h"
 #include "Splash.h"
 #include "Poco/Logger.h"
 #include <Python.h>
@@ -30,7 +31,11 @@ class UIApplication : public juce::JUCEApplication
         void anotherInstanceStarted (const juce::String& commandLine) override;
     private:
         Poco::Logger* _logger;
+#if LIGHT_MODE
+        juce::ScopedPointer<WizardWindow> _wizardWindow;
+#else
         juce::ScopedPointer<MainWindow> _mainWindow;
+#endif
         SubutaiLauncher::Core* _core;
 
         InitTimer* _initTimer;

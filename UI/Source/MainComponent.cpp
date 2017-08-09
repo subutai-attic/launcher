@@ -65,7 +65,6 @@ MainContentComponent::MainContentComponent() : _logoImage(nullptr)
 MainContentComponent::~MainContentComponent()
 {
     if (_logoImage) delete _logoImage;
-
 }
 
 void MainContentComponent::paint (Graphics& g)
@@ -73,8 +72,6 @@ void MainContentComponent::paint (Graphics& g)
     g.fillAll(juce::Colour::fromRGB(247, 249, 252));
     g.setFont (Font (16.0f));
     g.setColour (juce::Colour::fromRGB(105, 116, 144));
-
-    
 }
 
 void MainContentComponent::resized()

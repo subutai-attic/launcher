@@ -5,10 +5,14 @@
 #include "Wizard.h"
 #include "Poco/Logger.h"
 
+#if LIGHT_MODE
+class WizardWindow : public juce::DocumentWindow
+#else
 class WizardWindow : public juce::DialogWindow
+#endif
 {
     public:
-        WizardWindow();
+        WizardWindow(juce::String name);
         ~WizardWindow();
         void closeButtonPressed();
         bool escapeKeyPressed();
