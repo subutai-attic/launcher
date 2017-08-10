@@ -112,8 +112,7 @@ Wizard::Wizard() :
 	_finishPage->setBounds(300, 0, 500, 600);
 	addChildComponent(_finishPage);
 
-	// Progression buttons
-
+	// Progress buttons
 	_next.setBounds(202, 560, 86, 25);
 	_next.addListener(this);
 	_next.setColour(TextButton::buttonColourId, Colour(7, 141, 208));
@@ -127,6 +126,9 @@ Wizard::Wizard() :
 	_cancel.setBounds(10, 560, 86, 25);
 	_cancel.addListener(this);
 	addAndMakeVisible(_cancel);
+
+    _login.setBounds(0, 0, 800, 600);
+    addAndMakeVisible(_login);
 }
 
 Wizard::~Wizard()
@@ -163,6 +165,7 @@ void Wizard::resized()
 
 void Wizard::buttonClicked(juce::Button* button)
 {
+    _logger->debug("Wizard Button Clicked");
 	if (button == &_next)
 	{
 		switch (_step)

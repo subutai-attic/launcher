@@ -26,6 +26,7 @@ namespace SubutaiLauncher {
 
     void RootProcess::execute(const std::string& msg)
     {
+        _logger->information("Running gksudo: %s", msg);
         Poco::FileOutputStream of(_filename);
         of << "#!/bin/bash";
         of << std::endl;

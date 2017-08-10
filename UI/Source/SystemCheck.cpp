@@ -109,6 +109,11 @@ SystemCheck::SystemCheck()
 
     _vtxValue.setText(vtxStatus, dontSendNotification);
     _vtxValue.setColour(Label::textColourId, Colour(105, 116, 144));
+    if (vtxStatus == "Disabled")
+    {
+        _vtxValue.setColour(Label::textColourId, Colours::red);
+        
+    }
     _vtxValue.setBounds(150, 175, 500, 40);
     _vtxValue.setFont(font);
     _vtxValue.setJustificationType(Justification::top);

@@ -4,6 +4,7 @@ namespace SubutaiLauncher
 {
     const std::vector<std::string> AssetsManager::ASSETS_LIST({
             "launcher-logo.png",
+#if !LIGHT_MODE
             "launcher-facebook-active.png",
             "launcher-facebook-inactive.png",
             "launcher-twitter-active.png",
@@ -21,6 +22,7 @@ namespace SubutaiLauncher
             "launcher-templates-inactive.png",
             "launcher-community-active.png",
             "launcher-community-inactive.png",
+#endif
             "launcher-robot.png"
             });
 
