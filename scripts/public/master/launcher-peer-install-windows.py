@@ -75,6 +75,17 @@ def subutaistart():
     subutai.SetProgress(0.42)
     sleep(30)
     stopVm(machineName)
+    sleep(20)
+    if subutai.CheckVMRunning(machineName) == 0:
+        subutai.AddStatus("Failed to stop VM. Retrying")
+        stopVm(machineName)
+        sleep(20)
+
+    if subutai.CheckVMRunning(machineName) == 0:
+        subutai.RaiseError("Failed to stop VM. Retrying")
+        sleep(20)
+        return 22
+
     subutai.SetProgress(0.82)
     sleep(5)
     reconfigureNic(machineName)
@@ -202,7 +213,7 @@ def startVm(machineName):
 def stopVm(machineName):
     subutai.SSHRun("sync")
     subutai.log("info", "Stopping Virtual machine")
-    if subutai.CheckVMRunning(machineName) != 0:
+    if subutai.CheckVMRunning(machineName) == 0:
         subutai.VBox("controlvm " + machineName + " poweroff soft")
 
     return
