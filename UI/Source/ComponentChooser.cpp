@@ -8,10 +8,22 @@ ComponentChooser::ComponentChooser() :
     _cpu(2),
     _mem(2)
 {
+    SubutaiLauncher::Environment pEnv;
+    _vtxStatus = false;
+    if (pEnv.vtxEnabled()) _vtxStatus = true;
+    _maxCpu = pEnv.cpuNum();
+    _maxMem = 8;
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationP2P(true);
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationTray(true);
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationE2E(true);
-    SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(true);
+    if (_vtxStatus)
+    {
+        SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(true);
+    }
+    else
+    {
+        SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(false);
+    }
     SubutaiLauncher::Session::instance()->getSettings()->setCoreNum(2);
     SubutaiLauncher::Session::instance()->getSettings()->setMemSize(2);
     _logger = &Poco::Logger::get("subutai");
@@ -171,6 +183,12 @@ ComponentChooser::ComponentChooser() :
     addAndMakeVisible(_peerLabel);
     addAndMakeVisible(_peerInfo);
 
+    if (!_vtxStatus)
+    {
+        _peerNo->setEnabled(false);
+        _peerYes->setEnabled(false);
+    }
+
     // CPUs
 
     _cpuMinus = new juce::TextButton("-");
@@ -211,6 +229,12 @@ ComponentChooser::ComponentChooser() :
     addAndMakeVisible(_cpuLabel);
     addAndMakeVisible(_cpuInfo);
 
+    if (!_vtxStatus)
+    {
+        _cpuMinus->setEnabled(false);
+        _cpuPlus->setEnabled(false);
+    }
+
     // Memory
     
     _memMinus = new juce::TextButton("-");
@@ -249,6 +273,12 @@ ComponentChooser::ComponentChooser() :
     addAndMakeVisible(_memMinus);
     addAndMakeVisible(_memLabel);
     addAndMakeVisible(_memInfo);
+
+    if (!_vtxStatus)
+    {
+        _memPlus->setEnabled(false);
+        _memMinus->setEnabled(false);
+    }
 
     _logger->trace("Component Chooser UI Component created");
 }

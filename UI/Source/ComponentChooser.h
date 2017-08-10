@@ -65,6 +65,10 @@ class ComponentChooser : public juce::Component,
         int _cpu;
         int _mem;
 
+        bool _vtxStatus;
+        int _maxCpu;
+        int _maxMem;
+
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ComponentChooser)
 };
 
