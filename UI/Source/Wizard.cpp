@@ -126,6 +126,9 @@ Wizard::Wizard() :
 	_cancel.setBounds(10, 560, 86, 25);
 	_cancel.addListener(this);
 	addAndMakeVisible(_cancel);
+
+    _login.setBounds(0, 0, 800, 600);
+    addAndMakeVisible(_login);
 }
 
 Wizard::~Wizard()

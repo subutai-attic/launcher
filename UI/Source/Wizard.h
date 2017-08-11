@@ -12,6 +12,7 @@
 #include "WizardInstall.h"
 #include "RootProcess.h"
 #include "WizardFinish.h"
+#include "LoginScreen.h"
 
 class Wizard : 
     public juce::Component,
@@ -48,6 +49,8 @@ class Wizard :
         WizardInstall* _eteInstall;
         WizardInstall* _peerInstall;
         WizardFinish* _finishPage;
+
+        LoginScreen _login;
 
         bool _shutdown;
         bool _ptpInstalled;
