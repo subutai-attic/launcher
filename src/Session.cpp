@@ -13,11 +13,15 @@ SubutaiLauncher::Session::Session() :
   _downloader = new Downloader();
   _downloader->setOutputDirectory(_settings->getTmpPath());
   _notificationCenter = new NotificationCenter();
+  _hub = new Hub();
 }
 
 SubutaiLauncher::Session::~Session()
 {
-
+    if (_settings != nullptr) delete _settings;
+    if (_downloader != nullptr) delete _downloader;
+    if (_notificationCenter != nullptr) delete _notificationCenter;
+    if (_hub != nullptr) delete _hub;
 }
 
 SubutaiLauncher::Session* SubutaiLauncher::Session::instance()
@@ -44,6 +48,11 @@ SubutaiLauncher::Settings* SubutaiLauncher::Session::getSettings()
 SubutaiLauncher::NotificationCenter* SubutaiLauncher::Session::getNotificationCenter()
 {
   return _notificationCenter;
+}
+
+SubutaiLauncher::Hub* SubutaiLauncher::Session::getHub()
+{
+    return _hub;
 }
 
 void SubutaiLauncher::Session::setSSHCredentials(const std::string& user, const std::string& pass, const std::string& hostname, long port) 

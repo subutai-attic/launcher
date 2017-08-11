@@ -16,8 +16,20 @@ SystemCheck::SystemCheck()
     _osLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_osLabel);
 
+    bool osSupported = false;
+    std::string pOs = env.versionOS();
+    std::string pOsVersion = env.versionNumber();
+    pOs.append(" ");
+    pOs.append(pOsVersion);
+
+    if (pOsVersion.substr(0, 5) == "10.12" || pOsVersion.substr(0, 5) == "10.13")
+    {
+        osSupported = true;
+    }
+
     _osValue.setText(env.versionOS(), dontSendNotification);
-    _osValue.setColour(Label::textColourId, Colour(105, 116, 144));
+    if (osSupported) _osValue.setColour(Label::textColourId, Colour(105, 116, 144));
+    else _osValue.setColour(Label::textColourId, Colours::red);
     _osValue.setBounds(150, 15, 500, 40);
     _osValue.setFont(font);
     _osValue.setJustificationType(Justification::top);

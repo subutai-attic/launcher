@@ -24,23 +24,29 @@ namespace SubutaiLauncher
 
     void Hub::setLogin(std::string login) 
     {
+        _logger->trace("Setting user login: %s", login);
         _login = login;
     }
 
     void Hub::setPassword(std::string password) 
     {
+        _logger->trace("Setting user password");
         _password = password;
     }
 
     bool Hub::auth() 
     {
         _logger->debug("Authenticating at %s%s/tray/login", URL, REST);
-        Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/tray/login");
+        // Lame way to auth on hub
+        Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/tray/login?email="+_login+"&password="+_password);
         Poco::Net::HTMLForm pForm;
+
         pForm.add("email", _login);
         pForm.add("password", _password);
+        pRequest.setContentType("application/json");
         pForm.prepareSubmit(pRequest);
         _session.sendRequest(pRequest);
+        pRequest.write(std::cout);
 
         Poco::Net::HTTPResponse pResponse;
         std::istream& rs = _session.receiveResponse(pResponse);
@@ -49,6 +55,7 @@ namespace SubutaiLauncher
         _logger->trace("Received during login: %s", pBuffer);
         if (pResponse.getStatus() == Poco::Net::HTTPResponse::HTTP_OK) 
         {
+            _logger->information("Hub login is OK");
             std::vector<Poco::Net::HTTPCookie> pCookies;
             pResponse.getCookies(pCookies);
             for (auto it = pCookies.begin(); it != pCookies.end(); it++)

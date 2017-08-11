@@ -19,6 +19,9 @@ class LoginScreen :
         void buttonClicked(juce::Button* button) override;
     private:
 		juce::Label _passwordText;
+        juce::Label _title;
+        juce::Label _version;
+        juce::Label _error;
         LauncherButton _button;
         LauncherButton _skipButton;
         juce::TextEditor _login;

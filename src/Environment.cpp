@@ -259,6 +259,25 @@ std::string SubutaiLauncher::Environment::versionOS()
 #endif
 }
 
+std::string SubutaiLauncher::Environment::versionNumber()
+{
+#if LAUNCHER_MACOS
+    Poco::Process::Args pArgs;
+    pArgs.push_back("-productVersion");
+    Poco::Pipe pOut;
+    Poco::ProcessHandle pH = Poco::Process::launch("/usr/bin/sw_vers", pArgs, 0, &pOut, 0);
+    pH.wait();
+    std::string pBuffer;
+    Poco::PipeInputStream istr(pOut);
+    Poco::StreamCopier::copyToString(istr, pBuffer);
+    return pBuffer;
+#elif LAUNCHER_LINUX
+    return "UNKNOWN";
+#else
+    return "UNKNOWN";
+#endif
+}
+
 std::string SubutaiLauncher::Environment::cpuArch() 
 {
 #ifndef LAUNCHER_WINDOWS

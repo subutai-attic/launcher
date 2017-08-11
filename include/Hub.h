@@ -2,6 +2,7 @@
 #define __HUB_H__
 
 #include <string>
+#include <sstream>
 #include <cstring>
 #include <map>
 
@@ -23,6 +24,7 @@
 #include "Poco/Net/AcceptCertificateHandler.h"
 #include "Poco/Net/HTTPCookie.h"
 #include "Poco/Net/NameValueCollection.h"
+#include "Poco/Base64Encoder.h"
 
 namespace SubutaiLauncher 
 {
