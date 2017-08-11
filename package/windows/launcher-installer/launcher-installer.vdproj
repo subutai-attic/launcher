@@ -55350,7 +55350,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Subutai Launcher"
         "ProductCode" = "8:{1309B311-FDC0-46F3-AFF1-D1EC713DED67}"
-        "PackageCode" = "8:{93762C18-D410-43A1-9793-0858E2295B17}"
+        "PackageCode" = "8:{3590A6DA-228A-4CCB-889B-B7BF7485293E}"
         "UpgradeCode" = "8:{5230E7AA-85A5-42FF-9B10-1DA50580C4A2}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -55486,7 +55486,7 @@
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_87214A46F61049A0862B084D3B8EF078"
             {
-            "Name" = "8:Subuai Launcher"
+            "Name" = "8:Subutai Launcher"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
