@@ -56,11 +56,19 @@ void SubutaiLauncher::Core::initializePython()
     PyImport_AppendInittab("subutai", &PyInit_Subutai);
 #endif
 
+    //std::string pName = _args.at(0);
+    //Poco::Logger::get("subutai").debug("Setting program: %s", pName);
+    //std::wstring pwName = std::wstring(pName.begin(), pName.end());
+    //const wchar_t* name = pwName.c_str();
+    //const wchar_t* n = std::wstring(pName.begin(), pName.end()).c_str();
+    //Py_SetProgramName(const_cast<wchar_t*>(n));
+    /*
 #if LAUNCHER_WINDOWS
     Py_SetProgramName(L"SubutaiLauncher.exe");
 #else
 	Py_SetProgramName(L"SubutaiLauncher");
 #endif
+*/
     Py_Initialize();
 
 

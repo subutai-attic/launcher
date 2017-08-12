@@ -7,7 +7,7 @@ TEST_TARGET=testsuite
 INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_DIR)/include -I/usr/local/include
 #LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -Xlinker -export-dynamic -lssh -L$(PYLIB_DIR) -lPocoNet -lPocoNetSSL -lPocoFoundation -lPocoJSON
 LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -lssh -L$(PYLIB_DIR) -lPocoNet -lPocoNetSSL -lPocoFoundation -lPocoJSON
-CXXFLAGS = -g $(INCLUDES) -std=c++11 -DLIGHT_MODE -DRT_OS_LINUX $(BUILD_SCHEME_DEF) $(EXTRA_DEFINES)
+CXXFLAGS = -g $(INCLUDES) -std=c++11 -DLIGHT_MODE -DRT_OS_LINUX -DNDEBUG $(BUILD_SCHEME_DEF) $(EXTRA_DEFINES)
 LDFLAGS = -s $(LIBS)
 
 SRC_DIR = src

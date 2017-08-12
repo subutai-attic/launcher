@@ -266,6 +266,7 @@ namespace SubutaiLauncher
         Poco::Logger::get("subutai").trace("SL_GetTmpDir");
         auto settings = Session::instance()->getSettings();
         auto path = settings->getTmpPath().c_str();
+        Poco::Logger::get("subutai").trace("SL_GetTmpDir ~ %s", settings->getTmpPath());
         return Py_BuildValue("s", path);
     }
 
@@ -274,9 +275,9 @@ namespace SubutaiLauncher
     static PyObject* SL_GetInstallDir(PyObject* self, PyObject* args)
     {
         if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        Poco::Logger::get("subutai").trace("SL_GetInstallDir");
         auto settings = Session::instance()->getSettings();
         auto path = settings->getInstallationPath().c_str();
+        Poco::Logger::get("subutai").trace("SL_GetInstallDir ~ %s", settings->getInstallationPath());
         return Py_BuildValue("s", path);
     }
 
@@ -285,7 +286,6 @@ namespace SubutaiLauncher
     static PyObject* SL_SetTmpDir(PyObject* self, PyObject* args, PyObject* keywords)
     {
         if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        //Poco::Logger::get("subutai").information("SL_SetTmpDir");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|i", tmpdir_keywords, &sl_tmpdir))
             return NULL;
         Session::instance()->getDownloader()->setOutputDirectory(sl_tmpdir);
@@ -591,9 +591,9 @@ namespace SubutaiLauncher
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
             return NULL;
 
-        Poco::Logger::get("subutai").trace("SL_AddStatus ~ %s", std::string(sl_string));
-
-        Session::instance()->addStatus(sl_string);
+        //Poco::Logger::get("subutai").trace("SL_AddStatus ~ %s", std::string(sl_string));
+        std::string status(sl_string);
+        Session::instance()->addStatus(status);
         return Py_BuildValue("i", 0);
     }
 

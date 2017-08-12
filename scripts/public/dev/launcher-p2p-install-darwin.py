@@ -6,7 +6,6 @@ import stat
 
 
 def subutaistart():
-
     subutai.AddStatus("Download p2p binary")
 
     subutai.download("p2p_osx")
@@ -15,8 +14,8 @@ def subutaistart():
 
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
-
     subutai.AddStatus("Download finished. Installing")
+
     try:
         copyfile(tmpDir+"p2p_osx", installDir+"bin/p2p")
     except:

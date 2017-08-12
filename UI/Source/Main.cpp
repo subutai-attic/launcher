@@ -29,40 +29,6 @@ UIApplication::UIApplication() :
     _core(nullptr),
     _initTimer(nullptr)
 {
-    try
-    {
-        _core = new SubutaiLauncher::Core(std::vector<std::string>());
-    }
-    catch (Poco::OpenFileException& e)
-    {
-        std::printf("Couldn't open log file: %s", e.displayText().c_str());
-    }
-    try
-    {
-        _core->run();
-    }
-    catch (Poco::OpenFileException& e)
-    {
-        Poco::Logger::get("subutai").error(e.displayText());
-    }
-    catch (Poco::FileException& e)
-    {
-        Poco::Logger::get("subutai").error(e.displayText());
-    }
-    catch (Poco::PathSyntaxException& e)
-    {
-        Poco::Logger::get("subutai").error(e.displayText());
-    }
-    catch (Poco::Exception& e)
-    {
-        Poco::Logger::get("subutai").error(e.displayText());
-    }
-    SubutaiLauncher::Environment env;
-    env.updatePath(SubutaiLauncher::Session::instance()->getSettings()->getInstallationPath() + "bin");
-
-    Poco::Logger::get("subutai").information("Downloading assets");
-
-    _initTimer = new InitTimer(&UIApplication::checkInitialization, this);
     /*
        SubutaiLauncher::AssetsManager pAssets;
        try
@@ -94,6 +60,44 @@ bool UIApplication::moreThanOneInstanceAllowed()
 
 void UIApplication::initialise(const juce::String& commandLine)
 {    
+    try
+    {
+        _core = new SubutaiLauncher::Core(std::vector<std::string>());
+    }
+    catch (Poco::OpenFileException& e)
+    {
+        std::printf("Couldn't open log file: %s", e.displayText().c_str());
+    }
+
+    _logger = &Poco::Logger::get("subutai");
+    _logger->trace("UI Started with: %s", commandLine.toStdString());
+
+    try
+    {
+        _core->run();
+    }
+    catch (Poco::OpenFileException& e)
+    {
+        _logger->error(e.displayText());
+    }
+    catch (Poco::FileException& e)
+    {
+        _logger->error(e.displayText());
+    }
+    catch (Poco::PathSyntaxException& e)
+    {
+        _logger->error(e.displayText());
+    }
+    catch (Poco::Exception& e)
+    {
+        _logger->error(e.displayText());
+    }
+    SubutaiLauncher::Environment env;
+    env.updatePath(SubutaiLauncher::Session::instance()->getSettings()->getInstallationPath() + "bin");
+
+    Poco::Logger::get("subutai").information("Downloading assets");
+
+    _initTimer = new InitTimer(&UIApplication::checkInitialization, this);
     // This method is where you should put your application's initialisation code..
     //
     //
@@ -101,7 +105,6 @@ void UIApplication::initialise(const juce::String& commandLine)
     //if (cuser !=0) {
 
     //}
-    _logger = &Poco::Logger::get("subutai");
     SubutaiLauncher::AssetsManager pAssets;
     pAssets.download("launcher-logo.png");
     std::string pLogoFile(SubutaiLauncher::Session::instance()->getSettings()->getTmpPath() +
