@@ -26,8 +26,12 @@ def subutaistart():
     sleep(5)
 
     subutai.AddStatus("Making p2p binary executable")
-    st = os.stat(installDir+"/bin/p2p")
-    os.chmod(installDir+"/bin/p2p", st.st_mode | stat.S_IEXEC)
+    try:
+        st = os.stat(installDir+"/bin/p2p")
+        os.chmod(installDir+"/bin/p2p", st.st_mode | stat.S_IEXEC)
+    except:
+        subutai.RaiseError("Failed to make p2p binary executable")
+        return 31
 
     subutai.AddStatus("Creating symlink")
     subutai.MakeLink(installDir+"/bin/p2p", "/usr/local/bin/p2p")
@@ -59,9 +63,13 @@ def subutaistart():
 </plist>
 '''.strip()
 
-   f = open(tmpDir+'io.subutai.p2p.daemon.plist', 'w')
-   f.write(service)
-   f.close()
+    try:
+        f = open(tmpDir+'io.subutai.p2p.daemon.plist', 'w')
+        f.write(service)
+        f.close()
+    except:
+        subutai.RaiseError("Failed to create service file for p2p")
+        return 25
 
     sleep(5)
     subutai.Shutdown()

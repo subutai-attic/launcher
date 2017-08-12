@@ -272,7 +272,26 @@ std::string SubutaiLauncher::Environment::versionNumber()
     Poco::StreamCopier::copyToString(istr, pBuffer);
     return pBuffer;
 #elif LAUNCHER_LINUX
-    return "UNKNOWN";
+    Poco::Process::Args pArgs;
+    pArgs.push_back("/etc/lsb-release");
+    Poco::Pipe pOut;
+    Poco::ProcessHandle pH = Poco::Process::launch("/bin/cat", pArgs, 0, &pOut, 0);
+    pH.wait();
+    std::string pBuffer;
+    Poco::PipeInputStream istr(pOut);
+    Poco::StreamCopier::copyToString(istr, pBuffer);
+    Poco::StringTokenizer lines(pBuffer, "\n", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+    for (auto it = lines.begin(); it != lines.end(); it++)
+    {
+        if ((*it).substr(0, 15) == "DISTRIB_RELEASE")
+        {
+            _logger->trace("Found DISTRIB_RELEASE: %s", (*it));
+            std::string num = (*it).substr(16, 5);
+            _logger->information("Extracted version: %s", num);
+            return num;
+        }
+    }
+    return "Unknown Version";
 #else
     return "UNKNOWN";
 #endif
