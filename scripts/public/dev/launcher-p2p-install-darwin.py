@@ -6,14 +6,16 @@ import stat
 
 
 def subutaistart():
+    tmpDir = subutai.GetTmpDir()
+    installDir = subutai.GetInstallDir()
+    subutai.log("DEBUG", str(os.environ))
+
     subutai.AddStatus("Download p2p binary")
 
     subutai.download("p2p_osx")
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
 
-    tmpDir = subutai.GetTmpDir()
-    installDir = subutai.GetInstallDir()
     subutai.AddStatus("Download finished. Installing")
 
     try:

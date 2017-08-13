@@ -60,9 +60,15 @@ bool UIApplication::moreThanOneInstanceAllowed()
 
 void UIApplication::initialise(const juce::String& commandLine)
 {    
+    auto args = getCommandLineParameterArray();
+    std::vector<std::string> pArgs;
+    for (auto it = args.begin(); it != args.end(); it++)
+    {
+        pArgs.push_back((*it).toStdString());
+    }
     try
     {
-        _core = new SubutaiLauncher::Core(std::vector<std::string>());
+        _core = new SubutaiLauncher::Core(pArgs);
     }
     catch (Poco::OpenFileException& e)
     {

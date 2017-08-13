@@ -46,7 +46,6 @@ namespace SubutaiLauncher
         pRequest.setContentType("application/json");
         pForm.prepareSubmit(pRequest);
         _session.sendRequest(pRequest);
-        pRequest.write(std::cout);
 
         Poco::Net::HTTPResponse pResponse;
         std::istream& rs = _session.receiveResponse(pResponse);

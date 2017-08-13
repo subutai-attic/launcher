@@ -123,7 +123,7 @@
 #if JUCE_MAC || JUCE_IOS
 
   #if defined (DEBUG) || defined (_DEBUG) || ! (defined (NDEBUG) || defined (_NDEBUG))
-    #define JUCE_DEBUG 0
+    #define JUCE_DEBUG 1
   #endif
 
   #if ! (defined (DEBUG) || defined (_DEBUG) || defined (NDEBUG) || defined (_NDEBUG))

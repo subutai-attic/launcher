@@ -31,20 +31,6 @@
 namespace SubutaiLauncher 
 {
 
-    class SlDownloaderThreadWorker {
-        private:
-            SubutaiLauncher::Downloader* _downloader;
-        public:
-            SlDownloaderThreadWorker(SubutaiLauncher::Downloader* downloader) : _downloader(downloader) {
-            }
-            ~SlDownloaderThreadWorker() {/*do nothing*/}
-
-            void Run() {
-                _downloader->downloadImpl();
-            }
-    };
-    ////////////////////////////////////////////////////////////////////////////
-
     // TODO: Refactor and extend arguments
     static char const* sl_filename = "";
     static char const* sl_tmpdir = "";
@@ -276,9 +262,10 @@ namespace SubutaiLauncher
     {
         if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         auto settings = Session::instance()->getSettings();
-        auto path = settings->getInstallationPath().c_str();
+        //auto path = settings->getInstallationPath().c_str();
+        std::string path = settings->getInstallationPath();
         Poco::Logger::get("subutai").trace("SL_GetInstallDir ~ %s", settings->getInstallationPath());
-        return Py_BuildValue("s", path);
+        return Py_BuildValue("s", path.c_str());
     }
 
     // ========================================================================
@@ -587,13 +574,21 @@ namespace SubutaiLauncher
 
     static PyObject* SL_AddStatus(PyObject* self, PyObject* args, PyObject* keywords)
     {
+        Poco::Logger::get("subutai").trace("ADDSTATUS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~1");
         if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+        Poco::Logger::get("subutai").trace("ADDSTATUS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~2");
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string)) {
+            Poco::Logger::get("subutai").trace("ADDSTATUS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~3");
             return NULL;
+        }
 
-        //Poco::Logger::get("subutai").trace("SL_AddStatus ~ %s", std::string(sl_string));
+        Poco::Logger::get("subutai").trace("ADDSTATUS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~4");
+        Poco::Logger::get("subutai").trace("SL_AddStatus ~ %s", std::string(sl_string));
+        Poco::Logger::get("subutai").trace("ADDSTATUS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~5");
         std::string status(sl_string);
+        Poco::Logger::get("subutai").trace("ADDSTATUS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~6");
         Session::instance()->addStatus(status);
+        Poco::Logger::get("subutai").trace("ADDSTATUS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~7");
         return Py_BuildValue("i", 0);
     }
 
