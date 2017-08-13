@@ -1,8 +1,29 @@
 import subutai
+from time import sleep
 import os
+from shutil import copyfile
+import stat
 
 
 def subutaistart():
+    tmpDir = subutai.GetTmpDir()
+    installDir = subutai.GetInstallDir()
+
+    if not os.path.exists(installDir+"bin/cocoasudo"):
+        subutai.AddStatus("Downloading cocoasudo application")
+        subutai.download("cocoasudo")
+        while subutai.isDownloadComplete() != 1:
+            sleep(0.05)
+
+        try:
+            copyfile(tmpDir+"cocoasudo", installDir+"bin/cocoasudo")
+            st = os.stat(installDir+"bin/cocoasudo")
+            os.chmod(installDir+"bin/cocoasudo", st.st_mode | stat.S_IEXEC)
+        except:
+            subutai.RaiseError("Failed to install cocoasudo. Aborting")
+            sleep(10)
+            return -99
+
     subutai.AddStatus("Installing Browser Plugin")
 
     location = os.environ['HOME'] + '/Library/Application Support/Google/Chrome/External Extensions'

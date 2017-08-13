@@ -3,12 +3,46 @@ from time import sleep
 from shutil import copyfile
 import os
 import stat
+from subprocess import call
 
 
 def subutaistart():
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
-    subutai.log("DEBUG", str(os.environ))
+
+    if not os.path.exists(installDir+"bin/cocoasudo"):
+        subutai.AddStatus("Downloading cocoasudo application")
+        subutai.download("cocoasudo")
+        while subutai.isDownloadComplete() != 1:
+            sleep(0.05)
+
+        try:
+            copyfile(tmpDir+"cocoasudo", installDir+"bin/cocoasudo")
+            st = os.stat(installDir+"bin/cocoasudo")
+            os.chmod(installDir+"bin/cocoasudo", st.st_mode | stat.S_IEXEC)
+        except:
+            subutai.RaiseError("Failed to install cocoasudo. Aborting")
+            sleep(10)
+            return -99
+
+    subutai.AddStatus("Download TUNTAP driver")
+    subutai.download("tuntap_20150118_osx.pkg")
+    while subutai.isDownloadComplete() != 1:
+        sleep(0.05)
+
+    try:
+        call([installDir+"bin/cocoasudo",
+              '--prompt="Install TUNTAP driver"',
+              'installer',
+              '-pkg',
+              tmpDir+'tuntap_20150118.pkg',
+              '-target',
+              '/'])
+    except:
+        subutai.RaiseError("Failed to install TUNTAP driver. Aborting")
+        sleep(10)
+        return -98
+
 
     subutai.AddStatus("Download p2p binary")
 
@@ -68,6 +102,16 @@ def subutaistart():
         f = open(tmpDir+'io.subutai.p2p.daemon.plist', 'w')
         f.write(service)
         f.close()
+        call([installDir+"bin/cocoasudo",
+              '--prompt="Install P2P Service"',
+              'cp',
+              tmpDir+'io.subutai.p2p.daemon.plist',
+              '/Library/LaunchDaemons/'])
+        call([installDir+"bin/cocoasudo",
+              '--prompt="Start P2P Daemon"',
+              'launchctl',
+              'load',
+              '/Library/LaunchDaemons/io.subutai.p2p.daemon.plist'])
     except:
         subutai.RaiseError("Failed to create service file for p2p")
         return 25
