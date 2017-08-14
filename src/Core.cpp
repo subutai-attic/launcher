@@ -43,21 +43,11 @@ void SubutaiLauncher::Core::initializePython()
     Poco::Logger::get("subutai").information("Initializing Python v%d.%d", PY_MAJOR_VERSION, PY_MINOR_VERSION);
 
 #if LAUNCHER_WINDOWS
-    //std::string pPythonPath = Poco::Environment::get("PYTHONPATH");
-    //std::string pPythonHome = Poco::Environment::get("PYTHONHOME");
-
     std::string pNewPythonPath = "D:\\Projects\cpython";
     std::string pNewPythonHome = "D:\\Projects\cpython";
-
-    //Poco::Environment::set("PYTHONPATH", pNewPythonPath);
-    //Poco::Environment::set("PYTHONHOME", pNewPythonHome);
-
     Py_SetPythonHome(L".");
 #endif
 
-    //Environment e;
-    //e.setVar("PYTHONPATH", ".");
-    //
 #if PY_MAJOR_VERSION >= 3 
     PyImport_AppendInittab("subutai", &PyInit_Subutai);
 #endif
@@ -74,13 +64,6 @@ void SubutaiLauncher::Core::initializePython()
     {
         Poco::Logger::get("subutai").error("Failed to receive command line arguments");
     }
-    /*
-#if LAUNCHER_WINDOWS
-Py_SetProgramName(L"SubutaiLauncher.exe");
-#else
-Py_SetProgramName(L"SubutaiLauncher");
-#endif
-*/
     Py_Initialize();
 
 
@@ -88,17 +71,6 @@ Py_SetProgramName(L"SubutaiLauncher");
 #error Python versions below 3.5 is not supported
     Py_InitModule("subutai", SubutaiSLMethods);
 #endif
-
-    /*  
-        char *path, *newpath; 
-        path = Py_GetPath(); 
-        newpath = new char[strlen(path)+4]; 
-        strcpy(newpath, path); 
-        strcat(newpath, ":."); 
-    // ":." for unix, or ";." for windows 
-    PySys_SetPath(newpath); 
-    delete newpath;
-    */
 }
 
 void SubutaiLauncher::Core::initializeSSL()
@@ -164,8 +136,10 @@ void SubutaiLauncher::Core::run()
 
 void SubutaiLauncher::Core::parseArgs()
 {
-    for (auto it = _args.begin(); it != _args.end(); it++) {
-        if (it->compare("test") == 0) {
+    for (auto it = _args.begin(); it != _args.end(); it++) 
+    {
+        if (it->compare("test") == 0) 
+        {
         }
     }
 }
