@@ -43,7 +43,6 @@ def subutaistart():
         sleep(10)
         return -98
 
-
     subutai.AddStatus("Download p2p binary")
 
     subutai.download("p2p_osx")
@@ -107,14 +106,38 @@ def subutaistart():
               'cp',
               tmpDir+'io.subutai.p2p.daemon.plist',
               '/Library/LaunchDaemons/'])
+    except:
+        subutai.RaiseError("Failed to create service file for p2p")
+        return 25
+
+    subutai.AddStatus("Configuring syslog")
+    syslog = '''
+# logfilename          [owner:group]    mode count size when  flags [/pid_file] [sig_num]
+/var/log/p2p.log                       644  7     *    $D0   J
+    '''.strip()
+
+    try:
+        sf = open(tmpDir+'p2p.conf', 'w')
+        sf.write(syslog)
+        sf.close()
+        call([installDir+"bin/cocoasudo",
+              '--prompt="Setup P2P Logger"',
+              'cp',
+              tmpDir+'p2p.conf',
+              '/etc/newsyslog.d/p2p.conf'])
+    except:
+        subutai.AddStatus("Failed to configur P2P logger")
+
+    sleep(5)
+
+    try:
         call([installDir+"bin/cocoasudo",
               '--prompt="Start P2P Daemon"',
               'launchctl',
               'load',
               '/Library/LaunchDaemons/io.subutai.p2p.daemon.plist'])
     except:
-        subutai.RaiseError("Failed to create service file for p2p")
-        return 25
+        subutai.AddStatus("Failed to load P2P Service")
 
     sleep(5)
     subutai.Shutdown()
