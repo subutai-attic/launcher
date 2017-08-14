@@ -45,12 +45,28 @@ void HubTest::testBalance()
     assert(h.balance());
 }
 
+void HubTest::testSendLog()
+{
+    std::vector<std::string> args;
+    SubutaiLauncher::Core c(args);
+    c.initializeSSL();
+    SubutaiLauncher::Hub h;
+    h.setLogin("m.savochkin@gmail.com");
+    h.setPassword("testhubpassword");
+    h.auth();
+    h.sendLog(SubutaiLauncher::HL_INFO, "Launcher Testsuite: Log INFO");
+    h.sendLog(SubutaiLauncher::HL_WARNING, "Launcher Testsuite: Log WARNING");
+    h.sendLog(SubutaiLauncher::HL_ERROR, "Launcher Testsuite: Log ERROR");
+    h.sendLog(SubutaiLauncher::HL_FATAL, "Launcher Testsuite: Log FATAL");
+}
+
 CppUnit::Test* HubTest::suite()
 {
     CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HubTest");
 
     CppUnit_addTest(pSuite, HubTest, testAuth);
     CppUnit_addTest(pSuite, HubTest, testBalance);
+    CppUnit_addTest(pSuite, HubTest, testSendLog);
 
     return pSuite;
 }

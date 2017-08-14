@@ -14,7 +14,7 @@ LoginScreen::LoginScreen() :
     _login.setColour(juce::TextEditor::backgroundColourId, juce::Colour::fromRGB(247, 249, 252));
     _login.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colour::fromRGB(247, 249, 252));
     _login.setFont(font);
-    _login.setText("m.savochkin@gmail.com");
+    _login.setText("");
 
     addAndMakeVisible(_password);
     _password.setBounds(10, 85, 180, 24);
@@ -22,7 +22,7 @@ LoginScreen::LoginScreen() :
     _password.setColour(juce::TextEditor::backgroundColourId, juce::Colour::fromRGB(247, 249, 252));
     _password.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colour::fromRGB(247, 249, 252));
     _password.setFont(font);
-    _password.setText("testhubpassword");
+    _password.setText("");
 
     addAndMakeVisible(_button);
     _button.addListener(this);

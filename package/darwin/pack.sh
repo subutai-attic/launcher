@@ -14,7 +14,7 @@ fi
 rm -rf flat
 rm -rf root
 rm -f *.pkg
-version=4.0.15
+version=5.0.0
 # Copy files
 mkdir -p flat/Resources/en.lproj
 mkdir -p flat/base.pkg

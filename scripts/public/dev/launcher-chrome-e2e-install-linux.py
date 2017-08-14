@@ -1,8 +1,17 @@
 import subutai
 import os
+from subprocess import call
+from time import sleep
 
 
 def subutaistart():
+    subutai.AddStatus("Installing Google Chrome")
+    try:
+        call(['/usr/bin/gksudo', 'apt-get', 'install', 'google-chrome-stable'])
+    except:
+        subutai.RaiseError("Failed to install Google Chrome")
+        sleep(5)
+
     subutai.AddStatus("Installing Browser Plugin")
 
     location = os.environ['HOME'] + '/.config/google-chrome/Default/External Extensions'

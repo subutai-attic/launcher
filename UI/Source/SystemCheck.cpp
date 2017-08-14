@@ -26,12 +26,20 @@ SystemCheck::SystemCheck()
     pOs.append(" ");
     pOs.append(pOsVersion);
 
+#if LAUNCHER_MACOS
     if (pOsVersion.substr(0, 5) == "10.12" || pOsVersion.substr(0, 5) == "10.13")
     {
         osSupported = true;
     }
+#elif LAUNCHER_LINUX
+    std::string v = pOsVersion.substr(0, 5);
+    if (v == "16.04" || v == "16.10" || v == "17.04" || v == "17.10")
+    {
+        osSupported = true;
+    }
+#endif
 
-    _osValue.setText(env.versionOS(), dontSendNotification);
+    _osValue.setText(pOs, dontSendNotification);
     if (osSupported) _osValue.setColour(Label::textColourId, Colour(105, 116, 144));
     else _osValue.setColour(Label::textColourId, Colours::red);
     _osValue.setBounds(150, 15, 500, 40);

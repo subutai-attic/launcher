@@ -46,7 +46,6 @@ namespace SubutaiLauncher
         pRequest.setContentType("application/json");
         pForm.prepareSubmit(pRequest);
         _session.sendRequest(pRequest);
-        //pRequest.write(std::cout);
 
         Poco::Net::HTTPResponse pResponse;
         std::istream& rs = _session.receiveResponse(pResponse);
@@ -85,6 +84,57 @@ namespace SubutaiLauncher
             return true;
         }
         return false;
+    }
+
+    void Hub::addLogLine(HubLogLevel level, const std::string& message)
+    {
+        HubLog l;
+        l.level = level;
+        l.message = message;
+        _logs.push_back(l);
+    }
+
+    void Hub::sendLogs()
+    {
+        for (auto it = _logs.begin(); it != _logs.end(); it++)
+        {
+            sendLog((*it).level, (*it).message);
+        }
+        _logs.clear();
+    }
+
+    void Hub::sendLog(HubLogLevel level, const std::string& message)
+    {
+        std::string status = "info";
+        if (level == HL_WARNING) status = "warning";
+        else if (level == HL_ERROR) status = "error";
+        else if (level == HL_FATAL) status = "fatal";
+        std::string json("{");
+        json.append("\"uuid\": \"bd8a1439-ee45-4b6f-b3cd-ca60a0f8d61b\",");
+        json.append("\"step\": \"install\",");
+        json.append("\"problem\": \""+message+"\",");
+        json.append("\"info\": \""+_login+"\",");
+        json.append("\"status\": \""+status+"\"");
+        json.append("}");
+        
+        _logger->trace("Sending log %s", json);
+        Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/launcher/status");
+        pRequest.setCookies(_cookies);
+        pRequest.setContentLength(json.length());
+        std::ostream& pStr = _session.sendRequest(pRequest);
+        pStr << json;
+
+        Poco::Net::HTTPResponse pResponse;
+        std::istream& rs = _session.receiveResponse(pResponse);
+        std::string pBuffer;
+        Poco::StreamCopier::copyToString(rs, pBuffer);
+        _logger->trace("Received during log sending: %s", pBuffer);
+        if (pResponse.getStatus() == Poco::Net::HTTPResponse::HTTP_OK) 
+        {
+            _logger->debug("Log sent ok");
+            return;
+        }
+        _logger->error("Log sent failed");
     }
 
 }

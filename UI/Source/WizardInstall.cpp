@@ -149,6 +149,7 @@ void WizardInstall::runImpl()
 	std::thread pScriptThread;
 	try
 	{
+        //MessageManagerLock mmLock;
 		pScriptThread = sl.executeInThread();
 		auto nc = SubutaiLauncher::Session::instance()->getNotificationCenter();
 		//        bool download = false;
@@ -232,6 +233,7 @@ void WizardInstall::runImpl()
 
 void WizardInstall::addLine(const std::string& text, bool error)
 {
+    MessageManagerLock mmLock;
 	auto font = juce::Font("Encode Sans", 14, 0);
 	auto line = new juce::Label();
 	std::string t = _name;
