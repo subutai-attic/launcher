@@ -16,8 +16,12 @@ SystemCheck::SystemCheck()
     _osLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_osLabel);
 
+#if LAUNCHER_WINDOWS
+	bool osSupported = true;
+#else
     bool osSupported = false;
-    std::string pOs = env.versionOS();
+#endif
+	std::string pOs = env.versionOS();
     std::string pOsVersion = env.versionNumber();
     pOs.append(" ");
     pOs.append(pOsVersion);
