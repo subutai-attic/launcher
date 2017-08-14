@@ -5,7 +5,7 @@ from subprocess import call
 
 
 def subutaistart():
-    
+
     tmpDir = subutai.GetTmpDir()
 
     if subutai.IsChromeInstalled() != 0:
@@ -16,7 +16,7 @@ def subutaistart():
 
         subutai.AddStatus("Installing Chrome")
         try:
-            call(['msiexec', '/qn', '/i' tmpDir+"GoogleChromeStandaloneEnterprise64.msi"])
+            call(['msiexec', '/qn', '/i', tmpDir+"GoogleChromeStandaloneEnterprise64.msi"])
         except:
             subutai.RaiseError("Failed to install Google Chrome")
             sleep(5)
