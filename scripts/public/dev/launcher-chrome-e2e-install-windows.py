@@ -5,7 +5,9 @@ from subprocess import call
 
 
 def subutaistart():
+    
     tmpDir = subutai.GetTmpDir()
+
     if subutai.IsChromeInstalled() != 0:
         subutai.AddStatus("Downloading Chrome")
         subutai.download("GoogleChromeStandaloneEnterprise64.msi")
@@ -18,7 +20,7 @@ def subutaistart():
         except:
             subutai.RaiseError("Failed to install Google Chrome")
             sleep(5)
-            
+
     subutai.AddStatus("Installing Browser Plugin")
 
     subutai.RegisterPlugin()

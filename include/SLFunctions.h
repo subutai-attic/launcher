@@ -251,9 +251,9 @@ namespace SubutaiLauncher
         if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         Poco::Logger::get("subutai").trace("SL_GetTmpDir");
         auto settings = Session::instance()->getSettings();
-        auto path = settings->getTmpPath().c_str();
+        auto path = settings->getTmpPath();
         Poco::Logger::get("subutai").trace("SL_GetTmpDir ~ %s", settings->getTmpPath());
-        return Py_BuildValue("s", path);
+        return Py_BuildValue("s", path.c_str());
     }
 
     // ========================================================================
