@@ -5,9 +5,19 @@ from time import sleep
 
 
 def subutaistart():
-    subutai.AddStatus("Installing Google Chrome")
+    tmpDir = subutai.GetTmpDir()
+    subutai.AddStatus("Downloading Google Chrome")
+
+    subutai.download("google-chrome-stable_current_amd64.deb")
+    while subutai.isDownloadComplete() != 1:
+        sleep(0.05)
+
     try:
-        call(['/usr/bin/gksudo', 'apt-get', 'install', 'google-chrome-stable'])
+        call(['/usr/bin/gksudo',
+              '--message',
+              'Install Google Chrome',
+              'dpkg -i '+tmpDir+'google-chrome-stable_current_amd64.deb'])
+        sleep(20)
     except:
         subutai.RaiseError("Failed to install Google Chrome")
         sleep(5)
