@@ -25,15 +25,7 @@ def subutaistart():
             sleep(0.05)
 
         subutai.AddStatus("Installing VirtualBox")
-        try:
-            call(['/usr/bin/gksudo',
-                  '--message',
-                  'Install VirtualBox',
-                  'dpkg -i '+tmpDir+vboxfile])
-        except:
-            subutai.RaiseError("Failed to install VirtualBox. Aborting")
-            sleep(10)
-            return 41
+        subutai.InstallVBox(tmpDir+vboxfile)
 
     call(['ssh-keygen', '-R', '[127.0.0.1]:4567'])
 
@@ -272,6 +264,7 @@ def reconfigureNic(machineName):
         subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
 
     return
+
 
 def enableHostonlyif():
     adapterName = subutai.GetVBoxHostOnlyInterface()
