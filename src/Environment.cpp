@@ -155,15 +155,25 @@ unsigned SubutaiLauncher::Environment::versionVBox()
 bool SubutaiLauncher::Environment::vtxEnabled() 
 {
 #if LAUNCHER_LINUX
-    enum { eax = 0, ebx, ecx, edx};
-    enum { cpuid_sig = 0, cpuid_pifb = 1 } ;
-    uint32_t regs[4] = {0};
-
-    if (__get_cpuid(cpuid_pifb, &regs[eax], &regs[ebx], &regs[ecx], &regs[edx])) {
-        return regs[ecx] & 0x10;
-    } else {
+    Poco::Process::Args pArgs;
+    pArgs.push_back("/proc/cpuinfo");
+    Poco::Pipe pOut;
+    Poco::ProcessHandle ph = Poco::Process::launch("/bin/cat", pArgs, 0, &pOut, 0);
+    int rc = ph.wait();
+    if (rc != 0)
+    {
+        _logger->error("Failed to cat /proc/cpuinfo. VTX query failed");
         return false;
     }
+    std::string pBuffer;
+    Poco::PipeInputStream istr(pOut);
+    Poco::StreamCopier::copyToString(istr, pBuffer);
+    Poco::StringTokenizer lines(pBuffer, " ", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+    for (auto it = lines.begin(); it != lines.end(); it++)
+    {
+        if ((*it) == "vme" || (*it) == "VME") return true;
+    }
+    return false;
 #elif LAUNCHER_MACOS
     Poco::Process::Args pArgs;
     pArgs.push_back("-a");
