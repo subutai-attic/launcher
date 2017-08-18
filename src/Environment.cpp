@@ -987,6 +987,46 @@ std::string SubutaiLauncher::Environment::getDesktopDirectory()
 }
 
 #if LAUNCHER_WINDOWS
+bool SubutaiLauncher::Environment::isVBoxInstalled()
+{
+	enum { BUFF_SIZE = 1024 * 4 };
+	LPBYTE buffer = (LPBYTE)malloc(BUFF_SIZE);
+	DWORD buff_len = BUFF_SIZE;
+
+	int32_t result = 0;
+	LPCWSTR key_path[] = { L"SOFTWARE\\Wow6432Node\\Oracle\\VirtualBox",
+		L"SOFTWARE\\Oracle\\VirtualBox",
+		NULL };
+	LPCWSTR* tmp = key_path;
+
+	HKEY root_key = HKEY_LOCAL_MACHINE;
+	HKEY key;
+
+	result = 0;
+	memset(buffer, 0, buff_len);
+	setlocale(LC_ALL, ""); //todo remove
+
+	for (; *tmp; ++tmp) {
+		printf("%ls\n", *tmp);
+		if ((result = RegOpenKeyExW(root_key, *tmp, 0, KEY_READ | KEY_WOW64_64KEY, &key)) ==
+			ERROR_SUCCESS) {
+			result = 0;
+			break;
+		}
+		else {
+			printf("%d %d\n", result, GetLastError());
+		}
+		RegCloseKey(key);
+	}
+
+	printf("%s\n", result ?
+		"VBOx not found, babushka" :
+		"VBox found, let's start riot");
+
+	free(buffer);
+	if (result == 0) return true;
+	return false;
+}
 bool SubutaiLauncher::Environment::writeE2ERegistry(const std::string & name)
 {
     char* e2e_id = "kpmiofpmlciacjblommkcinncmneeoaa";
