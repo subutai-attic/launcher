@@ -323,6 +323,19 @@ namespace SubutaiLauncher
     }
 
     // ========================================================================
+    
+    static PyObject* SL_IsVBoxInstalled(PyObject* self, PyObject* args)
+    {
+        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+        Poco::Logger::get("subutai").trace("SL_IsVBoxInstalled");
+
+        VirtualBox vb;
+        vb.findInstallation();
+        if (vb.isInstalled()) return Py_BuildValue("i", 0);
+        return Py_BuildValue("i", 1);
+    }
+    
+    // ========================================================================
 
     static PyObject* SL_VBox(PyObject* self, PyObject* args, PyObject* keywords)
     {
@@ -930,6 +943,18 @@ namespace SubutaiLauncher
     }
 
     // ========================================================================
+    //
+    static PyObject* SL_GetOSVersionNumber(PyObject* self, PyObject* args)
+    {
+        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+        Poco::Logger::get("subutai").trace("SL_GetPeerIP");
+
+        Environment env;
+        std::string version = env.versionNumber();
+        return Py_BuildValue("s", version.c_str());
+    }
+
+    // ========================================================================
 
 #if LAUNCHER_LINUX 
     static PyObject* SL_AddSystemdUnit(PyObject* self, PyObject* args, PyObject* keywords)
@@ -991,6 +1016,27 @@ namespace SubutaiLauncher
         std::sprintf(cmd, "desktop-file-install %s", sl_string);
         rp->addCommand(std::string(cmd));
         rp->execute("Setup Tray");
+        delete rp;
+        return Py_BuildValue("i", 0);
+    }
+
+    // ========================================================================
+
+    static PyObject* SL_InstallVBox(PyObject* self, PyObject* args, PyObject* keywords)
+    {
+        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+        Poco::Logger::get("subutai").trace("SL_InstallVBox");
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+            return NULL;
+
+        char cmd[1024];
+
+        RootProcess* rp = new RootProcess();
+        std::sprintf(cmd, "dpkg -i %s", sl_string);
+        rp->addCommand(std::string(cmd));
+        rp->addCommand("modprobe vboxnetadp");
+        rp->addCommand("modprobe vboxpci");
+        rp->execute("Setup VirtualBox");
         delete rp;
         return Py_BuildValue("i", 0);
     }
@@ -1057,6 +1103,7 @@ namespace SubutaiLauncher
         { "RaiseError", (PyCFunction)SL_RaiseError, METH_VARARGS | METH_KEYWORDS, "Raising error" },
         { "RaiseWarning", (PyCFunction)SL_RaiseWarning, METH_VARARGS | METH_KEYWORDS, "Raising warning" },
         { "RaiseInfo", (PyCFunction)SL_RaiseInfo, METH_VARARGS | METH_KEYWORDS, "Raising info" },
+        { "IsVBoxInstalled", SL_IsVBoxInstalled, METH_VARARGS, "Returns 0 if vbox is installed" },
         { "VBox", (PyCFunction)SL_VBox, METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something" },
         { "VBoxS", (PyCFunction)SL_VBoxS, METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something and returns status" },
         { "Shutdown", SL_Shutdown, METH_VARARGS, "Finalizes the script" },
@@ -1096,10 +1143,12 @@ namespace SubutaiLauncher
         { "GetMemSize", SL_GetMemSize, METH_VARARGS, "Return amount of memory" },
         { "GetPeerIP", SL_GetPeerIP, METH_VARARGS, "Returns Peer IP address" },
         { "IsPeerReady", (PyCFunction)SL_IsPeerReady, METH_VARARGS | METH_KEYWORDS, "Returns 0 if peer is ready or 1 if it's not" },
+        { "GetOSVersionNumber", SL_GetOSVersionNumber, METH_VARARGS, "Returns number of OS version" },
 #if LAUNCHER_LINUX
         { "AddSystemdUnit", (PyCFunction)SL_AddSystemdUnit, METH_VARARGS | METH_KEYWORDS, "Adds new systemd unit" },
         { "RemoveSystemdUnit", (PyCFunction)SL_RemoveSystemdUnit, METH_VARARGS | METH_KEYWORDS, "Removes systemd unit" },
         { "DesktopFileInstall", (PyCFunction)SL_DesktopFileInstall, METH_VARARGS | METH_KEYWORDS, "Runs desktop-file-install" },
+        { "InstallVBox", (PyCFunction)SL_InstallVBox, METH_VARARGS | METH_KEYWORDS, "Install virtualbox as root" },
 #endif
 #if LAUNCHER_WINDOWS
         { "RegisterPlugin", SL_RegisterPlugin, METH_VARARGS, "Registers a plugin in windows registry" },

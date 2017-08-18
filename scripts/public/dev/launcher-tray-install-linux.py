@@ -18,6 +18,8 @@ def subutaistart():
 
     subutai.AddStatus("Unpacking Tray")
 
+    call(['/usr/bin/killall', '-9', 'SubutaiTray'])
+
     tar = tarfile.open(tmpDir+"/"+tray, "r:gz")
     tar.extractall(installDir+"/bin/")
     tar.close()
