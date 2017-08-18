@@ -11,7 +11,7 @@ def subutaistart():
     m.update(datetime.datetime.now().isoformat().encode('utf-8'))
     machineName = "subutai-ld-" + m.hexdigest()[:5]
 
-    if subutai.IsVBoxInstalled != 0:
+    if subutai.IsVBoxInstalled() != 0:
         vnum = subutai.GetOSVersionNumber()
         subutai.AddStatus("Downloading VirtualBox for " + vnum)
         vboxfile = "virtualbox-5.1_xenial_amd64.deb"

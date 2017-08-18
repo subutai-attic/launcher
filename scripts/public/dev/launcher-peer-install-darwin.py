@@ -3,16 +3,55 @@ import hashlib
 from time import sleep
 import datetime
 from subprocess import call
-import zipfile
+from shutil import copyfile
+import os
+import stat
 
 
 def subutaistart():
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
 
+    if not os.path.exists(installDir+"bin/cocoasudo"):
+        subutai.AddStatus("Downloading cocoasudo application")
+        subutai.download("cocoasudo")
+        while subutai.isDownloadComplete() != 1:
+            sleep(0.05)
+
+        try:
+            copyfile(tmpDir+"cocoasudo", installDir+"bin/cocoasudo")
+            st = os.stat(installDir+"bin/cocoasudo")
+            os.chmod(installDir+"bin/cocoasudo", st.st_mode | stat.S_IEXEC)
+        except:
+            subutai.RaiseError("Failed to install cocoasudo. Aborting")
+            sleep(10)
+            return -99
+
     m = hashlib.md5()
     m.update(datetime.datetime.now().isoformat().encode('utf-8'))
     machineName = "subutai-dd-" + m.hexdigest()[:5]
+
+    if not os.path.exists("/Applications/VirtualBox.app"):
+        subutai.AddStatus("Downloading VirtualBox")
+        subutai.download("VirtualBox.pkg")
+        while subutai.isDownloadComplete() != 1:
+            sleep(0.05)
+
+        subutai.AddStatus("Installing VirtualBox")
+        try:
+            call([installDir+"bin/cocoasudo",
+                  '--prompt="Install VirtualBox"',
+                  'installer',
+                  '-pkg',
+                  tmpDir+'VirtualBox.pkg',
+                  '-target',
+                  '/'])
+        except:
+            subutai.RaiseError("Failed to install VirtualBox. Aborting")
+            sleep(10)
+            return 45
+
+
 
     call(['ssh-keygen', '-R', '[127.0.0.1]:4567'])
 

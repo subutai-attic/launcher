@@ -77,7 +77,7 @@ def subutaistart():
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>io.subutai.p2p.daemon</string> <!-- org.mongodb.mongodb perhaps? -->
+    <string>io.subutai.p2p.daemon</string>
 
     <key>ProgramArguments</key>
     <array>
@@ -93,6 +93,9 @@ def subutaistart():
 
     <key>StandardErrorPath</key>
     <string>/var/log/p2p.log</string>
+
+    <key>Debug</key>
+    <true/>
 </dict>
 </plist>
 '''.strip()
