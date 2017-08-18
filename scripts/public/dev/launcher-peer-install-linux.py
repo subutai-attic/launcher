@@ -3,13 +3,9 @@ import hashlib
 from time import sleep
 import datetime
 from subprocess import call
-import zipfile
 
 
 def subutaistart():
-    tmpDir = subutai.GetTmpDir()
-    installDir = subutai.GetInstallDir()
-
     m = hashlib.md5()
     m.update(datetime.datetime.now().isoformat().encode('utf-8'))
     machineName = "subutai-ld-" + m.hexdigest()[:5]
@@ -17,6 +13,8 @@ def subutaistart():
     call(['ssh-keygen', '-R', '[127.0.0.1]:4567'])
 
     subutai.SetSSHCredentials("subutai", "ubuntai", "127.0.0.1", 4567)
+
+    enableHostonlyif()
 
     if setupVm(machineName) != 0:
         subutai.RaiseError("Failed to install Virtual Machine. See the logs for details")
@@ -52,15 +50,6 @@ def subutaistart():
     sleep(10)
     installManagement()
     subutai.SetProgress(0.80)
-    #subutai.AddStatus("Waiting for management container to download")
-    #rc = waitManagementInstall()
-    #if rc == 1:
-    #    subutai.RaiseError("Failed to install management: Operating timed out")
-    #    sleep(10)
-    #    subutai.Shutdown()
-    #    return
-
-    subutai.SetProgress(0.42)
     sleep(30)
     stopVm(machineName)
     sleep(20)
@@ -234,8 +223,9 @@ def setupVm(machineName):
         subutai.VBox("modifyvm " + machineName + " --rtcuseutc on")
         sleep(10)
         adapterName = subutai.GetVBoxHostOnlyInterface()
-        adapterName = adapterName.replace(' ', '+++')
-        subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
+        if adapterName != 'undefined':
+            subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
+
         sleep(10)
 
     return 0
@@ -252,15 +242,21 @@ def reconfigureNic(machineName):
     subutai.VBox("modifyvm " + machineName + ' --natpf2 ssh-fwd,tcp,,4567,,22 --natpf2 https-fwd,tcp,,9999,,8443')
 
     adapterName = subutai.GetVBoxHostOnlyInterface()
-    ret = subutai.VBoxS("hostonlyif ipconfig " + adapterName + " --ip 192.168.56.1")
 
-    if ret == 1:
+    if adapterName != 'undefined':
+        subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
+
+    return
+
+def enableHostonlyif():
+    adapterName = subutai.GetVBoxHostOnlyInterface()
+
+    if adapterName == 'undefined':
         subutai.VBox("hostonlyif create")
+        adapterName = subutai.GetVBoxHostOnlyInterface()
         subutai.VBox("hostonlyif ipconfig " + adapterName + " --ip 192.168.56.1")
         subutai.VBox("dhcpserver add --ifname " + adapterName + " --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
         subutai.VBox("dhcpserver modify --ifname " + adapterName + " --enable")
-
-    subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
 
     return
 

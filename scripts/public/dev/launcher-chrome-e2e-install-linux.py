@@ -15,6 +15,11 @@ def subutaistart():
     try:
         call(['/usr/bin/gksudo',
               '--message',
+              'Install Google Chrome Dependencies',
+              'apt-get install libappindicator1 -y'])
+
+        call(['/usr/bin/gksudo',
+              '--message',
               'Install Google Chrome',
               'dpkg -i '+tmpDir+'google-chrome-stable_current_amd64.deb'])
         sleep(20)
@@ -24,15 +29,34 @@ def subutaistart():
 
     subutai.AddStatus("Installing Browser Plugin")
 
-    location = os.environ['HOME'] + '/.config/google-chrome/Default/External Extensions'
+    #location = os.environ['HOME'] + '/.config/google-chrome/Default/External Extensions'
+    location = '/opt/google/chrome/extensions/'
     if not os.path.exists(location):
-        os.makedirs(location)
+        try:
+            call(['/usr/bin/gksudo',
+                  '--message',
+                  'Create extension directory',
+                  'mkdir -p '+location])
+        except:
+            subutai.RaiseError("Failed to create "+location+" directory")
+            sleep(5)
+            return -22
 
-    ete = '{\n\t"external_update_url": "https://clients2.google.com/service/update2/crx"\n}'
+    ete = '{\n\t"external_update_url": "https://clients2.google.com/service/update2/crx"\n}\n'
 
-    f = open(location+"/kpmiofpmlciacjblommkcinncmneeoaa.json", 'w')
+    f = open(tmpDir+"kpmiofpmlciacjblommkcinncmneeoaa.json", 'w')
     f.write(ete)  # python will convert \n to os.linesep
     f.close()
+
+    try:
+        call(['/usr/bin/gksudo',
+              '--message',
+              'Create extension directory',
+              'cp '+tmpDir+'kpmiofpmlciacjblommkcinncmneeoaa.json '+location])
+    except:
+        subutai.RaiseError("Failed to move extension file")
+        sleep(5)
+        return -22
 
     subutai.Shutdown()
 
