@@ -1019,6 +1019,27 @@ namespace SubutaiLauncher
         delete rp;
         return Py_BuildValue("i", 0);
     }
+
+    // ========================================================================
+
+    static PyObject* SL_InstallVBox(PyObject* self, PyObject* args, PyObject* keywords)
+    {
+        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+        Poco::Logger::get("subutai").trace("SL_InstallVBox");
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+            return NULL;
+
+        char cmd[1024];
+
+        RootProcess* rp = new RootProcess();
+        std::sprintf(cmd, "dpkg -i %s", sl_string);
+        rp->addCommand(std::string(cmd));
+        rp->addCommand("modprobe vboxnetadp");
+        rp->addCommand("modprobe vboxpci");
+        rp->execute("Setup VirtualBox");
+        delete rp;
+        return Py_BuildValue("i", 0);
+    }
 #endif
 
     // ========================================================================
@@ -1127,6 +1148,7 @@ namespace SubutaiLauncher
         { "AddSystemdUnit", (PyCFunction)SL_AddSystemdUnit, METH_VARARGS | METH_KEYWORDS, "Adds new systemd unit" },
         { "RemoveSystemdUnit", (PyCFunction)SL_RemoveSystemdUnit, METH_VARARGS | METH_KEYWORDS, "Removes systemd unit" },
         { "DesktopFileInstall", (PyCFunction)SL_DesktopFileInstall, METH_VARARGS | METH_KEYWORDS, "Runs desktop-file-install" },
+        { "InstallVBox", (PyCFunction)SL_InstallVBox, METH_VARARGS | METH_KEYWORDS, "Install virtualbox as root" },
 #endif
 #if LAUNCHER_WINDOWS
         { "RegisterPlugin", SL_RegisterPlugin, METH_VARARGS, "Registers a plugin in windows registry" },
