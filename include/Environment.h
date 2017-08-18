@@ -100,6 +100,7 @@ namespace SubutaiLauncher {
 			bool killProcess(const std::string& name);
 			std::string getDesktopDirectory();
 #if LAUNCHER_WINDOWS
+			bool isVBoxInstalled();
 			bool writeE2ERegistry(const std::string& name);
 #endif
         private:

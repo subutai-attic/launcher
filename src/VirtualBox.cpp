@@ -50,6 +50,12 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::getPeers()
 
 bool SubutaiLauncher::VirtualBox::findInstallation()
 {
+#if LAUNCHER_WINDOWS
+	_logger->trace("Searching for VirtualBox in registry");
+	Environment e;
+	if (!e.isVBoxInstalled()) return false;
+#endif
+
     _logger->trace("Searching for VirtualBox installation in PATH");
     std::string path;
 #if LAUNCHER_MACOS
