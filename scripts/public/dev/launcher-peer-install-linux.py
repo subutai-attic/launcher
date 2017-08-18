@@ -6,9 +6,34 @@ from subprocess import call
 
 
 def subutaistart():
+    tmpDir = subutai.GetTmpDir()
     m = hashlib.md5()
     m.update(datetime.datetime.now().isoformat().encode('utf-8'))
     machineName = "subutai-ld-" + m.hexdigest()[:5]
+
+    if subutai.IsVBoxInstalled != 0:
+        vnum = subutai.GetOSVersionNumber()
+        subutai.AddStatus("Downloading VirtualBox for " + vnum)
+        vboxfile = "virtualbox-5.1_xenial_amd64.deb"
+        if vnum == "16.10":
+            vboxfile = "virtualbox-5.1_yakkety_amd64.deb"
+        elif vnum == "17.04":
+            vboxfile = "virtualbox-5.1_zesty_amd64.deb"
+
+        subutai.download(vboxfile)
+        while subutai.isDownloadComplete() != 1:
+            sleep(0.05)
+
+        subutai.AddStatus("Installing VirtualBox")
+        try:
+            call(['/usr/bin/gksudo',
+                  '--message',
+                  'Install VirtualBox',
+                  'dpkg -i '+tmpDir+vboxfile])
+        except:
+            subutai.RaiseError("Failed to install VirtualBox. Aborting")
+            sleep(10)
+            return 41
 
     call(['ssh-keygen', '-R', '[127.0.0.1]:4567'])
 
@@ -203,9 +228,9 @@ def setupVm(machineName):
         subutai.download("core.ova")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
-        subutai.VBox("import " +
-                     subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname "+machineName)
-        sleep(10)
+            subutai.VBox("import " +
+                         subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname "+machineName)
+            sleep(10)
 
         cpus = subutai.GetCoreNum()
         mem = subutai.GetMemSize() * 1024
