@@ -11,7 +11,10 @@ std::string SubutaiLauncher::VirtualBox::cloneName = "subutai";
 std::string SubutaiLauncher::VirtualBox::subutaiBranch = "subutai-dev";
 
 
-SubutaiLauncher::VirtualBox::VirtualBox()
+SubutaiLauncher::VirtualBox::VirtualBox() : 
+    _installed(false),
+    _running(false),
+    _updateRequired(false)
 {
     _logger = &Poco::Logger::get("subutai");
     _logger->trace("Starting VirtualBox instance");
@@ -79,7 +82,7 @@ bool SubutaiLauncher::VirtualBox::findInstallation()
         Poco::File f(fp);
         if (f.exists()) 
 		{
-            _logger->trace("VirtualBox installation found at %s", fp);
+            _logger->debug("VirtualBox installation found at %s", fp);
             _installed = true;
             _path = (*it);
             _location = _path;
@@ -88,7 +91,7 @@ bool SubutaiLauncher::VirtualBox::findInstallation()
             return true;
         }
     }
-    _logger->trace("VirtualBox installation was not found");
+    _logger->debug("VirtualBox installation was not found");
     return false;
 }
 

@@ -330,8 +330,7 @@ namespace SubutaiLauncher
         Poco::Logger::get("subutai").trace("SL_IsVBoxInstalled");
 
         VirtualBox vb;
-        vb.findInstallation();
-        if (vb.isInstalled()) return Py_BuildValue("i", 0);
+        if (vb.findInstallation()) return Py_BuildValue("i", 0);
         return Py_BuildValue("i", 1);
     }
     
