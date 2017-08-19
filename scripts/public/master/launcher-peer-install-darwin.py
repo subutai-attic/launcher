@@ -51,8 +51,6 @@ def subutaistart():
             sleep(10)
             return 45
 
-
-
     call(['ssh-keygen', '-R', '[127.0.0.1]:4567'])
 
     subutai.SetSSHCredentials("subutai", "ubuntai", "127.0.0.1", 4567)
@@ -91,13 +89,6 @@ def subutaistart():
     sleep(10)
     installManagement()
     subutai.SetProgress(0.80)
-    #subutai.AddStatus("Waiting for management container to download")
-    #rc = waitManagementInstall()
-    #if rc == 1:
-    #    subutai.RaiseError("Failed to install management: Operating timed out")
-    #    sleep(10)
-    #    subutai.Shutdown()
-    #    return
 
     subutai.SetProgress(0.42)
     sleep(30)
@@ -254,6 +245,8 @@ def setupVm(machineName):
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
 
+        subutai.AddStatus("VM Image downloaded")
+
     subutai.VBox("import " +
                  subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname "+machineName)
     sleep(10)
@@ -262,17 +255,11 @@ def setupVm(machineName):
     mem = subutai.GetMemSize() * 1024
 
     subutai.VBox("modifyvm " + machineName + " --cpus " + str(cpus))
-    sleep(10)
     subutai.VBox("modifyvm " + machineName + " --memory " + str(mem))
-    sleep(10)
     subutai.VBox("modifyvm " + machineName + " --nic1 nat")
-    sleep(10)
     subutai.VBox("modifyvm " + machineName + " --cableconnected1 on")
-    sleep(10)
     subutai.VBox("modifyvm " + machineName + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
-    sleep(10)
     subutai.VBox("modifyvm " + machineName + " --rtcuseutc on")
-    sleep(10)
     adapterName = subutai.GetVBoxHostOnlyInterface()
     adapterName = adapterName.replace(' ', '+++')
     subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
