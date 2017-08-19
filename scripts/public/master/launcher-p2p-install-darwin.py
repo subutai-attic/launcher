@@ -100,6 +100,8 @@ def subutaistart():
 </plist>
 '''.strip()
 
+    daemonFile = 'io.subutai.p2p.daemon.plist'
+
     try:
         f = open(tmpDir+'io.subutai.p2p.daemon.plist', 'w')
         f.write(service)
@@ -107,7 +109,7 @@ def subutaistart():
         call([installDir+"bin/cocoasudo",
               '--prompt="Install P2P Service"',
               'cp',
-              tmpDir+'io.subutai.p2p.daemon.plist',
+              tmpDir+daemonFile,
               '/Library/LaunchDaemons/'])
     except:
         subutai.RaiseError("Failed to create service file for p2p")
@@ -129,18 +131,20 @@ def subutaistart():
               tmpDir+'p2p.conf',
               '/etc/newsyslog.d/p2p.conf'])
     except:
-        subutai.AddStatus("Failed to configur P2P logger")
+        subutai.AddStatus("Failed to configure P2P logger")
 
     sleep(5)
 
+    subutai.AddStatus("Launching Daemon")
     try:
         call([installDir+"bin/cocoasudo",
               '--prompt="Start P2P Daemon"',
-              'launchctl',
+              '/bin/launchctl',
               'load',
-              '/Library/LaunchDaemons/io.subutai.p2p.daemon.plist'])
+              '/Library/LaunchDaemons/'+daemonFile])
     except:
         subutai.AddStatus("Failed to load P2P Service")
+        sleep(10)
 
     sleep(5)
     subutai.Shutdown()

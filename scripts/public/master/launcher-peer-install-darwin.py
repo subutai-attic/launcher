@@ -55,6 +55,8 @@ def subutaistart():
 
     subutai.SetSSHCredentials("subutai", "ubuntai", "127.0.0.1", 4567)
 
+    enableHostonlyif()
+
     if setupVm(machineName) != 0:
         subutai.RaiseError("Failed to install Virtual Machine. See the logs for details")
         subutai.Shutdown()
@@ -288,6 +290,19 @@ def reconfigureNic(machineName):
         subutai.VBox("dhcpserver modify --ifname " + adapterName + " --enable")
 
     subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
+
+    return
+
+
+def enableHostonlyif():
+    adapterName = subutai.GetVBoxHostOnlyInterface()
+
+    if adapterName == 'undefined':
+        subutai.VBox("hostonlyif create")
+        adapterName = subutai.GetVBoxHostOnlyInterface()
+        subutai.VBox("hostonlyif ipconfig " + adapterName + " --ip 192.168.56.1")
+        subutai.VBox("dhcpserver add --ifname " + adapterName + " --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
+        subutai.VBox("dhcpserver modify --ifname " + adapterName + " --enable")
 
     return
 
