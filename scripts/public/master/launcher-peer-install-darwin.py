@@ -253,29 +253,30 @@ def setupVm(machineName):
         subutai.download("core.ova")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
-        subutai.VBox("import " +
-                     subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname "+machineName)
-        sleep(10)
 
-        cpus = subutai.GetCoreNum()
-        mem = subutai.GetMemSize() * 1024
+    subutai.VBox("import " +
+                 subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname "+machineName)
+    sleep(10)
 
-        subutai.VBox("modifyvm " + machineName + " --cpus " + str(cpus))
-        sleep(10)
-        subutai.VBox("modifyvm " + machineName + " --memory " + str(mem))
-        sleep(10)
-        subutai.VBox("modifyvm " + machineName + " --nic1 nat")
-        sleep(10)
-        subutai.VBox("modifyvm " + machineName + " --cableconnected1 on")
-        sleep(10)
-        subutai.VBox("modifyvm " + machineName + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
-        sleep(10)
-        subutai.VBox("modifyvm " + machineName + " --rtcuseutc on")
-        sleep(10)
-        adapterName = subutai.GetVBoxHostOnlyInterface()
-        adapterName = adapterName.replace(' ', '+++')
-        subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
-        sleep(10)
+    cpus = subutai.GetCoreNum()
+    mem = subutai.GetMemSize() * 1024
+
+    subutai.VBox("modifyvm " + machineName + " --cpus " + str(cpus))
+    sleep(10)
+    subutai.VBox("modifyvm " + machineName + " --memory " + str(mem))
+    sleep(10)
+    subutai.VBox("modifyvm " + machineName + " --nic1 nat")
+    sleep(10)
+    subutai.VBox("modifyvm " + machineName + " --cableconnected1 on")
+    sleep(10)
+    subutai.VBox("modifyvm " + machineName + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
+    sleep(10)
+    subutai.VBox("modifyvm " + machineName + " --rtcuseutc on")
+    sleep(10)
+    adapterName = subutai.GetVBoxHostOnlyInterface()
+    adapterName = adapterName.replace(' ', '+++')
+    subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
+    sleep(10)
 
     return 0
 
