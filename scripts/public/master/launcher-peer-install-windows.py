@@ -7,15 +7,29 @@ import zipfile
 
 
 def subutaistart():
+    tmpDir = subutai.GetTmpDir()
+    installDir = subutai.GetInstallDir()
+
+    if subutai.IsVBoxInstalled() != 0:
+        subutai.AddStatus("Downloading VirtualBox")
+        vboxfile = "VirtualBox.exe"
+        subutai.download(vboxfile)
+        while subutai.isDownloadComplete() != 1:
+            sleep(0.05)
+
+        subutai.AddStatus("Installing VirtualBox")
+        try:
+            call([tmpDir+vboxfile, '-silent'])
+        except:
+            subutai.RaiseError("Failed to install VirtualBox. Aborting")
+            sleep(10)
+            return 45
 
     sshlib = "ssh.zip"
 
     subutai.download(sshlib)
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
-
-    tmpDir = subutai.GetTmpDir()
-    installDir = subutai.GetInstallDir()
 
     zfl = zipfile.ZipFile(tmpDir+"/"+sshlib, 'r')
     zfl.extractall(installDir+"/bin")

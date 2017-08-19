@@ -6,9 +6,26 @@ from subprocess import call
 
 
 def subutaistart():
+    tmpDir = subutai.GetTmpDir()
     m = hashlib.md5()
     m.update(datetime.datetime.now().isoformat().encode('utf-8'))
     machineName = "subutai-lm-" + m.hexdigest()[:5]
+
+    if subutai.IsVBoxInstalled() != 0:
+        vnum = subutai.GetOSVersionNumber()
+        subutai.AddStatus("Downloading VirtualBox for " + vnum)
+        vboxfile = "virtualbox-5.1_xenial_amd64.deb"
+        if vnum == "16.10":
+            vboxfile = "virtualbox-5.1_yakkety_amd64.deb"
+        elif vnum == "17.04":
+            vboxfile = "virtualbox-5.1_zesty_amd64.deb"
+
+        subutai.download(vboxfile)
+        while subutai.isDownloadComplete() != 1:
+            sleep(0.05)
+
+        subutai.AddStatus("Installing VirtualBox")
+        subutai.InstallVBox(tmpDir+vboxfile)
 
     call(['ssh-keygen', '-R', '[127.0.0.1]:4567'])
 
@@ -203,25 +220,20 @@ def setupVm(machineName):
         subutai.download("core.ova")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
+
         subutai.VBox("import " +
-                     subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname "+machineName)
+                         subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname "+machineName)
         sleep(10)
 
         cpus = subutai.GetCoreNum()
         mem = subutai.GetMemSize() * 1024
 
         subutai.VBox("modifyvm " + machineName + " --cpus " + str(cpus))
-        sleep(10)
         subutai.VBox("modifyvm " + machineName + " --memory " + str(mem))
-        sleep(10)
         subutai.VBox("modifyvm " + machineName + " --nic1 nat")
-        sleep(10)
         subutai.VBox("modifyvm " + machineName + " --cableconnected1 on")
-        sleep(10)
         subutai.VBox("modifyvm " + machineName + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
-        sleep(10)
         subutai.VBox("modifyvm " + machineName + " --rtcuseutc on")
-        sleep(10)
         adapterName = subutai.GetVBoxHostOnlyInterface()
         if adapterName != 'undefined':
             subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
@@ -247,6 +259,7 @@ def reconfigureNic(machineName):
         subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
 
     return
+
 
 def enableHostonlyif():
     adapterName = subutai.GetVBoxHostOnlyInterface()
