@@ -39,6 +39,7 @@ namespace SubutaiLauncher
         _logger->debug("Authenticating at %s%s/tray/login", URL, REST);
         // Lame way to auth on hub
         Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/tray/login?email="+_login+"&password="+_password);
+        //Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/tray/login");
         Poco::Net::HTMLForm pForm;
 
         pForm.add("email", _login);

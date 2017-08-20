@@ -102,49 +102,46 @@ def subutaistart():
 
     daemonFile = 'io.subutai.p2p.daemon.plist'
 
-    try:
-        f = open(tmpDir+'io.subutai.p2p.daemon.plist', 'w')
-        f.write(service)
-        f.close()
-        call([installDir+"bin/cocoasudo",
-              '--prompt="Install P2P Service"',
-              'cp',
-              tmpDir+daemonFile,
-              '/Library/LaunchDaemons/'])
-    except:
-        subutai.RaiseError("Failed to create service file for p2p")
-        return 25
+    f = open(tmpDir+daemonFile, 'w')
+    f.write(service)
+    f.close()
 
-    subutai.AddStatus("Configuring syslog")
     syslog = '''
 # logfilename          [owner:group]    mode count size when  flags [/pid_file] [sig_num]
 /var/log/p2p.log                       644  7     *    $D0   J
     '''.strip()
+    sf = open(tmpDir+'p2p.conf', 'w')
+    sf.write(syslog)
+    sf.close()
+
+    subutai.AddStatus("Configur P2P Daemon")
+    installScript = "#!/bin/bash\n\n"
+    installScript = installScript + "cp " + tmpDir + daemonFile + " /Library/LaunchDaemons/" + daemonFile + "\n"
+    installScript = installScript + "cp " + tmpDir + "p2p.conf /etc/newsyslog.d/p2p.conf\n"
+    installScript = installScript + "launchctl load /Library/LaunchDaemons/" + daemonFile + "\n"
+
+    f = open(tmpDir+"p2p-setup.sh", 'w')
+    f.write(installScript)
+    f.close()
 
     try:
-        sf = open(tmpDir+'p2p.conf', 'w')
-        sf.write(syslog)
-        sf.close()
-        call([installDir+"bin/cocoasudo",
-              '--prompt="Setup P2P Logger"',
-              'cp',
-              tmpDir+'p2p.conf',
-              '/etc/newsyslog.d/p2p.conf'])
+        st = os.stat(tmpDir+"p2p-setup.sh")
+        os.chmod(tmpDir+"p2p-setup.sh", st.st_mode | stat.S_IEXEC)
     except:
-        subutai.AddStatus("Failed to configure P2P logger")
-
-    sleep(5)
-
-    subutai.AddStatus("Launching Daemon")
-    try:
-        call([installDir+"bin/cocoasudo",
-              '--prompt="Start P2P Daemon"',
-              '/bin/launchctl',
-              'load',
-              '/Library/LaunchDaemons/'+daemonFile])
-    except:
-        subutai.AddStatus("Failed to load P2P Service")
+        subutai.RaiseError("Failed to configure p2p daemon")
         sleep(10)
+        return 31
+
+    try:
+        call([installDir+"bin/cocoasudo",
+              '--prompt="Setup P2P Daemon"',
+              'sudo',
+              tmpDir+"p2p-setup.sh",
+              ])
+    except:
+        subutai.RaiseError("Failed to install p2p daemon")
+        sleep(10)
+        return 22
 
     sleep(5)
     subutai.Shutdown()
