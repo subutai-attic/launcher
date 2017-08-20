@@ -12,18 +12,22 @@ Building on Windows
 * Download and compile Poco C++ Libraries
 * Set `POCO_ROOT` environment variable pointing to top Poco directory
 
-Building on Linux or MacOS
-==========================
+Building on Linux
+=================
 
-Simply running ordinary build commands should work:
+1. Download and compile Poco C++ Libraries
+```./configure --static --shared --omit=Data/ODBC,Data/MySQL,Data/PostgreeSQL --no-tests --no-samples```
+2. Download and compile cpython
+```./configure --prefix=/opt/subutai/python```
+3. Install libssh, libx11-dev, libfreetype6-dev, libxrandr-dev, libxinerama-dev, libxcomposite-dev, libxcursor-dev
+4. Configure with ./configure script. Use `--help` option to see available configuration options
+5. Build with make
 ```
-./configure
-make
+make ui
 ```
 
-If you with to customize build (e.g. choose different version of Python) then you should provide
-additional arguments to configure script. Run `./confugure --help` to learn more. Most of the
-options available is for developers only, so you may want to look at CONTRIBUTING.md as well.
+Building on MacOS
+=================
 
 File System
 ===========
