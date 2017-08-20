@@ -16,7 +16,7 @@ Building on Linux
 =================
 
 1. Download and compile Poco C++ Libraries
-```./configure --static --shared --omit=Data/ODBC,Data/MySQL,Data/PostgreeSQL --no-tests --no-samples```
+```./configure --static --shared --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL --no-tests --no-samples```
 2. Download and compile cpython
 ```./configure --prefix=/opt/subutai/python```
 3. Install libssh, libx11-dev, libfreetype6-dev, libxrandr-dev, libxinerama-dev, libxcomposite-dev, libxcursor-dev
