@@ -24,6 +24,7 @@ SubutaiLauncher::Downloader::Downloader() :
 	_content(""),
 	_done(true),
 	_running(false),
+    _noValidate(false),
 	_outputDir(".")
 {
 	_logger = &Poco::Logger::get("subutai");
@@ -230,6 +231,12 @@ void SubutaiLauncher::Downloader::downloadImpl()
 
 		if (f.exists())
 		{
+            if (_noValidate)
+            {
+                _done = true;
+                _running = false;
+                return;
+            }
 			_logger->information("File %s already exists", _file.name);
 			if (verifyDownload())
 			{
@@ -336,4 +343,9 @@ std::string SubutaiLauncher::Downloader::getFullPath() const
 	path.append(PATH_DELIM);
 	path.append(_file.name);
 	return path;
+}
+
+void SubutaiLauncher::Downloader::setNoValidate(bool nv)
+{
+    _noValidate = nv;
 }

@@ -4,6 +4,27 @@ from shutil import copyfile
 import os
 import stat
 from subprocess import call
+from subprocess import Popen, PIPE
+
+
+def getLines(foo):
+    return iter(foo.splitlines())
+
+
+def getPid(output):
+    lines = getLines(output)
+    for line in lines:
+        if "configd" in str(line) and "libexec" in str(line):
+            words = str(line).split(" ")
+            for w in words:
+                if w != "" and w != " ":
+                    try:
+                        int(w)
+                        return w
+                    except:
+                        print("")
+
+    return ""
 
 
 def subutaistart():
@@ -30,19 +51,6 @@ def subutaistart():
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
 
-    try:
-        call([installDir+"bin/cocoasudo",
-              '--prompt="Install TUNTAP driver"',
-              'installer',
-              '-pkg',
-              tmpDir+'tuntap_20150118.pkg',
-              '-target',
-              '/'])
-    except:
-        subutai.RaiseError("Failed to install TUNTAP driver. Aborting")
-        sleep(10)
-        return -98
-
     subutai.AddStatus("Download p2p binary")
 
     subutai.download("p2p_osx")
@@ -66,9 +74,6 @@ def subutaistart():
     except:
         subutai.RaiseError("Failed to make p2p binary executable")
         return 31
-
-    subutai.AddStatus("Creating symlink")
-    subutai.MakeLink(installDir+"/bin/p2p", "/usr/local/bin/p2p")
 
     subutai.AddStatus("Creating p2p service")
     service = '''
@@ -100,47 +105,56 @@ def subutaistart():
 </plist>
 '''.strip()
 
-    try:
-        f = open(tmpDir+'io.subutai.p2p.daemon.plist', 'w')
-        f.write(service)
-        f.close()
-        call([installDir+"bin/cocoasudo",
-              '--prompt="Install P2P Service"',
-              'cp',
-              tmpDir+'io.subutai.p2p.daemon.plist',
-              '/Library/LaunchDaemons/'])
-    except:
-        subutai.RaiseError("Failed to create service file for p2p")
-        return 25
+    daemonFile = 'io.subutai.p2p.daemon.plist'
 
-    subutai.AddStatus("Configuring syslog")
+    f = open(tmpDir+daemonFile, 'w')
+    f.write(service)
+    f.close()
+
     syslog = '''
 # logfilename          [owner:group]    mode count size when  flags [/pid_file] [sig_num]
 /var/log/p2p.log                       644  7     *    $D0   J
     '''.strip()
+    sf = open(tmpDir+'p2p.conf', 'w')
+    sf.write(syslog)
+    sf.close()
+
+    subutai.AddStatus("Configure P2P Daemon")
+    installScript = "#!/bin/bash\n\n"
+    installScript = installScript + "cp " + tmpDir + daemonFile + " /Library/LaunchDaemons/" + daemonFile + "\n"
+    installScript = installScript + "cp " + tmpDir + "p2p.conf /etc/newsyslog.d/p2p.conf\n"
+    installScript = installScript + "launchctl load /Library/LaunchDaemons/" + daemonFile + "\n"
+    installScript = installScript + "installer -pkg " + tmpDir + "tuntap_20150118.pkg -target /\n"
+    installScript = installScript + "ln -s "+installDir+"/bin/p2p /usr/local/bin/p2p\n"
+#installScript = installScript + "sudo launchctl bsexec "+pid+" sudo launchctl load /Library/LaunchDaemons/" + daemonFile + "\n"
+    #installScript = installScript + 'osascript -e "do shell script \\"launchctl load /Library/LaunchDaemons/' + daemonFile + '\\" with administrator privileges"\n'
+
+    f = open(tmpDir+"p2p-setup.sh", 'w')
+    f.write(installScript)
+    f.close()
 
     try:
-        sf = open(tmpDir+'p2p.conf', 'w')
-        sf.write(syslog)
-        sf.close()
-        call([installDir+"bin/cocoasudo",
-              '--prompt="Setup P2P Logger"',
-              'cp',
-              tmpDir+'p2p.conf',
-              '/etc/newsyslog.d/p2p.conf'])
+        st = os.stat(tmpDir+"p2p-setup.sh")
+        os.chmod(tmpDir+"p2p-setup.sh", st.st_mode | stat.S_IEXEC)
     except:
-        subutai.AddStatus("Failed to configur P2P logger")
-
-    sleep(5)
+        subutai.RaiseError("Failed to configure p2p daemon")
+        sleep(10)
+        return 31
 
     try:
-        call([installDir+"bin/cocoasudo",
-              '--prompt="Start P2P Daemon"',
-              'launchctl',
-              'load',
-              '/Library/LaunchDaemons/io.subutai.p2p.daemon.plist'])
+        script = 'do shell script "'+tmpDir+'p2p-setup.sh" with administrator privileges'
+        p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+        stdout, stderr = p.communicate(script)
+        #call(['/usr/bin/osascript', '-e', '"do shell script \"/bin/bash '+tmpDir+'p2p-setup.sh\" with administrator privileges"'])
+        #call([installDir+"bin/cocoasudo",
+        #      '--prompt="Setup P2P Daemon"',
+        #      'sudo',
+        #      tmpDir+"p2p-setup.sh",
+        #      ])
     except:
-        subutai.AddStatus("Failed to load P2P Service")
+        subutai.RaiseError("Failed to install p2p daemon")
+        sleep(10)
+        return 22
 
     sleep(5)
     subutai.Shutdown()
