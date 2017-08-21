@@ -26,13 +26,15 @@ def subutaistart():
     subutai.ProcessKill("ssh.exe")
     subutai.ProcessKill("ssh-keygen.exe")
 
-    zf = zipfile.ZipFile(tmpDir+"/"+tray, 'r')
-    zf.extractall(installDir)
-    zf.close()
-
-    zfl = zipfile.ZipFile(tmpDir+"/"+sshlib, 'r')
-    zfl.extractall(installDir+"/bin")
-    zfl.close()
+    try:
+        zf = zipfile.ZipFile(tmpDir+"/"+tray, 'r')
+        zf.extractall(installDir)
+        zf.close()
+        zfl = zipfile.ZipFile(tmpDir+"/"+sshlib, 'r')
+        zfl.extractall(installDir+"/bin")
+        zfl.close()
+    except:
+        subutai.RaiseError("Failed to replace tray")
 
     subutai.CreateDesktopShortcut(installDir+"/tray/SubutaiTray.exe",
                                   "Subutai Tray")
