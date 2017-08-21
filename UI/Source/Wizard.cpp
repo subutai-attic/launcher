@@ -299,7 +299,7 @@ void Wizard::runInstall()
 
 void Wizard::stepCompleted(const std::string& name)
 {
-	_logger->debug("********* stepCompleted : %s", name.c_str());
+    _logger->trace("stepCompleted ~ %s", name);
 	if (_shutdown)
 	{
 		return;
@@ -358,11 +358,12 @@ void Wizard::finish(bool canceled)
 		_finishPage->finalize();
 	}
 
-	auto c = _componentChooserPage->getComponents();
-	_finishPage->addPTPResult(c.ptp, _ptpInstall->succeed());
-	_finishPage->addTrayResult(c.tray, _trayInstall->succeed());
-	_finishPage->addETEResult(c.ete, _eteInstall->succeed());
-	_finishPage->addPeerResult(c.peer, _peerInstall->succeed());
+	//auto c = _componentChooserPage->getComponents();
+    auto settings = SubutaiLauncher::Session::instance()->getSettings()->getInstallationSettings();
+	_finishPage->addPTPResult(settings.installP2P, _ptpInstall->succeed());
+	_finishPage->addTrayResult(settings.installTray, _trayInstall->succeed());
+	_finishPage->addETEResult(settings.installE2E, _eteInstall->succeed());
+	_finishPage->addPeerResult(settings.installPeer, _peerInstall->succeed());
 	_finishPage->setVisible(true);
 
 	_stepFinal.setColour(Label::textColourId, juce::Colour(7, 141, 208));
