@@ -8,18 +8,20 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
 	_logger = &Poco::Logger::get("subutai");
 	_logger->debug("Starting scripting language interface");
 #if LAUNCHER_LINUX
-	std::string some_path = "/opt/subutai/bin/Lib";
+	std::string sPath = "/opt/subutai/bin/Lib";
 #elif LAUNCHER_MACOS
-	std::string some_path = "/Users/mike/projects/launcher/bin/Lib";
+	std::string sPath = "/usr/local/share/subutai/python";
 #endif
 
 #if LAUNCHER_MACOS || LAUNCHER_LINUX
+    /*
 	PyObject *pSearchPathList = PyList_New(0);
-	PyObject *pPath = PyUnicode_FromString(some_path.c_str());
+	PyObject *pPath = PyUnicode_FromString(sPath.c_str());
 	PyList_Append(pSearchPathList, pPath);
 	Py_DECREF(pPath);
 	PySys_SetObject("prefix", pSearchPathList);
 	Py_DECREF(pSearchPathList);
+    */
 #endif
 
 	if (dir != "/")
@@ -136,7 +138,7 @@ void SubutaiLauncher::SL::execute()
 #else
 		Sleep(100);
 #endif
-}
+	}
 	ncenter->clear();
 	ncenter->start();
 	_running = true;
@@ -183,10 +185,8 @@ void SubutaiLauncher::SL::execute()
 	}
 
 	//Py_DECREF(_name);
-    /*
 	Py_DECREF(PyImport_ImportModule("threading"));
 	PyEval_InitThreads();
-    */
 
 	PyObject *pFunc, *pArgs, *pValue;
 	if (!(_module == NULL || _module == 0))
@@ -229,7 +229,7 @@ void SubutaiLauncher::SL::execute()
 		}
 		Py_XDECREF(pFunc);
 		Py_DECREF(_module);
-		}
+	}
 	else
 	{
 		PyErr_Print();
@@ -262,4 +262,3 @@ bool SubutaiLauncher::SL::running()
 {
 	return _running;
 }
-

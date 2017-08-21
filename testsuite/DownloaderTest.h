@@ -27,6 +27,21 @@
 #include "Poco/JSON/JSONException.h"
 #include "Poco/Dynamic/Var.h"
 
+#include "SubutaiLauncher.h"
+
+class SlDownloaderThreadWorker {
+private:
+	SubutaiLauncher::Downloader* _downloader;
+public:
+	SlDownloaderThreadWorker(SubutaiLauncher::Downloader* downloader) : _downloader(downloader) {
+	}
+	~SlDownloaderThreadWorker() {/*do nothing*/ }
+
+	void Run() {
+		_downloader->downloadImpl();
+	}
+};
+
 class DownloaderTest : public CppUnit::TestCase
 {
 public:

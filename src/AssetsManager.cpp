@@ -4,6 +4,9 @@ namespace SubutaiLauncher
 {
     const std::vector<std::string> AssetsManager::ASSETS_LIST({
             "launcher-logo.png",
+            "user.png",
+            "password.png",
+#if !LIGHT_MODE
             "launcher-facebook-active.png",
             "launcher-facebook-inactive.png",
             "launcher-twitter-active.png",
@@ -21,6 +24,7 @@ namespace SubutaiLauncher
             "launcher-templates-inactive.png",
             "launcher-community-active.png",
             "launcher-community-inactive.png",
+#endif
             "launcher-robot.png"
             });
 
@@ -48,15 +52,14 @@ namespace SubutaiLauncher
         for (auto it = ASSETS_LIST.begin(); it != ASSETS_LIST.end(); it++)
         {
             // Uncomment this to bypass verification
-            continue;
+            //continue;
             _logger->trace("Downloading %s", (*it));
             pDownloader->reset();
             pDownloader->setFilename((*it));
             if (pDownloader->retrieveFileInfo())
             {
                 _logger->trace("Downloading asset: %s", (*it));
-                auto t = pDownloader->download();
-                t.join();
+                pDownloader->downloadImpl(); // :-P
             }
             else
             {
@@ -79,8 +82,7 @@ namespace SubutaiLauncher
         if (pDownloader->retrieveFileInfo())
         {
             _logger->trace("Downloading asset: %s", name);
-            auto t = pDownloader->download();
-            t.join();
+            pDownloader->downloadImpl();
         }
         else
         {

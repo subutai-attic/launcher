@@ -11,7 +11,10 @@ std::string SubutaiLauncher::VirtualBox::cloneName = "subutai";
 std::string SubutaiLauncher::VirtualBox::subutaiBranch = "subutai-dev";
 
 
-SubutaiLauncher::VirtualBox::VirtualBox()
+SubutaiLauncher::VirtualBox::VirtualBox() : 
+    _installed(false),
+    _running(false),
+    _updateRequired(false)
 {
     _logger = &Poco::Logger::get("subutai");
     _logger->trace("Starting VirtualBox instance");
@@ -37,10 +40,12 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::getPeers()
 	_logger->trace("Executing %s", _path);
     Poco::Pipe pOut;
     Poco::ProcessHandle ph = Poco::Process::launch(_path, args, 0, &pOut, 0);
-    ph.wait();
+    int pExitCode = ph.wait();
+	_logger->trace("vboxmanage list vms completed with exit code %d", pExitCode);
     Poco::PipeInputStream istr(pOut);
     std::string buffer;
     Poco::StreamCopier::copyToString(istr, buffer);
+	_logger->trace("vboxmanage list vms output: %s", buffer);
 
     std::vector<SubutaiVM> peers = VirtualBox::parseVms(buffer);
     return peers;
@@ -48,6 +53,12 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::getPeers()
 
 bool SubutaiLauncher::VirtualBox::findInstallation()
 {
+#if LAUNCHER_WINDOWS
+	_logger->trace("Searching for VirtualBox in registry");
+	Environment e;
+	if (!e.isVBoxInstalled()) return false;
+#endif
+
     _logger->trace("Searching for VirtualBox installation in PATH");
     std::string path;
 #if LAUNCHER_MACOS
@@ -71,7 +82,7 @@ bool SubutaiLauncher::VirtualBox::findInstallation()
         Poco::File f(fp);
         if (f.exists()) 
 		{
-            _logger->trace("VirtualBox installation found at %s", fp);
+            _logger->debug("VirtualBox installation found at %s", fp);
             _installed = true;
             _path = (*it);
             _location = _path;
@@ -80,7 +91,7 @@ bool SubutaiLauncher::VirtualBox::findInstallation()
             return true;
         }
     }
-    _logger->trace("VirtualBox installation was not found");
+    _logger->debug("VirtualBox installation was not found");
     return false;
 }
 
@@ -155,7 +166,7 @@ std::vector<SubutaiLauncher::SubutaiVM> SubutaiLauncher::VirtualBox::parseVms(co
 #if LAUNCHER_LINUX || LAUNCHER_MACOS
         sscanf(line, "\"%[^\"]\" {%s}", vmname, vmid);
 #elif LAUNCHER_WINDOWS
-        sscanf_s(line, "\"%s\" {%s}", vmname, bsize, vmid, bsize);
+		sscanf_s(line, "\"%[^\"]\" {%s}", vmname, bsize, vmid, bsize);
 #endif
         SubutaiVM v;
         v.name = std::string(vmname);
@@ -257,16 +268,20 @@ std::string SubutaiLauncher::VirtualBox::getBridgedInterface(const std::string& 
 
 std::string SubutaiLauncher::VirtualBox::getMachineInfo(const std::string& name) 
 {
+	_logger->debug("Getting %s machine info", name);
     Poco::Process::Args args;
     args.push_back("showvminfo");
     args.push_back(name);
+	args.push_back("--machinereadable");
 
     Poco::Pipe pOut;
     Poco::ProcessHandle ph = Poco::Process::launch(_path, args, 0, &pOut, 0);
-    ph.wait();
+    int pExitCode = ph.wait();
+	_logger->trace("showvminfo executed with error code %d", pExitCode);
     Poco::PipeInputStream istr(pOut);
     std::string buffer;
     Poco::StreamCopier::copyToString(istr, buffer);
+	_logger->trace("showvminfo output: %s", buffer);
     return buffer;
 }
 
@@ -292,24 +307,31 @@ bool SubutaiLauncher::VirtualBox::isMachineRunning(const std::string& name)
     auto list = getPeers();
     for (auto it = list.begin(); it != list.end(); it++) 
 	{
+		_logger->trace("Checking machine %s", (*it).name);
         if ((*it).name == name) 
 		{
+			_logger->trace("Machine %s has been found", name);
             auto info = getMachineInfo(name);
             Poco::StringTokenizer lines(info, "\n", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
             for (auto line = lines.begin(); line != lines.end(); line++) 
 			{
-                if ((*line).substr(0, 6) == "State:") 
+                if ((*line).substr(0, 7) == "VMState") 
 				{
                     auto p = (*line).find("running", 0);
                     if (p != std::string::npos) 
 					{
+						_logger->trace("Machine %s is running", name);
                         return true;
                     } 
+					_logger->trace("Machine %s is stopped", name);
                     return false;
                 }
             }
+			_logger->error("State line was not found in output");
+			return false;
         }
     }
+	_logger->error("Machine %s has not been found", name);
     return false;
 }
 

@@ -7,6 +7,23 @@ import zipfile
 
 
 def subutaistart():
+    tmpDir = subutai.GetTmpDir()
+    installDir = subutai.GetInstallDir()
+
+    if subutai.IsVBoxInstalled() != 0:
+        subutai.AddStatus("Downloading VirtualBox")
+        vboxfile = "VirtualBox.exe"
+        subutai.download(vboxfile)
+        while subutai.isDownloadComplete() != 1:
+            sleep(0.05)
+
+        subutai.AddStatus("Installing VirtualBox")
+        try:
+            call([tmpDir+vboxfile, '-silent'])
+        except:
+            subutai.RaiseError("Failed to install VirtualBox. Aborting")
+            sleep(10)
+            return 45
 
     sshlib = "ssh.zip"
 
@@ -14,16 +31,13 @@ def subutaistart():
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
 
-    tmpDir = subutai.GetTmpDir()
-    installDir = subutai.GetInstallDir()
-
     zfl = zipfile.ZipFile(tmpDir+"/"+sshlib, 'r')
     zfl.extractall(installDir+"/bin")
     zfl.close()
 
     m = hashlib.md5()
     m.update(datetime.datetime.now().isoformat().encode('utf-8'))
-    machineName = "subutai-w" + m.hexdigest()[:5]
+    machineName = "subutai-wd-" + m.hexdigest()[:5]
 
     installDir = subutai.GetInstallDir()
     call([installDir+'/bin/ssh-keygen.exe', '-R', '[127.0.0.1]:4567'])
@@ -36,8 +50,19 @@ def subutaistart():
         return
 
     subutai.SetProgress(0.04)
-    sleep(6)
+    sleep(10)
     startVm(machineName)
+    sleep(40)
+    if subutai.CheckVMRunning(machineName) != 0:
+        subutai.AddStatus("Failed to start VM. Retrying")
+        startVm(machineName)
+        sleep(50)
+
+    if subutai.CheckVMRunning(machineName) != 0:
+        subutai.RaiseError("Failed to start VM. Aborting")
+        sleep(15)
+        return 21
+
     sleep(60)
     waitSSH()
     sleep(60)
@@ -64,12 +89,35 @@ def subutaistart():
     subutai.SetProgress(0.42)
     sleep(30)
     stopVm(machineName)
+    sleep(20)
+    if subutai.CheckVMRunning(machineName) == 0:
+        subutai.AddStatus("Failed to stop VM. Retrying")
+        stopVm(machineName)
+        sleep(20)
+
+    if subutai.CheckVMRunning(machineName) == 0:
+        subutai.RaiseError("Failed to stop VM. Retrying")
+        sleep(20)
+        return 22
+
     subutai.SetProgress(0.82)
     sleep(5)
     reconfigureNic(machineName)
     subutai.SetProgress(0.9)
     sleep(5)
     startVm(machineName)
+    subutai.SetProgress(0.93)
+    sleep(50)
+    if subutai.CheckVMRunning(machineName) != 0:
+        subutai.AddStatus("Failed to start VM. Retrying")
+        startVm(machineName)
+        sleep(50)
+
+    if subutai.CheckVMRunning(machineName) != 0:
+        subutai.RaiseError("Failed to start VM. Aborting")
+        sleep(15)
+        return 21
+
     subutai.SetProgress(1.0)
 
     subutai.Shutdown()
@@ -179,7 +227,7 @@ def startVm(machineName):
 def stopVm(machineName):
     subutai.SSHRun("sync")
     subutai.log("info", "Stopping Virtual machine")
-    if subutai.CheckVMRunning(machineName) != 0:
+    if subutai.CheckVMRunning(machineName) == 0:
         subutai.VBox("controlvm " + machineName + " poweroff soft")
 
     return
@@ -193,24 +241,28 @@ def setupVm(machineName):
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
         subutai.VBox("import " +
-                     subutai.GetTmpDir().replace(" ", "+++") + "core.ova")
+                     subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname "+machineName)
         sleep(10)
-        ret = subutai.VBoxS("modifyvm core --name " + machineName)
-        if ret != 0:
-            return 1
 
         cpus = subutai.GetCoreNum()
         mem = subutai.GetMemSize() * 1024
 
         subutai.VBox("modifyvm " + machineName + " --cpus " + str(cpus))
+        sleep(10)
         subutai.VBox("modifyvm " + machineName + " --memory " + str(mem))
+        sleep(10)
         subutai.VBox("modifyvm " + machineName + " --nic1 nat")
+        sleep(10)
         subutai.VBox("modifyvm " + machineName + " --cableconnected1 on")
+        sleep(10)
         subutai.VBox("modifyvm " + machineName + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
+        sleep(10)
         subutai.VBox("modifyvm " + machineName + " --rtcuseutc on")
+        sleep(10)
         adapterName = subutai.GetVBoxHostOnlyInterface()
         adapterName = adapterName.replace(' ', '+++')
         subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
+        sleep(10)
 
     return 0
 

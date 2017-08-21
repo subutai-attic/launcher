@@ -11,6 +11,7 @@
 #include "Downloader.h"
 #include "Settings.h"
 #include "NotificationCenter.h"
+#include "Hub.h"
 
 namespace SubutaiLauncher 
 {
@@ -23,6 +24,7 @@ namespace SubutaiLauncher
             Downloader* getDownloader();
             Settings* getSettings();
             NotificationCenter* getNotificationCenter();
+            Hub* getHub();
             void setSSHCredentials(const std::string& user, const std::string& pass, const std::string& hostname, long port);
             std::string getSSHUser();
             std::string getSSHPass();
@@ -40,6 +42,7 @@ namespace SubutaiLauncher
             Downloader* _downloader;
             Settings* _settings;
             NotificationCenter* _notificationCenter;
+            Hub* _hub;
             std::string _sshUser;
             std::string _sshPass;
             std::string _sshHostname;

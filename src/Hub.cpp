@@ -24,21 +24,27 @@ namespace SubutaiLauncher
 
     void Hub::setLogin(std::string login) 
     {
+        _logger->trace("Setting user login: %s", login);
         _login = login;
     }
 
     void Hub::setPassword(std::string password) 
     {
+        _logger->trace("Setting user password");
         _password = password;
     }
 
     bool Hub::auth() 
     {
         _logger->debug("Authenticating at %s%s/tray/login", URL, REST);
-        Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/tray/login");
+        // Lame way to auth on hub
+        Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/tray/login?email="+_login+"&password="+_password);
+        //Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/tray/login");
         Poco::Net::HTMLForm pForm;
+
         pForm.add("email", _login);
         pForm.add("password", _password);
+        pRequest.setContentType("application/json");
         pForm.prepareSubmit(pRequest);
         _session.sendRequest(pRequest);
 
@@ -49,6 +55,7 @@ namespace SubutaiLauncher
         _logger->trace("Received during login: %s", pBuffer);
         if (pResponse.getStatus() == Poco::Net::HTTPResponse::HTTP_OK) 
         {
+            _logger->information("Hub login is OK");
             std::vector<Poco::Net::HTTPCookie> pCookies;
             pResponse.getCookies(pCookies);
             for (auto it = pCookies.begin(); it != pCookies.end(); it++)
@@ -78,6 +85,57 @@ namespace SubutaiLauncher
             return true;
         }
         return false;
+    }
+
+    void Hub::addLogLine(HubLogLevel level, const std::string& message)
+    {
+        HubLog l;
+        l.level = level;
+        l.message = message;
+        _logs.push_back(l);
+    }
+
+    void Hub::sendLogs()
+    {
+        for (auto it = _logs.begin(); it != _logs.end(); it++)
+        {
+            sendLog((*it).level, (*it).message);
+        }
+        _logs.clear();
+    }
+
+    void Hub::sendLog(HubLogLevel level, const std::string& message)
+    {
+        std::string status = "info";
+        if (level == HL_WARNING) status = "warning";
+        else if (level == HL_ERROR) status = "error";
+        else if (level == HL_FATAL) status = "fatal";
+        std::string json("{");
+        json.append("\"uuid\": \"bd8a1439-ee45-4b6f-b3cd-ca60a0f8d61b\",");
+        json.append("\"step\": \"install\",");
+        json.append("\"problem\": \""+message+"\",");
+        json.append("\"info\": \""+_login+"\",");
+        json.append("\"status\": \""+status+"\"");
+        json.append("}");
+        
+        _logger->trace("Sending log %s", json);
+        Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/launcher/status");
+        pRequest.setCookies(_cookies);
+        pRequest.setContentLength(json.length());
+        std::ostream& pStr = _session.sendRequest(pRequest);
+        pStr << json;
+
+        Poco::Net::HTTPResponse pResponse;
+        std::istream& rs = _session.receiveResponse(pResponse);
+        std::string pBuffer;
+        Poco::StreamCopier::copyToString(rs, pBuffer);
+        _logger->trace("Received during log sending: %s", pBuffer);
+        if (pResponse.getStatus() == Poco::Net::HTTPResponse::HTTP_OK) 
+        {
+            _logger->debug("Log sent ok");
+            return;
+        }
+        _logger->error("Log sent failed");
     }
 
 }

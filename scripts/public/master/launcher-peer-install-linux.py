@@ -6,13 +6,32 @@ from subprocess import call
 
 
 def subutaistart():
+    tmpDir = subutai.GetTmpDir()
     m = hashlib.md5()
     m.update(datetime.datetime.now().isoformat().encode('utf-8'))
-    machineName = "subutai-l" + m.hexdigest()[:5]
+    machineName = "subutai-lm-" + m.hexdigest()[:5]
+
+    if subutai.IsVBoxInstalled() != 0:
+        vnum = subutai.GetOSVersionNumber()
+        subutai.AddStatus("Downloading VirtualBox for " + vnum)
+        vboxfile = "virtualbox-5.1_xenial_amd64.deb"
+        if vnum == "16.10":
+            vboxfile = "virtualbox-5.1_yakkety_amd64.deb"
+        elif vnum == "17.04":
+            vboxfile = "virtualbox-5.1_zesty_amd64.deb"
+
+        subutai.download(vboxfile)
+        while subutai.isDownloadComplete() != 1:
+            sleep(0.05)
+
+        subutai.AddStatus("Installing VirtualBox")
+        subutai.InstallVBox(tmpDir+vboxfile)
 
     call(['ssh-keygen', '-R', '[127.0.0.1]:4567'])
 
     subutai.SetSSHCredentials("subutai", "ubuntai", "127.0.0.1", 4567)
+
+    enableHostonlyif()
 
     if setupVm(machineName) != 0:
         subutai.RaiseError("Failed to install Virtual Machine. See the logs for details")
@@ -20,8 +39,19 @@ def subutaistart():
         return
 
     subutai.SetProgress(0.04)
-    sleep(6)
+    sleep(10)
     startVm(machineName)
+    sleep(40)
+    if subutai.CheckVMRunning(machineName) != 0:
+        subutai.AddStatus("Failed to start VM. Retrying")
+        startVm(machineName)
+        sleep(50)
+
+    if subutai.CheckVMRunning(machineName) != 0:
+        subutai.RaiseError("Failed to start VM. Aborting")
+        sleep(15)
+        return 21
+
     sleep(60)
     waitSSH()
     sleep(60)
@@ -37,23 +67,37 @@ def subutaistart():
     sleep(10)
     installManagement()
     subutai.SetProgress(0.80)
-    #subutai.AddStatus("Waiting for management container to download")
-    #rc = waitManagementInstall()
-    #if rc == 1:
-    #    subutai.RaiseError("Failed to install management: Operating timed out")
-    #    sleep(10)
-    #    subutai.Shutdown()
-    #    return
-
-    subutai.SetProgress(0.42)
     sleep(30)
     stopVm(machineName)
+    sleep(20)
+    if subutai.CheckVMRunning(machineName) == 0:
+        subutai.AddStatus("Failed to stop VM. Retrying")
+        stopVm(machineName)
+        sleep(20)
+
+    if subutai.CheckVMRunning(machineName) == 0:
+        subutai.RaiseError("Failed to stop VM. Retrying")
+        sleep(20)
+        return 22
+
     subutai.SetProgress(0.82)
     sleep(5)
     reconfigureNic(machineName)
     subutai.SetProgress(0.9)
     sleep(5)
     startVm(machineName)
+    subutai.SetProgress(0.93)
+    sleep(50)
+    if subutai.CheckVMRunning(machineName) != 0:
+        subutai.AddStatus("Failed to start VM. Retrying")
+        startVm(machineName)
+        sleep(50)
+
+    if subutai.CheckVMRunning(machineName) != 0:
+        subutai.RaiseError("Failed to start VM. Aborting")
+        sleep(15)
+        return 21
+
     subutai.SetProgress(1.0)
 
     subutai.Shutdown()
@@ -81,7 +125,7 @@ def installManagement():
         subutai.RaiseError("Failed to determine peer IP address")
         return
 
-    ip = "127.0.0.1:9999"
+    ip = "127.0.0.1"
 
     subutai.AddStatus("Downloading Ubuntu")
     subutai.SSHRun("sudo subutai -d import ubuntu16 1>/tmp/ubuntu16-1.log 2>/tmp/ubuntu16-2.log")
@@ -103,8 +147,8 @@ def installManagement():
 
 
 def waitManagementInstall():
-    rsize = subutai.GetRemoteTemplateSize("management-subutai-template_4.0.16-dev_amd64.tar.gz")
-    dsize = subutai.GetPeerFileSize("/var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_4.0.16-dev_amd64.tar.gz")
+    rsize = subutai.GetRemoteTemplateSize("management-subutai-template_4.0.16-master_amd64.tar.gz")
+    dsize = subutai.GetPeerFileSize("/var/snap/subutai-master/common/lxc/tmpdir/management-subutai-template_4.0.16-master_amd64.tar.gz")
 
     timeout = datetime.datetime.now() + datetime.timedelta(0, 120)
 
@@ -124,7 +168,7 @@ def waitManagementInstall():
 def installSnapFromStore():
     subutai.AddStatus("Installing Subutai")
     subutai.log("info", "Installing subutai snap")
-    subutai.SSHRun("sudo snap install --beta --devmode subutai-dev")
+    subutai.SSHRun("sudo snap install --beta --devmode subutai-master")
 
     return
 
@@ -132,14 +176,14 @@ def installSnapFromStore():
 def initBtrfs():
     subutai.log("info", "Initializing BTRFS")
     subutai.AddStatus("Initializing BTRFS")
-    subutai.SSHRun("sudo subutai-dev.btrfsinit /dev/sdb")
+    subutai.SSHRun("sudo subutai-master.btrfsinit /dev/sdb")
 
     return
 
 
 def setAlias():
     subutai.log("info", "Setting Alias")
-    subutai.SSHRun("sudo bash -c 'snap alias subutai-dev subutai'")
+    subutai.SSHRun("sudo bash -c 'snap alias subutai-master subutai'")
 
     return
 
@@ -163,7 +207,7 @@ def startVm(machineName):
 def stopVm(machineName):
     subutai.SSHRun("sync")
     subutai.log("info", "Stopping Virtual machine")
-    if subutai.CheckVMRunning(machineName) != 0:
+    if subutai.CheckVMRunning(machineName) == 0:
         subutai.VBox("controlvm " + machineName + " poweroff soft")
 
     return
@@ -176,12 +220,10 @@ def setupVm(machineName):
         subutai.download("core.ova")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
+
         subutai.VBox("import " +
-                     subutai.GetTmpDir().replace(" ", "+++") + "core.ova")
+                         subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname "+machineName)
         sleep(10)
-        ret = subutai.VBoxS("modifyvm core --name " + machineName)
-        if ret != 0:
-            return 1
 
         cpus = subutai.GetCoreNum()
         mem = subutai.GetMemSize() * 1024
@@ -193,8 +235,10 @@ def setupVm(machineName):
         subutai.VBox("modifyvm " + machineName + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
         subutai.VBox("modifyvm " + machineName + " --rtcuseutc on")
         adapterName = subutai.GetVBoxHostOnlyInterface()
-        adapterName = adapterName.replace(' ', '+++')
-        subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
+        if adapterName != 'undefined':
+            subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
+
+        sleep(10)
 
     return 0
 
@@ -204,23 +248,28 @@ def reconfigureNic(machineName):
     subutai.log("info", "Reconfiguring NIC")
     gateway = subutai.GetDefaultRoutingInterface()
     bridged = subutai.GetVBoxBridgedInterface(gateway)
-    bridged = bridged.replace(' ', '+++')
-    subutai.VBox("modifyvm " + machineName + ' --nic1 bridged --bridgeadapter1 "' + bridged + '"')
+    subutai.VBox("modifyvm " + machineName + ' --nic1 bridged --bridgeadapter1 ' + bridged)
     subutai.VBox("modifyvm " + machineName + " --nic2 nat")
     subutai.VBox("modifyvm " + machineName + " --cableconnected2 on")
     subutai.VBox("modifyvm " + machineName + ' --natpf2 ssh-fwd,tcp,,4567,,22 --natpf2 https-fwd,tcp,,9999,,8443')
 
     adapterName = subutai.GetVBoxHostOnlyInterface()
-    adapterName = adapterName.replace(' ', '+++')
-    ret = subutai.VBoxS("hostonlyif ipconfig " + adapterName + " --ip 192.168.56.1")
 
-    if ret == 1:
+    if adapterName != 'undefined':
+        subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
+
+    return
+
+
+def enableHostonlyif():
+    adapterName = subutai.GetVBoxHostOnlyInterface()
+
+    if adapterName == 'undefined':
         subutai.VBox("hostonlyif create")
+        adapterName = subutai.GetVBoxHostOnlyInterface()
         subutai.VBox("hostonlyif ipconfig " + adapterName + " --ip 192.168.56.1")
         subutai.VBox("dhcpserver add --ifname " + adapterName + " --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
         subutai.VBox("dhcpserver modify --ifname " + adapterName + " --enable")
-
-    subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
 
     return
 

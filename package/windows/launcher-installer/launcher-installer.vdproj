@@ -39,6 +39,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_00DCD299BE18450EBFF780030722C609"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_00DD974AB8EA43C18C7C54E8664B6F73"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1677,6 +1683,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_1F2944589CDF47A49E3D725D8919311B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_1F42377A82724B69832A17D5D70DAB15"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -2859,6 +2871,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_38725A78E0CC494C913213564E9BB250"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_387681762FF34D79B3C29238B28561E8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -3292,6 +3310,12 @@
         "Entry"
         {
         "MsmKey" = "8:_400A7ABC27AC4B3EAD619471607112C0"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4016F3500EE0417BAA3700E05404B4F5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -4509,6 +4533,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_5977D5A6E4D8404181EE265E81627752"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_597D884D48EA41E5865EDD0BB3A579BE"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -4996,6 +5026,12 @@
         "Entry"
         {
         "MsmKey" = "8:_6269431A923A42A78B2A4817EA9BEB17"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6289C5C2197D42D79F91550C0F08F09F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -5865,6 +5901,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_74B67AA5F0804A6188405C312102866A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_74D01022E7854CE99CF995334310EDB3"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -6028,6 +6070,12 @@
         "Entry"
         {
         "MsmKey" = "8:_77FDE3DBBC6D4F3EB9AD4E3E9DFBC99F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_78393479837B43599E8AF6B1BB171A28"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -6388,6 +6436,12 @@
         "Entry"
         {
         "MsmKey" = "8:_7F08915FD2084083A8709F1AB4214226"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7F0960613F6E46098E126CD2FB7DCCF0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -7413,6 +7467,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_95463D259193459EA6C332D048818E7A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_956A5AA6DD9F401D81A420685CBA2E8A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -7605,6 +7665,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_98DAEE99815447EB9B1881760F875DCA"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_9931A5EEFF824FDA944D33A01F97B1CF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -7654,6 +7720,12 @@
         "Entry"
         {
         "MsmKey" = "8:_9A4D8037B7384D5CB84C0FB75969A9E4"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9A5AFD7B239F4F47BC2ABA9AD0770B6B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -8661,6 +8733,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_B04C565D945C4451BFE58D4C327C7C1A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B06C4C41B6DE4C6EA74305492A2918DD"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_B0720F54AFED459987FF3F589CF6CB17"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -8776,6 +8860,12 @@
         "Entry"
         {
         "MsmKey" = "8:_B30F8523A83F45F5A59663B62C34DD24"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B323909B17A243C988CEF3820DE481BC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -10005,6 +10095,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_CD95504E65F54FA481B9AF2BEFE29B35"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_CDA1AB64339B4B4BA76AE6B6FA72C9B0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -10276,6 +10372,12 @@
         "Entry"
         {
         "MsmKey" = "8:_D3DF99795E854CB9AFB58C579FBFA66B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D3FBEAFEAEAD4CA98FE611659FC4039B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -10803,6 +10905,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_DDC4DBE2D1124D72ACC740631139E9E3"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_DDCC7879FDE0451483501EFF5CD6D036"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -11092,6 +11200,12 @@
         "Entry"
         {
         "MsmKey" = "8:_E4B751AB367449DFA671B7250D3FDFCF"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E4CC7E9A85044883AB07A666D85DA083"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -12356,6 +12470,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.5"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.5 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.5"
+                    }
+                }
             }
         }
         "Release"
@@ -12486,6 +12608,26 @@
             "TargetName" = "8:test_archive_util.py"
             "Tag" = "8:"
             "Folder" = "8:_544CB3463D254885B90B7F160ACBBAB6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_00DCD299BE18450EBFF780030722C609"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\api-ms-win-crt-utility-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-utility-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -17960,6 +18102,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1F2944589CDF47A49E3D725D8919311B"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\api-ms-win-crt-runtime-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-runtime-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1F42377A82724B69832A17D5D70DAB15"
             {
             "SourcePath" = "8:D:\\SubutaiLauncher-dev\\Lib\\test\\test_importlib\\frozen\\__main__.py"
@@ -21900,6 +22062,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_38725A78E0CC494C913213564E9BB250"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\msvcr120.dll"
+            "TargetName" = "8:msvcr120.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_387681762FF34D79B3C29238B28561E8"
             {
             "SourcePath" = "8:D:\\SubutaiLauncher-dev\\Lib\\xdrlib.py"
@@ -23346,6 +23528,26 @@
             "TargetName" = "8:fetch_macholib"
             "Tag" = "8:"
             "Folder" = "8:_E2D4990500AD4B0F981B102B972C6465"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4016F3500EE0417BAA3700E05404B4F5"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\api-ms-win-crt-process-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-process-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -27400,6 +27602,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5977D5A6E4D8404181EE265E81627752"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\api-ms-win-crt-string-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-string-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_597D884D48EA41E5865EDD0BB3A579BE"
             {
             "SourcePath" = "8:D:\\SubutaiLauncher-dev\\Lib\\test\\decimaltestdata\\comparetotmag.decTest"
@@ -29026,6 +29248,26 @@
             "TargetName" = "8:msg_22.txt"
             "Tag" = "8:"
             "Folder" = "8:_12236ABAD1DD4F67ADEC5923A47A6890"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6289C5C2197D42D79F91550C0F08F09F"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\api-ms-win-crt-stdio-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-stdio-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -31920,6 +32162,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_74B67AA5F0804A6188405C312102866A"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\api-ms-win-crt-convert-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-convert-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_74D01022E7854CE99CF995334310EDB3"
             {
             "SourcePath" = "8:D:\\SubutaiLauncher-dev\\Lib\\test\\decimaltestdata\\ddReduce.decTest"
@@ -33666,6 +33928,26 @@
             "TargetName" = "8:test_structmembers.py"
             "Tag" = "8:"
             "Folder" = "8:_0485DF61AB8A43819747C3303B3367D7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7F0960613F6E46098E126CD2FB7DCCF0"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\api-ms-win-crt-math-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-math-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -37080,6 +37362,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_95463D259193459EA6C332D048818E7A"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\api-ms-win-crt-locale-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-locale-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_956A5AA6DD9F401D81A420685CBA2E8A"
             {
             "SourcePath" = "8:D:\\SubutaiLauncher-dev\\Lib\\lib2to3\\fixes\\fix_imports.py"
@@ -37720,6 +38022,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_98DAEE99815447EB9B1881760F875DCA"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\api-ms-win-crt-time-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-time-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9931A5EEFF824FDA944D33A01F97B1CF"
             {
             "SourcePath" = "8:D:\\SubutaiLauncher-dev\\Lib\\test\\test_getpass.py"
@@ -37886,6 +38208,26 @@
             "TargetName" = "8:reprlib.cpython-37.pyc"
             "Tag" = "8:"
             "Folder" = "8:_4B60BFD9CBE74B3894A7E453759415DC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9A5AFD7B239F4F47BC2ABA9AD0770B6B"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\api-ms-win-crt-filesystem-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-filesystem-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -41240,6 +41582,46 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B04C565D945C4451BFE58D4C327C7C1A"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\vcruntime140.dll"
+            "TargetName" = "8:vcruntime140.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B06C4C41B6DE4C6EA74305492A2918DD"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\api-ms-win-crt-private-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-private-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B0720F54AFED459987FF3F589CF6CB17"
             {
             "SourcePath" = "8:D:\\SubutaiLauncher-dev\\Lib\\encodings\\cp856.py"
@@ -41626,6 +42008,26 @@
             "TargetName" = "8:test_epoll.py"
             "Tag" = "8:"
             "Folder" = "8:_0485DF61AB8A43819747C3303B3367D7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B323909B17A243C988CEF3820DE481BC"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\api-ms-win-crt-heap-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-heap-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -45720,6 +46122,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CD95504E65F54FA481B9AF2BEFE29B35"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\api-ms-win-crt-conio-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-conio-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CDA1AB64339B4B4BA76AE6B6FA72C9B0"
             {
             "SourcePath" = "8:D:\\SubutaiLauncher-dev\\Lib\\idlelib\\idle_test\\test_config_key.py"
@@ -46626,6 +47048,26 @@
             "TargetName" = "8:johab.py"
             "Tag" = "8:"
             "Folder" = "8:_861CDE99508F407DA14EFFC0D34E938D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D3FBEAFEAEAD4CA98FE611659FC4039B"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\api-ms-win-crt-environment-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-environment-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -48380,6 +48822,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DDC4DBE2D1124D72ACC740631139E9E3"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\api-ms-win-crt-multibyte-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-multibyte-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DDCC7879FDE0451483501EFF5CD6D036"
             {
             "SourcePath" = "8:D:\\SubutaiLauncher-dev\\Lib\\test\\test_email\\data\\msg_12.txt"
@@ -49346,6 +49808,26 @@
             "TargetName" = "8:trace_at_recursion_limit.py"
             "Tag" = "8:"
             "Folder" = "8:_DE3C91502CB24192926B2A00BB59A614"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E4CC7E9A85044883AB07A666D85DA083"
+            {
+            "SourcePath" = "8:D:\\SubutaiLauncher-dev\\msvcp140.dll"
+            "TargetName" = "8:msvcp140.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_61CBCA5B726E49BA8E786A53BE42C289"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -54867,15 +55349,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Subutai Launcher"
-        "ProductCode" = "8:{1309B311-FDC0-46F3-AFF1-D1EC713DED67}"
-        "PackageCode" = "8:{98485149-F7B4-4083-B668-50D9271301C8}"
+        "ProductCode" = "8:{BAA334E5-23F4-48B9-89F4-D8183B5B4324}"
+        "PackageCode" = "8:{27124CDB-9310-4D94-B3EA-8885A288A730}"
         "UpgradeCode" = "8:{5230E7AA-85A5-42FF-9B10-1DA50580C4A2}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:FALSE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.0"
+        "ProductVersion" = "8:5.0.0"
         "Manufacturer" = "8:Subutai"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://subut.ai"
@@ -55004,7 +55486,7 @@
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_87214A46F61049A0862B084D3B8EF078"
             {
-            "Name" = "8:Subuai Launcher"
+            "Name" = "8:Subutai Launcher"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
@@ -55412,6 +55894,20 @@
         }
         "MergeModule"
         {
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_78393479837B43599E8AF6B1BB171A28"
+            {
+            "UseDynamicProperties" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
+            "SourcePath" = "8:c:\\program files (x86)\\common files\\merge modules\\microsoft_vc140_crt_x86.msm"
+                "Properties"
+                {
+                }
+            "LanguageId" = "3:0"
+            "Exclude" = "11:FALSE"
+            "Folder" = "8:"
+            "Feature" = "8:"
+            "IsolateTo" = "8:"
+            }
         }
         "ProjectOutput"
         {

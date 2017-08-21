@@ -3,47 +3,56 @@
 SubutaiLauncher::Session* SubutaiLauncher::Session::_instance = NULL;
 
 SubutaiLauncher::Session::Session() :
-	_terminate(false),
+    _terminate(false),
     _sshUser(""),
     _sshPass(""),
     _sshHostname(""),
     _sshPort(0)
 {
-	_settings = new Settings();
-	_downloader = new Downloader();
-	_downloader->setOutputDirectory(_settings->getTmpPath());
-	_notificationCenter = new NotificationCenter();
+    _settings = new Settings();
+    _downloader = new Downloader();
+    _downloader->setOutputDirectory(_settings->getTmpPath());
+    _notificationCenter = new NotificationCenter();
+    _hub = new Hub();
 }
 
 SubutaiLauncher::Session::~Session()
 {
-
+    if (_settings != nullptr) delete _settings;
+    if (_downloader != nullptr) delete _downloader;
+    if (_notificationCenter != nullptr) delete _notificationCenter;
+    if (_hub != nullptr) delete _hub;
 }
 
 SubutaiLauncher::Session* SubutaiLauncher::Session::instance()
 {
-	if (!_instance) _instance = new Session();
-	return _instance;
+    if (!_instance) _instance = new Session();
+    return _instance;
 }
 
 void SubutaiLauncher::Session::destroyInstance()
 {
-	delete this;
+    delete this;
 }
 
 SubutaiLauncher::Downloader* SubutaiLauncher::Session::getDownloader()
 {
-	return _downloader;
+    return _downloader;
 }
 
 SubutaiLauncher::Settings* SubutaiLauncher::Session::getSettings()
 {
-	return _settings;
+    return _settings;
 }
 
 SubutaiLauncher::NotificationCenter* SubutaiLauncher::Session::getNotificationCenter()
 {
     return _notificationCenter;
+}
+
+SubutaiLauncher::Hub* SubutaiLauncher::Session::getHub()
+{
+    return _hub;
 }
 
 void SubutaiLauncher::Session::setSSHCredentials(const std::string& user, const std::string& pass, const std::string& hostname, long port) 
@@ -95,15 +104,15 @@ Poco::Logger& SubutaiLauncher::Session::logger()
 
 bool SubutaiLauncher::Session::isTerminating()
 {
-	return _terminate;
+    return _terminate;
 }
 
 void SubutaiLauncher::Session::terminate()
 {
-	_terminate = true;
+    _terminate = true;
 }
 
 void SubutaiLauncher::Session::start()
 {
-	_terminate = false;
+    _terminate = false;
 }

@@ -8,6 +8,24 @@ import tarfile
 
 
 def subutaistart():
+    tmpDir = subutai.GetTmpDir()
+    installDir = subutai.GetInstallDir()
+
+    if not os.path.exists(installDir+"bin/cocoasudo"):
+        subutai.AddStatus("Downloading cocoasudo application")
+        subutai.download("cocoasudo")
+        while subutai.isDownloadComplete() != 1:
+            sleep(0.05)
+
+        try:
+            copyfile(tmpDir+"cocoasudo", installDir+"bin/cocoasudo")
+            st = os.stat(installDir+"bin/cocoasudo")
+            os.chmod(installDir+"bin/cocoasudo", st.st_mode | stat.S_IEXEC)
+        except:
+            subutai.RaiseError("Failed to install cocoasudo. Aborting")
+            sleep(10)
+            return -99
+
     subutai.AddStatus("Download Tray application")
 
     tray = "SubutaiTray_libs_osx.tar.gz"
@@ -17,21 +35,34 @@ def subutaistart():
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
 
-    tmpDir = subutai.GetTmpDir()
-    installDir = subutai.GetInstallDir()
-
     subutai.AddStatus("Installing Tray")
 
-    tar = tarfile.open(tmpDir+"/"+tray, "r:gz")
-    tar.extractall("/Applications/Subutai")
-    tar.close()
+    try:
+        tar = tarfile.open(tmpDir+"/"+tray, "r:gz")
+        tar.extractall("/Applications/Subutai")
+        tar.close()
+    except:
+        subutai.RaiseError("Failed to unpack Tray archive. Aborting")
+        sleep(10)
+        return 86
 
     subutai.AddStatus("Installing Tray dependencies")
     subutai.download(libssh)
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
 
-    #call(['installer', '-pkg', tmpDir+'/'+libssh, '-target', installDir])
+    try:
+        call([installDir+'bin/cocoasudo',
+              '-prompt="Install libssh"',
+              'installer',
+              '-pkg',
+              tmpDir+'/'+libssh,
+              '-target',
+              '/'])
+    except:
+        subutai.RaiseError("Failed to install libssh. Aborting")
+        sleep(10)
+        return -99
 
     subutai.Shutdown()
 

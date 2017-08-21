@@ -2,8 +2,10 @@
 #define __HUB_H__
 
 #include <string>
+#include <sstream>
 #include <cstring>
 #include <map>
+#include <vector>
 
 #include "Vars.h"
 #include "Poco/Logger.h"
@@ -23,9 +25,25 @@
 #include "Poco/Net/AcceptCertificateHandler.h"
 #include "Poco/Net/HTTPCookie.h"
 #include "Poco/Net/NameValueCollection.h"
+#include "Poco/Base64Encoder.h"
 
 namespace SubutaiLauncher 
 {
+    enum HubLogLevel
+    {
+        HL_INFO = 0,
+        HL_WARNING,
+        HL_ERROR,
+        HL_FATAL,
+    };
+
+    struct HubLog
+    {
+        HubLogLevel level;
+        std::string message;
+    };
+
+    typedef std::vector<HubLog> HubLogs;
 
     class Hub 
     {
@@ -38,14 +56,18 @@ namespace SubutaiLauncher
             void setPassword(std::string password);
             bool auth();
             bool balance();
+            void addLogLine(HubLogLevel level, const std::string& message);
+            void sendLogs();
+            void sendLog(HubLogLevel level, const std::string& message);
         private:
             Poco::Net::NameValueCollection getCookies();
-            std::string _login;
-            std::string _password;
-            std::string _response;
             Poco::Logger* _logger;
             Poco::Net::HTTPSClientSession _session;
             Poco::Net::NameValueCollection _cookies;
+            std::string _login;
+            std::string _password;
+            std::string _response;
+            HubLogs _logs;
     };
 
 }

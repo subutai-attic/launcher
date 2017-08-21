@@ -39,6 +39,7 @@ namespace SubutaiLauncher
     {
         public:
             Core(std::vector<std::string> args);
+			Core();
             ~Core();
             void initializePython();
             void initializeSSL();

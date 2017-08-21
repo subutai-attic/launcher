@@ -14,7 +14,7 @@ fi
 rm -rf flat
 rm -rf root
 rm -f *.pkg
-version=4.0.15
+version=5.0.0
 # Copy files
 mkdir -p flat/Resources/en.lproj
 mkdir -p flat/base.pkg
@@ -54,4 +54,4 @@ sed -i -e "s/{SIZE_PLACEHOLDER}/$mbsize/g" ./flat/Distribution
 ( cd root && find . | cpio -o --format odc --owner 0:80 | gzip -c ) > flat/base.pkg/Payload
 ( cd scripts && find . | cpio -o --format odc --owner 0:80 | gzip -c ) > flat/base.pkg/Scripts
 mkbom -u 0 -g 80 root flat/base.pkg/Bom
-( cd flat && xar --compression none -cf "../SubutaiLauncher-4.0.15-Installer.pkg" * )
+( cd flat && xar --compression none -cf "../SubutaiLauncher-$version-Installer.pkg" * )

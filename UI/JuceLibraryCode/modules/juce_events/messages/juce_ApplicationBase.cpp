@@ -160,7 +160,7 @@ StringArray JUCE_CALLTYPE JUCEApplicationBase::getCommandLineParameterArray()
     int argc = 0;
     if (LPWSTR* const argv = CommandLineToArgvW (GetCommandLineW(), &argc))
     {
-        s = StringArray (argv + 1, argc - 1);
+        s = StringArray (argv, argc);
         LocalFree (argv);
     }
 
@@ -204,7 +204,7 @@ String JUCEApplicationBase::getCommandLineParameters()
 
 StringArray JUCEApplicationBase::getCommandLineParameterArray()
 {
-    return StringArray (juce_argv + 1, juce_argc - 1);
+    return StringArray (juce_argv/* + 1*/, juce_argc/* - 1*/);
 }
 
 int JUCEApplicationBase::main (int argc, const char* argv[], void* customDelegate)

@@ -74,6 +74,7 @@ namespace SubutaiLauncher {
             Environment();
             ~Environment();
             std::string versionOS();
+            std::string versionNumber();
             std::string cpuArch();
             unsigned int cpuNum();
             unsigned processorNum();
@@ -99,6 +100,7 @@ namespace SubutaiLauncher {
 			bool killProcess(const std::string& name);
 			std::string getDesktopDirectory();
 #if LAUNCHER_WINDOWS
+			bool isVBoxInstalled();
 			bool writeE2ERegistry(const std::string& name);
 #endif
         private:

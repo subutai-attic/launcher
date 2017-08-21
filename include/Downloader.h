@@ -45,54 +45,54 @@
 using Poco::Logger;
 using Poco::LogStream;
 
-namespace SubutaiLauncher 
+namespace SubutaiLauncher
 {
 
-    struct SubutaiFile 
-    {
-        std::string owner;
-        std::string name;
-        std::string id;
-        long size;
-    };
+	struct SubutaiFile
+	{
+		std::string owner;
+		std::string name;
+		std::string id;
+		long size;
+	};
 
-    class Downloader 
-    {
-        public:
-            static const std::string URL;
-            static const std::string REST;
-			static const std::string TREST;
-            static const std::string HOST;
-            static const int PORT = 8338;
+	class Downloader
+	{
+	public:
+		static const std::string URL;
+		static const std::string REST;
+		static const std::string TREST;
+		static const std::string HOST;
+		static const int PORT = 8338;
 
-            Downloader();
-            ~Downloader();
-            void reset();
-            void setFilename(const std::string& filename);
-            bool retrieveFileInfo(bool tmpl = false);
-			bool retrieveTemplateInfo();
-            SubutaiFile info();
-            std::thread download();
-            void downloadImpl();
-            bool isDone();
-            bool isRunning();
-            double getPercent();
-            bool verifyDownload();
-            long currentProgress();
-            void setOutputDirectory(const std::string& dir);
-            std::string getOutputDirectory() const;
-            std::string getFullPath() const;
-        private:
-            std::string buildRequest(std::string path, std::string key, std::string value);
-            std::string _filename;
-            std::string _content;
-            std::string _outputDir;
-            std::string _rfile; // output file
-            SubutaiFile _file;
-            long _progress;
-            bool _done;
-            bool _running;
-            Poco::Logger* _logger;
+		Downloader();
+		~Downloader();
+		void reset();
+		void setFilename(const std::string& filename);
+		bool retrieveFileInfo(bool tmpl = false);
+		bool retrieveTemplateInfo();
+		SubutaiFile info();
+		std::thread download();
+		void downloadImpl();
+		bool isDone();
+		bool isRunning();
+		double getPercent();
+		bool verifyDownload();
+		long currentProgress();
+		void setOutputDirectory(const std::string& dir);
+		std::string getOutputDirectory() const;
+		std::string getFullPath() const;
+	private:
+		std::string buildRequest(std::string path, std::string key, std::string value);
+		std::string _filename;
+		std::string _content;
+		std::string _outputDir;
+		std::string _rfile; // output file
+		SubutaiFile _file;
+		long _progress;
+		bool _done;
+		bool _running;
+		Poco::Logger* _logger;
 	};
 
 }

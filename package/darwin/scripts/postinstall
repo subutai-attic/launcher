@@ -3,9 +3,6 @@
 mkdir -p /Applications/Subutai
 chown -R $USER /Applications/Subutai*
 
-mkdir -p /Applications/VirtualBox.app
-chown -R $USER /Applications/VirtualBox.app
-
 mkdir -p /usr/local/share/subutai/bin
 mkdir -p /usr/local/share/subutai/etc
 mkdir -p /usr/local/share/subutai/resources
