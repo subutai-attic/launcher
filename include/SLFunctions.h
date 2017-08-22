@@ -238,6 +238,7 @@ namespace SubutaiLauncher
     {
         auto downloader = Session::instance()->getDownloader();
         long b = downloader->getBytesDownload();
+        Poco::Logger::get("subutai").trace("~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %ld", b);
         return Py_BuildValue("l", b);
     }
 

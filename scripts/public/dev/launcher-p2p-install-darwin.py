@@ -6,7 +6,9 @@ import stat
 from subprocess import Popen, PIPE
 
 
-def updateProgress(cur, total):
+def updateProgress(cocoasudo, p2p, tuntap, total):
+    cur = cocoasudo + p2p + tuntap
+
     print("Cur: " + str(cur) + " Total: " + str(total))
     val = (int)(100 * cur) / total
     print("Val: " + str(val))
@@ -19,19 +21,21 @@ def subutaistart():
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
 
-    totalSize = subutai.GetFileSize("cocoasudo")
-    totalSize = totalSize + subutai.GetFileSize("p2p_osx")
-    totalSize = totalSize + subutai.GetFileSize("tuntap_20150118_osx.pkg")
-    completedSize = 0
+    cocoasudoSize = subutai.GetFileSize("cocoasudo")
+    p2pSize = subutai.GetFileSize("p2p_osx")
+    tuntapSize = subutai.GetFileSize("tuntap_20150118_osx.pkg")
+    totalSize = cocoasudoSize + p2pSize + tuntapSize
+    cocoasudoProgress = 0
+    p2pProgress = 0
+    tuntapProgress = 0
 
     if not os.path.exists(installDir+"bin/cocoasudo"):
         subutai.AddStatus("Downloading cocoasudo application")
         subutai.download("cocoasudo")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
-            cl = completedSize
-            completedSize = completedSize + (cl - subutai.GetBytesDownload())
-            updateProgress(completedSize, totalSize)
+            cocoasudoProgress = subutai.GetBytesDownload()
+            updateProgress(cocoasudoProgress, p2pProgress, tuntapProgress, totalSize)
 
         try:
             copyfile(tmpDir+"cocoasudo", installDir+"bin/cocoasudo")
@@ -42,23 +46,24 @@ def subutaistart():
             sleep(10)
             return -99
 
+    cocoasudoProgress = cocoasudoSize
     subutai.AddStatus("Download TUNTAP driver")
     subutai.download("tuntap_20150118_osx.pkg")
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
-        cl = completedSize
-        completedSize = completedSize + (cl - subutai.GetBytesDownload())
-        updateProgress(completedSize, totalSize)
+        tuntapProgress = subutai.GetBytesDownload()
+        updateProgress(cocoasudoProgress, p2pProgress, tuntapProgress, totalSize)
 
+    tuntapProgress = tuntapSize
     subutai.AddStatus("Download p2p binary")
 
     subutai.download("p2p_osx")
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
-        cl = completedSize
-        completedSize = completedSize + (cl - subutai.GetBytesDownload())
-        updateProgress(completedSize, totalSize)
+        p2pProgress = subutai.GetBytesDownload()
+        updateProgress(cocoasudoProgress, p2pProgress, tuntapProgress, totalSize)
 
+    p2pProgress = p2pSize
     subutai.AddStatus("Download finished. Installing")
 
     try:
@@ -68,7 +73,7 @@ def subutaistart():
                            installDir + "bin/p2p")
         return 21
 
-    sleep(5)
+    subutai.SetProgress(0.99)
 
     subutai.AddStatus("Making p2p binary executable")
     try:
@@ -80,17 +85,17 @@ def subutaistart():
 
     subutai.AddStatus("Creating p2p service")
     service = '''
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
     <key>Label</key>
     <string>io.subutai.p2p.daemon</string>
 
     <key>ProgramArguments</key>
     <array>
-            <string>/usr/local/bin/p2p</string>
-            <string>daemon</string>
+    <string>/usr/local/bin/p2p</string>
+    <string>daemon</string>
     </array>
 
     <key>KeepAlive</key>
@@ -104,9 +109,9 @@ def subutaistart():
 
     <key>Debug</key>
     <true/>
-</dict>
-</plist>
-'''.strip()
+    </dict>
+    </plist>
+    '''.strip()
 
     daemonFile = 'io.subutai.p2p.daemon.plist'
 
@@ -115,8 +120,8 @@ def subutaistart():
     f.close()
 
     syslog = '''
-# logfilename          [owner:group]    mode count size when  flags [/pid_file] [sig_num]
-/var/log/p2p.log                       644  7     *    $D0   J
+    # logfilename          [owner:group]    mode count size when  flags [/pid_file] [sig_num]
+    /var/log/p2p.log                       644  7     *    $D0   J
     '''.strip()
     sf = open(tmpDir+'p2p.conf', 'w')
     sf.write(syslog)
@@ -129,7 +134,7 @@ def subutaistart():
     installScript = installScript + "launchctl load /Library/LaunchDaemons/" + daemonFile + "\n"
     installScript = installScript + "installer -pkg " + tmpDir + "tuntap_20150118.pkg -target /\n"
     installScript = installScript + "ln -s "+installDir+"/bin/p2p /usr/local/bin/p2p\n"
-#installScript = installScript + "sudo launchctl bsexec "+pid+" sudo launchctl load /Library/LaunchDaemons/" + daemonFile + "\n"
+    #installScript = installScript + "sudo launchctl bsexec "+pid+" sudo launchctl load /Library/LaunchDaemons/" + daemonFile + "\n"
     #installScript = installScript + 'osascript -e "do shell script \\"launchctl load /Library/LaunchDaemons/' + daemonFile + '\\" with administrator privileges"\n'
 
     f = open(tmpDir+"p2p-setup.sh", 'w')
@@ -152,6 +157,8 @@ def subutaistart():
         subutai.RaiseError("Failed to install p2p daemon")
         sleep(10)
         return 22
+
+    subutai.SetProgress(1.00)
 
     sleep(5)
     subutai.Shutdown()

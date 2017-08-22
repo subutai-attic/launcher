@@ -268,7 +268,7 @@ namespace SubutaiLauncher
             _outStream = std::shared_ptr<Poco::CountingOutputStream>(new Poco::CountingOutputStream(out));
             Poco::TimerCallback<Downloader> cb(*this, &Downloader::progressTimer);
 
-            auto pTimer = std::shared_ptr<Poco::Timer>(new Poco::Timer(0, 500));
+            auto pTimer = std::shared_ptr<Poco::Timer>(new Poco::Timer(0, 100));
             if (pTimer)
             {
                 pTimer->start(cb);
@@ -281,41 +281,6 @@ namespace SubutaiLauncher
                 pTimer->stop();
             }
 
-            /*
-               void onTimer(Timer& timer)
-               {
-               try
-               {
-               if (progress_callback)
-               {
-               int data_processed = 0;
-
-               counting_io_stream ? data_processed = counting_io_stream->chars() : __noop;
-
-               if (data_processed != total_processed_data)
-               {
-               total_processed_data = data_processed;
-
-               int percent     = (100 * total_processed_data) / file_size;
-
-               progress_callback(percent);
-               }
-               }
-               }
-               catch(const std::bad_function_call& e) 
-               {
-
-               }
-               catch(const std::bad_weak_ptr& e)
-               {
-
-               }
-               catch(const std::exception& e)
-               {
-
-               }
-               }
-               */
             //==============================================================================================
 
         }
