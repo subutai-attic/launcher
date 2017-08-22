@@ -3,39 +3,35 @@ from time import sleep
 from shutil import copyfile
 import os
 import stat
-from subprocess import call
 from subprocess import Popen, PIPE
 
 
-def getLines(foo):
-    return iter(foo.splitlines())
-
-
-def getPid(output):
-    lines = getLines(output)
-    for line in lines:
-        if "configd" in str(line) and "libexec" in str(line):
-            words = str(line).split(" ")
-            for w in words:
-                if w != "" and w != " ":
-                    try:
-                        int(w)
-                        return w
-                    except:
-                        print("")
-
-    return ""
+def updateProgress(cur, total):
+    print("Cur: " + str(cur) + " Total: " + str(total))
+    val = (int)(100 * cur) / total
+    print("Val: " + str(val))
+    progress = (float)(val/100)
+    print("Progress: " + str(progress))
+    subutai.SetProgress(progress)
 
 
 def subutaistart():
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
 
+    totalSize = subutai.GetFileSize("cocoasudo")
+    totalSize = totalSize + subutai.GetFileSize("p2p_osx")
+    totalSize = totalSize + subutai.GetFileSize("tuntap_20150118_osx.pkg")
+    completedSize = 0
+
     if not os.path.exists(installDir+"bin/cocoasudo"):
         subutai.AddStatus("Downloading cocoasudo application")
         subutai.download("cocoasudo")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
+            cl = completedSize
+            completedSize = completedSize + (cl - subutai.GetBytesDownload())
+            updateProgress(completedSize, totalSize)
 
         try:
             copyfile(tmpDir+"cocoasudo", installDir+"bin/cocoasudo")
@@ -50,19 +46,26 @@ def subutaistart():
     subutai.download("tuntap_20150118_osx.pkg")
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
+        cl = completedSize
+        completedSize = completedSize + (cl - subutai.GetBytesDownload())
+        updateProgress(completedSize, totalSize)
 
     subutai.AddStatus("Download p2p binary")
 
     subutai.download("p2p_osx")
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
+        cl = completedSize
+        completedSize = completedSize + (cl - subutai.GetBytesDownload())
+        updateProgress(completedSize, totalSize)
 
     subutai.AddStatus("Download finished. Installing")
 
     try:
         copyfile(tmpDir+"p2p_osx", installDir+"bin/p2p")
     except:
-        subutai.RaiseError("Failed to move p2p binary to " + installDir + "bin/p2p")
+        subutai.RaiseError("Failed to move p2p binary to " +
+                           installDir + "bin/p2p")
         return 21
 
     sleep(5)
@@ -145,12 +148,6 @@ def subutaistart():
         script = 'do shell script "'+tmpDir+'p2p-setup.sh" with administrator privileges'
         p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
         stdout, stderr = p.communicate(script)
-        #call(['/usr/bin/osascript', '-e', '"do shell script \"/bin/bash '+tmpDir+'p2p-setup.sh\" with administrator privileges"'])
-        #call([installDir+"bin/cocoasudo",
-        #      '--prompt="Setup P2P Daemon"',
-        #      'sudo',
-        #      tmpDir+"p2p-setup.sh",
-        #      ])
     except:
         subutai.RaiseError("Failed to install p2p daemon")
         sleep(10)
