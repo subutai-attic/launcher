@@ -37,7 +37,7 @@ def subutaistart():
 
     m = hashlib.md5()
     m.update(datetime.datetime.now().isoformat().encode('utf-8'))
-    machineName = "subutai-wd-" + m.hexdigest()[:5]
+    machineName = "subutai-dw-" + m.hexdigest()[:5]
 
     installDir = subutai.GetInstallDir()
     call([installDir+'/bin/ssh-keygen.exe', '-R', '[127.0.0.1]:4567'])
@@ -166,25 +166,6 @@ def installManagement():
     return
 
 
-def waitManagementInstall():
-    rsize = subutai.GetRemoteTemplateSize("management-subutai-template_4.0.16-dev_amd64.tar.gz")
-    dsize = subutai.GetPeerFileSize("/var/snap/subutai-dev/common/lxc/tmpdir/management-subutai-template_4.0.16-dev_amd64.tar.gz")
-
-    timeout = datetime.datetime.now() + datetime.timedelta(0, 120)
-
-    if rsize <= 0:
-        return 1
-
-    while rsize + 10 < dsize:
-        sleep(0.1)
-        percent = dsize / rsize * 100
-        subutai.SetProgress(percent / 100)
-        if datetime.datetime.now() > timeout:
-            return 1
-
-    return 0
-
-
 def installSnapFromStore():
     subutai.AddStatus("Installing Subutai")
     subutai.log("info", "Installing subutai snap")
@@ -204,7 +185,6 @@ def initBtrfs():
 def setAlias():
     subutai.log("info", "Setting Alias")
     subutai.SSHRun("sudo bash -c 'snap alias subutai-dev subutai'")
-
     return
 
 
@@ -240,29 +220,31 @@ def setupVm(machineName):
         subutai.download("core.ova")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
-        subutai.VBox("import " +
-                     subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname "+machineName)
-        sleep(10)
 
-        cpus = subutai.GetCoreNum()
-        mem = subutai.GetMemSize() * 1024
+        subutai.AddStatus("Virtual Machine Image file downloaded")
 
-        subutai.VBox("modifyvm " + machineName + " --cpus " + str(cpus))
-        sleep(10)
-        subutai.VBox("modifyvm " + machineName + " --memory " + str(mem))
-        sleep(10)
-        subutai.VBox("modifyvm " + machineName + " --nic1 nat")
-        sleep(10)
-        subutai.VBox("modifyvm " + machineName + " --cableconnected1 on")
-        sleep(10)
-        subutai.VBox("modifyvm " + machineName + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
-        sleep(10)
-        subutai.VBox("modifyvm " + machineName + " --rtcuseutc on")
-        sleep(10)
-        adapterName = subutai.GetVBoxHostOnlyInterface()
-        adapterName = adapterName.replace(' ', '+++')
-        subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
-        sleep(10)
+    subutai.VBox("import " +
+                 subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname "+machineName)
+    sleep(10)
+
+    cpus = subutai.GetCoreNum()
+    mem = subutai.GetMemSize() * 1024
+    subutai.VBox("modifyvm " + machineName + " --cpus " + str(cpus))
+    sleep(10)
+    subutai.VBox("modifyvm " + machineName + " --memory " + str(mem))
+    sleep(10)
+    subutai.VBox("modifyvm " + machineName + " --nic1 nat")
+    sleep(10)
+    subutai.VBox("modifyvm " + machineName + " --cableconnected1 on")
+    sleep(10)
+    subutai.VBox("modifyvm " + machineName + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
+    sleep(10)
+    subutai.VBox("modifyvm " + machineName + " --rtcuseutc on")
+    sleep(10)
+    adapterName = subutai.GetVBoxHostOnlyInterface()
+    adapterName = adapterName.replace(' ', '+++')
+    subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
+    sleep(10)
 
     return 0
 
@@ -292,7 +274,3 @@ def reconfigureNic(machineName):
 
     return
 
-
-def waitSnap():
-
-    return

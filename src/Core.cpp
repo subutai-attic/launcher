@@ -6,7 +6,8 @@
 
 SubutaiLauncher::Core::Core(std::vector<std::string> args) : 
     _args(args),
-    _running(false)
+    _running(false),
+    _noValidate(false)
 {
 #if LAUNCHER_MACOS
     chdir("/usr/local/share/subutai");
@@ -149,6 +150,11 @@ void SubutaiLauncher::Core::parseArgs()
     {
         if (it->compare("test") == 0) 
         {
+        }
+        if (it->compare("--no-validate") == 0)
+        {
+            _noValidate = true;
+            Session::instance()->getDownloader()->setNoValidate(true);
         }
     }
 }

@@ -49,6 +49,7 @@ namespace SubutaiLauncher
         private:
             std::vector<std::string> _args;
             bool _running;
+            bool _noValidate;
     };
 
 }

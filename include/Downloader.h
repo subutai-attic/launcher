@@ -82,6 +82,7 @@ namespace SubutaiLauncher
 		void setOutputDirectory(const std::string& dir);
 		std::string getOutputDirectory() const;
 		std::string getFullPath() const;
+        void setNoValidate(bool nv);
 	private:
 		std::string buildRequest(std::string path, std::string key, std::string value);
 		std::string _filename;
@@ -92,6 +93,7 @@ namespace SubutaiLauncher
 		long _progress;
 		bool _done;
 		bool _running;
+        bool _noValidate;
 		Poco::Logger* _logger;
 	};
 
