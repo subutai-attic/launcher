@@ -56,10 +56,19 @@ void SubutaiLauncher::Core::initializePython()
     if (_args.size() > 0)
     {
         std::string pName = _args.at(0);
-        Poco::Logger::get("subutai").debug("Setting program: %s", pName);
+#if LAUNCHER_LINUX
+        // This is a workaround for SubutaiLauncher symlink file which gaves us
+        // not full path to application in argv[0]
+        if (pName == "SubutaiLauncher") 
+        {
+            pName = "/opt/subutai/bin/SubutaiLauncher";
+        }
+#endif
+        Poco::Logger::get("subutai").information("Setting program: %s", pName);
         std::wstring pwName = std::wstring(pName.begin(), pName.end());
         const wchar_t* n = std::wstring(pName.begin(), pName.end()).c_str();
         Py_SetProgramName(const_cast<wchar_t*>(n));
+//#endif
     }
     else
     {
@@ -195,7 +204,7 @@ void SubutaiLauncher::Core::setupLogger()
     Poco::AutoPtr<Poco::FormattingChannel> pFormatChannel(new Poco::FormattingChannel(pFormatter, pSplitter));
     Poco::Logger& log = Poco::Logger::get("subutai");
 #ifdef BUILD_SCHEME_PRODUCTION
-    log.setLevel("information");
+    log.setLevel("trace");
 #endif
 #ifdef BUILD_SCHEME_MASTER
     log.setLevel("debug");
