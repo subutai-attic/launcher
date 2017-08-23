@@ -74,7 +74,7 @@ LoginScreen::LoginScreen() :
     _resetLink.setButtonText("Reset Password");
     _resetLink.setBounds(getWidth() / 2 - (INPUT_FIELD_WIDTH / 2), 300, 200, 20);
 
-    _registerLink.setURL(URL("https://hub.subut.ai/register"));
+    _registerLink.setURL(URL("https://"+SubutaiLauncher::Hub::URL+"/register"));
     _registerLink.setFont(linkFont, false);
     _registerLink.setButtonText("Create Account");
     _registerLink.setBounds(getWidth() / 2 - (INPUT_FIELD_WIDTH / 2), 300, 200, 20);
