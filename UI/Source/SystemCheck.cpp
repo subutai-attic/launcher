@@ -23,8 +23,10 @@ SystemCheck::SystemCheck()
 #endif
 	std::string pOs = env.versionOS();
     std::string pOsVersion = env.versionNumber();
+#if !LAUNCHER_WINDOWS
     pOs.append(" ");
     pOs.append(pOsVersion);
+#endif
 
 #if LAUNCHER_MACOS
     if (pOsVersion.substr(0, 5) == "10.12" || pOsVersion.substr(0, 5) == "10.13")

@@ -25,6 +25,7 @@
 #include "Poco/Net/AcceptCertificateHandler.h"
 #include "Poco/Net/HTTPCookie.h"
 #include "Poco/Net/NameValueCollection.h"
+#include "Poco/URI.h"
 #include "Poco/Base64Encoder.h"
 
 namespace SubutaiLauncher 
