@@ -6,15 +6,30 @@ from shutil import copyfile
 from subprocess import call
 
 
+def updateProgress(cocoasudo, chrome, total):
+    cur = cocoasudo + chrome
+    val = (int)(100 * cur) / total
+    progress = (float)(val/100)
+    subutai.SetProgress(progress)
+
+
 def subutaistart():
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
+
+    cocoasudoSize = subutai.GetFileSize("cocoasudo")
+    chromeSize = subutai.GetFileSize("GoogleChrome_osx.tar.gz")
+    totalSize = cocoasudoSize + chromeSize
+    cocoasudoProgress = 0
+    chromeProgress = 0
 
     if not os.path.exists(installDir+"bin/cocoasudo"):
         subutai.AddStatus("Downloading cocoasudo application")
         subutai.download("cocoasudo")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
+            cocoasudoProgress = subutai.GetBytesDownload()
+            updateProgress(cocoasudoProgress, chromeProgress, totalSize)
 
         try:
             copyfile(tmpDir+"cocoasudo", installDir+"bin/cocoasudo")
@@ -25,12 +40,18 @@ def subutaistart():
             sleep(10)
             return -99
 
+    cocoasudoProgress = cocoasudoSize
+
     subutai.AddStatus("Checking Google Chrome Installation")
     if not os.path.exists("/Applications/Google Chrome.app"):
         subutai.AddStatus("Downloading Google Chrome")
         subutai.download("GoogleChrome_osx.tar.gz")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
+            chromeProgress = subutai.GetBytesDownload()
+            updateProgress(cocoasudoProgress, chromeProgress, totalSize)
+
+        chromeProgress = chromeSize
 
         sleep(5)
         subutai.AddStatus("Installing Google Chrome")
