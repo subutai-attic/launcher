@@ -142,6 +142,7 @@ void LoginScreen::buttonClicked(juce::Button* button)
     if (button == &_button) 
     {
         _button.setEnabled(false);
+        _error.setVisible(false);
         // Loggin user in
         SubutaiLauncher::Hub* _pHub = SubutaiLauncher::Session::instance()->getHub();
         _pHub->setLogin(_login.getText().toStdString());
