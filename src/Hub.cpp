@@ -37,17 +37,17 @@ namespace SubutaiLauncher
     bool Hub::auth() 
     {
         _logger->debug("Authenticating at %s%s/tray/login", URL, REST);
-        // Lame way to auth on hub
-        Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/tray/login?email="+_login+"&password="+_password);
-        //Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/tray/login");
-        Poco::Net::HTMLForm pForm;
+        Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/tray/login", Poco::Net::HTTPRequest::HTTP_1_0);
 
-        pForm.add("email", _login);
-        pForm.add("password", _password);
-        pRequest.setContentType("application/json");
-        pForm.prepareSubmit(pRequest);
-        _session.sendRequest(pRequest);
 
+        Poco::URI u;
+        u.addQueryParameter("password", _password);
+        std::string req = "email="+_login+"&"+u.toString().substr(1, u.toString().length() - 1);
+        pRequest.setContentLength(req.length());
+        pRequest.setContentType("application/x-www-form-urlencoded");
+        std::ostream& pStr = _session.sendRequest(pRequest);
+        pStr << req;
+        
         Poco::Net::HTTPResponse pResponse;
         std::istream& rs = _session.receiveResponse(pResponse);
         std::string pBuffer;
