@@ -1,6 +1,9 @@
 #ifndef __DOWNLOADER_TEST_H__
 #define __DOWNLOADER_TEST_H__
 
+#include <thread>
+#include <chrono>
+
 #include "Poco/CppUnit/TestCase.h"
 #include "Poco/MD5Engine.h"
 #include "Poco/DigestStream.h"
@@ -55,6 +58,8 @@ public:
     void testParseFileInfo();
     void testDownload();
     void testVerifyDownload();
+    void testBytesDownload();
+    void testPercentDownload();
 
 	static CppUnit::Test* suite();
 };

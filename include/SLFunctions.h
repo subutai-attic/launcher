@@ -189,7 +189,7 @@ namespace SubutaiLauncher
         if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_Download");
         if (!PyArg_ParseTupleAndKeywords(
-                    args, keywords, "s|i", download_keywords, &sl_filename))
+                    args, keywords, "s", download_keywords, &sl_filename))
         {
             return NULL;
         }
@@ -231,6 +231,22 @@ namespace SubutaiLauncher
         {
             return Py_BuildValue("i", 0);
         }
+    }
+
+
+    static PyObject* SL_GetBytesDownload(PyObject* self, PyObject* args)
+    {
+        auto downloader = Session::instance()->getDownloader();
+        long b = downloader->getBytesDownload();
+        Poco::Logger::get("subutai").trace("~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %ld", b);
+        return Py_BuildValue("l", b);
+    }
+
+    static PyObject* SL_GetPercentDownload(PyObject* self, PyObject* args)
+    {
+        auto downloader = Session::instance()->getDownloader();
+        int p = downloader->getPercentDownload();
+        return Py_BuildValue("i", p);
     }
 
     // ========================================================================
@@ -586,21 +602,13 @@ namespace SubutaiLauncher
 
     static PyObject* SL_AddStatus(PyObject* self, PyObject* args, PyObject* keywords)
     {
-        Poco::Logger::get("subutai").trace("ADDSTATUS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~1");
         if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        Poco::Logger::get("subutai").trace("ADDSTATUS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~2");
         if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string)) {
-            Poco::Logger::get("subutai").trace("ADDSTATUS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~3");
             return NULL;
         }
 
-        Poco::Logger::get("subutai").trace("ADDSTATUS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~4");
-        Poco::Logger::get("subutai").trace("SL_AddStatus ~ %s", std::string(sl_string));
-        Poco::Logger::get("subutai").trace("ADDSTATUS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~5");
         std::string status(sl_string);
-        Poco::Logger::get("subutai").trace("ADDSTATUS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~6");
         Session::instance()->addStatus(status);
-        Poco::Logger::get("subutai").trace("ADDSTATUS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~7");
         return Py_BuildValue("i", 0);
     }
 
@@ -642,8 +650,9 @@ namespace SubutaiLauncher
         {
             auto pInfo = pDownloader->info();
             result = pInfo.size;
+            return Py_BuildValue("l", result);
         }
-        return Py_BuildValue("l", result);
+        return Py_BuildValue("l", 0);
     }
 
     // ========================================================================
@@ -1092,6 +1101,8 @@ namespace SubutaiLauncher
         //{ "GetDownloadResult", SL_GetDownloadResult, METH_VARARGS, "Returns download last error" },
         { "setTmpDir", (PyCFunction)SL_SetTmpDir, METH_VARARGS | METH_KEYWORDS, "Sets tmp output directory" },
         { "isDownloadComplete", SL_IsDownloaded, METH_VARARGS, "Returns 1 if current download has been completed" },
+        { "GetBytesDownload", SL_GetBytesDownload, METH_VARARGS, "Returns number of bytes downloaded" },
+        { "GetPercentDownload", SL_GetPercentDownload, METH_VARARGS, "Returns percents of download complete" },
         { "GetTmpDir", SL_GetTmpDir, METH_VARARGS, "Returns tmp directory" },
         { "GetInstallDir", SL_GetInstallDir, METH_VARARGS, "Returns installation directory" },
         { "getProgress", SL_GetProgress, METH_VARARGS, "Returns bool" },

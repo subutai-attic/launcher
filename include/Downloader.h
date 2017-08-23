@@ -14,6 +14,7 @@
 
 #include "Poco/URIStreamOpener.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/CountingStream.h"
 #include "Poco/Path.h"
 #include "Poco/Exception.h"
 #include "Poco/URI.h"
@@ -39,6 +40,7 @@
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTMLForm.h"
 #include "Poco/Net/HTTPResponse.h"
+#include "Poco/Timer.h"
 
 #include "FileSystem.h"
 
@@ -54,6 +56,7 @@ namespace SubutaiLauncher
 		std::string name;
 		std::string id;
 		long size;
+        std::string md5;
 	};
 
 	class Downloader
@@ -83,6 +86,10 @@ namespace SubutaiLauncher
 		std::string getOutputDirectory() const;
 		std::string getFullPath() const;
         void setNoValidate(bool nv);
+        // 5.0.1
+        long getBytesDownload();
+        int getPercentDownload();
+        void progressTimer(Poco::Timer& timer);
 	private:
 		std::string buildRequest(std::string path, std::string key, std::string value);
 		std::string _filename;
@@ -95,6 +102,10 @@ namespace SubutaiLauncher
 		bool _running;
         bool _noValidate;
 		Poco::Logger* _logger;
+        // 5.0.1
+        std::shared_ptr<Poco::CountingOutputStream> _outStream;
+        long _bytes;
+        int _percent;
 	};
 
 }
