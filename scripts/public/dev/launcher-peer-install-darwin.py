@@ -12,6 +12,10 @@ def subutaistart():
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
 
+    #cocoasudoFile = "cocoasudo"
+    #coreFile = "core.ova"
+    #vbFile = "VirtualBox.pkg"
+
     if not os.path.exists(installDir+"bin/cocoasudo"):
         subutai.AddStatus("Downloading cocoasudo application")
         subutai.download("cocoasudo")

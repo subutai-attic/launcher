@@ -15,6 +15,7 @@ def updateProgress(cocoasudo, tray, libssh, total):
 
 
 def subutaistart():
+
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
 
@@ -98,3 +99,4 @@ def subutaistart():
     subutai.Shutdown()
 
     return 0
+

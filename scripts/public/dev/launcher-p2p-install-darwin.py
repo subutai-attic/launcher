@@ -17,9 +17,13 @@ def subutaistart():
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
 
-    cocoasudoSize = subutai.GetFileSize("cocoasudo")
-    p2pSize = subutai.GetFileSize("p2p_osx")
-    tuntapSize = subutai.GetFileSize("tuntap_20150118_osx.pkg")
+    cocoasudoFile = "cocoasudo"
+    p2pFile = "p2p_osx"
+    tuntapFile = "tuntap_20150118_osx.pkg"
+
+    cocoasudoSize = subutai.GetFileSize(cocoasudoFile)
+    p2pSize = subutai.GetFileSize(p2pFile)
+    tuntapSize = subutai.GetFileSize(tuntapFile)
     totalSize = cocoasudoSize + p2pSize + tuntapSize
     cocoasudoProgress = 0
     p2pProgress = 0
@@ -27,14 +31,15 @@ def subutaistart():
 
     if not os.path.exists(installDir+"bin/cocoasudo"):
         subutai.AddStatus("Downloading cocoasudo application")
-        subutai.download("cocoasudo")
+        subutai.download(cocoasudoFile)
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
             cocoasudoProgress = subutai.GetBytesDownload()
-            updateProgress(cocoasudoProgress, p2pProgress, tuntapProgress, totalSize)
+            updateProgress(cocoasudoProgress, p2pProgress, tuntapProgress,
+                           totalSize)
 
         try:
-            copyfile(tmpDir+"cocoasudo", installDir+"bin/cocoasudo")
+            copyfile(tmpDir+cocoasudoFile, installDir+"bin/cocoasudo")
             st = os.stat(installDir+"bin/cocoasudo")
             os.chmod(installDir+"bin/cocoasudo", st.st_mode | stat.S_IEXEC)
         except:
@@ -44,26 +49,28 @@ def subutaistart():
 
     cocoasudoProgress = cocoasudoSize
     subutai.AddStatus("Download TUNTAP driver")
-    subutai.download("tuntap_20150118_osx.pkg")
+    subutai.download(tuntapFile)
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
         tuntapProgress = subutai.GetBytesDownload()
-        updateProgress(cocoasudoProgress, p2pProgress, tuntapProgress, totalSize)
+        updateProgress(cocoasudoProgress, p2pProgress, tuntapProgress,
+                       totalSize)
 
     tuntapProgress = tuntapSize
     subutai.AddStatus("Download p2p binary")
 
-    subutai.download("p2p_osx")
+    subutai.download(p2pFile)
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
         p2pProgress = subutai.GetBytesDownload()
-        updateProgress(cocoasudoProgress, p2pProgress, tuntapProgress, totalSize)
+        updateProgress(cocoasudoProgress, p2pProgress, tuntapProgress,
+                       totalSize)
 
     p2pProgress = p2pSize
     subutai.AddStatus("Download finished. Installing")
 
     try:
-        copyfile(tmpDir+"p2p_osx", installDir+"bin/p2p")
+        copyfile(tmpDir+p2pFile, installDir+"bin/p2p")
     except:
         subutai.RaiseError("Failed to move p2p binary to " +
                            installDir + "bin/p2p")
@@ -130,8 +137,6 @@ def subutaistart():
     installScript = installScript + "launchctl load /Library/LaunchDaemons/" + daemonFile + "\n"
     installScript = installScript + "installer -pkg " + tmpDir + "tuntap_20150118.pkg -target /\n"
     installScript = installScript + "ln -s "+installDir+"/bin/p2p /usr/local/bin/p2p\n"
-    #installScript = installScript + "sudo launchctl bsexec "+pid+" sudo launchctl load /Library/LaunchDaemons/" + daemonFile + "\n"
-    #installScript = installScript + 'osascript -e "do shell script \\"launchctl load /Library/LaunchDaemons/' + daemonFile + '\\" with administrator privileges"\n'
 
     f = open(tmpDir+"p2p-setup.sh", 'w')
     f.write(installScript)
