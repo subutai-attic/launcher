@@ -185,8 +185,8 @@ void SubutaiLauncher::SL::execute()
 	}
 
 	//Py_DECREF(_name);
-	Py_DECREF(PyImport_ImportModule("threading"));
-	PyEval_InitThreads();
+	//PyEval_InitThreads();
+	//Py_DECREF(PyImport_ImportModule("threading"));
 
 	PyObject *pFunc, *pArgs, *pValue;
 	if (!(_module == NULL || _module == 0))

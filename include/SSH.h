@@ -3,6 +3,7 @@
 
 #include "Vars.h"
 
+#include <thread>
 #include <cstdlib>
 #include <string>
 #include <vector>
@@ -24,6 +25,12 @@
 #include "SubutaiString.h"
 
 namespace SubutaiLauncher {
+    struct SSHThread 
+    {
+        std::thread t;
+        std::string id;
+    };
+
     class SSH {
         public:
             static const std::string BIN;

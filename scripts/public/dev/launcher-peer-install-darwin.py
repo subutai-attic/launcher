@@ -1,4 +1,5 @@
 import subutai
+from threading import Thread
 import hashlib
 from time import sleep
 import datetime
@@ -6,6 +7,11 @@ from subprocess import call
 from shutil import copyfile
 import os
 import stat
+
+
+def RunSubutaiInstall(package):
+    subutai.SSHRun("sudo subutai import "+package+" >/tmp/"+package+".log 2>&1")
+    return 0
 
 
 def subutaistart():
@@ -81,18 +87,19 @@ def subutaistart():
         return 21
 
     sleep(60)
-    waitSSH()
-    sleep(60)
+    rc = waitSSH()
+    if rc != 0:
+        return rc
+
+    sleep(5)
     setupSSH()
     installSnapFromStore()
     subutai.SetProgress(0.10)
-    sleep(60)
+    sleep(10)
     initBtrfs()
     subutai.SetProgress(0.20)
-    sleep(5)
     setAlias()
     subutai.SetProgress(0.30)
-    sleep(10)
     installManagement()
     subutai.SetProgress(0.80)
 
@@ -142,10 +149,11 @@ def waitSSH():
         sleep(1)
         attempts = attempts + 1
         if attempts == 30:
+            subutai.RaiseError("SSH connection failed after 30 attempts")
             subutai.log("error", "SSH timeout for 30 second")
-            return
+            return 34
     subutai.log("info", "SSH Connected")
-    return
+    return 0
 
 
 def installManagement():
@@ -157,8 +165,19 @@ def installManagement():
 
     ip = "127.0.0.1"
 
-    subutai.AddStatus("Downloading Ubuntu")
-    subutai.SSHRun("sudo subutai -d import ubuntu16 1>/tmp/ubuntu16-1.log 2>/tmp/ubuntu16-2.log")
+    thread = Thread(target = RunSubutaiInstall, args = ("ubuntu16", ))
+    thread.start()
+
+    while True:
+        out = subutai.SSHRunOut("ps -ef | grep \"subutai import\" | grep -v grep | awk '{print $2}'")
+        if out == '':
+            break
+        sleep(1)
+        print("STILL INSTALLING ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
+    thread.join()
+
+    #subutai.SSHRun("sudo subutai -d import ubuntu16 1>/tmp/ubuntu16-1.log 2>/tmp/ubuntu16-2.log")
 
     subutai.AddStatus("Downloading JVM")
     subutai.SSHRun("sudo subutai -d import openjre16 1>/tmp/openjre16-1.log 2>/tmp/openjre16-2.log")

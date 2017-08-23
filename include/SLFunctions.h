@@ -542,6 +542,35 @@ namespace SubutaiLauncher
     }
 
     // ========================================================================
+
+    static PyObject* SL_SSHRunOut(PyObject* self, PyObject* args, PyObject* keywords)
+    {
+        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+        if (!PyArg_ParseTupleAndKeywords(
+                    args,
+                    keywords,
+                    "s",
+                    string_keywords,
+                    &sl_string
+                    ))
+            return NULL;
+        Poco::Logger::get("subutai").trace("SL_SSHRunOut ~ %s", std::string(sl_string));
+
+        auto s = Session::instance();
+
+        SSH *p = new SubutaiLauncher::SSH();
+        p->setHost(s->getSSHHostname(), s->getSSHPort());
+        p->setUsername(s->getSSHUser(), s->getSSHPass());
+        p->connect();
+        p->authenticate();
+        auto ret = p->execute(sl_string);
+        p->disconnect();
+        delete p;
+
+        return Py_BuildValue("s", ret.c_str());
+    }
+
+    // ========================================================================
     // Unused
     // ========================================================================
 
@@ -1128,6 +1157,7 @@ namespace SubutaiLauncher
         { "TestSSH", (PyCFunction)SL_TestSSH, METH_VARARGS, "Test if SSH connection is alive" },
         { "InstallSSHKey", (PyCFunction)SL_InstallSSHKey, METH_VARARGS, "Install SSH public key" },
         { "SSHRun", (PyCFunction)SL_SSHRun, METH_VARARGS | METH_KEYWORDS, "Run command over SSH" },
+        { "SSHRunOut", (PyCFunction)SL_SSHRunOut, METH_VARARGS | METH_KEYWORDS, "Run command over SSH and return it's output" },
         { "CheckVMExists", (PyCFunction)SL_CheckVMExists, METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name exists" },
         { "CheckVMRunning", (PyCFunction)SL_CheckVMRunning, METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name running" },
         { "GetScheme", SL_GetScheme, METH_VARARGS, "Returns current scheme: production, master, dev" },
