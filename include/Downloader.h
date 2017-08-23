@@ -56,6 +56,7 @@ namespace SubutaiLauncher
 		std::string name;
 		std::string id;
 		long size;
+        std::string md5;
 	};
 
 	class Downloader

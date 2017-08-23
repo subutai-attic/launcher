@@ -48,6 +48,7 @@ namespace SubutaiLauncher
         _file.owner = "";
         _file.id = "";
         _file.size = 0;
+        _file.md5 = "";
         _content = "";
         _filename = "";
         _progress = 0;
@@ -173,6 +174,8 @@ namespace SubutaiLauncher
         _file.id = obj->get("id").toString();
         _file.name = obj->get("filename").toString();
         _file.size = obj->get("size").extract<int>();
+        Poco::JSON::Object::Ptr hashObj = obj->getObject("hash");
+        _file.md5 = hashObj->get("md5").toString();
         _file.owner = obj->get("owner").extract<Poco::JSON::Array::Ptr>()
             ->get(0).extract<std::string>();
 
@@ -180,6 +183,7 @@ namespace SubutaiLauncher
         _logger->debug("Name: %s", _file.name);
         _logger->debug("ID: %s", _file.id);
         _logger->debug("Size: %ld", _file.size);
+        _logger->debug("Hash: %s", _file.md5);
 
         return true;
     }
@@ -260,10 +264,6 @@ namespace SubutaiLauncher
                 }
             }
 
-            //==============================================================================================
-            // 5.0.1
-            //==============================================================================================
-
             std::ofstream out(path, std::fstream::app | std::fstream::out | std::fstream::binary);
             _outStream = std::shared_ptr<Poco::CountingOutputStream>(new Poco::CountingOutputStream(out));
             Poco::TimerCallback<Downloader> cb(*this, &Downloader::progressTimer);
@@ -280,9 +280,6 @@ namespace SubutaiLauncher
             {
                 pTimer->stop();
             }
-
-            //==============================================================================================
-
         }
         catch (Poco::Net::HTTPException e)
         {
@@ -295,7 +292,6 @@ namespace SubutaiLauncher
 
     void Downloader::progressTimer(Poco::Timer& timer)
     {
-        _logger->trace("Progress Timer");
         if (_outStream) 
         {
             _bytes = (long)_outStream->chars();
@@ -362,7 +358,7 @@ namespace SubutaiLauncher
         }
 
         std::string hash = Poco::DigestEngine::digestToHex(md5.digest());
-        return (hash == _file.id);
+        return (hash == _file.md5);
     }
 
     SubutaiFile Downloader::info()
