@@ -8,12 +8,8 @@ from subprocess import Popen, PIPE
 
 def updateProgress(cocoasudo, p2p, tuntap, total):
     cur = cocoasudo + p2p + tuntap
-
-    print("Cur: " + str(cur) + " Total: " + str(total))
     val = (int)(100 * cur) / total
-    print("Val: " + str(val))
     progress = (float)(val/100)
-    print("Progress: " + str(progress))
     subutai.SetProgress(progress)
 
 

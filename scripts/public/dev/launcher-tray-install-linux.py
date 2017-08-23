@@ -4,14 +4,29 @@ from time import sleep
 from subprocess import call
 
 
+def updateProgress(tray, total):
+    cur = tray
+    val = (int)(100 * cur) / total
+    progress = (float)(val/100)
+    subutai.SetProgress(progress)
+
+
 def subutaistart():
     subutai.AddStatus("Download Tray application")
 
-    tray = "SubutaiTray_libs.tar.gz"
+    trayFile = "SubutaiTray_libs.tar.gz"
 
-    subutai.download(tray)
+    traySize = subutai.GetFileSize(trayFile)
+    totalSize = traySize
+    trayProgress = 0
+
+    subutai.download(trayFile)
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
+        trayProgress = subutai.GetBytesDownload()
+        updateProgress(trayProgress, totalSize)
+
+    trayProgress = traySize
 
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
@@ -20,12 +35,13 @@ def subutaistart():
 
     call(['/usr/bin/killall', '-9', 'SubutaiTray'])
 
-    tar = tarfile.open(tmpDir+"/"+tray, "r:gz")
+    tar = tarfile.open(tmpDir+"/"+trayFile, "r:gz")
     tar.extractall(installDir+"/bin/")
     tar.close()
 
     subutai.AddStatus("Creating Symlink")
-    subutai.MakeLink(installDir+"/bin/SubutaiTray", "/usr/local/bin/SubutaiTray")
+    subutai.MakeLink(installDir+"/bin/SubutaiTray",
+                     "/usr/local/bin/SubutaiTray")
 
     desktop = '''
 [Desktop Entry]
