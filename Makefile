@@ -113,6 +113,9 @@ $(BUILD_DIR)/SLFunctions.o: $(SRC_DIR)/SLFunctions.cpp $(INCLUDE_DIR)/SLFunction
 $(BUILD_DIR)/SSH.o: $(SRC_DIR)/SSH.cpp $(INCLUDE_DIR)/SSH.h
 	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
 
+$(BUILD_DIR)/SSHException.o: $(SRC_DIR)/SSHException.cpp $(INCLUDE_DIR)/SSHException.h
+	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
+
 $(BUILD_DIR)/Session.o: $(SRC_DIR)/Session.cpp $(INCLUDE_DIR)/Session.h
 	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
 
@@ -149,6 +152,7 @@ OBJS = $(BUILD_DIR)/Core.o \
 									 $(BUILD_DIR)/SL.o \
 									 $(BUILD_DIR)/SLFunctions.o \
 									 $(BUILD_DIR)/SSH.o \
+									 $(BUILD_DIR)/SSHException.o \
 									 $(BUILD_DIR)/Session.o \
 									 $(BUILD_DIR)/Settings.o \
 									 $(BUILD_DIR)/SubutaiException.o \

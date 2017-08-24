@@ -10,7 +10,11 @@ namespace SubutaiLauncher
         _username("root"),
         _password(""),
         _host("127.0.0.1"),
-        _port(22)
+        _port(22),
+        _installed(false),
+        _connected(false),
+        _authenticated(false),
+        _bChanOpen(false)
     {
         _logger = &Poco::Logger::get("subutai");
         _ssh = ssh_new();
@@ -30,6 +34,33 @@ namespace SubutaiLauncher
         _logger->debug("SSH instance destructed");
     }
 
+    void SSH::authenticate()
+    {
+        int rc = ssh_userauth_password(_ssh, NULL, _password.c_str());
+        _logger->debug("SSH Authentication status: %d", rc);
+        if (rc == SSH_AUTH_ERROR) {
+            _authenticated = false;
+            return;
+        }
+        _authenticated = true;
+    }
+
+    void SSH::closeChannel()
+    {
+        if (_bChanOpen)
+        {
+            _bChanOpen = false;
+            ssh_channel_close(_channel);
+            ssh_channel_send_eof(_channel);
+            ssh_channel_free(_channel);
+        }
+    }
+
+    void SSH::closeShell()
+    {
+        if (_bShellOpen) closeChannel();
+    }
+
     void SSH::disconnect()
     {
         if (_connected) {
@@ -37,6 +68,60 @@ namespace SubutaiLauncher
             ssh_disconnect(_ssh);
             _connected = false;
         }
+    }
+
+    std::string SSH::execute(const std::string& command)
+    {
+        _logger->trace("Executing SSH command: %s", command);
+        int rc;
+        char buffer[1024];
+        int nbytes;
+        memset(buffer, 0, 1024);
+
+        if (!_bChanOpen)
+        {
+            rc = openChannel();
+            if (rc != E_NOERR)
+            {
+                _logger->error("Couldn't open SSH channel: %d", rc);
+                return "";
+            }
+        }
+
+        _logger->trace("Starting SSH command execution");
+        rc = ssh_channel_request_exec(_channel, command.c_str());
+        if (rc != SSH_OK) {
+            closeChannel();
+            throw SSHException("Failed to execute SSH command", SSHErrorCode::E_CMD_EXEC_FAILED);
+        }
+
+        _logger->trace("Reading from channel");
+        nbytes = ssh_channel_read(_channel, buffer, sizeof(buffer), 0);
+
+        std::string pBuffer("");
+
+        while (nbytes > 0)
+        {
+            pBuffer.append(buffer);
+            nbytes = ssh_channel_read(_channel, buffer, sizeof(buffer), 0);
+        }
+
+        if (nbytes < 0) 
+        {
+            closeChannel();
+            throw SSHException("Output channel is empty", SSHErrorCode::E_EMPTY_OUTPUT_CHAN);
+        }
+
+        closeChannel();
+        _logger->debug("SSH Execution output: %s", pBuffer);
+        return Poco::trim(pBuffer);
+    }
+
+    std::string SSH::executeInShell(const std::string& command)
+    {
+        int nbytes;
+
+        return "";
     }
 
     bool SSH::findInstallation()
@@ -90,17 +175,6 @@ namespace SubutaiLauncher
         _connected = true;
     }
 
-    void SSH::authenticate()
-    {
-        int rc = ssh_userauth_password(_ssh, NULL, _password.c_str());
-        _logger->debug("SSH Authentication status: %d", rc);
-        if (rc == SSH_AUTH_ERROR) {
-            _authenticated = false;
-            return;
-        }
-        _authenticated = true;
-    }
-
     int SSH::verifyHost()
     {
         int state;
@@ -150,63 +224,6 @@ namespace SubutaiLauncher
         return 0;
     }
 
-    std::string SSH::execute(const std::string& command)
-    {
-        _logger->trace("Executing SSH command: %s", command);
-        ssh_channel chan;
-        int rc;
-        char buffer[1024];
-        int nbytes;
-        memset(buffer, 0, 1024);
-
-        chan = ssh_channel_new(_ssh);
-        if (chan == NULL)
-        {
-            _logger->error("Failed to open channel");
-            return "Error: Failed to open channel ";
-        }
-
-        rc = ssh_channel_open_session(chan);
-        if (rc != SSH_OK) {
-            ssh_channel_close(chan);
-            ssh_channel_free(chan);
-            _logger->error("Failed to open SSH session");
-            return "Error: Failed to open SSH session ";
-        }
-
-        rc = ssh_channel_request_exec(chan, command.c_str());
-        if (rc != SSH_OK) {
-            ssh_channel_close(chan);
-            ssh_channel_free(chan);
-            _logger->error("Failed to execute command");
-            return "Error: Failed to execute command ";
-        }
-
-        nbytes = ssh_channel_read(chan, buffer, sizeof(buffer), 0);
-
-        std::string strBuffer("");
-
-        while (nbytes > 0)
-        {
-            strBuffer.append(buffer);
-            nbytes = ssh_channel_read(chan, buffer, sizeof(buffer), 0);
-        }
-
-        if (nbytes < 0) {
-            ssh_channel_close(chan);
-            ssh_channel_free(chan);
-            _logger->error("Output channel is empty");
-            return "Error: Output channel is empty ";
-        }
-
-        ssh_channel_send_eof(chan);
-        ssh_channel_close(chan);
-        ssh_channel_free(chan);
-        std::string ret(strBuffer);
-        _logger->debug("SSH Execution output: %s", ret);
-        return Poco::trim(ret);
-    }
-
     bool SSH::isConnected()
     {
         return _connected;
@@ -236,6 +253,58 @@ namespace SubutaiLauncher
             Poco::Logger::get("subutai").error("Exception: %s", e.what());
             return "";
         }
+    }
+
+    int SSH::openChannel()
+    {
+        int rc;
+        _logger->trace("Opening SSH channel");
+        _channel = ssh_channel_new(_ssh);
+        if (_channel == NULL)
+        {
+            _logger->error("Failed to open SSH channel");
+            throw SSHException("Failed to open SSH channel", SSHErrorCode::E_CHAN_OPEN_FAILED);
+        }
+
+        rc = ssh_channel_open_session(_channel);
+        if (rc != SSH_OK)
+        {
+            ssh_channel_close(_channel);
+            ssh_channel_free(_channel);
+            throw SSHException("Failed to open SSH session", SSHErrorCode::E_SESS_OPEN_FAILED);
+        }
+
+        _bChanOpen = true;
+        return SSHErrorCode::E_NOERR;
+    }
+
+    void SSH::openShell()
+    {
+        if (_bShellOpen)
+        {
+            return;
+        }
+        if (!_bChanOpen)
+        {
+            openChannel();
+        }
+        int rc;
+        rc = ssh_channel_request_pty(_channel);
+        if (rc != SSH_OK) 
+        {
+            throw SSHException("Failed to request PTY from remote host", SSHErrorCode::E_PTY_REQUEST_FAILED);
+        }
+        rc = ssh_channel_change_pty_size(_channel, 80, 24);
+        if (rc != SSH_OK) 
+        {
+            throw SSHException("Failed to change PTY size", SSHErrorCode::E_PTY_SIZE_FAILED);
+        }
+        rc = ssh_channel_request_shell(_channel);
+        if (rc != SSH_OK) 
+        {
+            throw SSHException("Failed to request remote shell", SSHErrorCode::E_SHELL_REQUEST_FAILED);
+        }
+        _bShellOpen = true;
     }
 
 }

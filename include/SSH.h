@@ -22,32 +22,42 @@
 #include "libssh/libssh.h"
 #include "Environment.h"
 #include "FileSystem.h"
-#include "SubutaiString.h"
+#include "SSHException.h"
 
 namespace SubutaiLauncher {
-    struct SSHThread 
-    {
-        std::thread t;
-        std::string id;
-    };
+
+    typedef enum {
+        E_NOERR = 0,
+        E_CHAN_OPEN_FAILED,
+        E_SESS_OPEN_FAILED,
+        E_CMD_EXEC_FAILED,
+        E_EMPTY_OUTPUT_CHAN,
+        E_PTY_REQUEST_FAILED,
+        E_PTY_SIZE_FAILED,
+        E_SHELL_REQUEST_FAILED
+    } SSHErrorCode;
 
     class SSH {
         public:
             static const std::string BIN;
             SSH();
             ~SSH();
-            bool findInstallation();
-            void setUsername(const std::string& username, const std::string& password);
-            void setHost(const std::string& host, long port = 22);
-            //std::string run(const std::string& command) const;
+            void authenticate();
+            void closeChannel();
             void connect();
             void disconnect();
-            void authenticate();
-            int verifyHost();
+            void openShell();
+            void closeShell();
             std::string execute(const std::string& command);
-            bool isConnected();
-            bool isAuthenticated();
+            std::string executeInShell(const std::string& command);
+            bool findInstallation();
             static std::string getPublicKey();
+            bool isAuthenticated();
+            bool isConnected();
+            int openChannel();
+            void setHost(const std::string& host, long port = 22);
+            void setUsername(const std::string& username, const std::string& password);
+            int verifyHost();
         private:
             Poco::Logger* _logger;
             ssh_session _ssh;
@@ -61,6 +71,9 @@ namespace SubutaiLauncher {
             bool _installed;
             bool _connected;
             bool _authenticated;
+            bool _bChanOpen;
+            bool _bShellOpen;
+            ssh_channel _channel; // SSH Channel for multi-command sessions
     };
 }
 

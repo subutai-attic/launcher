@@ -28,6 +28,7 @@ private:
 	std::thread runThread();
 	void runImpl();
 	void addLine(const std::string& text, bool error = false);
+    void replaceLine(const std::string& text, bool error = false);
 private:
 	bool _succeed;
 	Poco::Logger* _logger;

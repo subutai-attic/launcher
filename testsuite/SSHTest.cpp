@@ -39,7 +39,6 @@ void SSHTest::testConnect()
 
 void SSHTest::testAuthenticate()
 {
-    return;
     SubutaiLauncher::SSH p;
     p.setHost("127.0.0.1", 22);
     p.setUsername("ubuntu", "ubuntu");
@@ -50,7 +49,6 @@ void SSHTest::testAuthenticate()
 
 void SSHTest::testCommand()
 {
-    return;
     SubutaiLauncher::SSH p;
     p.setHost("127.0.0.1", 22);
     p.setUsername("ubuntu", "ubuntu");
@@ -58,6 +56,24 @@ void SSHTest::testCommand()
     p.authenticate();
     assert(p.isAuthenticated());
     p.execute("touch /tmp/ssh-test");
+}
+
+void SSHTest::testCommandChain()
+{
+    SubutaiLauncher::Core *c = new SubutaiLauncher::Core();
+    auto sess = SubutaiLauncher::Session::instance();
+    sess->setSSHCredentials("ubuntu", "ubuntu", "127.0.0.1", 22);
+    sess->makeSSHSession("ut");
+    auto s = sess->getSSHSession("ut");
+    s->execute("touch /tmp/unit-test1", true);
+    s->execute("touch /tmp/unit-test2", true);
+    s->execute("touch /tmp/unit-test3", true);
+    s->execute("touch /tmp/unit-test4 &", true);
+    s->execute("touch /tmp/unit-test5", true);
+    s->execute("touch /tmp/unit-test6", true);
+    s->execute("touch /tmp/unit-test7", true);
+    sess->finalizeSSHSession("ut");
+    delete c;
 }
 
 CppUnit::Test * SSHTest::suite()
@@ -68,6 +84,7 @@ CppUnit::Test * SSHTest::suite()
     CppUnit_addTest(pSuite, SSHTest, testConnect);
     CppUnit_addTest(pSuite, SSHTest, testAuthenticate);
     CppUnit_addTest(pSuite, SSHTest, testCommand);
+    CppUnit_addTest(pSuite, SSHTest, testCommandChain);
 
 	return pSuite;
 }

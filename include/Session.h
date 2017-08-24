@@ -10,11 +10,19 @@
 #include "VirtualBox.h"
 #include "Downloader.h"
 #include "Settings.h"
-#include "NotificationCenter.h"
 #include "Hub.h"
+#include "NotificationCenter.h"
 
 namespace SubutaiLauncher 
 {
+
+    class SSH;
+
+    struct SSHSession
+    {
+        std::string name;
+        SSH* session;
+    };
 
     class Session 
     {
@@ -31,11 +39,16 @@ namespace SubutaiLauncher
             std::string getSSHHostname();
             long getSSHPort();
             void addStatus(const std::string& text);
+            void replaceStatus(const std::string& text);
             std::string getStatus();
             Poco::Logger& logger();
 			bool isTerminating();
 			void terminate();
 			void start();
+            // SSH Session
+            SSH* makeSSHSession(const std::string& name, bool empty = false);
+            SSH* getSSHSession(const std::string& name);
+            void finalizeSSHSession(const std::string& name);
         private:
 			bool _terminate;
             //SubutaiLauncher::VirtualBox* _virtualBox;
@@ -48,6 +61,7 @@ namespace SubutaiLauncher
             std::string _sshHostname;
             long _sshPort;
             std::vector<std::string> _statusPool;
+            std::vector<SSHSession> _sshSessions;
         protected:
             static Session *_instance;
             Session();

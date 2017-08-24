@@ -1,5 +1,4 @@
 import subutai
-from threading import Thread
 import hashlib
 from time import sleep
 import datetime
@@ -165,17 +164,27 @@ def installManagement():
 
     ip = "127.0.0.1"
 
-    thread = Thread(target = RunSubutaiInstall, args = ("ubuntu16", ))
-    thread.start()
+# Start ubuntu installation
 
-    while True:
-        out = subutai.SSHRunOut("ps -ef | grep \"subutai import\" | grep -v grep | awk '{print $2}'")
-        if out == '':
-            break
-        sleep(1)
-        print("STILL INSTALLING ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    subutai.AddStatus("Downloading Ubuntu Linux")
+    rc = subutai.SSHStartSession("mng-setup")
+    if rc != 0:
+        subutai.RaiseError("Failed to install Ubuntu interactively. Switching to static install")
+        subutai.SSHRun("sudo subutai -d import ubuntu16 >/tmp/ubuntu16.log 2>&1")
+    else:
+        rc = subutai.SSHExecute("mng-setup", "sudo subutai import ubuntu16 >/tmp/ubuntu16.log 2>&1 &")
+        if rc[0] != 0:
+            subutai.RaiseError("Failed to install Ubuntu in background. Switching to static install")
+            subutai.SSHRun("sudo subutai -d import ubuntu16 >/tmp/ubuntu16.log 2>&1")
+        else:
+            while True:
+                out = subutai.SSHExecute("mng-setup", "ps -ef | grep \"subutai import\" | grep -v grep | awk '{print $2}'")
+                if out[1] == '':
+                    break
+                sleep(1)
+                print("STILL INSTALLING ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
-    thread.join()
+    subutai.SSHStopSession("mng-setup")
 
     #subutai.SSHRun("sudo subutai -d import ubuntu16 1>/tmp/ubuntu16-1.log 2>/tmp/ubuntu16-2.log")
 
