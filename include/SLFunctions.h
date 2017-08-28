@@ -1103,7 +1103,6 @@ namespace SubutaiLauncher
             execl("/opt/subutai/bin/SubutaiTray", 0);
             return Py_BuildValue("i", 0);
         }
-    }
 #elif LAUNCHER_WINDOWS
     STARTUPINFO si;     
     PROCESS_INFORMATION pi;
@@ -1128,6 +1127,8 @@ namespace SubutaiLauncher
             );
     CloseHandle( pi.hProcess );
     CloseHandle( pi.hThread );
+    return Py_BuildValue("i", 0);
+
 #else
     return Py_BuildValue("i", -1);
 #endif

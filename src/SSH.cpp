@@ -1,11 +1,13 @@
 #include "SSH.h"
 #define MAX_XFER_BUF_SIZE 16384
 
-namespace SubutaiLauncher 
-{
 #include <mutex>
 #include <thread>
 #include <libssh/callbacks.h>
+
+namespace SubutaiLauncher 
+{
+#if !LAUNCHER_LINUX
 
     static int ssh_std_thread_mutex_init(void **priv) {
         *priv = new std::mutex();
@@ -48,12 +50,15 @@ namespace SubutaiLauncher
     struct ssh_threads_callbacks_struct * ssh_threads_get_std_threads(void) {
         return &ssh_threads_std_thread;
     }
+#endif
 
     const std::string SSH::BIN = "ssh";
 
     void SSH::initialize()
     {
+#if !LAUNCHER_LINUX
         ssh_threads_set_callbacks(ssh_threads_get_std_threads());
+#endif
         ssh_init();
     }
 
