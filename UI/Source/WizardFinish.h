@@ -34,6 +34,7 @@ class WizardFinish :
 		juce::Label _trayResult;
 		juce::Label _eteResult;
 		juce::Label _peerResult;
+        juce::HyperlinkButton _peerLink;
         LauncherButton _finish;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WizardFinish)
 };

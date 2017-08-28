@@ -1075,298 +1075,336 @@ namespace SubutaiLauncher
         return Py_BuildValue("i", 0);
     }
 
-    // ========================================================================
-    // Unused
-    // ========================================================================
-
-    static PyObject* SL_StopProcedure(PyObject* self, PyObject* args)
+    static PyObject* SL_StartTray(PyObject* self, PyObject* args)
     {
-        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        return Py_BuildValue("i", 0);
+#if LAUNCHER_LINUX
+        if (fork() == 0) {
+            execl("/opt/subutai/bin/SubutaiTray", 0);
+            return Py_BuildValue("i", 0);
+        }
     }
+#elif LAUNCHER_WINDOWS
+    STARTUPINFO si;     
+    PROCESS_INFORMATION pi;
 
-    // ========================================================================
-    // VM
-    // ========================================================================
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    ZeroMemory(&pi, sizeof(pi));
+
+    std::string app = Session::instance()->getSettings()->SL_GetInstallDir();
+    app.append("\\tray\\SubutaiTray.exe");
+
+    CreateProcess(app.c_str(),   // the path
+            "",        // Command line
+            NULL,           // Process handle not inheritable
+            NULL,           // Thread handle not inheritable
+            FALSE,          // Set handle inheritance to FALSE
+            0,              // No creation flags
+            NULL,           // Use parent's environment block
+            NULL,           // Use parent's starting directory 
+            &si,            // Pointer to STARTUPINFO structure
+            &pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
+            );
+    CloseHandle( pi.hProcess );
+    CloseHandle( pi.hThread );
+#else
+    return Py_BuildValue("i", -1);
+#endif
+}
+
+// ========================================================================
+// Unused
+// ========================================================================
+
+static PyObject* SL_StopProcedure(PyObject* self, PyObject* args)
+{
+    if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+    return Py_BuildValue("i", 0);
+}
+
+// ========================================================================
+// VM
+// ========================================================================
 
 
 
 
 
-    // ========================================================================
+// ========================================================================
 
-    static PyObject* SL_SetProgress(PyObject* self, PyObject* args, PyObject* keywords)
-    {
-        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "d", double_keywords, &sl_double))
-            return NULL;
+static PyObject* SL_SetProgress(PyObject* self, PyObject* args, PyObject* keywords)
+{
+    if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+    if (!PyArg_ParseTupleAndKeywords(args, keywords, "d", double_keywords, &sl_double))
+        return NULL;
 
-        std::printf("DOUBLE: %f\n", sl_double);
-        Poco::Dynamic::Var pProgress = sl_double;
-        Session::instance()->getNotificationCenter()->notificationRaised(N_DOUBLE_DATA, pProgress);
-        return Py_BuildValue("i", 0);
-    }
+    std::printf("DOUBLE: %f\n", sl_double);
+    Poco::Dynamic::Var pProgress = sl_double;
+    Session::instance()->getNotificationCenter()->notificationRaised(N_DOUBLE_DATA, pProgress);
+    return Py_BuildValue("i", 0);
+}
 
-    // ========================================================================
+// ========================================================================
 
-    static PyObject* SL_MakeLink(PyObject* self, PyObject* args, PyObject* keywords)
-    {
-        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        //Poco::Logger::get("subutai").information("SL_MakeLink");
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
-            return NULL;
+static PyObject* SL_MakeLink(PyObject* self, PyObject* args, PyObject* keywords)
+{
+    if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+    //Poco::Logger::get("subutai").information("SL_MakeLink");
+    if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
+        return NULL;
 
 #if LAUNCHER_LINUX
-        RootProcess* rp = new RootProcess();
-        char cmd[1024];
-        std::sprintf(cmd, "ln -s %s %s", sl_string, sl_desc);
-        rp->addCommand(std::string(cmd));
-        rp->execute("Install executable");
-        delete rp;
-        return Py_BuildValue("i", 0);
+    RootProcess* rp = new RootProcess();
+    char cmd[1024];
+    std::sprintf(cmd, "ln -s %s %s", sl_string, sl_desc);
+    rp->addCommand(std::string(cmd));
+    rp->execute("Install executable");
+    delete rp;
+    return Py_BuildValue("i", 0);
 #elif LAUNCHER_MACOS
-        Poco::Process::Args symlinkArgs;
-        symlinkArgs.push_back("-s");
-        symlinkArgs.push_back(sl_string);
-        symlinkArgs.push_back(sl_desc);
-        auto ph = Poco::Process::launch("ln", symlinkArgs);
-        int exitCode = ph.wait();
-        return Py_BuildValue("i", exitCode);
+    Poco::Process::Args symlinkArgs;
+    symlinkArgs.push_back("-s");
+    symlinkArgs.push_back(sl_string);
+    symlinkArgs.push_back(sl_desc);
+    auto ph = Poco::Process::launch("ln", symlinkArgs);
+    int exitCode = ph.wait();
+    return Py_BuildValue("i", exitCode);
 #else
-        return Py_BuildValue("i", 1);
+    return Py_BuildValue("i", 1);
 #endif
 
+}
+
+// ========================================================================
+
+static PyObject* SL_RegisterService(PyObject* self, PyObject* args, PyObject* keywords)
+{
+    if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+    if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
+        return NULL;
+
+    Poco::Logger::get("subutai").trace("SL_RegisterService ~ %s %s", std::string(sl_string), std::string(sl_desc));
+
+    // sl_string - name of service
+    // sl_desc - path_to_exe|arguments
+    std::vector<std::string> pArgs;
+    std::string pPath = "";
+
+    Poco::StringTokenizer st(std::string(sl_desc), "|", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+    for (auto it = st.begin(); it != st.end(); it++)
+    {
+        if (it == st.begin())
+        {
+            pPath = (*it);
+            continue;
+        }
+        pArgs.push_back((*it));
     }
 
-    // ========================================================================
-
-    static PyObject* SL_RegisterService(PyObject* self, PyObject* args, PyObject* keywords)
+    Environment e;
+    bool rc = e.registerService(std::string(sl_string), pPath, pArgs);
+    if (rc)
     {
-        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "ss", desc_keywords, &sl_string, &sl_desc))
-            return NULL;
-
-        Poco::Logger::get("subutai").trace("SL_RegisterService ~ %s %s", std::string(sl_string), std::string(sl_desc));
-
-        // sl_string - name of service
-        // sl_desc - path_to_exe|arguments
-        std::vector<std::string> pArgs;
-        std::string pPath = "";
-
-        Poco::StringTokenizer st(std::string(sl_desc), "|", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
-        for (auto it = st.begin(); it != st.end(); it++)
-        {
-            if (it == st.begin())
-            {
-                pPath = (*it);
-                continue;
-            }
-            pArgs.push_back((*it));
-        }
-
-        Environment e;
-        bool rc = e.registerService(std::string(sl_string), pPath, pArgs);
-        if (rc)
-        {
-            return Py_BuildValue("i", 0);
-        }
-        return Py_BuildValue("i", 1);
-    }
-
-    // ========================================================================
-
-    static PyObject* SL_UnregisterService(PyObject* self, PyObject* args, PyObject* keywords)
-    {
-        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
-            return NULL;
-
-        Poco::Logger::get("subutai").trace("SL_UnregisterService ~ %s", std::string(sl_string));
-
-        Environment e;
-        bool rc = e.unregisterService(std::string(sl_string));
-        if (rc)
-        {
-            return Py_BuildValue("i", 0);
-        }
-        return Py_BuildValue("i", 1);
-    }
-
-    // ========================================================================
-
-    static PyObject* SL_UpdatePath(PyObject* self, PyObject* args)
-    {
-        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        Environment e;
-        e.updatePath(Session::instance()->getSettings()->getInstallationPath() + "bin");
         return Py_BuildValue("i", 0);
     }
+    return Py_BuildValue("i", 1);
+}
 
-    // ========================================================================
+// ========================================================================
 
-    static PyObject* SL_ProcessKill(PyObject* self, PyObject* args, PyObject* keywords)
+static PyObject* SL_UnregisterService(PyObject* self, PyObject* args, PyObject* keywords)
+{
+    if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+    if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+        return NULL;
+
+    Poco::Logger::get("subutai").trace("SL_UnregisterService ~ %s", std::string(sl_string));
+
+    Environment e;
+    bool rc = e.unregisterService(std::string(sl_string));
+    if (rc)
     {
-
-        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
-            return NULL;
-
-        Poco::Logger::get("subutai").trace("SL_ProcessKill ~ %s", std::string(sl_string));
-
-        Environment e;
-        bool rc = e.killProcess(std::string(sl_string));
-        if (rc)
-        {
-            return Py_BuildValue("i", 0);
-        }
-        return Py_BuildValue("i", 1);
-    }
-
-
-    // ========================================================================
-
-#if LAUNCHER_LINUX
-    // ========================================================================
-
-    static PyObject* SL_RemoveSystemdUnit(PyObject* self, PyObject* args, PyObject* keywords)
-    {
-        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        Poco::Logger::get("subutai").trace("SL_RemoveSystemdUnit");
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
-            return NULL;
-
-        char cmd[1024];
-
-        RootProcess* rp = new RootProcess();
-        std::sprintf(cmd, "systemctl stop %s", sl_string);
-        rp->addCommand(std::string(cmd));
-        std::sprintf(cmd, "systemctl disable %s", sl_string);
-        rp->addCommand(std::string(cmd));
-        std::sprintf(cmd, "rm -rf /etc/systemd/system/%s", sl_string);
-        rp->addCommand(std::string(cmd));
-        rp->execute("Uninstall P2P systemd unit");
-        delete rp;
         return Py_BuildValue("i", 0);
     }
+    return Py_BuildValue("i", 1);
+}
 
-    // ========================================================================
+// ========================================================================
 
-#endif
+static PyObject* SL_UpdatePath(PyObject* self, PyObject* args)
+{
+    if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+    Environment e;
+    e.updatePath(Session::instance()->getSettings()->getInstallationPath() + "bin");
+    return Py_BuildValue("i", 0);
+}
 
-    // ========================================================================
+// ========================================================================
 
-    static __attribute_used__ PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
+static PyObject* SL_ProcessKill(PyObject* self, PyObject* args, PyObject* keywords)
+{
+
+    if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+    if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+        return NULL;
+
+    Poco::Logger::get("subutai").trace("SL_ProcessKill ~ %s", std::string(sl_string));
+
+    Environment e;
+    bool rc = e.killProcess(std::string(sl_string));
+    if (rc)
     {
-#if LAUNCHER_WINDOWS
-        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        Poco::Logger::get("subutai").trace("SL_RegisterPlugin");
-        Environment e;
-        if (e.writeE2ERegistry(""))
-        {
-            return Py_BuildValue("i", 0);
-        }
-        else
-        {
-            return Py_BuildValue("i", 1);
-        }
-#else
-        return Py_BuildValue("i", 1);
-#endif
+        return Py_BuildValue("i", 0);
     }
-    // ========================================================================
-    // Module bindings
-    // ========================================================================
+    return Py_BuildValue("i", 1);
+}
 
-    static PyMethodDef SubutaiSLMethods[] = {
-        { "AddStatus",                  (PyCFunction)   SL_AddStatus,                   METH_VARARGS | METH_KEYWORDS, "Add status" },
+
+// ========================================================================
+
 #if LAUNCHER_LINUX
-        { "AddSystemdUnit",             (PyCFunction)   SL_AddSystemdUnit,              METH_VARARGS | METH_KEYWORDS, "Adds new systemd unit" },
+// ========================================================================
+
+static PyObject* SL_RemoveSystemdUnit(PyObject* self, PyObject* args, PyObject* keywords)
+{
+    if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+    Poco::Logger::get("subutai").trace("SL_RemoveSystemdUnit");
+    if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+        return NULL;
+
+    char cmd[1024];
+
+    RootProcess* rp = new RootProcess();
+    std::sprintf(cmd, "systemctl stop %s", sl_string);
+    rp->addCommand(std::string(cmd));
+    std::sprintf(cmd, "systemctl disable %s", sl_string);
+    rp->addCommand(std::string(cmd));
+    std::sprintf(cmd, "rm -rf /etc/systemd/system/%s", sl_string);
+    rp->addCommand(std::string(cmd));
+    rp->execute("Uninstall P2P systemd unit");
+    delete rp;
+    return Py_BuildValue("i", 0);
+}
+
+// ========================================================================
+
 #endif
-        { "CheckDirectories",                           SL_CheckDirectories,            METH_VARARGS, "Display launcher version" },
-        { "CheckVMExists",              (PyCFunction)   SL_CheckVMExists,               METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name exists" },
-        { "CheckVMRunning",             (PyCFunction)   SL_CheckVMRunning,              METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name running" },
-        { "CreateDesktopShortcut",      (PyCFunction)   SL_CreateDesktopShortcut,       METH_VARARGS | METH_KEYWORDS, "Creates a shortcut on a desktop" },
-        { "debug",                                      SL_Debug,                       METH_VARARGS, "Shows debug information about current launcher instance and environment" },
-#if LAUNCHER_LINUX
-        { "DesktopFileInstall",         (PyCFunction)   SL_DesktopFileInstall,          METH_VARARGS | METH_KEYWORDS, "Runs desktop-file-install" },
+
+// ========================================================================
+
+static __attribute_used__ PyObject* SL_RegisterPlugin(PyObject* self, PyObject* args)
+{
+#if LAUNCHER_WINDOWS
+    if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+    Poco::Logger::get("subutai").trace("SL_RegisterPlugin");
+    Environment e;
+    if (e.writeE2ERegistry(""))
+    {
+        return Py_BuildValue("i", 0);
+    }
+    else
+    {
+        return Py_BuildValue("i", 1);
+    }
+#else
+    return Py_BuildValue("i", 1);
 #endif
-        { "download",                   (PyCFunction)   SL_Download,                    METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN" },
-        { "GetBytesDownload",                           SL_GetBytesDownload,            METH_VARARGS, "Returns number of bytes downloaded" },
-        { "GetCoreNum",                                 SL_GetCoreNum,                  METH_VARARGS, "Returns choosen amount of cores" },
-        { "GetDefaultRoutingInterface",                 SL_GetDefaultRoutingInterface,  METH_VARARGS, "Returns name of default network interface" },
-        { "GetDevVersion",                              SL_GetDevVersion,               METH_VARARGS, "Returns dev version of a product" },
-        { "GetDownloadProgress",                        SL_GetDownloadProgress,         METH_VARARGS, "Return percentage of download" },
-        { "GetFileSize",                (PyCFunction)   SL_GetFileSize,                 METH_VARARGS | METH_KEYWORDS, "Gets remote file size" },
-        { "GetInstallDir",                              SL_GetInstallDir,               METH_VARARGS, "Returns installation directory" },
-        { "GetMasterVersion",                           SL_GetMasterVersion,            METH_VARARGS, "Returns master version of a product" },
-        { "GetMemSize",                                 SL_GetMemSize,                  METH_VARARGS, "Return amount of memory" },
-        { "GetOSVersionNumber",                         SL_GetOSVersionNumber,          METH_VARARGS, "Returns number of OS version" },
-        { "GetPeerFileSize",            (PyCFunction)   SL_GetPeerFileSize,             METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for a file inside a peer over SSH" },
-        { "GetPeerIP",                                  SL_GetPeerIP,                   METH_VARARGS, "Returns Peer IP address" },
-        { "GetPercentDownload",                         SL_GetPercentDownload,          METH_VARARGS, "Returns percents of download complete" },
-        { "getProgress",                                SL_GetProgress,                 METH_VARARGS, "Returns bool" },
-        { "GetRemoteFileSize",          (PyCFunction)   SL_GetRemoteFileSize,           METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for kurjun file" },
-        { "GetRemoteTemplateSize",      (PyCFunction)   SL_GetRemoteTemplateSize,       METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for kurjun file" },
-        { "GetScheme",                                  SL_GetScheme,                   METH_VARARGS, "Returns current scheme: production, master, dev" },
-        { "GetTmpDir",                                  SL_GetTmpDir,                   METH_VARARGS, "Returns tmp directory" },
-        { "GetVBoxBridgedInterface",    (PyCFunction)   SL_GetVBoxBridgedInterface,     METH_VARARGS | METH_KEYWORDS, "Returns name of default network interface" },
-        { "GetVBoxHostOnlyInterface",   (PyCFunction)   SL_GetVBoxHostOnlyInterface,    METH_VARARGS, "Returns name of the VB HO interface" },
-        { "GetVBoxPath",                                SL_GetVBoxPath,                 METH_VARARGS, "Returns path to a vboxmanage binary" },
-        { "HelloWorld",                                      SL_HelloWorld,                  METH_VARARGS, "Hello World method of subutai scripting language" },
-        { "InstallSSHKey",              (PyCFunction)   SL_InstallSSHKey,               METH_VARARGS, "Install SSH public key" },
+}
+// ========================================================================
+// Module bindings
+// ========================================================================
+
+static PyMethodDef SubutaiSLMethods[] = {
+    { "AddStatus",                  (PyCFunction)   SL_AddStatus,                   METH_VARARGS | METH_KEYWORDS, "Add status" },
 #if LAUNCHER_LINUX
-        { "InstallVBox",                (PyCFunction)   SL_InstallVBox,                 METH_VARARGS | METH_KEYWORDS, "Install virtualbox as root" },
+    { "AddSystemdUnit",             (PyCFunction)   SL_AddSystemdUnit,              METH_VARARGS | METH_KEYWORDS, "Adds new systemd unit" },
+#endif
+    { "CheckDirectories",                           SL_CheckDirectories,            METH_VARARGS, "Display launcher version" },
+    { "CheckVMExists",              (PyCFunction)   SL_CheckVMExists,               METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name exists" },
+    { "CheckVMRunning",             (PyCFunction)   SL_CheckVMRunning,              METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name running" },
+    { "CreateDesktopShortcut",      (PyCFunction)   SL_CreateDesktopShortcut,       METH_VARARGS | METH_KEYWORDS, "Creates a shortcut on a desktop" },
+    { "debug",                                      SL_Debug,                       METH_VARARGS, "Shows debug information about current launcher instance and environment" },
+#if LAUNCHER_LINUX
+    { "DesktopFileInstall",         (PyCFunction)   SL_DesktopFileInstall,          METH_VARARGS | METH_KEYWORDS, "Runs desktop-file-install" },
+#endif
+    { "download",                   (PyCFunction)   SL_Download,                    METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN" },
+    { "GetBytesDownload",                           SL_GetBytesDownload,            METH_VARARGS, "Returns number of bytes downloaded" },
+    { "GetCoreNum",                                 SL_GetCoreNum,                  METH_VARARGS, "Returns choosen amount of cores" },
+    { "GetDefaultRoutingInterface",                 SL_GetDefaultRoutingInterface,  METH_VARARGS, "Returns name of default network interface" },
+    { "GetDevVersion",                              SL_GetDevVersion,               METH_VARARGS, "Returns dev version of a product" },
+    { "GetDownloadProgress",                        SL_GetDownloadProgress,         METH_VARARGS, "Return percentage of download" },
+    { "GetFileSize",                (PyCFunction)   SL_GetFileSize,                 METH_VARARGS | METH_KEYWORDS, "Gets remote file size" },
+    { "GetInstallDir",                              SL_GetInstallDir,               METH_VARARGS, "Returns installation directory" },
+    { "GetMasterVersion",                           SL_GetMasterVersion,            METH_VARARGS, "Returns master version of a product" },
+    { "GetMemSize",                                 SL_GetMemSize,                  METH_VARARGS, "Return amount of memory" },
+    { "GetOSVersionNumber",                         SL_GetOSVersionNumber,          METH_VARARGS, "Returns number of OS version" },
+    { "GetPeerFileSize",            (PyCFunction)   SL_GetPeerFileSize,             METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for a file inside a peer over SSH" },
+    { "GetPeerIP",                                  SL_GetPeerIP,                   METH_VARARGS, "Returns Peer IP address" },
+    { "GetPercentDownload",                         SL_GetPercentDownload,          METH_VARARGS, "Returns percents of download complete" },
+    { "getProgress",                                SL_GetProgress,                 METH_VARARGS, "Returns bool" },
+    { "GetRemoteFileSize",          (PyCFunction)   SL_GetRemoteFileSize,           METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for kurjun file" },
+    { "GetRemoteTemplateSize",      (PyCFunction)   SL_GetRemoteTemplateSize,       METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for kurjun file" },
+    { "GetScheme",                                  SL_GetScheme,                   METH_VARARGS, "Returns current scheme: production, master, dev" },
+    { "GetTmpDir",                                  SL_GetTmpDir,                   METH_VARARGS, "Returns tmp directory" },
+    { "GetVBoxBridgedInterface",    (PyCFunction)   SL_GetVBoxBridgedInterface,     METH_VARARGS | METH_KEYWORDS, "Returns name of default network interface" },
+    { "GetVBoxHostOnlyInterface",   (PyCFunction)   SL_GetVBoxHostOnlyInterface,    METH_VARARGS, "Returns name of the VB HO interface" },
+    { "GetVBoxPath",                                SL_GetVBoxPath,                 METH_VARARGS, "Returns path to a vboxmanage binary" },
+    { "HelloWorld",                                      SL_HelloWorld,                  METH_VARARGS, "Hello World method of subutai scripting language" },
+    { "InstallSSHKey",              (PyCFunction)   SL_InstallSSHKey,               METH_VARARGS, "Install SSH public key" },
+#if LAUNCHER_LINUX
+    { "InstallVBox",                (PyCFunction)   SL_InstallVBox,                 METH_VARARGS | METH_KEYWORDS, "Install virtualbox as root" },
 #endif
 #if LAUNCHER_WINDOWS
-        { "IsChromeInstalled",                          SL_IsChromeInstalled,           METH_VARARGS, "Checks whether chrome web browser installed or not" },
+    { "IsChromeInstalled",                          SL_IsChromeInstalled,           METH_VARARGS, "Checks whether chrome web browser installed or not" },
 #endif
-        { "isDownloadComplete",                         SL_IsDownloaded,                METH_VARARGS, "Returns 1 if current download has been completed" },
-        { "IsPeerReady",                (PyCFunction)   SL_IsPeerReady,                 METH_VARARGS | METH_KEYWORDS, "Returns 0 if peer is ready or 1 if it's not" },
-        { "IsVBoxInstalled",                            SL_IsVBoxInstalled,             METH_VARARGS, "Returns 0 if vbox is installed" },
-        { "log",                        (PyCFunction)   SL_Log,                         METH_VARARGS | METH_KEYWORDS, "Writes to log" },
-        { "MakeLink",                   (PyCFunction)   SL_MakeLink,                    METH_VARARGS | METH_KEYWORDS, "Executes ln -s on root behalf" },
-        { "ProcessKill",                (PyCFunction)   SL_ProcessKill,                 METH_VARARGS | METH_KEYWORDS, "Kills a Windows process" },
-        { "RaiseError",                 (PyCFunction)   SL_RaiseError,                  METH_VARARGS | METH_KEYWORDS, "Raising error" },
-        { "RaiseInfo",                  (PyCFunction)   SL_RaiseInfo,                   METH_VARARGS | METH_KEYWORDS, "Raising info" },
-        { "RaiseWarning",               (PyCFunction)   SL_RaiseWarning,                METH_VARARGS | METH_KEYWORDS, "Raising warning" },
+    { "isDownloadComplete",                         SL_IsDownloaded,                METH_VARARGS, "Returns 1 if current download has been completed" },
+    { "IsPeerReady",                (PyCFunction)   SL_IsPeerReady,                 METH_VARARGS | METH_KEYWORDS, "Returns 0 if peer is ready or 1 if it's not" },
+    { "IsVBoxInstalled",                            SL_IsVBoxInstalled,             METH_VARARGS, "Returns 0 if vbox is installed" },
+    { "log",                        (PyCFunction)   SL_Log,                         METH_VARARGS | METH_KEYWORDS, "Writes to log" },
+    { "MakeLink",                   (PyCFunction)   SL_MakeLink,                    METH_VARARGS | METH_KEYWORDS, "Executes ln -s on root behalf" },
+    { "ProcessKill",                (PyCFunction)   SL_ProcessKill,                 METH_VARARGS | METH_KEYWORDS, "Kills a Windows process" },
+    { "RaiseError",                 (PyCFunction)   SL_RaiseError,                  METH_VARARGS | METH_KEYWORDS, "Raising error" },
+    { "RaiseInfo",                  (PyCFunction)   SL_RaiseInfo,                   METH_VARARGS | METH_KEYWORDS, "Raising info" },
+    { "RaiseWarning",               (PyCFunction)   SL_RaiseWarning,                METH_VARARGS | METH_KEYWORDS, "Raising warning" },
 #if LAUNCHER_WINDOWS
-        { "RegisterPlugin",                             SL_RegisterPlugin,              METH_VARARGS, "Registers a plugin in windows registry" },
+    { "RegisterPlugin",                             SL_RegisterPlugin,              METH_VARARGS, "Registers a plugin in windows registry" },
 #endif
-        { "RegisterService",            (PyCFunction)   SL_RegisterService,             METH_VARARGS | METH_KEYWORDS, "Win32: Register new service" },
+    { "RegisterService",            (PyCFunction)   SL_RegisterService,             METH_VARARGS | METH_KEYWORDS, "Win32: Register new service" },
 #if LAUNCHER_LINUX
-        { "RemoveSystemdUnit",          (PyCFunction)   SL_RemoveSystemdUnit,           METH_VARARGS | METH_KEYWORDS, "Removes systemd unit" },
+    { "RemoveSystemdUnit",          (PyCFunction)   SL_RemoveSystemdUnit,           METH_VARARGS | METH_KEYWORDS, "Removes systemd unit" },
 #endif
-        { "StatusReplace",              (PyCFunction)   SL_StatusReplace,               METH_VARARGS | METH_KEYWORDS, "Replaces last status line" },
-        { "SSHExecute",                 (PyCFunction)   SL_SSHExecute,                  METH_VARARGS | METH_KEYWORDS, "Runs SSH command in specific SSH session" },
-        { "SSHRun",                     (PyCFunction)   SL_SSHRun,                      METH_VARARGS | METH_KEYWORDS, "Run command over SSH" },
-        { "SSHRunOut",                  (PyCFunction)   SL_SSHRunOut,                   METH_VARARGS | METH_KEYWORDS, "Run command over SSH and return it's output" },
-        { "SSHStartSession",            (PyCFunction)   SL_SSHStartSession,             METH_VARARGS | METH_KEYWORDS, "Opens new SSH session" },
-        { "SSHStopSession",             (PyCFunction)   SL_SSHStopSession,              METH_VARARGS | METH_KEYWORDS, "Closes SSH session" },
-        { "SetProgress",                (PyCFunction)   SL_SetProgress,                 METH_VARARGS | METH_KEYWORDS, "Sets action percentage" },
-        { "SetSSHCredentials",          (PyCFunction)   SL_SetSSHCredentials,           METH_VARARGS | METH_KEYWORDS, "Set SSH Connection credentials" },
-        { "setTmpDir",                  (PyCFunction)   SL_SetTmpDir,                   METH_VARARGS | METH_KEYWORDS, "Sets tmp output directory" },
-        { "Shutdown",                                   SL_Shutdown,                    METH_VARARGS, "Finalizes the script" },
-        { "StartProcedure",             (PyCFunction)   SL_StartProcedure,              METH_VARARGS | METH_KEYWORDS, "Starts install/update/remove procedure" },
-        { "StopProcedure",                              SL_StopProcedure,               METH_VARARGS, "Stops install/update/remove procedure" },
-        { "TestSSH",                    (PyCFunction)   SL_TestSSH,                     METH_VARARGS, "Test if SSH connection is alive" },
-        { "UnregisterService",          (PyCFunction)   SL_UnregisterService,           METH_VARARGS | METH_KEYWORDS, "Win32: Unregister service" },
-        { "UpdatePath",                                 SL_UpdatePath,                  METH_VARARGS, "Updates path variables on windows" },
-        { "VBox",                       (PyCFunction)   SL_VBox,                        METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something" },
-        { "VBoxS",                      (PyCFunction)   SL_VBoxS,                       METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something and returns status" },
-        { "version",                                    SL_Version,                     METH_VARARGS, "Display launcher version" },
-        { NULL,                                         NULL,                           0, NULL }
-    };
+    { "StatusReplace",              (PyCFunction)   SL_StatusReplace,               METH_VARARGS | METH_KEYWORDS, "Replaces last status line" },
+    { "SSHExecute",                 (PyCFunction)   SL_SSHExecute,                  METH_VARARGS | METH_KEYWORDS, "Runs SSH command in specific SSH session" },
+    { "SSHRun",                     (PyCFunction)   SL_SSHRun,                      METH_VARARGS | METH_KEYWORDS, "Run command over SSH" },
+    { "SSHRunOut",                  (PyCFunction)   SL_SSHRunOut,                   METH_VARARGS | METH_KEYWORDS, "Run command over SSH and return it's output" },
+    { "SSHStartSession",            (PyCFunction)   SL_SSHStartSession,             METH_VARARGS | METH_KEYWORDS, "Opens new SSH session" },
+    { "SSHStopSession",             (PyCFunction)   SL_SSHStopSession,              METH_VARARGS | METH_KEYWORDS, "Closes SSH session" },
+    { "SetProgress",                (PyCFunction)   SL_SetProgress,                 METH_VARARGS | METH_KEYWORDS, "Sets action percentage" },
+    { "SetSSHCredentials",          (PyCFunction)   SL_SetSSHCredentials,           METH_VARARGS | METH_KEYWORDS, "Set SSH Connection credentials" },
+    { "setTmpDir",                  (PyCFunction)   SL_SetTmpDir,                   METH_VARARGS | METH_KEYWORDS, "Sets tmp output directory" },
+    { "Shutdown",                                   SL_Shutdown,                    METH_VARARGS, "Finalizes the script" },
+    { "StartProcedure",             (PyCFunction)   SL_StartProcedure,              METH_VARARGS | METH_KEYWORDS, "Starts install/update/remove procedure" },
+    { "StartTray",                                  SL_StartTray,                   METH_VARARGS, "" },
+    { "StopProcedure",                              SL_StopProcedure,               METH_VARARGS, "Stops install/update/remove procedure" },
+    { "TestSSH",                    (PyCFunction)   SL_TestSSH,                     METH_VARARGS, "Test if SSH connection is alive" },
+    { "UnregisterService",          (PyCFunction)   SL_UnregisterService,           METH_VARARGS | METH_KEYWORDS, "Win32: Unregister service" },
+    { "UpdatePath",                                 SL_UpdatePath,                  METH_VARARGS, "Updates path variables on windows" },
+    { "VBox",                       (PyCFunction)   SL_VBox,                        METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something" },
+    { "VBoxS",                      (PyCFunction)   SL_VBoxS,                       METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something and returns status" },
+    { "version",                                    SL_Version,                     METH_VARARGS, "Display launcher version" },
+    { NULL,                                         NULL,                           0, NULL }
+};
 
 #if PY_MAJOR_VERSION >= 3
-    static PyModuleDef SubutaiModule = {
-        PyModuleDef_HEAD_INIT, "subutai", NULL, -1, SubutaiSLMethods,
-        NULL, NULL, NULL, NULL
-    };
+static PyModuleDef SubutaiModule = {
+    PyModuleDef_HEAD_INIT, "subutai", NULL, -1, SubutaiSLMethods,
+    NULL, NULL, NULL, NULL
+};
 
-    static __attribute_used__ PyObject* PyInit_Subutai(void)
-    {
-        return PyModule_Create(&SubutaiModule);
-    }
+static __attribute_used__ PyObject* PyInit_Subutai(void)
+{
+    return PyModule_Create(&SubutaiModule);
+}
 #endif
 
 

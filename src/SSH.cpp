@@ -3,10 +3,66 @@
 
 namespace SubutaiLauncher 
 {
+#include <mutex>
+#include <thread>
+#include <libssh/callbacks.h>
+
+    static int ssh_std_thread_mutex_init(void **priv) {
+        *priv = new std::mutex();
+        if(*priv == nullptr)
+            return ENOMEM;
+
+        return 0;
+    }
+
+    static int ssh_std_thread_mutex_destroy(void **priv) {
+        delete static_cast<std::mutex *>(*priv);
+        *priv = nullptr;
+        return 0;
+    }
+
+    static int ssh_std_thread_mutex_lock(void **lock) {
+        static_cast<std::mutex *>(*lock)->lock();
+        return 0;
+    }
+
+    static int ssh_std_thread_mutex_unlock(void **unlock) {
+        static_cast<std::mutex *>(*unlock)->unlock();
+        return 0;
+    }
+
+    static unsigned long ssh_std_thread_thread_id(void) {
+        std::hash<std::thread::id> hash;
+        return hash(std::this_thread::get_id());
+    }
+
+    static struct ssh_threads_callbacks_struct ssh_threads_std_thread = {
+        /* .type          = */ "std_thread",
+        /* .mutex_init    = */ &ssh_std_thread_mutex_init,
+        /* .mutex_destroy = */ &ssh_std_thread_mutex_destroy,
+        /* .mutex_lock    = */ &ssh_std_thread_mutex_lock,
+        /* .mutex_unlock  = */ &ssh_std_thread_mutex_unlock,
+        /* .thread_id     = */ &ssh_std_thread_thread_id
+    };
+
+    struct ssh_threads_callbacks_struct * ssh_threads_get_std_threads(void) {
+        return &ssh_threads_std_thread;
+    }
 
     const std::string SSH::BIN = "ssh";
 
-    SSH::SSH() :
+    void SSH::initialize()
+    {
+        ssh_threads_set_callbacks(ssh_threads_get_std_threads());
+        ssh_init();
+    }
+
+    void SSH::deinitialize()
+    {
+        ssh_finalize();
+    }
+
+    SSH::SSH(bool init) :
         _username("root"),
         _password(""),
         _host("127.0.0.1"),
@@ -17,14 +73,25 @@ namespace SubutaiLauncher
         _bChanOpen(false)
     {
         _logger = &Poco::Logger::get("subutai");
-        _ssh = ssh_new();
-        if (_ssh == NULL) {
-            throw SubutaiException("Failed to start SSH session");
+        if (init)
+        {
+            _ssh = ssh_new();
+            if (_ssh == NULL) {
+                throw SubutaiException("Failed to start SSH session");
+            }
         }
     }
 
     SSH::~SSH()
     {
+        if (_bShellOpen)
+        {
+            closeShell();
+        }
+        if (_bChanOpen)
+        {
+            closeChannel();
+        }
         _logger->debug("Destructing SSH instance");
         if (_connected) ssh_disconnect(_ssh);
         if (_ssh != NULL) {
@@ -77,6 +144,14 @@ namespace SubutaiLauncher
         char buffer[1024];
         int nbytes;
         memset(buffer, 0, 1024);
+        if (_ssh == NULL)
+        {
+            _logger->debug("Initializing SSH");
+            _ssh = ssh_new();
+        }
+        if (_ssh == NULL) {
+            throw SubutaiException("Failed to start SSH session");
+        }
 
         if (!_bChanOpen)
         {
@@ -119,9 +194,22 @@ namespace SubutaiLauncher
 
     std::string SSH::executeInShell(const std::string& command)
     {
-        int nbytes;
+        _logger->trace("Executing [%s] in shell", command);
+        std::string pOutput = "";
+        ssh_channel_request_exec(_channel, command.c_str());
+        /*
+           size_t nbytes = ssh_channel_write(_channel, command.c_str(), command.length());
+           if (nbytes != command.length())
+           {
+           _logger->error("Data size mismtach");
+           }
+           */
+        return pOutput;
+    }
 
-        return "";
+    std::thread SSH::executeInThread(const std::string& command)
+    {
+        return std::thread([=] { execute(command); });
     }
 
     bool SSH::findInstallation()
@@ -259,6 +347,10 @@ namespace SubutaiLauncher
     {
         int rc;
         _logger->trace("Opening SSH channel");
+        if (_ssh == NULL)
+        {
+            _ssh = ssh_new();
+        }
         _channel = ssh_channel_new(_ssh);
         if (_channel == NULL)
         {
@@ -288,6 +380,7 @@ namespace SubutaiLauncher
         {
             openChannel();
         }
+        _logger->debug("Opening SSH shell");
         int rc;
         rc = ssh_channel_request_pty(_channel);
         if (rc != SSH_OK) 

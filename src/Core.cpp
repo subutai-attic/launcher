@@ -37,6 +37,7 @@ SubutaiLauncher::Core::~Core()
     Poco::Logger::get("subutai").information("Subutai Launcher Core stopped");
 
     Py_Finalize();
+    SSH::deinitialize();
 }
 
 void SubutaiLauncher::Core::initializePython()
@@ -99,6 +100,11 @@ void SubutaiLauncher::Core::initializeSSL()
     Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, pContext);
 }
 
+void SubutaiLauncher::Core::initializeSSH()
+{
+    SSH::initialize();
+}
+
 void SubutaiLauncher::Core::run()
 {
     Poco::File f;
@@ -140,6 +146,7 @@ void SubutaiLauncher::Core::run()
     _running = true;
     initializePython();
     initializeSSL();
+    initializeSSH();
     Session::instance();
     parseArgs();
 }

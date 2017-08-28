@@ -19,12 +19,14 @@
 #include <io.h>
 #endif 
 
+#include <libssh/callbacks.h>
 #include "libssh/libssh.h"
 #include "Environment.h"
 #include "FileSystem.h"
 #include "SSHException.h"
 
 namespace SubutaiLauncher {
+    struct ssh_threads_callbacks_struct * ssh_threads_get_std_threads(void);
 
     typedef enum {
         E_NOERR = 0,
@@ -40,7 +42,9 @@ namespace SubutaiLauncher {
     class SSH {
         public:
             static const std::string BIN;
-            SSH();
+            static void initialize();
+            static void deinitialize();
+            SSH(bool init = true);
             ~SSH();
             void authenticate();
             void closeChannel();
@@ -50,6 +54,7 @@ namespace SubutaiLauncher {
             void closeShell();
             std::string execute(const std::string& command);
             std::string executeInShell(const std::string& command);
+            std::thread executeInThread(const std::string& command);
             bool findInstallation();
             static std::string getPublicKey();
             bool isAuthenticated();
@@ -73,7 +78,7 @@ namespace SubutaiLauncher {
             bool _authenticated;
             bool _bChanOpen;
             bool _bShellOpen;
-            ssh_channel _channel; // SSH Channel for multi-command sessions
+            ssh_channel _channel; 
     };
 }
 

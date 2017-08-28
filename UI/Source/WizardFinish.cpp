@@ -76,6 +76,11 @@ WizardFinish::WizardFinish() :
     _finish.setColour(juce::TextButton::buttonColourId, juce::Colour(7,141,208));
     _finish.addListener(this);
     addAndMakeVisible(_finish);
+
+    _peerLink.setBounds(-1, -1, 1, 1);
+    _peerLink.setURL(URL("https://localhost:9999"));
+    addAndMakeVisible(_peerLink);
+    _peerLink.triggerClick();
 }
 
 WizardFinish::~WizardFinish()

@@ -62,6 +62,7 @@ StartupNotify=true
     f.close()
 
     subutai.DesktopFileInstall(tmpDir+"SubutaiTray.desktop")
+    subutai.StartTray()
 
     subutai.Shutdown()
 

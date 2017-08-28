@@ -4,6 +4,7 @@ from shutil import copyfile
 import os
 import stat
 from subprocess import call
+from subprocess import Popen, PIPE
 import tarfile
 
 
@@ -95,6 +96,13 @@ def subutaistart():
         subutai.RaiseError("Failed to install libssh. Aborting")
         sleep(10)
         return -99
+
+    try:
+        launch = 'tell application "SubutaiTray.app" to activate'
+        p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+        stdout, stderr = p.communicate(launch)
+    except:
+        subutai.RaiseError("Failed to launch Subutai Tray application")
 
     subutai.Shutdown()
 
