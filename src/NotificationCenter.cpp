@@ -51,16 +51,7 @@ namespace SubutaiLauncher
 
     void NotificationCenter::notificationRaised(NotificationType t, Poco::Dynamic::Var v)
 	{
-		_logger->debug("Notification raised");
-        //_logger->debug("Notification raised: %s", v.convert<std::string>());
-		/*if (t == N_DOUBLE_DATA)
-		{
-			_logger->debug("Notification: N_DOUBLE_DATA");
-		}
-		else
-		{
-			_logger->debug("Notification: OTHER_DATA");
-		}*/
+		//_logger->debug("Notification raised");
         NotificationMessage m;
         m.type = t;
         m.message = v;

@@ -918,7 +918,7 @@ namespace SubutaiLauncher
         std::string pOutput;
         std::string pSessionName = std::string(ssh_session);
         std::string pCommand = std::string(sl_string);
-        pCommand.append(" ;\r\r");
+        pCommand.append(" \r\r");
         Poco::Logger::get("subutai").trace("SL_SSHExecute ~ [%s] [%s]", pSessionName, pCommand);
 
         Session* pSession = Session::instance();
@@ -1159,7 +1159,6 @@ static PyObject* SL_SetProgress(PyObject* self, PyObject* args, PyObject* keywor
     if (!PyArg_ParseTupleAndKeywords(args, keywords, "d", double_keywords, &sl_double))
         return NULL;
 
-    std::printf("DOUBLE: %f\n", sl_double);
     Poco::Dynamic::Var pProgress = sl_double;
     Session::instance()->getNotificationCenter()->notificationRaised(N_DOUBLE_DATA, pProgress);
     return Py_BuildValue("i", 0);

@@ -8,5 +8,5 @@ Homepage: https://subut.ai
 
 Package: subutai-launcher
 Architecture: any
-Depends: python3, gksu, ${shlibs:Depends}, ${misc:Depends}
+Depends: python3, gksu, libssh2, ${shlibs:Depends}, ${misc:Depends}
 Description: Subutai Launcher Installer 

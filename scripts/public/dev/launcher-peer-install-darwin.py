@@ -20,22 +20,16 @@ class Progress:
     openjreProgress = 0
     managementProgress = 0
     totalSize = 0
+    lastProgress = 0.0
 
     def __init__(self, core, vbox, ubuntu, openjre, management):
-        print("=========================PROGRESSINIT==========================")
+        self.lastProgress = -1.0
         self.coreSize = subutai.GetFileSize(core)
-        print(self.coreSize)
         self.vboxSize = subutai.GetFileSize(vbox)
-        print(self.vboxSize)
         self.ubuntuSize = subutai.GetTemplateSize(ubuntu)
-        print(self.ubuntuSize)
         self.openjreSize = subutai.GetTemplateSize(openjre)
-        print(self.openjreSize)
         self.managementSize = subutai.GetTemplateSize(management)
-        print(self.managementSize)
         self.totalSize = self.coreSize + self.vboxSize + self.ubuntuSize + self.openjreSize + self.managementSize
-        print(self.totalSize)
-        print("=========================PROGRESSINIT==========================")
 
     def getCoreSize(self):
         return self.coreSize
@@ -73,7 +67,15 @@ class Progress:
         cur = self.coreProgress + self.vboxProgress + self.ubuntuProgress + self.openjreProgress + self.managementProgress
         val = (int)(100 * cur) / self.totalSize
         p = (float)(val/100)
+        self.lastProgress = p
         subutai.SetProgress(p)
+
+    def spin(self):
+        subutai.SetProgress(-1.0)
+
+    def unspin(self):
+        subutai.SetProgress(self.lastProgress)
+
 
 
 def installCocoasudo(tmpDir, installDir):
@@ -99,7 +101,7 @@ def installVBox(tmpDir, installDir, progress):
         subutai.download("VirtualBox.pkg")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
-            progress.setVboxProgres(subutai.GetBytesDownload())
+            progress.setVboxProgress(subutai.GetBytesDownload())
             progress.updateProgress()
 
         subutai.AddStatus("Installing VirtualBox")
@@ -167,12 +169,16 @@ def subutaistart():
         return rc
 
     setupSSH()
+    progress.spin()
     installSnapFromStore()
     initBtrfs()
     setAlias()
-    ip = GetPeerIP()
-    installManagement(ubuntuFile, openjreFile, mngFile, progress)
-    WaitForPeer(ip)
+    peerip = GetPeerIP()
+    progress.unspin()
+    installUbuntu(ubuntuFile, progress)
+    installOpenjre(openjreFile, progress)
+    installManagement(mngFile, progress)
+    WaitForPeer(peerip)
 
     sleep(3)
     stopVm(machineName)
@@ -188,6 +194,7 @@ def subutaistart():
         return 22
 
     reconfigureNic(machineName)
+    sleep(3)
     startVm(machineName)
     sleep(10)
     if subutai.CheckVMRunning(machineName) != 0:
@@ -241,7 +248,7 @@ def WaitForPeer(ip):
     return
 
 
-def installManagement(ubuntuFile, openjreFile, mngFile, progress):
+def installUbuntu(ubuntuFile, progress):
     td = "/var/snap/subutai-dev/common/lxc/tmpdir/"
     awk = " | awk '{print $5}'"
 
@@ -251,23 +258,25 @@ def installManagement(ubuntuFile, openjreFile, mngFile, progress):
     if rc != 0:
         subutai.RaiseError("Failed to install Ubuntu interactively. Switching to static install")
         subutai.SSHRun("sudo subutai -d import ubuntu16 >/tmp/ubuntu16.log 2>&1")
-        subutai.AddStatus("Downloading JVM")
-        subutai.SSHRun("sudo subutai -d import openjre16 1>/tmp/openjre16-1.log 2>/tmp/openjre16-2.log")
-        subutai.AddStatus("Installing Management Container")
-        subutai.SSHRun("sudo subutai -d import management 1>/tmp/management-1.log 2>/tmp/management-2.log")
         return 0
 
-    rc = subutai.SSHExecute("mng-setup", "sudo subutai import ubuntu16 >/tmp/ubuntu16.log 2>&1 &")
+    #rc = subutai.SSHExecute("mng-setup", "sudo subutai import -d ubuntu16 >/tmp/ubuntu16.log 2>&1 &")
+    rc = subutai.SSHExecute("mng-setup", "sudo subutai import ubuntu16 &")
     if rc[0] != 0:
         subutai.RaiseError("Failed to install Ubuntu in background. Switching to static install")
         subutai.SSHRun("sudo subutai -d import ubuntu16 >/tmp/ubuntu16.log 2>&1")
     else:
+        checks = 0
         while True:
-            subutai.SSHExecute("mng-setup", "echo 1")
             out = subutai.SSHRunOut("ps -ef | grep \"subutai import\" | grep -v grep | awk '{print $2}'")
             if out == '':
+                subutai.AddStatus("Download completed")
                 break
             sleep(1)
+            checks = checks + 1
+            if checks >= 60:
+                subutai.SSHExecute("mng-setup", "ls / &")
+                checks = 0
             out = subutai.SSHRunOut("ls -l "+td+ubuntuFile+awk)
             try:
                 val = int(out)
@@ -277,19 +286,34 @@ def installManagement(ubuntuFile, openjreFile, mngFile, progress):
                 pass
 
     subutai.SSHStopSession("mng-setup")
-    subutai.SSHStartSession("mng-setup2")
+
+
+def installOpenjre(openjreFile, progress):
+    td = "/var/snap/subutai-dev/common/lxc/tmpdir/"
+    awk = " | awk '{print $5}'"
+
+    rc = subutai.SSHStartSession("mng-setup2")
+    if rc != 0:
+        subutai.AddStatus("Downloading JVM")
+        subutai.SSHRun("sudo subutai -d import openjre16 1>/tmp/openjre16-1.log 2>/tmp/openjre16-2.log")
+        return 0
+
     subutai.AddStatus("Downloading JVM")
-    rc = subutai.SSHExecute("mng-setup", "sudo subutai import openjre16 >/tmp/openjre16.log 2>&1 &")
+    rc = subutai.SSHExecute("mng-setup2", "sudo subutai import openjre16 &")
     if rc[0] != 0:
         subutai.RaiseError("Failed to install OpenJRE in background. Switching to static install")
         subutai.SSHRun("sudo subutai import openjre16 >/tmp/openjre16.log 2>&1")
     else:
+        checks = 0
         while True:
-            subutai.SSHExecute("mng-setup", "echo 1")
             out = subutai.SSHRunOut("ps -ef | grep \"subutai import\" | grep -v grep | awk '{print $2}'")
             if out == '':
                 break
             sleep(1)
+            checks = checks + 1
+            if checks >= 60:
+                subutai.SSHExecute("mng-setup2", "ls / &")
+                checks = 0
             out = subutai.SSHRunOut("ls -l "+td+openjreFile+awk)
             try:
                 val = int(out)
@@ -299,23 +323,38 @@ def installManagement(ubuntuFile, openjreFile, mngFile, progress):
                 pass
 
     subutai.SSHStopSession("mng-setup2")
-    subutai.SSHStartSession("mng-setup3")
+
+
+def installManagement(mngFile, progress):
+    td = "/var/snap/subutai-dev/common/lxc/tmpdir/"
+    awk = " | awk '{print $5}'"
+
+    rc = subutai.SSHStartSession("mng-setup3")
+    if rc != 0:
+        subutai.AddStatus("Installing Management Container")
+        subutai.SSHRun("sudo subutai -d import management 1>/tmp/management-1.log 2>/tmp/management-2.log")
+        return 0
+
     subutai.AddStatus("Installing Management Container")
-    rc = subutai.SSHExecute("mng-setup", "sudo subutai import management >/tmp/management.log 2>&1 &")
+    rc = subutai.SSHExecute("mng-setup3", "sudo subutai import management &")
     if rc[0] != 0:
         subutai.RaiseError("Failed to install Management in background. Switching to static install")
         subutai.SSHRun("sudo subutai import management >/tmp/management.log 2>&1")
     else:
+        checks = 0
         while True:
-            subutai.SSHExecute("mng-setup", "echo 1")
             out = subutai.SSHRunOut("ps -ef | grep \"subutai import\" | grep -v grep | awk '{print $2}'")
             if out == '':
                 break
             sleep(1)
-            out = subutai.SSHRunOut("ls -l *"+td+mngFile+"*"+awk)
+            checks = checks + 1
+            if checks >= 60:
+                subutai.SSHExecute("mng-setup3", "ls / &")
+                checks = 0
+            out = subutai.SSHRunOut("ls -l "+td+"*"+mngFile+"*"+awk)
             try:
                 val = int(out)
-                progress.setOpenjreProgress(val)
+                progress.setManagementProgress(val)
                 progress.updateProgress()
             except:
                 pass
