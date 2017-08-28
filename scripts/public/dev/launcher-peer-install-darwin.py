@@ -8,14 +8,75 @@ import os
 import stat
 
 
-def subutaistart():
-    tmpDir = subutai.GetTmpDir()
-    installDir = subutai.GetInstallDir()
+class Progress:
+    coreSize = 0
+    vboxSize = 0
+    ubuntuSize = 0
+    openjreSize = 0
+    managementSize = 0
+    coreProgress = 0
+    vboxProgress = 0
+    ubuntuProgress = 0
+    openjreProgress = 0
+    managementProgress = 0
+    totalSize = 0
 
-    #cocoasudoFile = "cocoasudo"
-    #coreFile = "core.ova"
-    #vbFile = "VirtualBox.pkg"
+    def __init__(self, core, vbox, ubuntu, openjre, management):
+        print("=========================PROGRESSINIT==========================")
+        self.coreSize = subutai.GetFileSize(core)
+        print(self.coreSize)
+        self.vboxSize = subutai.GetFileSize(vbox)
+        print(self.vboxSize)
+        self.ubuntuSize = subutai.GetTemplateSize(ubuntu)
+        print(self.ubuntuSize)
+        self.openjreSize = subutai.GetTemplateSize(openjre)
+        print(self.openjreSize)
+        self.managementSize = subutai.GetTemplateSize(management)
+        print(self.managementSize)
+        self.totalSize = self.coreSize + self.vboxSize + self.ubuntuSize + self.openjreSize + self.managementSize
+        print(self.totalSize)
+        print("=========================PROGRESSINIT==========================")
 
+    def getCoreSize(self):
+        return self.coreSize
+
+    def getVboxSize(self):
+        return self.vboxSize
+
+    def getUbuntuSize(self):
+        return self.ubuntuSize
+
+    def getOpenjreSize(self):
+        return self.openjreSize
+
+    def getManagementSize(self):
+        return self.managementSize
+
+    def setCoreProgress(self, s):
+        self.coreProgress = s
+
+    def setVboxProgress(self, s):
+        self.vboxProgress = s
+
+    def setUbuntuProgress(self, s):
+        self.coreProgress = s
+
+    def setOpenjreProgress(self, s):
+        self.openjreProgress = s
+
+    def setManagementProgress(self, s):
+        self.managementProgress = s
+
+    def updateProgress(self):
+        if self.totalSize == 0:
+            return
+        cur = self.coreProgress + self.vboxProgress + self.ubuntuProgress + self.openjreProgress + self.managementProgress
+        val = (int)(100 * cur) / self.totalSize
+        p = (float)(val/100)
+        subutai.SetProgress(p)
+
+
+def installCocoasudo(tmpDir, installDir):
     if not os.path.exists(installDir+"bin/cocoasudo"):
         subutai.AddStatus("Downloading cocoasudo application")
         subutai.download("cocoasudo")
@@ -31,15 +92,15 @@ def subutaistart():
             sleep(10)
             return -99
 
-    m = hashlib.md5()
-    m.update(datetime.datetime.now().isoformat().encode('utf-8'))
-    machineName = "subutai-dd-" + m.hexdigest()[:5]
 
+def installVBox(tmpDir, installDir, progress):
     if not os.path.exists("/Applications/VirtualBox.app"):
         subutai.AddStatus("Downloading VirtualBox")
         subutai.download("VirtualBox.pkg")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
+            progress.setVboxProgres(subutai.GetBytesDownload())
+            progress.updateProgress()
 
         subutai.AddStatus("Installing VirtualBox")
         try:
@@ -55,20 +116,41 @@ def subutaistart():
             sleep(10)
             return 45
 
+    progress.setVboxProgress(progress.getVboxSize())
+    progress.updateProgress()
+
+
+def subutaistart():
+    coreFile = "core.ova"
+    vboxFile = "VirtualBox.pkg"
+    ubuntuFile = "ubuntu16-subutai-template_4.0.0_amd64.tar.gz"
+    openjreFile = "openjre16-subutai-template_4.0.0_amd64.tar.gz"
+    mngFile = "management"
+    progress = Progress(coreFile, vboxFile, ubuntuFile, openjreFile, mngFile)
+
+    tmpDir = subutai.GetTmpDir()
+    installDir = subutai.GetInstallDir()
+
+    installCocoasudo(tmpDir, installDir)
+    installVBox(tmpDir, installDir, progress)
+
+    m = hashlib.md5()
+    m.update(datetime.datetime.now().isoformat().encode('utf-8'))
+    machineName = "subutai-dd-" + m.hexdigest()[:5]
+
     call(['ssh-keygen', '-R', '[127.0.0.1]:4567'])
 
     subutai.SetSSHCredentials("subutai", "ubuntai", "127.0.0.1", 4567)
 
     enableHostonlyif()
 
-    if setupVm(machineName) != 0:
+    if setupVm(machineName, progress) != 0:
         subutai.RaiseError("Failed to install Virtual Machine. See the logs for details")
         subutai.Shutdown()
         return
 
-    subutai.SetProgress(0.04)
-    sleep(10)
     startVm(machineName)
+    subutai.AddStatus("Waiting for peer to start and initialize")
     sleep(40)
     if subutai.CheckVMRunning(machineName) != 0:
         subutai.AddStatus("Failed to start VM. Retrying")
@@ -80,26 +162,21 @@ def subutaistart():
         sleep(15)
         return 21
 
-    sleep(60)
-    waitSSH()
-    sleep(60)
+    rc = waitSSH()
+    if rc != 0:
+        return rc
+
     setupSSH()
     installSnapFromStore()
-    subutai.SetProgress(0.10)
-    sleep(60)
     initBtrfs()
-    subutai.SetProgress(0.20)
-    sleep(5)
     setAlias()
-    subutai.SetProgress(0.30)
-    sleep(10)
-    installManagement()
-    subutai.SetProgress(0.80)
+    ip = GetPeerIP()
+    installManagement(ubuntuFile, openjreFile, mngFile, progress)
+    WaitForPeer(ip)
 
-    subutai.SetProgress(0.42)
-    sleep(30)
+    sleep(3)
     stopVm(machineName)
-    sleep(20)
+    sleep(5)
     if subutai.CheckVMRunning(machineName) == 0:
         subutai.AddStatus("Failed to stop VM. Retrying")
         stopVm(machineName)
@@ -110,18 +187,13 @@ def subutaistart():
         sleep(20)
         return 22
 
-    subutai.SetProgress(0.82)
-    sleep(5)
     reconfigureNic(machineName)
-    subutai.SetProgress(0.9)
-    sleep(5)
     startVm(machineName)
-    subutai.SetProgress(0.93)
-    sleep(50)
+    sleep(10)
     if subutai.CheckVMRunning(machineName) != 0:
         subutai.AddStatus("Failed to start VM. Retrying")
         startVm(machineName)
-        sleep(50)
+        sleep(30)
 
     if subutai.CheckVMRunning(machineName) != 0:
         subutai.RaiseError("Failed to start VM. Aborting")
@@ -129,7 +201,6 @@ def subutaistart():
         return 21
 
     subutai.SetProgress(1.0)
-
     subutai.Shutdown()
 
     return 0
@@ -142,42 +213,119 @@ def waitSSH():
         sleep(1)
         attempts = attempts + 1
         if attempts == 30:
+            subutai.RaiseError("SSH connection failed after 30 attempts")
             subutai.log("error", "SSH timeout for 30 second")
-            return
+            return 34
     subutai.log("info", "SSH Connected")
-    return
+    return 0
 
 
-def installManagement():
+def GetPeerIP():
     ip = subutai.GetPeerIP()
 
     if ip == "":
         subutai.RaiseError("Failed to determine peer IP address")
-        return
+        return "127.0.0.1"
 
     ip = "127.0.0.1"
+    return ip
 
-    subutai.AddStatus("Downloading Ubuntu")
-    subutai.SSHRun("sudo subutai -d import ubuntu16 1>/tmp/ubuntu16-1.log 2>/tmp/ubuntu16-2.log")
 
-    subutai.AddStatus("Downloading JVM")
-    subutai.SSHRun("sudo subutai -d import openjre16 1>/tmp/openjre16-1.log 2>/tmp/openjre16-2.log")
-
-    subutai.AddStatus("Installing Management Container")
-    subutai.SSHRun("sudo subutai -d import management 1>/tmp/management-1.log 2>/tmp/management-2.log")
-
+def WaitForPeer(ip):
     attempts = 0
     while subutai.IsPeerReady(ip) != 0:
         sleep(2)
         attempts = attempts + 1
         if attempts >= 30:
             break
+    return
 
+
+def installManagement(ubuntuFile, openjreFile, mngFile, progress):
+    td = "/var/snap/subutai-dev/common/lxc/tmpdir/"
+    awk = " | awk '{print $5}'"
+
+    subutai.AddStatus("Downloading Ubuntu Linux")
+    rc = subutai.SSHStartSession("mng-setup")
+
+    if rc != 0:
+        subutai.RaiseError("Failed to install Ubuntu interactively. Switching to static install")
+        subutai.SSHRun("sudo subutai -d import ubuntu16 >/tmp/ubuntu16.log 2>&1")
+        subutai.AddStatus("Downloading JVM")
+        subutai.SSHRun("sudo subutai -d import openjre16 1>/tmp/openjre16-1.log 2>/tmp/openjre16-2.log")
+        subutai.AddStatus("Installing Management Container")
+        subutai.SSHRun("sudo subutai -d import management 1>/tmp/management-1.log 2>/tmp/management-2.log")
+        return 0
+
+    rc = subutai.SSHExecute("mng-setup", "sudo subutai import ubuntu16 >/tmp/ubuntu16.log 2>&1 &")
+    if rc[0] != 0:
+        subutai.RaiseError("Failed to install Ubuntu in background. Switching to static install")
+        subutai.SSHRun("sudo subutai -d import ubuntu16 >/tmp/ubuntu16.log 2>&1")
+    else:
+        while True:
+            subutai.SSHExecute("mng-setup", "echo 1")
+            out = subutai.SSHRunOut("ps -ef | grep \"subutai import\" | grep -v grep | awk '{print $2}'")
+            if out == '':
+                break
+            sleep(1)
+            out = subutai.SSHRunOut("ls -l "+td+ubuntuFile+awk)
+            try:
+                val = int(out)
+                progress.setUbuntuProgress(val)
+                progress.updateProgress()
+            except:
+                pass
+
+    subutai.SSHStopSession("mng-setup")
+    subutai.SSHStartSession("mng-setup2")
+    subutai.AddStatus("Downloading JVM")
+    rc = subutai.SSHExecute("mng-setup", "sudo subutai import openjre16 >/tmp/openjre16.log 2>&1 &")
+    if rc[0] != 0:
+        subutai.RaiseError("Failed to install OpenJRE in background. Switching to static install")
+        subutai.SSHRun("sudo subutai import openjre16 >/tmp/openjre16.log 2>&1")
+    else:
+        while True:
+            subutai.SSHExecute("mng-setup", "echo 1")
+            out = subutai.SSHRunOut("ps -ef | grep \"subutai import\" | grep -v grep | awk '{print $2}'")
+            if out == '':
+                break
+            sleep(1)
+            out = subutai.SSHRunOut("ls -l "+td+openjreFile+awk)
+            try:
+                val = int(out)
+                progress.setOpenjreProgress(val)
+                progress.updateProgress()
+            except:
+                pass
+
+    subutai.SSHStopSession("mng-setup2")
+    subutai.SSHStartSession("mng-setup3")
+    subutai.AddStatus("Installing Management Container")
+    rc = subutai.SSHExecute("mng-setup", "sudo subutai import management >/tmp/management.log 2>&1 &")
+    if rc[0] != 0:
+        subutai.RaiseError("Failed to install Management in background. Switching to static install")
+        subutai.SSHRun("sudo subutai import management >/tmp/management.log 2>&1")
+    else:
+        while True:
+            subutai.SSHExecute("mng-setup", "echo 1")
+            out = subutai.SSHRunOut("ps -ef | grep \"subutai import\" | grep -v grep | awk '{print $2}'")
+            if out == '':
+                break
+            sleep(1)
+            out = subutai.SSHRunOut("ls -l *"+td+mngFile+"*"+awk)
+            try:
+                val = int(out)
+                progress.setOpenjreProgress(val)
+                progress.updateProgress()
+            except:
+                pass
+
+    subutai.SSHStopSession("mng-setup3")
     return
 
 
 def installSnapFromStore():
-    subutai.AddStatus("Installing Subutai")
+    subutai.AddStatus("Installing Subutai. This may take a few minutes")
     subutai.log("info", "Installing subutai snap")
     subutai.SSHRun("sudo snap install --beta --devmode subutai-dev")
 
@@ -222,19 +370,23 @@ def stopVm(machineName):
     return
 
 
-def setupVm(machineName):
+def setupVm(machineName, progress):
     subutai.log("info", "Setting up a VM")
     subutai.AddStatus("Installing VM")
     if subutai.CheckVMExists(machineName) != 0:
         subutai.download("core.ova")
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
+            progress.setCoreProgress(subutai.GetBytesDownload())
+            progress.updateProgress()
 
         subutai.AddStatus("VM Image downloaded")
 
+    progress.setCoreProgress(progress.getCoreSize())
+    progress.updateProgress()
     subutai.VBox("import " +
                  subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname "+machineName)
-    sleep(10)
+    sleep(3)
 
     cpus = subutai.GetCoreNum()
     mem = subutai.GetMemSize() * 1024
@@ -248,7 +400,7 @@ def setupVm(machineName):
     adapterName = subutai.GetVBoxHostOnlyInterface()
     adapterName = adapterName.replace(' ', '+++')
     subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
-    sleep(10)
+    sleep(1)
 
     return 0
 

@@ -13,6 +13,10 @@ BUILD_DIR = ../build/testsuite
 $(TARGET): $(OUTPUT_DIR)/libsubutai-launcher.$(LIB_EXT)
 $(TARGET): $(OUTPUT_DIR)/$(TARGET)
 
+test-ssh: $(TARGET)
+test-ssh: 
+	@$(TARGET) SSHTest
+
 OBJECTS = $(BUILD_DIR)/DownloaderTest.o \
 		  $(BUILD_DIR)/PeerSetupTest.o \
 		  $(BUILD_DIR)/SLTest.o \

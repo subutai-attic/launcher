@@ -4,6 +4,7 @@ from shutil import copyfile
 import os
 import stat
 from subprocess import Popen, PIPE
+import threading
 
 
 def updateProgress(cocoasudo, p2p, tuntap, total):
@@ -14,6 +15,10 @@ def updateProgress(cocoasudo, p2p, tuntap, total):
 
 
 def subutaistart():
+    rc = subutai.HelloWorld()
+    print(rc[0])
+    print(rc[1])
+    return 0
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
 

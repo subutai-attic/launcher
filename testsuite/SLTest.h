@@ -18,6 +18,7 @@ public:
 
 	// Test functions
 	void testSLF_SetProgress();
+    void testSLF_HelloWorld();
 
 	static CppUnit::Test* suite();
 };
