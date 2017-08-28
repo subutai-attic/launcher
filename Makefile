@@ -56,10 +56,13 @@ ifdef BUILD_TESTS
 test: directories
 test: lib
 #test: $(OUTPUT_DIR)/$(TEST_TARGET)
-test: directories lib
-	$(MAKE) -C ./testsuite
+#test: directories lib
+#	$(MAKE) -C ./testsuite
 #test:
 #	@cp testsuite/*.py bin/
+
+test-ssh: test
+	$(MAKE) -C ./testsuite test-ssh
 endif
 
 cli: lib
