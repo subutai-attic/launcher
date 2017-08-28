@@ -24,6 +24,8 @@ class WizardFinish :
     private:
         Poco::Logger* _logger;
         juce::Label _thanks;
+
+        bool _peerSucceed;
 		
 		juce::Label _ptp;
 		juce::Label _tray;

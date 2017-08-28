@@ -263,7 +263,6 @@ namespace SubutaiLauncher
     {
         auto downloader = Session::instance()->getDownloader();
         long b = downloader->getBytesDownload();
-        Poco::Logger::get("subutai").trace("~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %ld", b);
         return Py_BuildValue("l", b);
     }
     // ========================================================================
@@ -316,6 +315,27 @@ namespace SubutaiLauncher
         if (pDownloader->retrieveFileInfo()) 
         {
             auto pInfo = pDownloader->info();
+            result = pInfo.size;
+            return Py_BuildValue("l", result);
+        }
+        return Py_BuildValue("l", 0);
+    }
+
+    // ========================================================================
+
+    static PyObject* SL_GetTemplateSize(PyObject* self, PyObject* args, PyObject* keywords)
+    {
+        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+            return NULL;
+
+        auto pDownloader = Session::instance()->getDownloader();
+        pDownloader->setFilename(sl_string);
+        long result = -1;
+        if (pDownloader->retrieveTemplateInfo()) 
+        {
+            auto pInfo = pDownloader->info();
+            Poco::Logger::get("subutai").trace("SL_GetTemplateSize ~ %s %li", std::string(sl_string), pInfo.size);
             result = pInfo.size;
             return Py_BuildValue("l", result);
         }
@@ -898,6 +918,7 @@ namespace SubutaiLauncher
         std::string pOutput;
         std::string pSessionName = std::string(ssh_session);
         std::string pCommand = std::string(sl_string);
+        pCommand.append(" ;\r\r");
         Poco::Logger::get("subutai").trace("SL_SSHExecute ~ [%s] [%s]", pSessionName, pCommand);
 
         Session* pSession = Session::instance();
@@ -912,7 +933,7 @@ namespace SubutaiLauncher
         {
             try 
             {
-                pOutput = pSSH->execute(pCommand);
+                pOutput = pSSH->executeInShell(pCommand);
                 rc = 0;
             }
             catch (SSHException& exc)
@@ -1334,6 +1355,7 @@ static PyMethodDef SubutaiSLMethods[] = {
     { "GetDevVersion",                              SL_GetDevVersion,               METH_VARARGS, "Returns dev version of a product" },
     { "GetDownloadProgress",                        SL_GetDownloadProgress,         METH_VARARGS, "Return percentage of download" },
     { "GetFileSize",                (PyCFunction)   SL_GetFileSize,                 METH_VARARGS | METH_KEYWORDS, "Gets remote file size" },
+    { "GetTemplateSize",            (PyCFunction)   SL_GetTemplateSize,             METH_VARARGS | METH_KEYWORDS, "Gets template file size" },
     { "GetInstallDir",                              SL_GetInstallDir,               METH_VARARGS, "Returns installation directory" },
     { "GetMasterVersion",                           SL_GetMasterVersion,            METH_VARARGS, "Returns master version of a product" },
     { "GetMemSize",                                 SL_GetMemSize,                  METH_VARARGS, "Return amount of memory" },
