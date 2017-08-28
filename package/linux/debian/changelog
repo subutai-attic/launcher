@@ -1,5 +1,11 @@
 subutai-launcher (5.0.0-0ubuntu1~trusty) trusty; urgency=medium
 
+  * Release draft
+
+ -- Mikhail Savochkin <i@crioto.com>  Thu, 23 Aug 2017 17:45:42 +0600
+
+subutai-launcher (5.0.0-0ubuntu1~trusty) trusty; urgency=medium
+
   * First Release
 
  -- Mikhail Savochkin <i@crioto.com>  Thu, 21 Aug 2017 09:19:04 +0600
