@@ -334,7 +334,7 @@ def installManagement(mngFile, progress):
 def installSnapFromStore():
     subutai.AddStatus("Installing Subutai")
     subutai.log("info", "Installing subutai snap")
-    subutai.SSHRun("sudo snap install --beta --devmode subutai-master")
+    subutai.SSHRun("sudo snap install --beta --devmode subutai-dev")
 
     return
 
@@ -342,7 +342,7 @@ def installSnapFromStore():
 def initBtrfs():
     subutai.log("info", "Initializing BTRFS")
     subutai.AddStatus("Initializing BTRFS")
-    subutai.SSHRun("sudo subutai-master.btrfsinit /dev/sdb")
+    subutai.SSHRun("sudo subutai-dev.btrfsinit /dev/sdb")
 
     return
 
