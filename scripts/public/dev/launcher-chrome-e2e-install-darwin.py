@@ -4,6 +4,7 @@ import stat
 from time import sleep
 from shutil import copyfile
 from subprocess import call
+from subprocess import Popen, PIPE
 
 
 def updateProgress(cocoasudo, chrome, total):
@@ -52,6 +53,15 @@ def subutaistart():
             updateProgress(cocoasudoProgress, chromeProgress, totalSize)
 
         chromeProgress = chromeSize
+        updateProgress(cocoasudoProgress, chromeProgress, totalSize)
+
+        try:
+            script = 'quit Application \"Google Chrome.app\"'
+            p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+            stdout, stderr = p.communicate(script)
+        except:
+            subutai.RaiseError("Failed to stop Google Chrome")
+            sleep(10)
 
         sleep(5)
         subutai.AddStatus("Installing Google Chrome")
@@ -65,6 +75,7 @@ def subutaistart():
                   '/Applications'])
         except:
             subutai.RaiseError("Failed to install Google Chrome")
+            sleep(5)
 
     subutai.AddStatus("Installing Browser Plugin")
     sleep(3)

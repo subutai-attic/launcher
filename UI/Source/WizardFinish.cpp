@@ -2,7 +2,8 @@
 #include "WizardWindow.h"
 
 WizardFinish::WizardFinish() :
-    _finish("Finish")
+    _finish("Finish"),
+    _peerSucceed(false)
 {
 	
     _logger = &Poco::Logger::get("subutai");
@@ -76,6 +77,10 @@ WizardFinish::WizardFinish() :
     _finish.setColour(juce::TextButton::buttonColourId, juce::Colour(7,141,208));
     _finish.addListener(this);
     addAndMakeVisible(_finish);
+
+    _peerLink.setBounds(-1, -1, 1, 1);
+    _peerLink.setURL(URL("https://localhost:9999"));
+    addAndMakeVisible(_peerLink);
 }
 
 WizardFinish::~WizardFinish()
@@ -98,6 +103,10 @@ void WizardFinish::buttonClicked(juce::Button* button)
     if (button == &_finish)
     {
         _logger->trace("Finish button pressed");
+        if (_peerSucceed)
+        {
+            _peerLink.triggerClick();
+        }
         // Wizard -> WizardWindow
         WizardWindow* window = (WizardWindow*)getParentComponent()->getParentComponent();
         window->closeButtonPressed();
@@ -164,6 +173,7 @@ void WizardFinish::addPeerResult(bool installed, bool succeed)
 	}
 	if (succeed)
 	{
+        _peerSucceed = true;
 		_peerResult.setText("Installed", juce::dontSendNotification);
 	}
 	else

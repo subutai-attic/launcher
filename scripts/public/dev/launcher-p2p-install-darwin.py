@@ -4,6 +4,7 @@ from shutil import copyfile
 import os
 import stat
 from subprocess import Popen, PIPE
+import threading
 
 
 def updateProgress(cocoasudo, p2p, tuntap, total):

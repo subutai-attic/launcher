@@ -135,7 +135,6 @@ namespace SubutaiLauncher
             return false;
         }
 
-
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result;
 

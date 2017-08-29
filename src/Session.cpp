@@ -1,118 +1,181 @@
 #include "Session.h"
+#include "SSH.h"
 
-SubutaiLauncher::Session* SubutaiLauncher::Session::_instance = NULL;
-
-SubutaiLauncher::Session::Session() :
-    _terminate(false),
-    _sshUser(""),
-    _sshPass(""),
-    _sshHostname(""),
-    _sshPort(0)
+namespace SubutaiLauncher
 {
-    _settings = new Settings();
-    _downloader = new Downloader();
-    _downloader->setOutputDirectory(_settings->getTmpPath());
-    _notificationCenter = new NotificationCenter();
-    _hub = new Hub();
-}
 
-SubutaiLauncher::Session::~Session()
-{
-    if (_settings != nullptr) delete _settings;
-    if (_downloader != nullptr) delete _downloader;
-    if (_notificationCenter != nullptr) delete _notificationCenter;
-    if (_hub != nullptr) delete _hub;
-}
+    Session* Session::_instance = NULL;
 
-SubutaiLauncher::Session* SubutaiLauncher::Session::instance()
-{
-    if (!_instance) _instance = new Session();
-    return _instance;
-}
+    Session::Session() :
+        _terminate(false),
+        _sshUser(""),
+        _sshPass(""),
+        _sshHostname(""),
+        _sshPort(0)
+    {
+        _settings = new Settings();
+        _downloader = new Downloader();
+        _downloader->setOutputDirectory(_settings->getTmpPath());
+        _notificationCenter = new NotificationCenter();
+        _hub = new Hub();
+    }
 
-void SubutaiLauncher::Session::destroyInstance()
-{
-    delete this;
-}
+    Session::~Session()
+    {
+        // Cleanup stalled SSH sessions
+        for (auto it = _sshSessions.begin(); it != _sshSessions.end(); it++)
+        {
+            (*it).session->closeChannel();
+            (*it).session->disconnect();
+            delete (*it).session;
+        }
+        _sshSessions.clear();
+        if (_settings != nullptr) delete _settings;
+        if (_downloader != nullptr) delete _downloader;
+        if (_notificationCenter != nullptr) delete _notificationCenter;
+        if (_hub != nullptr) delete _hub;
+    }
 
-SubutaiLauncher::Downloader* SubutaiLauncher::Session::getDownloader()
-{
-    return _downloader;
-}
+    Session* Session::instance()
+    {
+        if (!_instance) _instance = new Session();
+        return _instance;
+    }
 
-SubutaiLauncher::Settings* SubutaiLauncher::Session::getSettings()
-{
-    return _settings;
-}
+    void Session::destroyInstance()
+    {
+        delete this;
+    }
 
-SubutaiLauncher::NotificationCenter* SubutaiLauncher::Session::getNotificationCenter()
-{
-    return _notificationCenter;
-}
+    SubutaiLauncher::Downloader* Session::getDownloader()
+    {
+        return _downloader;
+    }
 
-SubutaiLauncher::Hub* SubutaiLauncher::Session::getHub()
-{
-    return _hub;
-}
+    SubutaiLauncher::Settings* Session::getSettings()
+    {
+        return _settings;
+    }
 
-void SubutaiLauncher::Session::setSSHCredentials(const std::string& user, const std::string& pass, const std::string& hostname, long port) 
-{
-    _sshUser = user;
-    _sshPass = pass;
-    _sshHostname = hostname;
-    _sshPort = port;
-}
+    SubutaiLauncher::NotificationCenter* Session::getNotificationCenter()
+    {
+        return _notificationCenter;
+    }
 
-std::string SubutaiLauncher::Session::getSSHUser()
-{
-    return _sshUser;
-}
+    SubutaiLauncher::Hub* Session::getHub()
+    {
+        return _hub;
+    }
 
-std::string SubutaiLauncher::Session::getSSHPass()
-{
-    return _sshPass;
-}
+    void Session::setSSHCredentials(const std::string& user, const std::string& pass, const std::string& hostname, long port) 
+    {
+        _sshUser = user;
+        _sshPass = pass;
+        _sshHostname = hostname;
+        _sshPort = port;
+    }
 
-std::string SubutaiLauncher::Session::getSSHHostname()
-{
-    return _sshHostname;
-}
+    std::string Session::getSSHUser()
+    {
+        return _sshUser;
+    }
 
-long SubutaiLauncher::Session::getSSHPort()
-{
-    return _sshPort;
-}
+    std::string Session::getSSHPass()
+    {
+        return _sshPass;
+    }
 
-void SubutaiLauncher::Session::addStatus(const std::string& text)
-{
-    _statusPool.push_back(text);
-}
+    std::string Session::getSSHHostname()
+    {
+        return _sshHostname;
+    }
 
-std::string SubutaiLauncher::Session::getStatus()
-{
-    if (_statusPool.empty()) return "";
+    long Session::getSSHPort()
+    {
+        return _sshPort;
+    }
 
-    auto elem = _statusPool.back();
-    _statusPool.pop_back();
-    return elem;
-}
+    void Session::addStatus(const std::string& text)
+    {
+        _statusPool.push_back(text);
+    }
 
-Poco::Logger& SubutaiLauncher::Session::logger()
-{
-    return Poco::Logger::get("SubutaiLogger");
-}
+    void Session::replaceStatus(const std::string& text)
+    {
+        _statusPool.push_back(text);
+    }
 
-bool SubutaiLauncher::Session::isTerminating()
-{
-    return _terminate;
-}
+    std::string Session::getStatus()
+    {
+        if (_statusPool.empty()) return "";
 
-void SubutaiLauncher::Session::terminate()
-{
-    _terminate = true;
-}
+        auto elem = _statusPool.back();
+        _statusPool.pop_back();
+        return elem;
+    }
 
-void SubutaiLauncher::Session::start()
-{
-    _terminate = false;
+    Poco::Logger& Session::logger()
+    {
+        return Poco::Logger::get("SubutaiLogger");
+    }
+
+    bool Session::isTerminating()
+    {
+        return _terminate;
+    }
+
+    void Session::terminate()
+    {
+        _terminate = true;
+    }
+
+    void Session::start()
+    {
+        _terminate = false;
+    }
+
+    SSH* Session::makeSSHSession(const std::string& name, bool empty)
+    {
+        SSHSession s;
+        s.name = name;
+        s.session = new SSH();
+        if (!empty) 
+        {
+            s.session->setHost(getSSHHostname(), getSSHPort());
+            s.session->setUsername(getSSHUser(), getSSHPass());
+            s.session->connect();
+            s.session->authenticate();
+            s.session->openChannel();
+        }
+        _sshSessions.push_back(s);
+        return s.session;
+    }
+
+    SSH* Session::getSSHSession(const std::string& name)
+    {
+        for (auto it = _sshSessions.begin(); it != _sshSessions.end(); it++)
+        {
+            if ((*it).name == name)
+            {
+                return (*it).session;
+            }
+        }
+        return nullptr;
+    }
+
+    void Session::finalizeSSHSession(const std::string& name)
+    {
+        for (auto it = _sshSessions.begin(); it != _sshSessions.end(); it++)
+        {
+            if ((*it).name == name)
+            {
+                (*it).session->closeChannel();
+                (*it).session->disconnect();
+                delete (*it).session;
+                _sshSessions.erase(it);
+                return;
+            }
+        }
+    }
+
 }

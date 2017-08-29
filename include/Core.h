@@ -25,6 +25,7 @@
 #include "Poco/DateTimeFormatter.h"
 
 #include "SL.h"
+#include "SSH.h"
 #include "SLFunctions.h"
 #include "Hub.h"
 #include "VirtualBox.h"
@@ -43,6 +44,7 @@ namespace SubutaiLauncher
             ~Core();
             void initializePython();
             void initializeSSL();
+            void initializeSSH();
             void run();
             void parseArgs();
             void setupLogger();

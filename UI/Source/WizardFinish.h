@@ -24,6 +24,8 @@ class WizardFinish :
     private:
         Poco::Logger* _logger;
         juce::Label _thanks;
+
+        bool _peerSucceed;
 		
 		juce::Label _ptp;
 		juce::Label _tray;
@@ -34,6 +36,7 @@ class WizardFinish :
 		juce::Label _trayResult;
 		juce::Label _eteResult;
 		juce::Label _peerResult;
+        juce::HyperlinkButton _peerLink;
         LauncherButton _finish;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WizardFinish)
 };

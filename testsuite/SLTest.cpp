@@ -19,7 +19,7 @@ void SLTest::setUp()
 
 void SLTest::tearDown()
 {
-	std::printf("\n==========================================================\n");
+    std::printf("\n==========================================================\n");
 }
 
 void SLTest::testGetScheme() 
@@ -38,72 +38,96 @@ void SLTest::testFailedScript()
     c->initializePython();
     SubutaiLauncher::SL sl("../testsuite");
     sl.open("unit-test-failed-script");
-	try 
-	{
-		sl.execute();
-	}
-	catch (SubutaiLauncher::SLException& e)
-	{
-		std::printf("%s", e.displayText().c_str());
-	}
-	/*
-	std::thread t;
-	try 
-	{
-		t = sl.executeInThread();
-	}
-	catch (SubutaiLauncher::SLException& e)
-	{
-		std::printf("Exception %s\n", e.displayText().c_str());
-	}
-	if (t.joinable()) t.join();*/
+    try 
+    {
+        sl.execute();
+    }
+    catch (SubutaiLauncher::SLException& e)
+    {
+        std::printf("%s", e.displayText().c_str());
+    }
+    /*
+       std::thread t;
+       try 
+       {
+       t = sl.executeInThread();
+       }
+       catch (SubutaiLauncher::SLException& e)
+       {
+       std::printf("Exception %s\n", e.displayText().c_str());
+       }
+       if (t.joinable()) t.join();*/
     delete c;
 }
 
 void SLTest::testFailedScriptThread()
 {
-	
+
 }
 
 void SLTest::testSLF_SetProgress()
 {
-	std::printf("SetProgress SL Function test started\n");
-	SubutaiLauncher::Core *c = new SubutaiLauncher::Core(std::vector<std::string>());
-	c->initializePython();
-	SubutaiLauncher::Session::instance();
-	SubutaiLauncher::SL sl("../testsuite");
-	sl.open("slf-set-progress");
-	sl.execute();
+    std::printf("SetProgress SL Function test started\n");
+    SubutaiLauncher::Core *c = new SubutaiLauncher::Core(std::vector<std::string>());
+    c->initializePython();
+    SubutaiLauncher::Session::instance();
+    SubutaiLauncher::SL sl("../testsuite");
+    sl.open("slf-set-progress");
+    sl.execute();
 
-	SubutaiLauncher::NotificationCenter* nc = SubutaiLauncher::Session::instance()->getNotificationCenter();
-	SubutaiLauncher::NotificationMessage n;
-	n.type = SubutaiLauncher::N_INFO;
-	while (n.type != SubutaiLauncher::N_EMPTY)
-	{
-		n = nc->dispatchNotification();
-		if (n.type == SubutaiLauncher::N_DOUBLE_DATA)
-		{
-			double d;
-			n.message.convert(d);
-			std::printf("Progress: %f\n", d);
-		}
-		else
-		{
-			std::printf("Unknown type\n");
-		}
-	}
-	delete c;
-	std::printf("SetProgress SL Function test finished\n");
+    SubutaiLauncher::NotificationCenter* nc = SubutaiLauncher::Session::instance()->getNotificationCenter();
+    SubutaiLauncher::NotificationMessage n;
+    n.type = SubutaiLauncher::N_INFO;
+    while (n.type != SubutaiLauncher::N_EMPTY)
+    {
+        n = nc->dispatchNotification();
+        if (n.type == SubutaiLauncher::N_DOUBLE_DATA)
+        {
+            double d;
+            n.message.convert(d);
+            std::printf("Progress: %f\n", d);
+        }
+        else
+        {
+            std::printf("Unknown type\n");
+        }
+    }
+    delete c;
+    std::printf("SetProgress SL Function test finished\n");
+}
+
+void SLTest::testSLF_HelloWorld()
+{
+    try 
+    {
+        std::printf("SetProgress SL Function test started\n");
+        SubutaiLauncher::Core *c = new SubutaiLauncher::Core(std::vector<std::string>());
+        c->initializePython();
+        SubutaiLauncher::Session::instance();
+        SubutaiLauncher::SL sl;
+        sl.open("slf-hello-world");
+        sl.execute();
+        assert(sl.exitCode() == 0);
+    } 
+    catch (SubutaiLauncher::SubutaiException& exc)
+    {
+        std::printf("Exception: %s", exc.displayText().c_str());
+    }
+    catch (SubutaiLauncher::SLException& exc)
+    {
+        std::printf("Exception: %s", exc.displayText().c_str());
+    }
 }
 
 CppUnit::Test * SLTest::suite()
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SLTest");
+    CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SLTest");
 
-	CppUnit_addTest(pSuite, SLTest, testSLF_SetProgress);
+    CppUnit_addTest(pSuite, SLTest, testSLF_SetProgress);
+    CppUnit_addTest(pSuite, SLTest, testSLF_HelloWorld);
     CppUnit_addTest(pSuite, SLTest, testGetScheme);
     CppUnit_addTest(pSuite, SLTest, testFailedScript);
     //CppUnit_addTest(pSuite, SLTest, testFailedScriptThread);
 
-	return pSuite;
+    return pSuite;
 }

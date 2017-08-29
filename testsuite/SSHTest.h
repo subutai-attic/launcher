@@ -16,6 +16,8 @@ public:
     void testConnect();
     void testAuthenticate();
     void testCommand();
+    void testExecuteInShell();
+    void testExecuteInThread();
 
 	static CppUnit::Test* suite();
 };
