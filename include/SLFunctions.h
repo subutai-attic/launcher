@@ -1099,10 +1099,12 @@ namespace SubutaiLauncher
     static PyObject* SL_StartTray(PyObject* self, PyObject* args)
     {
 #if LAUNCHER_LINUX
+        /*
         if (fork() == 0) {
             execl("/opt/subutai/bin/SubutaiTray", 0);
             return Py_BuildValue("i", 0);
         }
+        */
     }
 #elif LAUNCHER_WINDOWS
     STARTUPINFO si;     
