@@ -51,7 +51,7 @@ class Progress:
         self.vboxProgress = s
 
     def setUbuntuProgress(self, s):
-        self.coreProgress = s
+        self.ubuntuProgress = s
 
     def setOpenjreProgress(self, s):
         self.openjreProgress = s
@@ -94,6 +94,11 @@ def installVBox(tmpDir, progress):
 
     progress.setVboxProgress(progress.getVboxSize())
     progress.updateProgress()
+    if subutai.IsVBoxInstalled() != 0:
+        subutai.AddStatus("Failed to install VirtualBox. Aborting")
+        return 24
+
+    return 0
 
 
 def subutaistart():
@@ -107,7 +112,11 @@ def subutaistart():
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
 
-    installVBox(tmpDir, progress)
+    rc = installVBox(tmpDir, progress)
+    if rc != 0:
+        sleep(10)
+        subutai.Shutdown()
+        return rc
 
     sshlib = "ssh.zip"
 
@@ -130,8 +139,9 @@ def subutaistart():
 
     if setupVm(machineName, progress) != 0:
         subutai.RaiseError("Failed to install Virtual Machine. See the logs for details")
+        sleep(10)
         subutai.Shutdown()
-        return
+        return -4
 
     startVm(machineName)
     subutai.AddStatus("Waiting for peer to start and initialize")
@@ -144,10 +154,12 @@ def subutaistart():
     if subutai.CheckVMRunning(machineName) != 0:
         subutai.RaiseError("Failed to start VM. Aborting")
         sleep(15)
+        subutai.Shutdown()
         return 21
 
     rc = waitSSH()
     if rc != 0:
+        subutai.Shutdown()
         return rc
 
     setupSSH()
@@ -173,6 +185,7 @@ def subutaistart():
     if subutai.CheckVMRunning(machineName) == 0:
         subutai.RaiseError("Failed to stop VM. Retrying")
         sleep(20)
+        subutai.Shutdown()
         return 22
 
     reconfigureNic(machineName)
@@ -187,6 +200,7 @@ def subutaistart():
     if subutai.CheckVMRunning(machineName) != 0:
         subutai.RaiseError("Failed to start VM. Aborting")
         sleep(15)
+        subutai.Shutdown()
         return 21
 
     subutai.SetProgress(1.0)
@@ -346,7 +360,11 @@ def installSnapFromStore():
     subutai.log("info", "Installing subutai snap")
     subutai.SSHRun("sudo snap install --beta --devmode subutai-dev")
 
-    return
+    out = subutai.SSHRunOut("which subutai-dev; echo $?")
+    if out != '0':
+        return 55
+
+    return 0
 
 
 def initBtrfs():
@@ -389,6 +407,7 @@ def stopVm(machineName):
 
 
 def setupVm(machineName, progress):
+    rc = 0
     subutai.log("info", "Setting up a VM")
     subutai.AddStatus("Installing VM")
     if subutai.CheckVMExists(machineName) != 0:
@@ -402,8 +421,11 @@ def setupVm(machineName, progress):
 
     progress.setCoreProgress(progress.getCoreSize())
     progress.updateProgress()
-    subutai.VBox("import " +
+    rc = subutai.VBoxS("import " +
                  subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname "+machineName)
+    if rc != 0:
+        return rc
+
     sleep(3)
 
     cpus = subutai.GetCoreNum()
@@ -419,7 +441,7 @@ def setupVm(machineName, progress):
     subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
     sleep(1)
 
-    return 0
+    return rc
 
 
 def reconfigureNic(machineName):

@@ -50,7 +50,7 @@ class Progress:
         self.vboxProgress = s
 
     def setUbuntuProgress(self, s):
-        self.coreProgress = s
+        self.ubuntuProgress = s
 
     def setOpenjreProgress(self, s):
         self.openjreProgress = s
@@ -88,7 +88,11 @@ def installVBox(vboxFile, tmpDir, installDir, progress):
 
     progress.setVboxProgress(progress.getVboxSize())
     progress.updateProgress()
-    return
+    if subutai.IsVBoxInstalled() != 0:
+        subutai.AddStatus("Failed to install VirtualBox. Aborting")
+        return 24
+
+    return 0
 
 
 def subutaistart():
@@ -109,7 +113,10 @@ def subutaistart():
     openjreFile = "openjre16-subutai-template_4.0.0_amd64.tar.gz"
     mngFile = "management"
     progress = Progress(coreFile, vboxFile, ubuntuFile, openjreFile, mngFile)
-    installVBox(vboxFile, tmpDir, installDir, progress)
+    rc = installVBox(vboxFile, tmpDir, installDir, progress)
+    if rc != 0:
+        sleep(10)
+        return rc
 
     call(['ssh-keygen', '-R', '[127.0.0.1]:4567'])
 
@@ -381,6 +388,7 @@ def stopVm(machineName):
 def setupVm(machineName, progress):
     subutai.log("info", "Setting up a VM")
     subutai.AddStatus("Installing VM")
+    rc = 0
     if subutai.CheckVMExists(machineName) != 0:
         subutai.download("core.ova")
         while subutai.isDownloadComplete() != 1:
@@ -391,8 +399,11 @@ def setupVm(machineName, progress):
         progress.setCoreProgress(progress.getCoreSize())
         progress.updateProgress()
 
-        subutai.VBox("import " +
+        rc = subutai.VBoxS("import " +
                          subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname "+machineName)
+        if rc != 0:
+            return rc
+
         sleep(3)
 
         cpus = subutai.GetCoreNum()
@@ -410,7 +421,7 @@ def setupVm(machineName, progress):
 
         sleep(1)
 
-    return 0
+    return rc
 
 
 def reconfigureNic(machineName):
