@@ -640,6 +640,7 @@ namespace SubutaiLauncher
         RootProcess* rp = new RootProcess();
         std::sprintf(cmd, "dpkg -i %s", sl_string);
         rp->addCommand(std::string(cmd));
+        rp->addCommand("modprobe vboxnetflt");
         rp->addCommand("modprobe vboxnetadp");
         rp->addCommand("modprobe vboxpci");
         rp->execute("Setup VirtualBox");
