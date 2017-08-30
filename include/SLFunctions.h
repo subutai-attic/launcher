@@ -636,7 +636,6 @@ namespace SubutaiLauncher
             return NULL;
 
         char cmd[1024];
-
         RootProcess* rp = new RootProcess();
         std::sprintf(cmd, "dpkg -i %s", sl_string);
         rp->addCommand(std::string(cmd));
@@ -1100,12 +1099,10 @@ namespace SubutaiLauncher
     static PyObject* SL_StartTray(PyObject* self, PyObject* args)
     {
 #if LAUNCHER_LINUX
-        /*
         if (fork() == 0) {
             execl("/opt/subutai/bin/SubutaiTray", 0);
-            return Py_BuildValue("i", 0);
         }
-        */
+        return Py_BuildValue("i", 0);
 #elif LAUNCHER_WINDOWS
     STARTUPINFO si;     
     PROCESS_INFORMATION pi;
