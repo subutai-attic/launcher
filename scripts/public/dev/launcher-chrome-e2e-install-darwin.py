@@ -3,7 +3,6 @@ import os
 import stat
 from time import sleep
 from shutil import copyfile
-from subprocess import call
 from subprocess import Popen, PIPE
 
 
@@ -67,13 +66,9 @@ def subutaistart():
         sleep(1)
         subutai.AddStatus("Installing Google Chrome")
         try:
-            call([installDir+"bin/cocoasudo",
-                  '--prompt="Install Google Chrome"',
-                  '/usr/bin/tar',
-                  '-xf',
-                  tmpDir+'GoogleChrome_osx.tar.gz',
-                  '-C',
-                  '/Applications'])
+            script = 'do shell script "/usr/bin/tar -xf '+tmpDir+'GoogleChrome_osx.tar.gz -C /Applications" with administrator privileges'
+            p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+            stdout, stderr = p.communicate(script)
         except:
             subutai.RaiseError("Failed to install Google Chrome")
             sleep(5)
@@ -87,9 +82,12 @@ def subutaistart():
 
     ete = '{\n\t"external_update_url": "https://clients2.google.com/service/update2/crx"\n}'
 
-    f = open(location+"/kpmiofpmlciacjblommkcinncmneeoaa.json", 'w')
-    f.write(ete)  # python will convert \n to os.linesep
-    f.close()
+    try:
+        f = open(location+"/kpmiofpmlciacjblommkcinncmneeoaa.json", 'w')
+        f.write(ete)  # python will convert \n to os.linesep
+        f.close()
+    except:
+        subutai.RaiseError("Can't write plugin to Extensions directory")
 
     subutai.Shutdown()
 

@@ -95,6 +95,23 @@ def installVBox(vboxFile, tmpDir, installDir, progress):
     return 0
 
 
+def waitForNetwork():
+    subutai.AddStatus("Waiting for network")
+
+    attempts = 0
+    while True:
+        out = subutai.SSHRunOut('if [ $(timeout 3 ping 8.8.8.8 -c1 2>/dev/null | grep -c "1 received") -ne 1 ]; then echo 1; else echo 0; fi')
+        if out == '0':
+            break
+        if attempts >= 60:
+            subutai.RaiseError("Failed to establish Internet connection on peer")
+            return 82
+        attempts = attempts + 1
+        sleep(1)
+
+    return 0
+
+
 def subutaistart():
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
@@ -147,7 +164,18 @@ def subutaistart():
         return rc
 
     setupSSH()
-    installSnapFromStore()
+    rc = waitForNetwork()
+    if rc != 0:
+        sleep(10)
+        return rc
+
+    rc = installSnapFromStore()
+    if rc != 0:
+        subutai.RaiseError("Failed to install Subutai. Aborting")
+        sleep(10)
+        subutai.Shutdown()
+        return rc
+
     initBtrfs()
     setAlias()
     peerip = GetPeerIP()
@@ -343,7 +371,11 @@ def installSnapFromStore():
     subutai.log("info", "Installing subutai snap")
     subutai.SSHRun("sudo snap install --beta --devmode subutai-dev")
 
-    return
+    out = subutai.SSHRunOut("which subutai-dev >/dev/null; echo $?")
+    if out != '0':
+        return 55
+
+    return 0
 
 
 def initBtrfs():
@@ -449,10 +481,12 @@ def enableHostonlyif():
         subutai.VBox("hostonlyif create")
         adapterName = subutai.GetVBoxHostOnlyInterface()
         subutai.VBox("hostonlyif ipconfig " + adapterName + " --ip 192.168.56.1")
-        subutai.VBox("dhcpserver add --ifname " + adapterName + " --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
-        subutai.VBox("dhcpserver modify --ifname " + adapterName + " --enable")
+        out = subutai.VBox("list dhcpservers")
+        if out == '':
+            subutai.VBox("dhcpserver add --ifname " + adapterName + " --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
+            subutai.VBox("dhcpserver modify --ifname " + adapterName + " --enable")
 
-    return
+    return 0
 
 
 def waitSnap():
