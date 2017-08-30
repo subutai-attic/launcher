@@ -52,18 +52,19 @@ def subutaistart():
             chromeProgress = subutai.GetBytesDownload()
             updateProgress(cocoasudoProgress, chromeProgress, totalSize)
 
+        subutai.AddStatus("Download Complete")
         chromeProgress = chromeSize
         updateProgress(cocoasudoProgress, chromeProgress, totalSize)
 
-        try:
-            script = 'quit Application \"Google Chrome.app\"'
-            p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-            stdout, stderr = p.communicate(script)
-        except:
-            subutai.RaiseError("Failed to stop Google Chrome")
-            sleep(10)
+        #try:
+        #    script = 'quit Application \"Google Chrome.app\"'
+        #    p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+        #    stdout, stderr = p.communicate(script)
+        #except:
+        #    subutai.RaiseError("Failed to stop Google Chrome")
+        #    sleep(10)
 
-        sleep(5)
+        sleep(1)
         subutai.AddStatus("Installing Google Chrome")
         try:
             call([installDir+"bin/cocoasudo",
