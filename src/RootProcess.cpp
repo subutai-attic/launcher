@@ -38,8 +38,6 @@ namespace SubutaiLauncher {
 
         Poco::File f(_filename);
         f.setExecutable(true);
-
-        _logger->debug("Running gksudo");
         Poco::Process p;
         Poco::Process::Args args;
         args.push_back("--message");
