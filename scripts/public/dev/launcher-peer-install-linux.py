@@ -50,7 +50,7 @@ class Progress:
         self.vboxProgress = s
 
     def setUbuntuProgress(self, s):
-        self.coreProgress = s
+        self.ubuntuProgress = s
 
     def setOpenjreProgress(self, s):
         self.openjreProgress = s
@@ -88,7 +88,28 @@ def installVBox(vboxFile, tmpDir, installDir, progress):
 
     progress.setVboxProgress(progress.getVboxSize())
     progress.updateProgress()
-    return
+    if subutai.IsVBoxInstalled() != 0:
+        subutai.AddStatus("Failed to install VirtualBox. Aborting")
+        return 24
+
+    return 0
+
+
+def waitForNetwork():
+    subutai.AddStatus("Waiting for network")
+
+    attempts = 0
+    while True:
+        out = subutai.SSHRunOut('if [ $(timeout 3 ping 8.8.8.8 -c1 2>/dev/null | grep -c "1 received") -ne 1 ]; then echo 1; else echo 0; fi')
+        if out == '0':
+            break
+        if attempts >= 60:
+            subutai.RaiseError("Failed to establish Internet connection on peer")
+            return 82
+        attempts = attempts + 1
+        sleep(1)
+
+    return 0
 
 
 def subutaistart():
@@ -109,7 +130,10 @@ def subutaistart():
     openjreFile = "openjre16-subutai-template_4.0.0_amd64.tar.gz"
     mngFile = "management"
     progress = Progress(coreFile, vboxFile, ubuntuFile, openjreFile, mngFile)
-    installVBox(vboxFile, tmpDir, installDir, progress)
+    rc = installVBox(vboxFile, tmpDir, installDir, progress)
+    if rc != 0:
+        sleep(10)
+        return rc
 
     call(['ssh-keygen', '-R', '[127.0.0.1]:4567'])
 
@@ -140,7 +164,18 @@ def subutaistart():
         return rc
 
     setupSSH()
-    installSnapFromStore()
+    rc = waitForNetwork()
+    if rc != 0:
+        sleep(10)
+        return rc
+
+    rc = installSnapFromStore()
+    if rc != 0:
+        subutai.RaiseError("Failed to install Subutai. Aborting")
+        sleep(10)
+        subutai.Shutdown()
+        return rc
+
     initBtrfs()
     setAlias()
     peerip = GetPeerIP()
@@ -336,7 +371,11 @@ def installSnapFromStore():
     subutai.log("info", "Installing subutai snap")
     subutai.SSHRun("sudo snap install --beta --devmode subutai-dev")
 
-    return
+    out = subutai.SSHRunOut("which subutai-dev >/dev/null; echo $?")
+    if out != '0':
+        return 55
+
+    return 0
 
 
 def initBtrfs():
@@ -381,6 +420,7 @@ def stopVm(machineName):
 def setupVm(machineName, progress):
     subutai.log("info", "Setting up a VM")
     subutai.AddStatus("Installing VM")
+    rc = 0
     if subutai.CheckVMExists(machineName) != 0:
         subutai.download("core.ova")
         while subutai.isDownloadComplete() != 1:
@@ -391,8 +431,11 @@ def setupVm(machineName, progress):
         progress.setCoreProgress(progress.getCoreSize())
         progress.updateProgress()
 
-        subutai.VBox("import " +
+        rc = subutai.VBoxS("import " +
                          subutai.GetTmpDir().replace(" ", "+++") + "core.ova --vsys 0 --vmname "+machineName)
+        if rc != 0:
+            return rc
+
         sleep(3)
 
         cpus = subutai.GetCoreNum()
@@ -410,7 +453,7 @@ def setupVm(machineName, progress):
 
         sleep(1)
 
-    return 0
+    return rc
 
 
 def reconfigureNic(machineName):
@@ -438,10 +481,12 @@ def enableHostonlyif():
         subutai.VBox("hostonlyif create")
         adapterName = subutai.GetVBoxHostOnlyInterface()
         subutai.VBox("hostonlyif ipconfig " + adapterName + " --ip 192.168.56.1")
-        subutai.VBox("dhcpserver add --ifname " + adapterName + " --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
-        subutai.VBox("dhcpserver modify --ifname " + adapterName + " --enable")
+        out = subutai.VBox("list dhcpservers")
+        if out == '':
+            subutai.VBox("dhcpserver add --ifname " + adapterName + " --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
+            subutai.VBox("dhcpserver modify --ifname " + adapterName + " --enable")
 
-    return
+    return 0
 
 
 def waitSnap():
