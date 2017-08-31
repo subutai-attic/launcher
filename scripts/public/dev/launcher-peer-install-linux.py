@@ -369,7 +369,7 @@ def installManagement(mngFile, progress):
 def installSnapFromStore():
     subutai.AddStatus("Installing Subutai")
     subutai.log("info", "Installing subutai snap")
-    subutai.SSHRun("sudo snap install --beta --devmode subutai-dev")
+    subutai.SSHRun("sudo snap install --beta --devmode subutai-dev > /tmp/subutai-snap.log 2>&1")
 
     out = subutai.SSHRunOut("which subutai-dev >/dev/null; echo $?")
     if out != '0':

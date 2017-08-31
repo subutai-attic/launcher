@@ -639,10 +639,11 @@ namespace SubutaiLauncher
         RootProcess* rp = new RootProcess();
         std::sprintf(cmd, "dpkg -i %s", sl_string);
         rp->addCommand(std::string(cmd));
-        rp->addCommand("modprobe vboxdrv >> /tmp/subutai/vbox.log");
-        rp->addCommand("modprobe vboxnetflt >> /tmp/subutai/vbox.log");
-        rp->addCommand("modprobe vboxnetadp >> /tmp/subutai/vbox.log");
-        rp->addCommand("modprobe vboxpci >> /tmp/subutai/vbox.log");
+        rp->addCommand("modprobe vboxdrv >> /tmp/subutai/vbox.log 2>&1");
+        rp->addCommand("modprobe vboxnetflt >> /tmp/subutai/vbox.log 2>&1");
+        rp->addCommand("modprobe vboxnetadp >> /tmp/subutai/vbox.log 2>&1");
+        rp->addCommand("modprobe vboxpci >> /tmp/subutai/vbox.log 2>&1");
+        rp->addCommand("apt-get install -f");
         rp->execute("Setup VirtualBox");
         delete rp;
         return Py_BuildValue("i", 0);
