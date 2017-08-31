@@ -4,9 +4,9 @@ CC=g++
 SHARED_TARGET = libsubutai-launcher.$(LIB_EXT)
 STATIC_TARGET = libsubutai-launcher.a
 TEST_TARGET=testsuite
-INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_DIR)/include -I/usr/local/include
-#LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -Xlinker -export-dynamic -lssh -L$(PYLIB_DIR) -lPocoNet -lPocoNetSSL -lPocoFoundation -lPocoJSON
-LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -lssh -L$(PYLIB_DIR) -lPocoNet -lPocoNetSSL -lPocoFoundation -lPocoJSON
+INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_HEADERS_DIR) -I/usr/local/include
+LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -Xlinker -export-dynamic -lssh -L$(PYLIB_DIR) -lPocoNet -lPocoNetSSL -lPocoFoundation -lPocoJSON
+#LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -lssh -L$(PYLIB_DIR) -lPocoNet -lPocoNetSSL -lPocoFoundation -lPocoJSON
 CXXFLAGS = -g $(INCLUDES) -std=c++11 -DLIGHT_MODE -DRT_OS_LINUX -DNDEBUG $(BUILD_SCHEME_DEF) $(EXTRA_DEFINES)
 LDFLAGS = -s $(LIBS)
 
@@ -56,10 +56,13 @@ ifdef BUILD_TESTS
 test: directories
 test: lib
 #test: $(OUTPUT_DIR)/$(TEST_TARGET)
-test: directories lib
-	$(MAKE) -C ./testsuite
+#test: directories lib
+#	$(MAKE) -C ./testsuite
 #test:
 #	@cp testsuite/*.py bin/
+
+test-ssh: test
+	$(MAKE) -C ./testsuite test-ssh
 endif
 
 cli: lib
@@ -113,6 +116,9 @@ $(BUILD_DIR)/SLFunctions.o: $(SRC_DIR)/SLFunctions.cpp $(INCLUDE_DIR)/SLFunction
 $(BUILD_DIR)/SSH.o: $(SRC_DIR)/SSH.cpp $(INCLUDE_DIR)/SSH.h
 	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
 
+$(BUILD_DIR)/SSHException.o: $(SRC_DIR)/SSHException.cpp $(INCLUDE_DIR)/SSHException.h
+	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
+
 $(BUILD_DIR)/Session.o: $(SRC_DIR)/Session.cpp $(INCLUDE_DIR)/Session.h
 	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
 
@@ -149,6 +155,7 @@ OBJS = $(BUILD_DIR)/Core.o \
 									 $(BUILD_DIR)/SL.o \
 									 $(BUILD_DIR)/SLFunctions.o \
 									 $(BUILD_DIR)/SSH.o \
+									 $(BUILD_DIR)/SSHException.o \
 									 $(BUILD_DIR)/Session.o \
 									 $(BUILD_DIR)/Settings.o \
 									 $(BUILD_DIR)/SubutaiException.o \

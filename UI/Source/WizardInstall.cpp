@@ -231,6 +231,14 @@ void WizardInstall::runImpl()
 	_logger->trace("Parent notified");
 }
 
+void WizardInstall::replaceLine(const std::string& text, bool error)
+{
+    auto it = _lines.back();
+    delete it;
+    _lines.pop_back();
+    addLine(text, error);
+}
+
 void WizardInstall::addLine(const std::string& text, bool error)
 {
     MessageManagerLock mmLock;

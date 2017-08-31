@@ -4,13 +4,30 @@ from subprocess import call
 from time import sleep
 
 
+def updateProgress(chrome, total):
+    cur = chrome
+    val = (int)(100 * cur) / total
+    progress = (float)(val/100)
+    subutai.SetProgress(progress)
+
+
 def subutaistart():
     tmpDir = subutai.GetTmpDir()
     subutai.AddStatus("Downloading Google Chrome")
 
-    subutai.download("google-chrome-stable_current_amd64.deb")
+    chromeFilename = "google-chrome-stable_current_amd64.deb"
+
+    chromeSize = subutai.GetFileSize(chromeFilename)
+    totalSize = chromeSize
+    chromeProgress = 0
+
+    subutai.download(chromeFilename)
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
+        chromeProgress = subutai.GetBytesDownload()
+        updateProgress(chromeProgress, totalSize)
+
+    chromeProgress = chromeSize
 
     try:
         call(['/usr/bin/gksudo',
@@ -21,7 +38,7 @@ def subutaistart():
         call(['/usr/bin/gksudo',
               '--message',
               'Install Google Chrome',
-              'dpkg -i '+tmpDir+'google-chrome-stable_current_amd64.deb'])
+              'dpkg -i '+tmpDir+chromeFilename])
         sleep(20)
     except:
         subutai.RaiseError("Failed to install Google Chrome")

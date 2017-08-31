@@ -76,13 +76,12 @@ void DownloaderTest::testParseFileInfo()
 
 void DownloaderTest::testDownload()
 {
+    SubutaiLauncher::Core* c = new SubutaiLauncher::Core();
     SubutaiLauncher::Downloader* d = SubutaiLauncher::Session::instance()->getDownloader();
     d->setFilename("p2p");
-	CThreadWrapper<SlDownloaderThreadWorker> *tw =
-		new CThreadWrapper<SlDownloaderThreadWorker>(new SlDownloaderThreadWorker(d), true);
-	tw->Start(); //todo delete after execution.
-    //auto t = d.download();
-    //t.join();
+    auto t = d->download();
+    t.join();
+    delete c;
 }
 
 void DownloaderTest::testVerifyDownload()
@@ -109,14 +108,66 @@ void DownloaderTest::testVerifyDownload()
     assert(hash == thash);
 }
 
+void DownloaderTest::testBytesDownload()
+{
+    SubutaiLauncher::Core* c = new SubutaiLauncher::Core();
+    std::string pOutDir("/tmp");
+    std::string pFilename("core.ova");
+    SubutaiLauncher::Downloader* d = SubutaiLauncher::Session::instance()->getDownloader();
+#if !LAUNCHER_WINDOWS
+    d->setOutputDirectory(pOutDir);
+#endif
+    Poco::File f(pOutDir+"/"+pFilename);
+    if (f.exists()) {
+        std::printf("%s file already exists. Removing\n", pFilename.c_str());
+        f.remove();
+    }
+    d->setFilename(pFilename);
+    auto t = d->download();
+    while (!d->isDone()) {
+        long b = d->getBytesDownload();
+        std::printf("Bytes: %ld\n", b);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+    t.join();
+    delete c;
+}
+
+void DownloaderTest::testPercentDownload()
+{
+    SubutaiLauncher::Core* c = new SubutaiLauncher::Core();
+    std::string pOutDir("/tmp");
+    std::string pFilename("core.ova");
+    SubutaiLauncher::Downloader* d = SubutaiLauncher::Session::instance()->getDownloader();
+#if !LAUNCHER_WINDOWS
+    d->setOutputDirectory(pOutDir);
+#endif
+    Poco::File f(pOutDir+"/"+pFilename);
+    if (f.exists()) {
+        std::printf("%s file already exists. Removing\n", pFilename.c_str());
+        f.remove();
+    }
+    d->setFilename(pFilename);
+    auto t = d->download();
+    while (!d->isDone()) {
+        int b = d->getPercentDownload();
+        std::printf("Percent: %d\n", b);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+    t.join();
+    delete c;
+}
+
 CppUnit::Test * DownloaderTest::suite()
 {
     CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("DownloaderTest");
 
-    CppUnit_addTest(pSuite, DownloaderTest, testRetrieveFileInfo);
-    CppUnit_addTest(pSuite, DownloaderTest, testParseFileInfo);
-    CppUnit_addTest(pSuite, DownloaderTest, testDownload);
-    CppUnit_addTest(pSuite, DownloaderTest, testVerifyDownload);
+    CppUnit_addTest(pSuite, DownloaderTest, testBytesDownload);
+    CppUnit_addTest(pSuite, DownloaderTest, testPercentDownload);
+    //CppUnit_addTest(pSuite, DownloaderTest, testRetrieveFileInfo);
+    //CppUnit_addTest(pSuite, DownloaderTest, testParseFileInfo);
+    //CppUnit_addTest(pSuite, DownloaderTest, testDownload);
+    //CppUnit_addTest(pSuite, DownloaderTest, testVerifyDownload);
 
     return pSuite;
 }

@@ -1,3 +1,13 @@
+subutai-launcher (5.0.1-0ubuntu1~trusty) trusty; urgency=medium
+
+  * Multiple fixes of progress bar
+  * Automatic VirtualBox installation
+  * Automatic Google Chrome Installation
+  * Scripts bug fixes
+  * Proper exit codes and error notifications
+
+ -- Mikhail Savochkin <i@crioto.com>  Thu, 31 Aug 2017 11:16:17 +0600
+
 subutai-launcher (5.0.0-0ubuntu1~trusty) trusty; urgency=medium
 
   * First Release

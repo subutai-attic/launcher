@@ -6,7 +6,8 @@
 
 SubutaiLauncher::Core::Core(std::vector<std::string> args) : 
     _args(args),
-    _running(false)
+    _running(false),
+    _noValidate(false)
 {
 #if LAUNCHER_MACOS
     chdir("/usr/local/share/subutai");
@@ -36,6 +37,7 @@ SubutaiLauncher::Core::~Core()
     Poco::Logger::get("subutai").information("Subutai Launcher Core stopped");
 
     Py_Finalize();
+    SSH::deinitialize();
 }
 
 void SubutaiLauncher::Core::initializePython()
@@ -55,10 +57,19 @@ void SubutaiLauncher::Core::initializePython()
     if (_args.size() > 0)
     {
         std::string pName = _args.at(0);
-        Poco::Logger::get("subutai").debug("Setting program: %s", pName);
+#if LAUNCHER_LINUX
+        // This is a workaround for SubutaiLauncher symlink file which gaves us
+        // not full path to application in argv[0]
+        if (pName == "SubutaiLauncher") 
+        {
+            pName = "/opt/subutai/bin/SubutaiLauncher";
+        }
+#endif
+        Poco::Logger::get("subutai").information("Setting program: %s", pName);
         std::wstring pwName = std::wstring(pName.begin(), pName.end());
         const wchar_t* n = std::wstring(pName.begin(), pName.end()).c_str();
         Py_SetProgramName(const_cast<wchar_t*>(n));
+//#endif
     }
     else
     {
@@ -87,6 +98,11 @@ void SubutaiLauncher::Core::initializeSSL()
             );
     Poco::Net::SSLManager::InvalidCertificateHandlerPtr ptrHandler ( new Poco::Net::AcceptCertificateHandler(false) );
     Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, pContext);
+}
+
+void SubutaiLauncher::Core::initializeSSH()
+{
+    SSH::initialize();
 }
 
 void SubutaiLauncher::Core::run()
@@ -130,6 +146,7 @@ void SubutaiLauncher::Core::run()
     _running = true;
     initializePython();
     initializeSSL();
+    initializeSSH();
     Session::instance();
     parseArgs();
 }
@@ -140,6 +157,11 @@ void SubutaiLauncher::Core::parseArgs()
     {
         if (it->compare("test") == 0) 
         {
+        }
+        if (it->compare("--no-validate") == 0)
+        {
+            _noValidate = true;
+            Session::instance()->getDownloader()->setNoValidate(true);
         }
     }
 }
@@ -189,7 +211,7 @@ void SubutaiLauncher::Core::setupLogger()
     Poco::AutoPtr<Poco::FormattingChannel> pFormatChannel(new Poco::FormattingChannel(pFormatter, pSplitter));
     Poco::Logger& log = Poco::Logger::get("subutai");
 #ifdef BUILD_SCHEME_PRODUCTION
-    log.setLevel("information");
+    log.setLevel("trace");
 #endif
 #ifdef BUILD_SCHEME_MASTER
     log.setLevel("debug");

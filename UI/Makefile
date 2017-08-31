@@ -1,6 +1,6 @@
 CC = g++
 TARGET = subutai-launcher
-INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_DIR)/include -I../include
+INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_HEADERS_DIR) -I../include
 #MACOS ONLY
 #ST_LIBS = -g -ggdb $(LIBDIRS) $(WLSH) $(EXTRA_LIBS) -lm $(WLST) -Wl,--whole-archive -l$(PYTHON_VER) -Wl,--no-whole-archive $(WLSH) -ldl -lpthread $(WLST) -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation $(WLSH) $(SYSLIBS) -lssl -lcrypto -lssh -lutil -Xlinker -export-dynamic
 ST_LIBS = -g -ggdb $(LIBDIRS) $(WLSH) $(EXTRA_LIBS) -lm $(WLST) -l$(PYTHON_VER) $(WLSH) -ldl -lpthread $(WLST) -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation $(WLSH) $(SYSLIBS) -lssl -lcrypto -lssh -lutil

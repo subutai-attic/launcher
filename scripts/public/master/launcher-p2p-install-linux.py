@@ -5,7 +5,18 @@ import os
 import stat
 
 
+def updateProgress(p2p, total):
+    cur = p2p
+    val = (int)(100 * cur) / total
+    progress = (float)(val/100)
+    subutai.SetProgress(progress)
+
+
 def subutaistart():
+    p2pSize = subutai.GetFileSize("p2p")
+    totalSize = p2pSize
+    p2pProgress = 0
+
     subutai.AddStatus("Download p2p binary")
 
     sfile = "/etc/systemd/system/p2p.service"
@@ -15,6 +26,10 @@ def subutaistart():
     subutai.download("p2p")
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
+        p2pProgress = subutai.GetBytesDownload()
+        updateProgress(p2pProgress, totalSize)
+
+    subutai.SetProgress(1.0)
 
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
