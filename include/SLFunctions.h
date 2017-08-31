@@ -643,7 +643,7 @@ namespace SubutaiLauncher
         rp->addCommand("modprobe vboxnetflt >> /tmp/subutai/vbox.log 2>&1");
         rp->addCommand("modprobe vboxnetadp >> /tmp/subutai/vbox.log 2>&1");
         rp->addCommand("modprobe vboxpci >> /tmp/subutai/vbox.log 2>&1");
-        rp->addCommand("apt-get install -f");
+        rp->addCommand("apt-get install -f -y");
         rp->execute("Setup VirtualBox");
         delete rp;
         return Py_BuildValue("i", 0);

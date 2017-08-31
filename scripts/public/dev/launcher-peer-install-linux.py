@@ -78,6 +78,7 @@ def installVBox(vboxFile, tmpDir, installDir, progress):
     if subutai.IsVBoxInstalled() != 0:
         subutai.AddStatus("Downloading VirtualBox")
         subutai.download(vboxFile)
+
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
             progress.setVboxProgress(subutai.GetBytesDownload())
