@@ -3,19 +3,40 @@ from time import sleep
 import zipfile
 
 
+def updateProgress(tray, libssh, total):
+    cur = tray + libssh
+    val = (int)(100 * cur) / total
+    progress = (float)(val/100)
+    subutai.SetProgress(progress)
+
+
 def subutaistart():
     subutai.AddStatus("Download Tray application")
 
-    tray = "SubutaiTray_libs.zip"
-    sshlib = "ssh.zip"
+    trayFile = "SubutaiTray_libs.zip"
+    sshlibFile = "ssh.zip"
 
-    subutai.download(tray)
+    traySize = subutai.GetFileSize(trayFile)
+    libsshSize = subutai.GetFileSize(sshlibFile)
+    totalSize = traySize + libsshSize
+    trayProgress = 0
+    libsshProgress = 0
+
+    subutai.download(trayFile)
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
+        trayProgress = subutai.GetBytesDownload()
+        updateProgress(trayProgress, libsshProgress, totalSize)
 
-    subutai.download(sshlib)
+    trayProgress = traySize
+
+    subutai.download(sshlibFile)
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
+        libsshProgress = subutai.GetBytesDownload()
+        updateProgress(trayProgress, libsshProgress, totalSize)
+
+    libsshProgress = libsshSize
 
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
@@ -27,10 +48,10 @@ def subutaistart():
     subutai.ProcessKill("ssh-keygen.exe")
 
     try:
-        zf = zipfile.ZipFile(tmpDir+"/"+tray, 'r')
+        zf = zipfile.ZipFile(tmpDir+"/"+trayFile, 'r')
         zf.extractall(installDir)
         zf.close()
-        zfl = zipfile.ZipFile(tmpDir+"/"+sshlib, 'r')
+        zfl = zipfile.ZipFile(tmpDir+"/"+sshlibFile, 'r')
         zfl.extractall(installDir+"/bin")
         zfl.close()
     except:
@@ -44,7 +65,8 @@ def subutaistart():
     unVBoxPath = subutai.GetVBoxPath().replace('\\', '/')
     f = open(unPath+"/tray/subutai_tray.ini", "w")
     f.write("P2P_Path="+unPath+"/bin/p2p.exe\n")
-    f.write("VBoxManage_Path="+unVBoxPath+"\n")
+    if unVBoxPath != "":
+        f.write("VBoxManage_Path="+unVBoxPath+"\n")
     f.write("Ssh_Path="+unPath+"/bin/ssh.exe\n")
     f.write("Ssh_Keygen_Cmd="+unPath+"/bin/ssh-keygen.exe\n")
     f.close()

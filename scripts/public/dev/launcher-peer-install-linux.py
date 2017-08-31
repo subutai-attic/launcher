@@ -226,7 +226,18 @@ def waitSSH():
         attempts = attempts + 1
         if attempts == 30:
             subutai.log("error", "SSH timeout for 30 second")
-            return -1
+            return 34
+
+    attempts = 0
+    out = ''
+    while out == '':
+        out = subutai.SSHRunOut("uptime")
+        attempts = attempts + 1
+        if attempts >= 30:
+            subutai.RaiseError("SSH connection failed after 30 attempts")
+            subutai.log("error", "SSH timeout for 30 second")
+            return 35
+
     subutai.log("info", "SSH Connected")
     return 0
 
@@ -372,6 +383,7 @@ def installSnapFromStore():
     subutai.log("info", "Installing subutai snap")
     subutai.SSHRun("sudo snap install --beta --devmode subutai-dev > /tmp/subutai-snap.log 2>&1")
 
+    sleep(5)
     out = subutai.SSHRunOut("which subutai-dev >/dev/null; echo $?")
     if out != '0':
         return 55
