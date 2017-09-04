@@ -62,6 +62,7 @@ collect_static=""
 python="3.6m"
 pylib=""
 py_header=""
+version=`cat VERSION`
 py_config_header=""
 scheme="production"
 lib_ext=""
@@ -348,6 +349,7 @@ echo "LIB_EXT = $lib_ext" >> config.make
 echo "EXTRA_DEFINES = $extra_defines" >> config.make
 echo "CODE_EXT = $code_extension" >> config.make
 echo "EXTRA_LIBS = $extra_libraries" >> config.make
+#echo "LAUNCHER_VERSION = \"$version\"" >> config.make
 if [ "$scheme" == "production" ]; then
     echo "Production scheme"
     echo "BUILD_SCHEME_DEF = -DBUILD_SCHEME_PRODUCTION" >> config.make
@@ -358,6 +360,7 @@ else
     echo "Developer scheme"
     echo "BUILD_SCHEME_DEF = -DBUILD_SCHEME_DEV" >> config.make
 fi
+echo "DEFINES = -DLAUNCHER_VERSION=\\\"$version\\\"" >> config.make
 
 echo "Shared: $shared"
 
@@ -413,4 +416,5 @@ export EXTRA_LIBS
 export LIBDIRS
 export OPENSSL_HEADERS_DIR
 export OPENSSL_LIB_DIR
+export DEFINES
 __EOF__

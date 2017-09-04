@@ -50,7 +50,7 @@ const juce::String UIApplication::getApplicationName()
 
 const juce::String UIApplication::getApplicationVersion()
 {
-    return "4.0.15";
+    return LAUNCHER_VERSION;
 }
 
 bool UIApplication::moreThanOneInstanceAllowed()
@@ -155,8 +155,11 @@ void UIApplication::anotherInstanceStarted(const juce::String& commandLine)
 
 void UIApplication::startMainWindow()
 {    
-    std::string pTitle = "SubutaiLauncher -> ";
+    std::string pTitle = "SubutaiLauncher ";
+    pTitle.append(LAUNCHER_VERSION);
+#if !BUILD_SCHEME_PRODUCTION
     pTitle.append(BUILD_SCHEME);
+#endif
 
     _splashScreen->deleteAfterDelay(juce::RelativeTime::seconds(1), false);
 #if LIGHT_MODE

@@ -85,7 +85,7 @@ LoginScreen::LoginScreen() :
     _title.setJustificationType(Justification::centred);
     addAndMakeVisible(_title);
 
-    _version.setText("Version 5.0.0", dontSendNotification);
+    _version.setText("Version " + std::string(LAUNCHER_VERSION), dontSendNotification);
     _version.setColour(Label::textColourId, juce::Colour(105, 116, 144));
     _version.setBounds(0, 130, 250, 25);
     _version.setFont(fontVersion);

@@ -13,6 +13,7 @@ SubutaiLauncher::Core::Core(std::vector<std::string> args) :
     chdir("/usr/local/share/subutai");
 #endif
     setupLogger();
+    Poco::Logger::get("subutai").information("Subutai Launcher " + std::string(LAUNCHER_VERSION));
 }
 
 SubutaiLauncher::Core::Core() :
@@ -23,6 +24,7 @@ SubutaiLauncher::Core::Core() :
     chdir("/usr/local/share/subutai");
 #endif
     setupLogger();
+    Poco::Logger::get("subutai").information("Subutai Launcher " + std::string(LAUNCHER_VERSION));
 }
 
 SubutaiLauncher::Core::~Core()
