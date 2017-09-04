@@ -2,8 +2,7 @@
 
 LoginScreen::LoginScreen() : 
     _button("Login"), 
-    _password("Password", (juce::juce_wchar) 0x2022),
-    _skipButton("Skip")
+    _password("Password", (juce::juce_wchar) 0x2022)
 {
     _logger = &Poco::Logger::get("subutai");
     auto font = Font("Encode Sans", 17, 1);
@@ -27,9 +26,6 @@ LoginScreen::LoginScreen() :
     addAndMakeVisible(_button);
     _button.addListener(this);
     _button.setBounds(10, 105, 180, 24);
-
-    addAndMakeVisible(_skipButton);
-    _skipButton.addListener(this);
 
     std::string pLogoFile(SubutaiLauncher::Session::instance()->getSettings()->getTmpPath() + "launcher-logo.png");
     std::string pUserFile(SubutaiLauncher::Session::instance()->getSettings()->getTmpPath() + "user.png");
@@ -134,7 +130,6 @@ void LoginScreen::resized()
     _resetLink.setBounds(getWidth() / 2 - (INPUT_FIELD_WIDTH / 2), 395, 200, 20);
     _title.setBounds(getWidth() / 2 - 150, 110, 300, 25);
     _version.setBounds(getWidth() / 2 - 150, 130, 300, 25);
-    _skipButton.setBounds(getWidth() - _skipButton.getWidth() - 20, getHeight() - 44, _skipButton.getWidth(), 24);
 }
 
 void LoginScreen::buttonClicked(juce::Button* button) 
@@ -156,20 +151,6 @@ void LoginScreen::buttonClicked(juce::Button* button)
         {
             _error.setVisible(true);
             _button.setEnabled(true);
-        }
-    }
-    else if (button == &_skipButton)
-    {
-        juce::String title = "Skip login?";
-        juce::String message = "Although optional, we highly recommend logging into your Hub account to track the installation process due to several advantages:\n\n" \
-        "1.    Every system's hardware resources are different. Each fits into a specific resource grade. The resource grades are important for resource comparison and your peer's reputation. Resource grade determination takes place at installation time and is associated with your peer on the Hub.\n" \
-        "2.    Every software configuration is different and several problems may result. Logging these from cradle to grave with analytics help to automatically determine better installation options during installation and afterwards for maintenance. Having a cradle to grave view of your peer and client configuration is key.\n" \
-        "3.    This information helps us to provide better options and services for you and others that might use your resources. It helps to improve the overall system.\n\n" \
-        "Only the resource grade (A-F) of your peer and its resource hosts are made available on the Hub if and only if you choose to make your peer visible to friends or the public. Besides this information, all the installation logs are deemed private information associated with your peer. In no way shape or form will it be shared or sold to any other entity. Please see our privacy bylaws on the Optimal Dynamics website.";
-
-        if (NativeMessageBox::showOkCancelBox(AlertWindow::QuestionIcon, title,
-                    message, nullptr, nullptr)) {
-            setVisible(false);
         }
     }
 }
