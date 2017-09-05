@@ -9,6 +9,7 @@ Wizard::Wizard() :
 	_ptpInstalled(false),
 	_eteInstalled(false),
 	_peerInstalled(false),
+  _rhInstalled(false),
 	_trayInstalled(false)
 {
 	_logger = &Poco::Logger::get("subutai");
@@ -108,6 +109,10 @@ Wizard::Wizard() :
 	_peerInstall->setBounds(300, 0, 500, 600);
 	addChildComponent(_peerInstall);
 
+  _rhInstall = new WizardInstall();
+  _rhInstall->setBounds(300, 0, 500, 600);
+  addChildComponent(_rhInstall);
+
 	_finishPage = new WizardFinish();
 	_finishPage->setBounds(300, 0, 500, 600);
 	addChildComponent(_finishPage);
@@ -149,6 +154,8 @@ Wizard::~Wizard()
 	if (_eteInstall != nullptr) delete _eteInstall;
 	_logger->trace("Requesting Peer Installation page destroy");
 	if (_peerInstall != nullptr) delete _peerInstall;
+  _logger->trace("Requesting RH Installation page destroy");
+  if (_rhInstall != nullptr) delete _rhInstall;
 	_logger->trace("Requesting Finish page destroy");
 	if (_finishPage != nullptr) delete _finishPage;
 }
@@ -293,6 +300,13 @@ void Wizard::runInstall()
 		_logger->debug("pSettings.installPeer = %d,  _peerInstalled = %d", pSettings.installPeer, _peerInstalled);
 	}
 
+  if (pSettings.installRh && !_rhInstalled) {
+    _rhInstall->activate();
+    _logger->debug("RH Component has been choosen");
+    _rhInstall->start("RH");
+    _rhInstall->run();
+  }
+
 	_logger->debug("Nothing to install");
 	finish();
 }
@@ -328,7 +342,11 @@ void Wizard::stepCompleted(const std::string& name)
 	// Determine if we need to install something else
 	_logger->debug("Looking for next component");
 	auto c = _componentChooserPage->getComponents();
-	if ((c.ptp && !_ptpInstalled) || (c.tray && !_trayInstalled) || (c.ete && !_eteInstalled) || (c.peer && !_peerInstalled))
+  if ((c.ptp && !_ptpInstalled) ||
+      (c.tray && !_trayInstalled) ||
+      (c.ete && !_eteInstalled) || (
+        c.peer && !_peerInstalled) ||
+      c.rh && !_rhInstalled)
 	{
 		_logger->debug("Next component found");
 		runInstall();

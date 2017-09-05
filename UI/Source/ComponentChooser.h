@@ -11,6 +11,7 @@ struct ChosenComponents
     bool tray = false;
     bool ete = false;
     bool peer = false;
+    bool rh = false;
     int cpu = 2;
     int mem = 2;
 };
@@ -26,6 +27,21 @@ class ComponentChooser : public juce::Component,
         void buttonClicked(juce::Button* button) override;
         ChosenComponents getComponents();
     private:
+        void btnPtpYes_Clicked();
+        void btnPtpNo_Clicked();
+        void btnTrayYes_Clicked();
+        void btnTrayNo_Clicked();
+        void btnETEYes_Clicked();
+        void btnETENo_Clicked();
+        void btnPeerYes_Clicked();
+        void btnPeerNo_Clicked();
+        void btnRHYes_Clicked();
+        void btnRHNo_Clicked();
+        void btnCPUPlus_Clicked();
+        void btnCPUMinus_Clicked();
+        void btnMemPlus_Clicked();
+        void btnMemMinus_Clicked();
+
         Poco::Logger *_logger;
 
         juce::Label _ptpLabel;
@@ -36,6 +52,8 @@ class ComponentChooser : public juce::Component,
         juce::Label _eteInfo;
         juce::Label _peerLabel;
         juce::Label _peerInfo;
+        juce::Label _rhLabel;
+        juce::Label _rhInfo;
         juce::Label _cpuLabel;
         juce::Label _cpuInfo;
         juce::Label _memLabel;
@@ -49,6 +67,8 @@ class ComponentChooser : public juce::Component,
         juce::TextButton* _eteYes;
         juce::TextButton* _peerNo;
         juce::TextButton* _peerYes;
+        juce::TextButton* _rhNo;
+        juce::TextButton* _rhYes;
 
         juce::TextButton* _cpuNum;
         juce::TextButton* _cpuPlus;
@@ -62,6 +82,7 @@ class ComponentChooser : public juce::Component,
         bool _tray;
         bool _ete;
         bool _peer;
+        bool _rh;
         int _cpu;
         int _mem;
 
