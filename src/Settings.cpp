@@ -201,6 +201,7 @@ namespace SubutaiLauncher
         _installSettings.installE2E = e2e;
     }
 
+
     void Settings::setInstallationPeer(bool peer)
     {
         if (peer)
@@ -212,6 +213,12 @@ namespace SubutaiLauncher
             _logger->trace("Settings -> Deactivating Peer");
         }
         _installSettings.installPeer = peer;
+    }
+
+    void Settings::setInstallationRH(bool rh)
+    {
+      _logger->trace(rh ? "Settings -> Activating RH" : "Settings -> Deactivating RH");
+      _installSettings.installRh = rh;
     }
 
     void Settings::setInstallationCpuNum(int num)

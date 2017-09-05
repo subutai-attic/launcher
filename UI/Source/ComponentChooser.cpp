@@ -1,310 +1,228 @@
 #include "ComponentChooser.h"
 
 ComponentChooser::ComponentChooser() :
-    _ptp(true),
-    _tray(true),
-    _ete(true),
-    _peer(true),
-    _cpu(2),
-    _mem(2)
+  _ptp(true),
+  _tray(true),
+  _ete(true),
+  _peer(true),
+  _rh(false),
+  _cpu(2),
+  _mem(2)
 {
-    SubutaiLauncher::Environment pEnv;
-    _vtxStatus = false;
-    if (pEnv.vtxEnabled()) _vtxStatus = true;
-    _maxCpu = pEnv.cpuNum();
-    _maxMem = 8;
-    SubutaiLauncher::Session::instance()->getSettings()->setInstallationP2P(true);
-    SubutaiLauncher::Session::instance()->getSettings()->setInstallationTray(true);
-    SubutaiLauncher::Session::instance()->getSettings()->setInstallationE2E(true);
-    if (_vtxStatus)
-    {
-        SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(true);
+  SubutaiLauncher::Environment pEnv;
+  _vtxStatus = false;
+  if (pEnv.vtxEnabled()) _vtxStatus = true;
+  _maxCpu = pEnv.cpuNum();
+  _maxMem = 8;
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationP2P(true);
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationTray(true);
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationE2E(true);
+  if (_vtxStatus)
+  {
+    SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(true);
+    SubutaiLauncher::Session::instance()->getSettings()->setInstallationRH(true);
+  }
+  else
+  {
+    SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(false);
+    SubutaiLauncher::Session::instance()->getSettings()->setInstallationRH(false);
+  }
+  SubutaiLauncher::Session::instance()->getSettings()->setCoreNum(2);
+  SubutaiLauncher::Session::instance()->getSettings()->setMemSize(2);
+  _logger = &Poco::Logger::get("subutai");
+  _logger->trace("Creating Component Chooser UI Component");
+
+  auto font = juce::Font("Encode Sans", 15, 0);
+  auto font2 = juce::Font("Encode Sans", 13, 0);
+
+  struct RadioBtnComponentItem {
+    juce::TextButton **btnDisable;
+    juce::TextButton **btnEnable;
+
+    uint32_t radioGroupId;
+    bool btnEnableToggleState;
+
+    juce::Label *lbl;
+    std::string lblText;
+    juce::Label *lblInfo;
+    std::string lblInfoText;
+  } ;
+
+  std::vector<RadioBtnComponentItem> lstBtnItemsCont = {
+
+      RadioBtnComponentItem{&_ptpNo, &_ptpYes, 20001, false, &_ptpLabel, "P2P", &_ptpInfo,
+                            "P2P Service to build mesh network with your environments"},
+
+      RadioBtnComponentItem{&_trayNo, &_trayYes, 20002, false, &_trayLabel, "Tray Subutai Client",
+                            &_trayInfo, "Manages your environments. Requires P2P"},
+
+      RadioBtnComponentItem{&_eteNo, &_eteYes, 20003, false, &_eteLabel, "E2E Browser Plugin",
+                            &_eteInfo, "E2E description"},
+
+      RadioBtnComponentItem{&_peerNo, &_peerYes, 20004, false, &_peerLabel, "Create Subutai Peer",
+                            &_peerInfo, "Create new virtual machine with Subutai"},
+
+      RadioBtnComponentItem{&_rhNo, &_rhYes, 20005, true, &_rhLabel, "Create Subutai RH",
+                            &_rhInfo, "Create new virtual machine with RH only"},
+  };
+
+
+  uint32_t lineY = 15;
+  for (RadioBtnComponentItem item : lstBtnItemsCont) {
+    static const uint32_t btnWidth = 55;
+    static const uint32_t btnHeight = 30;
+    static const uint32_t btnIndent1 = 20;
+    static const uint32_t btnIndent2 = btnIndent1 + btnWidth;
+
+    *item.btnDisable = new juce::TextButton("-");
+    (*item.btnDisable)->setClickingTogglesState(true);
+    (*item.btnDisable)->setRadioGroupId(item.radioGroupId);
+    (*item.btnDisable)->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
+    (*item.btnDisable)->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
+    (*item.btnDisable)->setBounds(btnIndent1, lineY, btnWidth, btnHeight);
+    (*item.btnDisable)->setConnectedEdges(Button::ConnectedOnRight);
+    (*item.btnDisable)->setToggleState(!item.btnEnableToggleState, dontSendNotification);
+    (*item.btnDisable)->addListener(this);
+
+    *item.btnEnable = new juce::TextButton("+");
+    (*item.btnEnable)->setClickingTogglesState(true);
+    (*item.btnEnable)->setRadioGroupId(item.radioGroupId);
+    (*item.btnEnable)->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
+    (*item.btnEnable)->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
+    (*item.btnEnable)->setBounds(btnIndent2, lineY, btnWidth, btnHeight);
+    (*item.btnEnable)->setConnectedEdges(Button::ConnectedOnLeft);
+    (*item.btnEnable)->setToggleState(item.btnEnableToggleState, dontSendNotification);
+    (*item.btnEnable)->addListener(this);
+
+    item.lbl->setText(item.lblText, dontSendNotification);
+    item.lbl->setColour(Label::textColourId, Colour(105, 116, 144));
+    item.lbl->setBounds(150, lineY, 500, 40);
+    item.lbl->setFont(font);
+    item.lbl->setJustificationType(Justification::top);
+
+    item.lblInfo->setText(item.lblInfoText, dontSendNotification);
+    item.lblInfo->setColour(Label::textColourId, Colours::grey);
+    item.lblInfo->setBounds(150, lineY + 20, 500, 40);
+    item.lblInfo->setFont(font2);
+    item.lblInfo->setJustificationType(Justification::top);
+
+    addAndMakeVisible(*item.btnDisable);
+    addAndMakeVisible(*item.btnEnable);
+    addAndMakeVisible(*item.lbl);
+    addAndMakeVisible(*item.lblInfo);
+    lineY += 40; //todo check this
+  }
+
+
+  struct PlusMinusBtn {
+    juce::TextButton **minus;
+    juce::TextButton **plus;
+    juce::TextButton **btnText;
+    juce::Label *lbl;
+    juce::Label *lblInfo;
+    std::string btnTextText;
+    std::string toolTipMinus;
+    std::string toolTipPlus;
+    std::string lblText;
+    std::string lblInfoText;
+  };
+
+  std::vector<PlusMinusBtn> lst_pm = {
+    PlusMinusBtn {
+      (&_cpuMinus), (&_cpuPlus), (&_cpuNum),
+      &_cpuLabel, &_cpuInfo, "2",
+      "Remove one core", "Add one core",
+      "Number of CPUs", "Choose how many CPUs you would like to share with peer"
+    },
+
+    PlusMinusBtn {
+      (&_memMinus), (&_memPlus), (&_memSize),
+      &_memLabel, &_memInfo, "2",
+      "Remove one GB", "Add one GB",
+      "Memory Limit (GB)", "How many of RAM you would like to share with peer in GB"
     }
-    else
-    {
-        SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(false);
-    }
-    SubutaiLauncher::Session::instance()->getSettings()->setCoreNum(2);
-    SubutaiLauncher::Session::instance()->getSettings()->setMemSize(2);
-    _logger = &Poco::Logger::get("subutai");
-    _logger->trace("Creating Component Chooser UI Component");
+  };
 
-    auto font = juce::Font("Encode Sans", 15, 0);
-    auto font2 = juce::Font("Encode Sans", 13, 0);
+  lineY = 15 + lstBtnItemsCont.size() * 40;
 
-    // P2P
-    
-    _ptpNo = new juce::TextButton("-");
-	_ptpNo->setTooltip("Exclude P2P");
-    _ptpNo->setClickingTogglesState(true);
-    _ptpNo->setRadioGroupId(20001);
-    _ptpNo->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
-    _ptpNo->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
-    _ptpNo->setBounds(20, 15, 55, 30);
-    _ptpNo->setConnectedEdges(Button::ConnectedOnRight);
-    _ptpNo->addListener(this);
-    _ptpYes = new juce::TextButton("+");
-	_ptpYes->setTooltip("Include P2P");
-    _ptpYes->setClickingTogglesState(true);
-    _ptpYes->setRadioGroupId(20001);
-    _ptpYes->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
-    _ptpYes->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
-    _ptpYes->setBounds(75, 15, 55, 30);
-    _ptpYes->setConnectedEdges(Button::ConnectedOnLeft);
-    _ptpYes->setToggleState(true, dontSendNotification);
-    _ptpYes->addListener(this);
+  for (PlusMinusBtn item : lst_pm) {
 
-    _ptpLabel.setText("P2P", dontSendNotification);
-    _ptpLabel.setColour(Label::textColourId, Colour(105, 116, 144));
-    _ptpLabel.setBounds(150, 15, 500, 40);
-    _ptpLabel.setFont(font);
-    _ptpLabel.setJustificationType(Justification::top);
+    (*item.minus) = new juce::TextButton("-");
+    (*item.minus)->setTooltip(item.toolTipMinus);
+    (*item.minus)->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
+    (*item.minus)->setBounds(20, lineY, 36, 30);
+    (*item.minus)->setConnectedEdges(Button::ConnectedOnRight);
+    (*item.minus)->addListener(this);
 
-    _ptpInfo.setText("P2P Service to build mesh network with your environments", dontSendNotification);
-    _ptpInfo.setColour(Label::textColourId, Colours::grey);
-    _ptpInfo.setBounds(150, 35, 500, 40);
-    _ptpInfo.setFont(font2);
-    _ptpInfo.setJustificationType(Justification::top);
+    (*item.btnText) = new juce::TextButton(item.btnTextText);
+    (*item.btnText)->setColour(TextButton::buttonColourId, Colour(255, 255, 255));
+    (*item.btnText)->setColour(TextButton::textColourOffId, Colour(105, 116, 144));
+    (*item.btnText)->setColour(TextButton::textColourOnId, Colour(105, 116, 144));
+    (*item.btnText)->setBounds(56, lineY, 36, 30);
+    (*item.btnText)->setConnectedEdges(Button::ConnectedOnRight | Button::ConnectedOnLeft);
 
-    addAndMakeVisible(_ptpNo);
-    addAndMakeVisible(_ptpYes);
-    addAndMakeVisible(_ptpLabel);
-    addAndMakeVisible(_ptpInfo);
+    (*item.plus) = new juce::TextButton("+");
+    (*item.plus)->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
+    (*item.plus)->setBounds(92, lineY, 36, 30);
+    (*item.plus)->setConnectedEdges(Button::ConnectedOnLeft);
+    (*item.plus)->addListener(this);
 
-    // Tray
-    
-    _trayNo = new juce::TextButton("-");
-    _trayNo->setClickingTogglesState(true);
-    _trayNo->setRadioGroupId(20002);
-    _trayNo->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
-    _trayNo->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
-    _trayNo->setBounds(20, 55, 55, 30);
-    _trayNo->setConnectedEdges(Button::ConnectedOnRight);
-    _trayNo->addListener(this);
-    _trayYes = new juce::TextButton("+");
-    _trayYes->setClickingTogglesState(true);
-    _trayYes->setRadioGroupId(20002);
-    _trayYes->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
-    _trayYes->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
-    _trayYes->setBounds(75, 55, 55, 30);
-    _trayYes->setConnectedEdges(Button::ConnectedOnLeft);
-    _trayYes->setToggleState(true, dontSendNotification);
-    _trayYes->addListener(this);
+    item.lbl->setText(item.lblText, dontSendNotification);
+    item.lbl->setColour(Label::textColourId, Colour(105, 116, 144));
+    item.lbl->setBounds(150, lineY, 500, 40);
+    item.lbl->setFont(font);
+    item.lbl->setJustificationType(Justification::top);
 
-    _trayLabel.setText("Tray Subutai Client", dontSendNotification);
-    _trayLabel.setColour(Label::textColourId, Colour(105, 116, 144));
-    _trayLabel.setBounds(150, 55, 500, 40);
-    _trayLabel.setFont(font);
-    _trayLabel.setJustificationType(Justification::top);
-    addAndMakeVisible(_trayLabel);
+    item.lblInfo->setText(item.lblInfoText, dontSendNotification);
+    item.lblInfo->setColour(Label::textColourId, Colours::grey);
+    item.lblInfo->setBounds(150, lineY + 20, 500, 40);
+    item.lblInfo->setFont(font2);
+    item.lblInfo->setJustificationType(Justification::top);
 
-    _trayInfo.setText("Manages your environments. Requires P2P", dontSendNotification);
-    _trayInfo.setColour(Label::textColourId, Colours::grey);
-    _trayInfo.setBounds(150, 75, 500, 40);
-    _trayInfo.setFont(font2);
-    _trayInfo.setJustificationType(Justification::top);
+    addAndMakeVisible(*item.minus);
+    addAndMakeVisible(*item.btnText);
+    addAndMakeVisible(*item.plus);
+    addAndMakeVisible(item.lbl);
+    addAndMakeVisible(item.lblInfo);
+    lineY += 60;
+  }
 
-    addAndMakeVisible(_trayNo);
-    addAndMakeVisible(_trayYes);
-    addAndMakeVisible(_trayLabel);
-    addAndMakeVisible(_trayInfo);
+  _peerNo->setEnabled(_vtxStatus);
+  _peerYes->setEnabled(_vtxStatus);
+  _rhNo->setEnabled(_vtxStatus);
+  _rhYes->setEnabled(_vtxStatus);
+  _cpuMinus->setEnabled(_vtxStatus);
+  _cpuPlus->setEnabled(_vtxStatus);
+  _memPlus->setEnabled(_vtxStatus);
+  _memMinus->setEnabled(_vtxStatus);
 
-    // E2E
-    
-    _eteNo = new juce::TextButton("-");
-    _eteNo->setClickingTogglesState(true);
-    _eteNo->setRadioGroupId(20003);
-    _eteNo->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
-    _eteNo->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
-    _eteNo->setBounds(20, 95, 55, 30);
-    _eteNo->setConnectedEdges(Button::ConnectedOnRight);
-    _eteNo->addListener(this);
-    _eteYes = new juce::TextButton("+");
-    _eteYes->setClickingTogglesState(true);
-    _eteYes->setRadioGroupId(20003);
-    _eteYes->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
-    _eteYes->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
-    _eteYes->setBounds(75, 95, 55, 30);
-    _eteYes->setConnectedEdges(Button::ConnectedOnLeft);
-    _eteYes->setToggleState(true, dontSendNotification);
-    _eteYes->addListener(this);
-
-    _eteLabel.setText("E2E Browser Plugin", dontSendNotification);
-    _eteLabel.setColour(Label::textColourId, Colour(105, 116, 144));
-    _eteLabel.setBounds(150, 95, 500, 40);
-    _eteLabel.setFont(font);
-    _eteLabel.setJustificationType(Justification::top);
-
-    _eteInfo.setText("E2E description", dontSendNotification);
-    _eteInfo.setColour(Label::textColourId, Colours::grey);
-    _eteInfo.setBounds(150, 115, 500, 40);
-    _eteInfo.setFont(font2);
-    _eteInfo.setJustificationType(Justification::top);
-
-    addAndMakeVisible(_eteNo);
-    addAndMakeVisible(_eteYes);
-    addAndMakeVisible(_eteLabel);
-    addAndMakeVisible(_eteInfo);
-
-    // Subutai Peer
-    
-    _peerNo = new juce::TextButton("-");
-    _peerNo->setClickingTogglesState(true);
-    _peerNo->setRadioGroupId(20004);
-    _peerNo->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
-    _peerNo->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
-    _peerNo->setBounds(20, 135, 55, 30);
-    _peerNo->setConnectedEdges(Button::ConnectedOnRight);
-    _peerNo->addListener(this);
-    _peerYes = new juce::TextButton("+");
-    _peerYes->setClickingTogglesState(true);
-    _peerYes->setRadioGroupId(20004);
-    _peerYes->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
-    _peerYes->setColour(TextButton::buttonOnColourId, Colour(89, 183, 255));
-    _peerYes->setBounds(75, 135, 55, 30);
-    _peerYes->setConnectedEdges(Button::ConnectedOnLeft);
-    _peerYes->setToggleState(true, dontSendNotification);
-    _peerYes->addListener(this);
-
-    _peerLabel.setText("Create Subutai Peer", dontSendNotification);
-    _peerLabel.setColour(Label::textColourId, Colour(105, 116, 144));
-    _peerLabel.setBounds(150, 135, 500, 40);
-    _peerLabel.setFont(font);
-    _peerLabel.setJustificationType(Justification::top);
-
-    _peerInfo.setText("Create new virtual machine with Subutai", dontSendNotification);
-    _peerInfo.setColour(Label::textColourId, Colours::grey);
-    _peerInfo.setBounds(150, 155, 500, 40);
-    _peerInfo.setFont(font2);
-    _peerInfo.setJustificationType(Justification::top);
-
-    addAndMakeVisible(_peerNo);
-    addAndMakeVisible(_peerYes);
-    addAndMakeVisible(_peerLabel);
-    addAndMakeVisible(_peerInfo);
-
-    if (!_vtxStatus)
-    {
-        _peerNo->setEnabled(false);
-        _peerYes->setEnabled(false);
-    }
-
-    // CPUs
-
-    _cpuMinus = new juce::TextButton("-");
-	_cpuMinus->setTooltip("Remove one core");
-    _cpuMinus->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
-    _cpuMinus->setBounds(20, 175, 36, 30);
-    _cpuMinus->setConnectedEdges(Button::ConnectedOnRight);
-    _cpuMinus->addListener(this);
-
-    _cpuNum = new juce::TextButton("2");
-    _cpuNum->setColour(TextButton::buttonColourId, Colour(255, 255, 255));
-    _cpuNum->setColour(TextButton::textColourOffId, Colour(105, 116, 144));
-    _cpuNum->setColour(TextButton::textColourOnId, Colour(105, 116, 144));
-    _cpuNum->setBounds(56, 175, 36, 30);
-    _cpuNum->setConnectedEdges(Button::ConnectedOnRight | Button::ConnectedOnLeft);
-
-    _cpuPlus = new juce::TextButton("+");
-    _cpuPlus->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
-    _cpuPlus->setBounds(92, 175, 36, 30);
-    _cpuPlus->setConnectedEdges(Button::ConnectedOnLeft);
-    _cpuPlus->addListener(this);
-
-    _cpuLabel.setText("Number of CPUs", dontSendNotification);
-    _cpuLabel.setColour(Label::textColourId, Colour(105, 116, 144));
-    _cpuLabel.setBounds(150, 175, 500, 40);
-    _cpuLabel.setFont(font);
-    _cpuLabel.setJustificationType(Justification::top);
-
-    _cpuInfo.setText("Choose how many CPUs you would like to share with peer", dontSendNotification);
-    _cpuInfo.setColour(Label::textColourId, Colours::grey);
-    _cpuInfo.setBounds(150, 195, 500, 40);
-    _cpuInfo.setFont(font2);
-    _cpuInfo.setJustificationType(Justification::top);
-
-    addAndMakeVisible(_cpuMinus);
-    addAndMakeVisible(_cpuNum);
-    addAndMakeVisible(_cpuPlus);
-    addAndMakeVisible(_cpuLabel);
-    addAndMakeVisible(_cpuInfo);
-
-    if (!_vtxStatus)
-    {
-        _cpuMinus->setEnabled(false);
-        _cpuPlus->setEnabled(false);
-    }
-
-    // Memory
-    
-    _memMinus = new juce::TextButton("-");
-    _memMinus->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
-    _memMinus->setBounds(20, 215, 36, 30);
-    _memMinus->setConnectedEdges(Button::ConnectedOnRight);
-    _memMinus->addListener(this);
-
-    _memSize = new juce::TextButton("2");
-    _memSize->setColour(TextButton::buttonColourId, Colour(255, 255, 255));
-    _memSize->setColour(TextButton::textColourOffId, Colour(105, 116, 144));
-    _memSize->setColour(TextButton::textColourOnId, Colour(105, 116, 144));
-    _memSize->setBounds(56, 215, 36, 30);
-    _memSize->setConnectedEdges(Button::ConnectedOnRight | Button::ConnectedOnLeft);
-
-    _memPlus = new juce::TextButton("+");
-    _memPlus->setColour(TextButton::buttonColourId, Colour(247, 249, 252));
-    _memPlus->setBounds(92, 215, 36, 30);
-    _memPlus->setConnectedEdges(Button::ConnectedOnLeft);
-    _memPlus->addListener(this);
-
-    _memLabel.setText("Memory Limit (GB)", dontSendNotification);
-    _memLabel.setColour(Label::textColourId, Colour(105, 116, 144));
-    _memLabel.setBounds(150, 215, 500, 40);
-    _memLabel.setFont(font);
-    _memLabel.setJustificationType(Justification::top);
-
-    _memInfo.setText("How many of RAM you would like to share with peer in GB", dontSendNotification);
-    _memInfo.setColour(Label::textColourId, Colours::grey);
-    _memInfo.setBounds(150, 235, 500, 40);
-    _memInfo.setFont(font2);
-    _memInfo.setJustificationType(Justification::top);
-
-    addAndMakeVisible(_memPlus);
-    addAndMakeVisible(_memSize);
-    addAndMakeVisible(_memMinus);
-    addAndMakeVisible(_memLabel);
-    addAndMakeVisible(_memInfo);
-
-    if (!_vtxStatus)
-    {
-        _memPlus->setEnabled(false);
-        _memMinus->setEnabled(false);
-    }
-
-    _logger->trace("Component Chooser UI Component created");
+  _logger->trace("Component Chooser UI Component created");
 }
 
 ComponentChooser::~ComponentChooser()
 {
-    _logger->trace("Destroying Component Chooser UI Component");
-    delete _ptpNo;
-    delete _ptpYes;
-    delete _trayNo;
-    delete _trayYes;
-    delete _eteNo;
-    delete _eteYes;
-    delete _peerNo;
-    delete _peerYes;
-    delete _cpuNum;
-    delete _cpuPlus;
-    delete _cpuMinus;
-    delete _memPlus;
-    delete _memSize;
-    delete _memMinus;
+  _logger->trace("Destroying Component Chooser UI Component");
+  if (_ptpNo) delete _ptpNo;
+  if (_ptpYes) delete _ptpYes;
+  if (_trayNo) delete _trayNo;
+  if (_trayYes) delete _trayYes;
+  if (_eteNo) delete _eteNo;
+  if (_eteYes) delete _eteYes;
+  if (_peerNo) delete _peerNo;
+  if (_peerYes) delete _peerYes;
+  if (_rhNo) delete _rhNo;
+  if (_rhYes) delete _rhYes;
+  if (_cpuNum) delete _cpuNum;
+  if (_cpuPlus) delete _cpuPlus;
+  if (_cpuMinus) delete _cpuMinus;
+  if (_memPlus) delete _memPlus;
+  if (_memSize) delete _memSize;
+  if (_memMinus) delete _memMinus;
 }
 
 void ComponentChooser::paint(juce::Graphics& g)
 {
-    g.fillAll(Colour(255, 255, 255));
+  g.fillAll(Colour(255, 255, 255));
 }
 
 void ComponentChooser::resized()
@@ -314,130 +232,195 @@ void ComponentChooser::resized()
 
 void ComponentChooser::buttonClicked(juce::Button* button)
 {
-    if (button == _ptpYes) 
-    {
-		_logger->trace("Activating P2P");
-        _ptpLabel.setColour(Label::textColourId, Colour(105, 116, 144));
-        SubutaiLauncher::Session::instance()->getSettings()->setInstallationP2P(true);
-		return;
-    } 
-    else if (button == _ptpNo) 
-    {
-		_logger->trace("Deactivating P2P");
-        _ptpLabel.setColour(Label::textColourId, Colours::grey);
-        SubutaiLauncher::Session::instance()->getSettings()->setInstallationP2P(false);
-		return;
-    } 
-    else if (button == _trayYes) 
-    {
-		_logger->trace("Activating Tray");
-        _trayLabel.setColour(Label::textColourId, Colour(105, 116, 144));
-        SubutaiLauncher::Session::instance()->getSettings()->setInstallationTray(true);
-		return;
-    }
-    else if (button == _trayNo) 
-    {
-		_logger->trace("Deactivating Tray");
-        _trayLabel.setColour(Label::textColourId, Colours::grey);
-        SubutaiLauncher::Session::instance()->getSettings()->setInstallationTray(false);
-		return;
-    }
-    else if (button == _eteYes)
-    {
-		_logger->trace("Activating E2E");
-        _eteLabel.setColour(Label::textColourId, Colour(105, 116, 144));
-        SubutaiLauncher::Session::instance()->getSettings()->setInstallationE2E(true);
-		return;
-    }
-    else if (button == _eteNo)
-    {
-		_logger->trace("Deactivating E2E");
-        _eteLabel.setColour(Label::textColourId, Colours::grey);
-        SubutaiLauncher::Session::instance()->getSettings()->setInstallationE2E(false);
-		return;
-    }
-    else if (button == _peerYes)
-    {
-		_logger->trace("Activating Peer");
-        SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(true);
-        _peerLabel.setColour(Label::textColourId, Colour(105, 116, 144));
-        _cpuLabel.setColour(Label::textColourId, Colour(105, 116, 144));
-        _memLabel.setColour(Label::textColourId, Colour(105, 116, 144));
-        _cpuNum->setEnabled(true);
-        _cpuPlus->setEnabled(true);
-        _cpuMinus->setEnabled(true);
-        _memSize->setEnabled(true);
-        _memPlus->setEnabled(true);
-        _memMinus->setEnabled(true);
-		return;
-    }
-    else if (button == _peerNo)
-    {
-		_logger->trace("Deactivating Peer");
-        SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(false);
-        _peerLabel.setColour(Label::textColourId, Colours::grey);
-        _cpuLabel.setColour(Label::textColourId, Colours::grey);
-        _memLabel.setColour(Label::textColourId, Colours::grey);
-        _cpuNum->setEnabled(false);
-        _cpuPlus->setEnabled(false);
-        _cpuMinus->setEnabled(false);
-        _memSize->setEnabled(false);
-        _memPlus->setEnabled(false);
-        _memMinus->setEnabled(false);
-		return;
-    }
-    else if (button == _cpuPlus) 
-    {
-        _cpu++;
-        SubutaiLauncher::Session::instance()->getSettings()->setInstallationCpuNum(_cpu);
-        char t[4];
-        std::sprintf(t, "%d", _cpu);
-        _cpuNum->setButtonText(t);
-		return;
-    }
-    else if (button == _cpuMinus)
-    {
-        _cpu--;
-        if (_cpu <= 1) {
-            _cpu = 1;
-        }
-        SubutaiLauncher::Session::instance()->getSettings()->setInstallationCpuNum(_cpu);
-        char t[4];
-        std::sprintf(t, "%d", _cpu);
-        _cpuNum->setButtonText(t);
-		return;
-    }
-    else if (button == _memPlus) 
-    {
-        _mem++;
-        SubutaiLauncher::Session::instance()->getSettings()->setInstallationMemSize(_mem);
-        char t[4];
-        std::sprintf(t, "%d", _mem);
-        _memSize->setButtonText(t);
-		return;
-    }
-    else if (button == _memMinus)
-    {
-        _mem--;
-        if (_mem <= 1) {
-            _mem = 1;
-        }
-        SubutaiLauncher::Session::instance()->getSettings()->setInstallationMemSize(_mem);
-        char t[4];
-        std::sprintf(t, "%d", _mem);
-        _memSize->setButtonText(t);
-		return;
-    }
+  typedef void (ComponentChooser::*fpBtnHandler)();
+  struct btnHandler {
+    juce::TextButton* btn;
+    fpBtnHandler handler;
+  };
+
+  std::vector<btnHandler> lstHandlers = {
+    {_ptpYes, &ComponentChooser::btnPtpYes_Clicked},
+    {_ptpNo, &ComponentChooser::btnPtpNo_Clicked},
+    {_trayYes, &ComponentChooser::btnTrayYes_Clicked},
+    {_trayNo, &ComponentChooser::btnTrayNo_Clicked},
+    {_eteYes, &ComponentChooser::btnETEYes_Clicked},
+    {_eteNo, &ComponentChooser::btnETENo_Clicked},
+    {_peerYes, &ComponentChooser::btnPeerYes_Clicked},
+    {_peerNo, &ComponentChooser::btnPeerNo_Clicked},
+    {_rhYes, &ComponentChooser::btnRHYes_Clicked},
+    {_rhNo, &ComponentChooser::btnRHNo_Clicked},
+
+    {_cpuPlus, &ComponentChooser::btnCPUPlus_Clicked},
+    {_cpuMinus, &ComponentChooser::btnCPUMinus_Clicked},
+    {_memPlus, &ComponentChooser::btnMemPlus_Clicked},
+    {_memMinus, &ComponentChooser::btnMemMinus_Clicked},
+  };
+
+  for (btnHandler item : lstHandlers) {
+    if (item.btn != button) continue;
+    (this->*item.handler)();
+    return;
+  }
+
+  _logger->error("Couldn't find handler in ComponentChooser::buttonClicked.");
 }
 
 ChosenComponents ComponentChooser::getComponents()
 {
-    ChosenComponents c;
-    c.ptp = _ptp;
-    c.tray = _tray;
-    c.ete = _ete;
-    c.peer = _peer;
-    c.cpu = _cpu;
-    c.mem = _mem;
-    return c;
+  ChosenComponents c;
+  c.ptp = _ptp;
+  c.tray = _tray;
+  c.ete = _ete;
+  c.peer = _peer;
+  c.rh = _rh;
+  c.cpu = _cpu;
+  c.mem = _mem;
+  return c;
+}
+
+void ComponentChooser::btnPtpYes_Clicked()
+{
+  _logger->trace("Activating P2P");
+  _ptpLabel.setColour(Label::textColourId, Colour(105, 116, 144));
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationP2P(true);
+}
+
+void ComponentChooser::btnPtpNo_Clicked()
+{
+  _logger->trace("Deactivating P2P");
+  _ptpLabel.setColour(Label::textColourId, Colours::grey);
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationP2P(false);
+}
+
+void ComponentChooser::btnTrayYes_Clicked()
+{
+  _logger->trace("Activating Tray");
+  _trayLabel.setColour(Label::textColourId, Colour(105, 116, 144));
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationTray(true);
+}
+
+void ComponentChooser::btnTrayNo_Clicked()
+{
+  _logger->trace("Deactivating Tray");
+  _trayLabel.setColour(Label::textColourId, Colours::grey);
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationTray(false);
+}
+
+void ComponentChooser::btnETEYes_Clicked()
+{
+  _logger->trace("Activating E2E");
+  _eteLabel.setColour(Label::textColourId, Colour(105, 116, 144));
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationE2E(true);
+}
+
+void ComponentChooser::btnETENo_Clicked()
+{
+  _logger->trace("Deactivating E2E");
+  _eteLabel.setColour(Label::textColourId, Colours::grey);
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationE2E(false);
+}
+
+void ComponentChooser::btnPeerYes_Clicked()
+{
+  _rhNo->triggerClick();
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(true);
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationRH(false);
+
+  _peerLabel.setColour(Label::textColourId, Colour(105, 116, 144));
+  _cpuLabel.setColour(Label::textColourId, Colour(105, 116, 144));
+  _memLabel.setColour(Label::textColourId, Colour(105, 116, 144));
+  _cpuNum->setEnabled(true);
+  _cpuPlus->setEnabled(true);
+  _cpuMinus->setEnabled(true);
+  _memSize->setEnabled(true);
+  _memPlus->setEnabled(true);
+  _memMinus->setEnabled(true);
+}
+
+void ComponentChooser::btnPeerNo_Clicked()
+{
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(false);
+
+  _peerLabel.setColour(Label::textColourId, Colours::grey);
+  _cpuLabel.setColour(Label::textColourId, Colours::grey);
+  _memLabel.setColour(Label::textColourId, Colours::grey);
+  _cpuNum->setEnabled(false);
+  _cpuPlus->setEnabled(false);
+  _cpuMinus->setEnabled(false);
+  _memSize->setEnabled(false);
+  _memPlus->setEnabled(false);
+  _memMinus->setEnabled(false);
+}
+
+void ComponentChooser::btnRHYes_Clicked()
+{
+  _peerNo->triggerClick();
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationRH(true);
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(false);
+
+  _rhLabel.setColour(Label::textColourId, Colour(105, 116, 144));
+  _cpuLabel.setColour(Label::textColourId, Colour(105, 116, 144));
+  _memLabel.setColour(Label::textColourId, Colour(105, 116, 144));
+  _cpuNum->setEnabled(true);
+  _cpuPlus->setEnabled(true);
+  _cpuMinus->setEnabled(true);
+  _memSize->setEnabled(true);
+  _memPlus->setEnabled(true);
+  _memMinus->setEnabled(true);
+}
+
+void ComponentChooser::btnRHNo_Clicked()
+{
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationRH(false);
+  _rhLabel.setColour(Label::textColourId, Colours::grey);
+  _cpuLabel.setColour(Label::textColourId, Colours::grey);
+  _memLabel.setColour(Label::textColourId, Colours::grey);
+  _cpuNum->setEnabled(false);
+  _cpuPlus->setEnabled(false);
+  _cpuMinus->setEnabled(false);
+  _memSize->setEnabled(false);
+  _memPlus->setEnabled(false);
+  _memMinus->setEnabled(false);
+}
+
+void ComponentChooser::btnCPUPlus_Clicked()
+{
+  _cpu++;
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationCpuNum(_cpu);
+  char t[4];
+  std::sprintf(t, "%d", _cpu);
+  _cpuNum->setButtonText(t);
+}
+
+void ComponentChooser::btnCPUMinus_Clicked()
+{
+  _cpu--;
+  if (_cpu <= 1) {
+    _cpu = 1;
+  }
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationCpuNum(_cpu);
+  char t[4];
+  std::sprintf(t, "%d", _cpu);
+  _cpuNum->setButtonText(t);
+}
+
+void ComponentChooser::btnMemPlus_Clicked()
+{
+  _mem++;
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationMemSize(_mem);
+  char t[4];
+  std::sprintf(t, "%d", _mem);
+  _memSize->setButtonText(t);
+}
+
+void ComponentChooser::btnMemMinus_Clicked()
+{
+  _mem--;
+  if (_mem <= 1) {
+    _mem = 1;
+  }
+  SubutaiLauncher::Session::instance()->getSettings()->setInstallationMemSize(_mem);
+  char t[4];
+  std::sprintf(t, "%d", _mem);
+  _memSize->setButtonText(t);
 }
