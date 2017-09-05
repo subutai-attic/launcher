@@ -44,9 +44,11 @@ class UIApplication : public juce::JUCEApplication
         void checkInitialization();
         void startMainWindow();
 
-        std::thread getAssets();
-        void getAssetsImpl();
+        std::thread runSplashBackgroundTask();
+        void runSplashBackgroundTaskImpl();
 
+        std::thread gatherSystemInfo();
+        void gatherSystemInfoImpl();
 };
 
 #endif  // MAIN_H_INCLUDED

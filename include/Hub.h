@@ -60,6 +60,7 @@ namespace SubutaiLauncher
             void sendInfo(const std::string& key, const std::string& value);
             void addInfo(const std::string& key, const std::string& value);
             void flushInfo();
+            std::deque<InfoMessage> getInfo();
         private:
             void send(const std::string& ep, const std::string& json);
             void generateID();

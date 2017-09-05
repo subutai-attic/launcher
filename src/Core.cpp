@@ -7,7 +7,8 @@
 SubutaiLauncher::Core::Core(std::vector<std::string> args) : 
     _args(args),
     _running(false),
-    _noValidate(false)
+    _noValidate(false),
+    _appName("")
 {
 #if LAUNCHER_MACOS
     chdir("/usr/local/share/subutai");
@@ -25,6 +26,12 @@ SubutaiLauncher::Core::Core() :
 #endif
     setupLogger();
     Poco::Logger::get("subutai").information("Subutai Launcher " + std::string(LAUNCHER_VERSION));
+}
+
+SubutaiLauncher::Core::Core(const std::string& appName) : 
+    _appName(appName)
+{
+    
 }
 
 SubutaiLauncher::Core::~Core()

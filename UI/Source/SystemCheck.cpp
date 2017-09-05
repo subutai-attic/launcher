@@ -45,12 +45,6 @@ SystemCheck::SystemCheck()
     std::string pCoresNum = Poco::format("%u", env.cpuNum());
     std::string pCPUArch = env.cpuArch();
 
-    // Send launcher information
-    SubutaiLauncher::Session::instance()->getHub()->addInfo(SI_LAUNCHER_VERSION, LAUNCHER_VERSION);
-    SubutaiLauncher::Session::instance()->getHub()->addInfo(SI_OS_NAME, pOs);
-    SubutaiLauncher::Session::instance()->getHub()->addInfo(SI_CPU_ARCH, pCPUArch);
-    SubutaiLauncher::Session::instance()->getHub()->addInfo(SI_CORE_NUM, pCoresNum);
-
     _osValue.setText(pOs, dontSendNotification);
     if (osSupported) _osValue.setColour(Label::textColourId, Colour(105, 116, 144));
     else _osValue.setColour(Label::textColourId, Colours::red);

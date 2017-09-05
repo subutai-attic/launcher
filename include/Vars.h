@@ -46,6 +46,8 @@
 
 // System information
 #define SI_LAUNCHER_VERSION         "LauncherVersion"
+#define SI_SYSTEM_INFO              "SystemInfo"
+#define SI_CPU_INFO                 "CPUInfo"
 #define SI_OS_NAME                  "OSName"
 #define SI_CPU_ARCH                 "CPUArch"
 #define SI_CORE_NUM                 "CoresNum"
@@ -63,6 +65,7 @@
 #define SI_P2P_SERVICE_EXISTS       "P2PServiceExists"
 #define SI_P2P_SERVICE_RUNNING      "P2PServiceRunning"
 #define SI_IP                       "IPConfiguration"
+#define SI_NETSTAT                  "NetStatConfiguration"
 #define SI_DEFAULT_GATEWAY          "DefaultGateway"
 #define SI_VMS                      "SubutaiMachines"
 

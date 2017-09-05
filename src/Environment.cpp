@@ -1,134 +1,154 @@
 #include "Environment.h"
 
-const std::string SubutaiLauncher::Environment::EXTRA_PATH="/usr/local/bin:";
-
-SubutaiLauncher::Environment::Environment() : 
-    _impl(new EnvironmentImpl)
+namespace SubutaiLauncher
 {
 
-}
+    const std::string Environment::EXTRA_PATH="/usr/local/bin:";
 
-SubutaiLauncher::Environment::~Environment() 
-{
+    Environment::Environment() : 
+        _impl(new EnvironmentImpl)
+    {
 
-}
+    }
 
-unsigned SubutaiLauncher::Environment::processorNum() 
-{
-    return _impl->processorNum();
-}
+    Environment::~Environment() 
+    {
 
-unsigned SubutaiLauncher::Environment::is64() 
-{
-    return _impl->is64();
-}
+    }
 
-ULORAMSIZE_T SubutaiLauncher::Environment::ramSize() 
-{
-    return _impl->ramSize();
-}
+    unsigned Environment::processorNum() 
+    {
+        return _impl->processorNum();
+    }
 
-unsigned SubutaiLauncher::Environment::versionVBox() 
-{
-    return _impl->versionVBox();
-}
+    unsigned Environment::is64() 
+    {
+        return _impl->is64();
+    }
 
-bool SubutaiLauncher::Environment::vtxEnabled() 
-{
-    return _impl->vtxEnabled();
-}
+    ULORAMSIZE_T Environment::ramSize() 
+    {
+        return _impl->ramSize();
+    }
 
-std::string SubutaiLauncher::Environment::versionOS() 
-{
-    return _impl->versionOS();
-}
+    unsigned Environment::versionVBox() 
+    {
+        return _impl->versionVBox();
+    }
 
-std::string SubutaiLauncher::Environment::versionNumber()
-{
-    return _impl->versionNumber();
-}
+    bool Environment::vtxEnabled() 
+    {
+        return _impl->vtxEnabled();
+    }
 
-std::string SubutaiLauncher::Environment::cpuArch() 
-{
-    return _impl->cpuArch();
-}
+    std::string Environment::versionOS() 
+    {
+        return _impl->versionOS();
+    }
 
-unsigned int SubutaiLauncher::Environment::cpuNum() 
-{
-    return _impl->cpuNum();
-}
+    std::string Environment::versionNumber()
+    {
+        return _impl->versionNumber();
+    }
 
-std::string SubutaiLauncher::Environment::getVar(const std::string& name, const std::string& defaultValue) 
-{
-    return _impl->getVar(name, defaultValue);
-}
+    std::string Environment::cpuArch() 
+    {
+        return _impl->cpuArch();
+    }
 
-std::string SubutaiLauncher::Environment::setVar(const std::string& name, const std::string& value)
-{
-    return _impl->setVar(name, value);
-}
+    unsigned int Environment::cpuNum() 
+    {
+        return _impl->cpuNum();
+    }
 
-std::string SubutaiLauncher::Environment::getDefaultGateway()
-{
-    return _impl->getDefaultGateway();
-}
+    std::string Environment::getVar(const std::string& name, const std::string& defaultValue) 
+    {
+        return _impl->getVar(name, defaultValue);
+    }
 
-bool SubutaiLauncher::Environment::isNSSMInstalled()
-{
-    return _impl->isNSSMInstalled();
-}
+    std::string Environment::setVar(const std::string& name, const std::string& value)
+    {
+        return _impl->setVar(name, value);
+    }
 
-bool SubutaiLauncher::Environment::registerService(const std::string& name, const std::string& path, std::vector<std::string> args)
-{
-    return _impl->registerService(name, path, args);
-}
+    std::string Environment::getDefaultGateway()
+    {
+        return _impl->getDefaultGateway();
+    }
 
-bool SubutaiLauncher::Environment::unregisterService(const std::string & name)
-{
-    return _impl->unregisterService(name);
-}
+    bool Environment::isNSSMInstalled()
+    {
+        return _impl->isNSSMInstalled();
+    }
 
-bool SubutaiLauncher::Environment::startService(const std::string& name)
-{
-    return _impl->startService(name);
-}
+    bool Environment::registerService(const std::string& name, const std::string& path, std::vector<std::string> args)
+    {
+        return _impl->registerService(name, path, args);
+    }
 
-bool SubutaiLauncher::Environment::stopService(const std::string& name)
-{
-    return _impl->stopService(name);
-}
+    bool Environment::unregisterService(const std::string & name)
+    {
+        return _impl->unregisterService(name);
+    }
 
-void SubutaiLauncher::Environment::CreateShortcut(const std::string& source, const std::string& name)
-{
-    return _impl->CreateShortcut(source, name);
-}
+    bool Environment::startService(const std::string& name)
+    {
+        return _impl->startService(name);
+    }
 
-int32_t SubutaiLauncher::Environment::updatePath(const std::string& path)
-{
-    return _impl->updatePath(path);
-}
+    bool Environment::stopService(const std::string& name)
+    {
+        return _impl->stopService(name);
+    }
 
-bool SubutaiLauncher::Environment::killProcess(const std::string & name)
-{
-    return _impl->killProcess(name);
-}
+    void Environment::CreateShortcut(const std::string& source, const std::string& name)
+    {
+        return _impl->CreateShortcut(source, name);
+    }
 
-std::string SubutaiLauncher::Environment::getDesktopDirectory()
-{
-    return _impl->getDesktopDirectory();
-}
+    int32_t Environment::updatePath(const std::string& path)
+    {
+        return _impl->updatePath(path);
+    }
 
-bool SubutaiLauncher::Environment::isVBoxInstalled()
-{
-    return _impl->isVBoxInstalled();
-}
+    bool Environment::killProcess(const std::string & name)
+    {
+        return _impl->killProcess(name);
+    }
 
-bool SubutaiLauncher::Environment::writeE2ERegistry(const std::string & name)
-{
-    return _impl->writeE2ERegistry(name);
-}
+    std::string Environment::getDesktopDirectory()
+    {
+        return _impl->getDesktopDirectory();
+    }
 
-BOOL SubutaiLauncher::Environment::terminateWinProcess(DWORD dwProcessId, UINT uExitCode)
-{
-    return _impl->terminateWinProcess(dwProcessId, uExitCode);
+    bool Environment::isVBoxInstalled()
+    {
+        return _impl->isVBoxInstalled();
+    }
+
+    bool Environment::writeE2ERegistry(const std::string & name)
+    {
+        return _impl->writeE2ERegistry(name);
+    }
+
+    BOOL Environment::terminateWinProcess(DWORD dwProcessId, UINT uExitCode)
+    {
+        return _impl->terminateWinProcess(dwProcessId, uExitCode);
+    }
+
+    const std::string& Environment::getNetworkConfiguration() const
+    {
+        return _impl->getNetworkConfiguration();
+    }
+
+    const std::string& Environment::getNetstat() const
+    {
+        return _impl->getNetstat();
+    }
+
+    const std::string& Environment::getSystemInfo() const
+    {
+        return _impl->getSystemInfo();
+    }
+
 }

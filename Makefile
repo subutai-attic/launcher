@@ -54,9 +54,9 @@ endif
 ifdef BUILD_TESTS
 test: directories
 test: lib
+	$(MAKE) -C ./testsuite
 #test: $(OUTPUT_DIR)/$(TEST_TARGET)
 #test: directories lib
-#	$(MAKE) -C ./testsuite
 #test:
 #	@cp testsuite/*.py bin/
 

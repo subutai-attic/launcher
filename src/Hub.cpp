@@ -190,9 +190,10 @@ namespace SubutaiLauncher
 
     void Hub::addInfo(const std::string& key, const std::string& value)
     {
+        if (key.empty() || value.empty()) return;
         InfoMessage m;
         m.key = key;
-        m.value = value;
+        m.value = Poco::replace(value, "\n", "\\n");
         _messages.push_back(m);
     }
 
@@ -203,6 +204,11 @@ namespace SubutaiLauncher
             sendInfo((*it).key, (*it).value);
             it = _messages.erase(it);
         }
+    }
+
+    std::deque<InfoMessage> Hub::getInfo()
+    {
+        return _messages;
     }
 
 }

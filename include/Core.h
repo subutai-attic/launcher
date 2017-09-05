@@ -42,6 +42,7 @@ namespace SubutaiLauncher
         public:
             Core(std::vector<std::string> args);
 			Core();
+            Core(const std::string& appName);
             ~Core();
             void initializePython();
             void initializeSSL();
@@ -51,6 +52,7 @@ namespace SubutaiLauncher
             void setupLogger();
         private:
             std::vector<std::string> _args;
+            std::string _appName;
             bool _running;
             bool _noValidate;
     };

@@ -122,6 +122,7 @@ std::thread WizardInstall::runThread()
 
 void WizardInstall::runImpl()
 {
+    SubutaiLauncher::Session::instance()->getHub()->flushInfo();
 	_running = true;
 	_logger->information("%s installation started", _name);
 	// Download installation script
