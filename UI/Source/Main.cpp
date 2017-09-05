@@ -98,23 +98,17 @@ void UIApplication::initialise(const juce::String& commandLine)
     {
         _logger->error(e.displayText());
     }
+    _logger->information("Starting up the UI");
     SubutaiLauncher::Environment env;
     env.updatePath(SubutaiLauncher::Session::instance()->getSettings()->getInstallationPath() + "bin");
 
     Poco::Logger::get("subutai").information("Downloading assets");
 
     _initTimer = new InitTimer(&UIApplication::checkInitialization, this);
-    // This method is where you should put your application's initialisation code..
-    //
-    //
-    //uid_t cuser = getuid();
-    //if (cuser !=0) {
-
-    //}
     SubutaiLauncher::AssetsManager pAssets;
-    pAssets.download("launcher-logo.png");
+    pAssets.download("launcher-splash.png");
     std::string pLogoFile(SubutaiLauncher::Session::instance()->getSettings()->getTmpPath() +
-            "launcher-logo.png");
+            "launcher-splash.png");
     Poco::File pLogo(pLogoFile);
 
     if (pLogo.exists()) {
@@ -122,7 +116,7 @@ void UIApplication::initialise(const juce::String& commandLine)
                 getApplicationName(),
                 juce::ImageCache::getFromFile(juce::File(pLogoFile)),
                 true);
-        getAssets().detach();
+        runSplashBackgroundTask().detach();
     }
     //_logger->debug("UI Initialization completed");
 }
@@ -177,16 +171,16 @@ void UIApplication::checkInitialization()
     startMainWindow();
 }
 
-std::thread UIApplication::getAssets()
+std::thread UIApplication::runSplashBackgroundTask()
 {
     _initTimer->startTimer(1000); //run timer in main thread. then run initialization thread
     return std::thread([=] {
-            getAssetsImpl();
+            runSplashBackgroundTaskImpl();
             initializationFinished = true;
             });
 }
 
-void UIApplication::getAssetsImpl()
+void UIApplication::runSplashBackgroundTaskImpl()
 {
     SubutaiLauncher::AssetsManager pAssets;
 
@@ -199,7 +193,29 @@ void UIApplication::getAssetsImpl()
         Poco::Logger::get("subutai").error("Failed to download assets");
         SubutaiLauncher::Session::instance()->getDownloader()->reset();
     }
+    gatherSystemInfoImpl();
     //    _assetsReady = true;
+}
+
+std::thread UIApplication::gatherSystemInfo()
+{
+
+}
+
+void UIApplication::gatherSystemInfoImpl()
+{
+    SubutaiLauncher::Environment env;
+    auto hub = SubutaiLauncher::Session::instance()->getHub();
+    // Send launcher information
+    if (hub == nullptr) return;
+    std::string pCoresNum = Poco::format("%u", env.cpuNum());
+    hub->addInfo(SI_LAUNCHER_VERSION, LAUNCHER_VERSION);
+    hub->addInfo(SI_OS_NAME, env.versionOS());
+    hub->addInfo(SI_CPU_ARCH, env.cpuArch());
+    hub->addInfo(SI_CORE_NUM, pCoresNum);
+    hub->addInfo(SI_SYSTEM_INFO, env.getSystemInfo());
+    hub->addInfo(SI_IP, env.getNetworkConfiguration());
+    hub->addInfo(SI_NETSTAT, env.getNetstat());
 }
 
 START_JUCE_APPLICATION (UIApplication)

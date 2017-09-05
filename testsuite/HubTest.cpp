@@ -54,10 +54,22 @@ void HubTest::testSendLog()
     h.setLogin("m.savochkin@gmail.com");
     h.setPassword("testhubpassword");
     h.auth();
-    h.sendLog(SubutaiLauncher::HL_INFO, "Launcher Testsuite: Log INFO");
-    h.sendLog(SubutaiLauncher::HL_WARNING, "Launcher Testsuite: Log WARNING");
-    h.sendLog(SubutaiLauncher::HL_ERROR, "Launcher Testsuite: Log ERROR");
-    h.sendLog(SubutaiLauncher::HL_FATAL, "Launcher Testsuite: Log FATAL");
+    //h.sendLog(SubutaiLauncher::HL_INFO, "Launcher Testsuite: Log INFO");
+    //h.sendLog(SubutaiLauncher::HL_WARNING, "Launcher Testsuite: Log WARNING");
+    //h.sendLog(SubutaiLauncher::HL_ERROR, "Launcher Testsuite: Log ERROR");
+    //h.sendLog(SubutaiLauncher::HL_FATAL, "Launcher Testsuite: Log FATAL");
+}
+
+void HubTest::testAddInfo()
+{
+    SubutaiLauncher::Hub h;
+    h.addInfo("one key", "one val");
+    h.addInfo("two key", "two val\nmultiline");
+    auto m = h.getInfo();
+    assert(m[0].key == "one key");
+    assert(m[0].value == "one val");
+    assert(m[1].key == "two key");
+    assert(m[1].value == "two val\\nmultiline");
 }
 
 CppUnit::Test* HubTest::suite()
@@ -67,6 +79,7 @@ CppUnit::Test* HubTest::suite()
     CppUnit_addTest(pSuite, HubTest, testAuth);
     CppUnit_addTest(pSuite, HubTest, testBalance);
     CppUnit_addTest(pSuite, HubTest, testSendLog);
+    CppUnit_addTest(pSuite, HubTest, testAddInfo);
 
     return pSuite;
 }

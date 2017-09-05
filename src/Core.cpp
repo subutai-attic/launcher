@@ -7,7 +7,8 @@
 SubutaiLauncher::Core::Core(std::vector<std::string> args) : 
     _args(args),
     _running(false),
-    _noValidate(false)
+    _noValidate(false),
+    _appName("")
 {
 #if LAUNCHER_MACOS
     chdir("/usr/local/share/subutai");
@@ -25,6 +26,12 @@ SubutaiLauncher::Core::Core() :
 #endif
     setupLogger();
     Poco::Logger::get("subutai").information("Subutai Launcher " + std::string(LAUNCHER_VERSION));
+}
+
+SubutaiLauncher::Core::Core(const std::string& appName) : 
+    _appName(appName)
+{
+    
 }
 
 SubutaiLauncher::Core::~Core()
@@ -150,6 +157,7 @@ void SubutaiLauncher::Core::run()
     initializeSSL();
     initializeSSH();
     Session::instance();
+    // Configure Hub channel
     parseArgs();
 }
 
@@ -172,12 +180,14 @@ void SubutaiLauncher::Core::setupLogger()
 {
     Poco::AutoPtr<Poco::FileChannel>            pChannel(new Poco::FileChannel);
     Poco::AutoPtr<Poco::ConsoleChannel>         cConsole(new Poco::ConsoleChannel);
+    Poco::AutoPtr<HubChannel>                   pHub(new HubChannel);
     Poco::AutoPtr<Poco::SplitterChannel>        pSplitter(new Poco::SplitterChannel);
     Poco::AutoPtr<Poco::PatternFormatter>       pFormatter(new Poco::PatternFormatter);
     pFormatter->setProperty("pattern", "%Y-%m-%d %H:%M:%S [%p]: %t");
     pFormatter->setProperty("times", "local");
     pSplitter->addChannel(pChannel);
     pSplitter->addChannel(cConsole);
+    pSplitter->addChannel(pHub);
     Poco::DateTime dt;
     Poco::Timestamp now;
     std::string filename = "subutai-launcher-" + Poco::DateTimeFormatter::format(now, "%Y-%m-%d_%H-%M-%S") + ".log";
@@ -209,11 +219,10 @@ void SubutaiLauncher::Core::setupLogger()
         std::printf("Can't create log file: %s\n", e.displayText());
     }
 #endif
-    pChannel->setProperty("rotation", "5 M");
     Poco::AutoPtr<Poco::FormattingChannel> pFormatChannel(new Poco::FormattingChannel(pFormatter, pSplitter));
     Poco::Logger& log = Poco::Logger::get("subutai");
 #ifdef BUILD_SCHEME_PRODUCTION
-    log.setLevel("trace");
+    log.setLevel("information");
 #endif
 #ifdef BUILD_SCHEME_MASTER
     log.setLevel("debug");

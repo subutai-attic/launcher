@@ -44,4 +44,52 @@
     #endif
 #endif
 
+// System information
+#define SI_LAUNCHER_VERSION         "LauncherVersion"
+#define SI_SYSTEM_INFO              "SystemInfo"
+#define SI_CPU_INFO                 "CPUInfo"
+#define SI_OS_NAME                  "OSName"
+#define SI_CPU_ARCH                 "CPUArch"
+#define SI_CORE_NUM                 "CoresNum"
+#define SI_MEM_SIZE                 "MemSize"
+#define SI_P2P_VERSION              "P2PVersion"
+#define SI_TRAY_VERSION             "TrayVersion"
+#define SI_E2E_VERSION              "E2EVersion"
+#define SI_VBOX_VERSION             "VBoxVersion"
+#define SI_COCOASUDO_INSTALLED      "cocoasudoInstalled"
+#define SI_OSASCRIPT_INSTALLED      "osascriptInstalled"
+#define SI_TUNTAP_INSTALLED         "tuntapInstalled"
+#define SI_SSH_VERSION              "sshVersion"
+#define SI_GKSU_INSTALLED           "gksuInstalled"
+#define SI_NSSM_INSTALLED           "nssmInstalled"
+#define SI_P2P_SERVICE_EXISTS       "P2PServiceExists"
+#define SI_P2P_SERVICE_RUNNING      "P2PServiceRunning"
+#define SI_IP                       "IPConfiguration"
+#define SI_NETSTAT                  "NetStatConfiguration"
+#define SI_DEFAULT_GATEWAY          "DefaultGateway"
+#define SI_VMS                      "SubutaiMachines"
+
+
+// Steps definitions
+#define STEP_INIT                   "INIT"
+#define STEP_P2P                    "P2P"
+#define STEP_E2E                    "E2E"
+#define STEP_TRAY                   "TRAY"
+#define STEP_PEER                   "PEER"
+#define STEP_RH                     "RH"
+
+// Generic actions
+#define ACT_INIT                    "INIT"      // Initialization 
+#define ACT_DOWNLOAD                "DWL"       // Download
+#define ACT_UNPACK                  "UNAR"      // Unarchive
+#define ACT_INSTALL                 "INST"      // Installation using current OS installation method (ubuntu - dpkg, macos - installer, windows - .exe)
+#define ACT_FILE_INFO               "FINF"      // Request remote file info
+#define ACT_TEMPLATE_INFO           "TINF"      // Request remote template info
+
+// VirtualBox related actions
+#define VB_START                    "VSTA" 
+#define VB_STOP                     "VSTO"
+#define VB_MODIFY                   "VMOD"
+#define VB_DHCP                     "VDHCP" 
+
 #endif

@@ -14,6 +14,7 @@
 #include "Poco/FileStream.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Logger.h"
+#include "Poco/String.h"
 
 #if LAUNCHER_WINDOWS
 #include <io.h>
@@ -21,9 +22,9 @@
 
 #include <libssh/callbacks.h>
 #include "libssh/libssh.h"
-#include "Environment.h"
 #include "FileSystem.h"
 #include "SSHException.h"
+#include "Environment.h"
 
 namespace SubutaiLauncher {
     struct ssh_threads_callbacks_struct * ssh_threads_get_std_threads(void);

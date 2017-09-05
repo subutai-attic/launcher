@@ -37,7 +37,7 @@ SubutaiLauncher::SL::SL(const std::string& dir) :
         wcscat(newpath, L":.");
         std::wcstombs(dst, newpath, sizeof(dst));
 #endif
-        std::wprintf(L"NEWPATH: %sl\n", newpath);
+        //std::wprintf(L"NEWPATH: %sl\n", newpath);
         PySys_SetPath(newpath);
         delete newpath;
     }

@@ -21,11 +21,11 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/String.h"
 
-#include "Environment.h"
 #include "SubutaiString.h"
 #include "FileSystem.h"
 #include "SSH.h"
 #include "Session.h"
+#include "Environment.h"
 
 namespace SubutaiLauncher {
 

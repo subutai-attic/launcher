@@ -1,16 +1,71 @@
-#ifndef __ENVIRONMENT_H__
-#define __ENVIRONMENT_H__
+#ifndef __ENVIRONMENT_IMPL_WINDOWS_H__
+#define __ENVIRONMENT_IMPL_WINDOWS_H__
 
 #include "Vars.h"
-#include "EnvironmentImpl.h"
 
-namespace SubutaiLauncher {
+#include <string>
+#include <cstdlib>
+#include <sstream>
+#include <limits.h>
 
-    class Environment {
+#include "SubutaiException.h"
+#include "SubutaiString.h"
+#include "Poco/Environment.h"
+#include "Poco/StringTokenizer.h"
+#include "Poco/Process.h"
+#include "Poco/Pipe.h"
+#include "Poco/PipeStream.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/Logger.h"
+#include "Poco/File.h"
+#include "Poco/Path.h"
+
+#include <windows.h>
+#include <VersionHelpers.h>
+#include <WinSock2.h>
+#include <shlobj.h>
+#include <winnls.h>
+#include <shobjidl.h>
+#include <objbase.h>
+#include <objidl.h>
+#include <shlguid.h>
+#include <tlhelp32.h>
+#include <KnownFolders.h>
+#include <wchar.h>
+
+#include <IPHlpApi.h>
+#pragma comment(lib, "IPHLPAPI.LIB")
+#define ENV_MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
+#define ENV_FREE(x) HeapFree(GetProcessHeap(), 0, (x))
+
+#pragma comment(lib, "user32.lib")
+
+#include "Poco/Util/WinRegistryKey.h"
+
+#ifndef ULORAMSIZE_T
+#define ULORAMSIZE_T unsigned long long
+#endif
+
+namespace SubutaiLauncher 
+{
+
+	typedef enum error_codes 
+    {
+		ec_success = 0,
+		ec_wrong_key_type,
+		ec_cant_open_reg_key,
+		ec_cant_query_reg_value,
+		ec_cant_change_registry,
+		ec_need_to_realloc,
+		ec_existing_val
+	} error_codes_t;
+
+    class EnvironmentImpl 
+    {
         public:
             static const std::string EXTRA_PATH;
-            Environment();
-            ~Environment();
+            EnvironmentImpl();
+            ~EnvironmentImpl();
             std::string versionOS();
             std::string versionNumber();
             std::string cpuArch();
@@ -40,7 +95,7 @@ namespace SubutaiLauncher {
             const std::string& getNetstat() const;
             const std::string& getSystemInfo() const;
         private:
-            EnvironmentImpl* _impl;
+            Poco::Logger* _logger;
     };
 
 }

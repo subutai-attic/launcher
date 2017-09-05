@@ -200,6 +200,7 @@ void Wizard::buttonClicked(juce::Button* button)
 			_step = 4;
 			_back.setEnabled(false);
 			_next.setEnabled(false);
+            SubutaiLauncher::Session::instance()->getHub()->flushInfo();
 			runInstall();
 			break;
 		default:
