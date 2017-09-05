@@ -432,7 +432,6 @@ namespace SubutaiLauncher
         {
             std::string pErr = "Failed to determine IP of Resource Host";
             Poco::Logger::get("subutai").error(pErr);
-            Session::instance()->getHub()->addLogLine(HubLogLevel::HL_FATAL, pErr);
         }
         p->disconnect();
         delete p;
@@ -1085,6 +1084,28 @@ namespace SubutaiLauncher
         return Py_BuildValue("i", 0);
     }
 
+    static PyObject* SL_SetStep(PyObject* self, PyObject* args, PyObject* keywords)
+    {
+        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+            return NULL;
+
+        Session::instance()->setStep(std::string(sl_string));
+
+        return Py_BuildValue("i", 0);
+    }
+
+    static PyObject* SL_SetAction(PyObject* self, PyObject* args, PyObject* keywords)
+    {
+        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
+            return NULL;
+
+        Session::instance()->setAction(std::string(sl_string));
+
+        return Py_BuildValue("i", 0);
+    }
+
     // ========================================================================
     // Unused
     // ========================================================================
@@ -1403,8 +1424,10 @@ static PyMethodDef SubutaiSLMethods[] = {
     { "SSHRunOut",                  (PyCFunction)   SL_SSHRunOut,                   METH_VARARGS | METH_KEYWORDS, "Run command over SSH and return it's output" },
     { "SSHStartSession",            (PyCFunction)   SL_SSHStartSession,             METH_VARARGS | METH_KEYWORDS, "Opens new SSH session" },
     { "SSHStopSession",             (PyCFunction)   SL_SSHStopSession,              METH_VARARGS | METH_KEYWORDS, "Closes SSH session" },
+    { "SetAction",                  (PyCFunction)   SL_SetAction,                   METH_VARARGS | METH_KEYWORDS, "Set installation action" },
     { "SetProgress",                (PyCFunction)   SL_SetProgress,                 METH_VARARGS | METH_KEYWORDS, "Sets action percentage" },
     { "SetSSHCredentials",          (PyCFunction)   SL_SetSSHCredentials,           METH_VARARGS | METH_KEYWORDS, "Set SSH Connection credentials" },
+    { "SetStep",                    (PyCFunction)   SL_SetStep,                     METH_VARARGS | METH_KEYWORDS, "Set installation step" },
     { "setTmpDir",                  (PyCFunction)   SL_SetTmpDir,                   METH_VARARGS | METH_KEYWORDS, "Sets tmp output directory" },
     { "Shutdown",                                   SL_Shutdown,                    METH_VARARGS, "Finalizes the script" },
     { "StartProcedure",             (PyCFunction)   SL_StartProcedure,              METH_VARARGS | METH_KEYWORDS, "Starts install/update/remove procedure" },

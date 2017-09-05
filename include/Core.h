@@ -8,16 +8,16 @@
 #include <string>
 #include <Python.h>
 
-#include <Poco/Message.h>
-#include <Poco/Channel.h>
-#include <Poco/ConsoleChannel.h>
-#include <Poco/FileChannel.h>
-#include <Poco/SplitterChannel.h>
-#include <Poco/FormattingChannel.h>
-#include <Poco/PatternFormatter.h>
-#include <Poco/Logger.h>
-#include <Poco/LogStream.h>
-#include <Poco/AutoPtr.h>
+#include "Poco/Message.h"
+#include "Poco/Channel.h"
+#include "Poco/ConsoleChannel.h"
+#include "Poco/FileChannel.h"
+#include "Poco/SplitterChannel.h"
+#include "Poco/FormattingChannel.h"
+#include "Poco/PatternFormatter.h"
+#include "Poco/Logger.h"
+#include "Poco/LogStream.h"
+#include "Poco/AutoPtr.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/AcceptCertificateHandler.h"
 #include "Poco/Timestamp.h"
@@ -32,6 +32,7 @@
 #include "Session.h"
 #include "Environment.h"
 #include "Browser.h"
+#include "HubChannel.h"
 
 namespace SubutaiLauncher 
 {

@@ -98,6 +98,7 @@ void UIApplication::initialise(const juce::String& commandLine)
     {
         _logger->error(e.displayText());
     }
+    _logger->information("Starting up the UI");
     SubutaiLauncher::Environment env;
     env.updatePath(SubutaiLauncher::Session::instance()->getSettings()->getInstallationPath() + "bin");
 

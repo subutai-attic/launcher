@@ -137,35 +137,6 @@ find_openssl_library()
     echo "Using openssl directory for libraries: $openssl_lib_directory"
 }
 
-find_openssl_directory()
-{
-    echo -e "Looking for openssl directory..."
-
-    local header_location=`find $top_lib_dir -name 'crypto.h' | grep -v Permission`
-
-    if [[ ( $? != 0 ) || ( -z "$header_location" ) ]]; then
-        echo "WARNING: Openssl library was not found"
-        return
-    fi
-
-    while read -r line; do
-        while :
-        do
-            line=`dirname $line`
-            if [[ ( "$line" == "$top_lib_dir" ) || ( "$line" == "/" ) || ( $? != 0 ) ]]; then
-                break
-            fi
-            sslex=`find $line -name "libssl*$lib_ext" | grep -v Permission | head -1`
-            if [[ ( $? == 0 ) && ( ! -z "$sslex" ) ]]; then
-                openssl_directory=$line
-                echo -e "OK [$openssl_directory]"
-                return
-            fi
-        done
-    done <<< "$header_location"
-    echo "FAIL. openssl directory was not found"
-}
-
 check_python()
 {
     if [ $static -eq 1 ]; then
@@ -176,7 +147,7 @@ check_python()
 
     echo -n "Looking for libpython$1.$lext library path... "
 
-    pypath=`find $python_dir -name "libpython$1.$lext" | grep -v Permission | head -1`
+    pypath=`find $python_dir -name "libpython$1.$lext" 2>&1 | grep -v Permission | head -1`
     if [[ ( $? != 0 ) || ( -z "$pypath" ) ]]; then
         echo "ERROR: Failed to find path to python library"
         exit
@@ -190,7 +161,7 @@ check_python_header()
 {
     echo -n "Looking for Python.h... "
 
-    local py_header_dir=`find $python_dir -name "Python.h" | grep $python | grep -v Permission`
+    local py_header_dir=`find $python_dir -name "Python.h" 2>&1 | grep -v Permission | grep $python`
     if [[ ( $? != 0 ) || ( -z "$py_header_dir" ) ]]; then
         echo -e "FAIL"
         echo -e "Couldn't find libpython$1 directory under $python_dir"
@@ -210,7 +181,7 @@ check_python_pyconfig()
 {
     echo -n "Looking for pyconfig.h... "
 
-    local py_header_dir=`find $python_dir -name "pyconfig.h" | grep $python | grep -v PC | grep -v Permission`
+    local py_header_dir=`find $python_dir -name "pyconfig.h" 2>&1 | grep -v Permission | grep $python | grep -v PC`
     if [[ ( $? != 0 ) || ( -z "$py_header_dir" ) ]]; then
         echo -e "FAIL"
         echo -e "Couldn't find pyconfig.h directory under $python_dir"
@@ -230,7 +201,7 @@ find_openssl_header()
 {
     echo -n "Looking for crypto.h... "
 
-    local openssl_dirs=`find $top_include_dir -name "crypto.h" | grep -v Permission | head -1`
+    local openssl_dirs=`find $top_include_dir -name "crypto.h" 2>&1 | grep -v Permission | head -1`
     if [[ ( $? != 0 ) || ( -z "$openssl_dirs" ) ]]; then
         echo -e "FAIL"
         echo -e "Couldn't find crypto.h directory under $top_include_dir"
@@ -255,12 +226,12 @@ collect_static_libraries()
     rm -f $collect_static/*.a
     rm -f $collect_static/Python
     # Looking for Poco static libraries
-    find /usr -name 'libPoco*.a' -exec cp -v {} $collect_static/ \;
-    find $python_dir -name 'libpython*.a' -exec cp -v {} $collect_static/ \;
+    find /usr -name 'libPoco*.a' -exec cp -v {} $collect_static/ \; 2>&1 | grep -v Permission
+    find $python_dir -name 'libpython*.a' -exec cp -v {} $collect_static/ \; 2>&1 | grep -v Permission
     cp -v $collect_static/libpython$python.a $collect_static/Python
-    find /usr -name 'libssl*.a' -exec cp -v {} $collect_static/ \;
-    find /usr -name 'libcrypto*.a' -exec cp -v {} $collect_static/ \;
-    find /usr -name 'libssh*.a' -exec cp -v {} $collect_static/ \;
+    find /usr -name 'libssl*.a' -exec cp -v {} $collect_static/ \; 2>&1 | grep -v Permission
+    find /usr -name 'libcrypto*.a' -exec cp -v {} $collect_static/ \; 2>&1 | grep -v Permission
+    find /usr -name 'libssh*.a' -exec cp -v {} $collect_static/ \; 2>&1 | grep -v Permission
 }
 
 while [ $# -ge 1 ]; do
@@ -320,8 +291,6 @@ find_openssl_library
 check_python_header $python
 check_python $python
 check_python_pyconfig $python
-#find_openssl_header
-find_openssl_directory
 collect_static_libraries
 
 if [ "$scheme" == "production" ]; then
@@ -339,28 +308,30 @@ echo "PYTHON_VER = python$python" >> config.make
 echo "PYLIB_DIR = $pylib" >> config.make
 echo "PYLIB_HEADER_DIR = $py_header" >> config.make
 echo "PYCONFIG_HEADER_DIR = $py_config_header" >> config.make
-echo "BUILD_SCHEME = $scheme" >> config.make
+#echo "BUILD_SCHEME = $scheme" >> config.make
 echo "OPENSSL_DIR = $openssl_directory" >> config.make
 echo "OPENSSL_HEADERS_DIR = $openssl_headers_directory" >> config.make
 echo "OPENSSL_LIB_DIR = $openssl_lib_directory" >> config.make
 echo "OS = $os" >> config.make
 echo "SYSLIBS = $os_libs" >> config.make
 echo "LIB_EXT = $lib_ext" >> config.make
-echo "EXTRA_DEFINES = $extra_defines" >> config.make
 echo "CODE_EXT = $code_extension" >> config.make
 echo "EXTRA_LIBS = $extra_libraries" >> config.make
-#echo "LAUNCHER_VERSION = \"$version\"" >> config.make
+scheme_definition=
 if [ "$scheme" == "production" ]; then
     echo "Production scheme"
-    echo "BUILD_SCHEME_DEF = -DBUILD_SCHEME_PRODUCTION" >> config.make
+    scheme_definition="-DBUILD_SCHEME_PRODUCTION"
+    #echo "BUILD_SCHEME_DEF = -DBUILD_SCHEME_PRODUCTION" >> config.make
 elif [ "$sheme" == "master" ]; then
     echo "Stage scheme"
-    echo "BUILD_SCHEME_DEF = -DBUILD_SCHEME_MASTER" >> config.make
+    scheme_definition="-DBUILD_SCHEME_MASTER"
+    #echo "BUILD_SCHEME_DEF = -DBUILD_SCHEME_MASTER" >> config.make
 else
     echo "Developer scheme"
-    echo "BUILD_SCHEME_DEF = -DBUILD_SCHEME_DEV" >> config.make
+    scheme_definition="-DBUILD_SCHEME_DEV"
+    #echo "BUILD_SCHEME_DEF = -DBUILD_SCHEME_DEV" >> config.make
 fi
-echo "DEFINES = -DLAUNCHER_VERSION=\\\"$version\\\"" >> config.make
+echo "DEFINES = -DLAUNCHER_VERSION=\\\"$version\\\" $extra_defines $scheme_definition" >> config.make
 
 echo "Shared: $shared"
 
@@ -385,8 +356,14 @@ if [ "$os" == "Linux" ]; then
     echo "LIBDIRS = -L/usr/lib/x86_64-linux-gnu -L$pylib -L../bin -L/usr/X11R6/lib -L/usr/local/lib -L/usr/lib -L$openssl_lib_directory" >> config.make
     echo "WLST = -Wl,-Bstatic " >> config.make
     echo "WLSH = -Wl,-Bdynamic " >> config.make
+    echo "WLWA = -Wl,--whole-archive " >> config.make
+    echo "WLNWA = -Wl,--no-whole-archive " >>config.make
+    echo "LINKER_OPTIONS = -Xlinker -export-dynamic" >> config.make
     echo "export WLST" >> config.make
     echo "export WLSH" >> config.make
+    echo "export WLWA" >> config.make
+    echo "export WLNWA" >> config.make
+    echo "export LINKER_OPTIONS" >> config.make
 elif [ "$os" == "Darwin" ]; then
     stlibs=""
     if [ "$collect_static" != "" ]; then
@@ -401,8 +378,8 @@ export PYTHON_VER
 export PYLIB_DIR
 export PYLIB_HEADER_DIR
 export PYCONFIG_HEADER_DIR
-export BUILD_SCHEME
-export BUILD_SCHEME_DEF
+#export BUILD_SCHEME
+#export BUILD_SCHEME_DEF
 export OPENSSL_DIR
 export STATIC_BUILD
 export SHARED_BUILD
@@ -410,7 +387,6 @@ export BUILD_TESTS
 export OS
 export SYSLIBS
 export LIB_EXT
-export EXTRA_DEFINES
 export CODE_EXT
 export EXTRA_LIBS
 export LIBDIRS

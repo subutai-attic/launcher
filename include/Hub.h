@@ -5,7 +5,7 @@
 #include <sstream>
 #include <cstring>
 #include <map>
-#include <vector>
+#include <deque>
 
 #include "Vars.h"
 #include "Poco/Logger.h"
@@ -27,24 +27,22 @@
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/URI.h"
 #include "Poco/Base64Encoder.h"
+#include "Poco/SplitterChannel.h"
+#include "Poco/Message.h"
+#include "Poco/DigestStream.h"
+#include "Poco/MD5Engine.h"
+#include "Poco/Timestamp.h"
+
+#include "SubutaiException.h"
 
 namespace SubutaiLauncher 
 {
-    enum HubLogLevel
-    {
-        HL_INFO = 0,
-        HL_WARNING,
-        HL_ERROR,
-        HL_FATAL,
-    };
 
-    struct HubLog
+    struct InfoMessage
     {
-        HubLogLevel level;
-        std::string message;
+        std::string key;
+        std::string value;
     };
-
-    typedef std::vector<HubLog> HubLogs;
 
     class Hub 
     {
@@ -57,10 +55,15 @@ namespace SubutaiLauncher
             void setPassword(std::string password);
             bool auth();
             bool balance();
-            void addLogLine(HubLogLevel level, const std::string& message);
-            void sendLogs();
-            void sendLog(HubLogLevel level, const std::string& message);
+            bool isLoggedIn();
+            void sendLog(Poco::Message::Priority prio, const std::string& message);
+            void sendInfo(const std::string& key, const std::string& value);
+            void addInfo(const std::string& key, const std::string& value);
+            void flushInfo();
         private:
+            void send(const std::string& ep, const std::string& json);
+            void generateID();
+            std::string _id;
             Poco::Net::NameValueCollection getCookies();
             Poco::Logger* _logger;
             Poco::Net::HTTPSClientSession _session;
@@ -68,7 +71,8 @@ namespace SubutaiLauncher
             std::string _login;
             std::string _password;
             std::string _response;
-            HubLogs _logs;
+            bool _loggedIn;
+            std::deque<InfoMessage> _messages;
     };
 
 }

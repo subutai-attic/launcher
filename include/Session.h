@@ -28,6 +28,7 @@ namespace SubutaiLauncher
     {
         public:
             static Session* instance();
+            static bool isInstanced();
             void destroyInstance();
             Downloader* getDownloader();
             Settings* getSettings();
@@ -49,6 +50,10 @@ namespace SubutaiLauncher
             SSH* makeSSHSession(const std::string& name, bool empty = false);
             SSH* getSSHSession(const std::string& name);
             void finalizeSSHSession(const std::string& name);
+            void setStep(const std::string& step);
+            void setAction(const std::string& action);
+            std::string getStep();
+            std::string getAction();
         private:
 			bool _terminate;
             //SubutaiLauncher::VirtualBox* _virtualBox;
@@ -62,6 +67,8 @@ namespace SubutaiLauncher
             long _sshPort;
             std::vector<std::string> _statusPool;
             std::vector<SSHSession> _sshSessions;
+            std::string _step;
+            std::string _action;
         protected:
             static Session *_instance;
             Session();
