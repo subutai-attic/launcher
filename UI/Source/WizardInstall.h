@@ -12,6 +12,7 @@ public:
 	static const std::string TRAY_INSTALL;
 	static const std::string E2E_INSTALL;
 	static const std::string PEER_INSTALL;
+  static const std::string RH_INSTALL;
 	WizardInstall();
 	~WizardInstall();
 	void paint(juce::Graphics&) override;

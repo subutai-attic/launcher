@@ -6,16 +6,19 @@ const std::string WizardInstall::P2P_INSTALL = "launcher-p2p-install-linux";
 const std::string WizardInstall::TRAY_INSTALL = "launcher-tray-install-linux";
 const std::string WizardInstall::E2E_INSTALL = "launcher-chrome-e2e-install-linux";
 const std::string WizardInstall::PEER_INSTALL = "launcher-peer-install-linux";
+const std::string WizardInstall::RH_INSTALL = "launcher-rh-install-linux";
 #elif LAUNCHER_WINDOWS
 const std::string WizardInstall::P2P_INSTALL = "launcher-p2p-install-windows";
 const std::string WizardInstall::TRAY_INSTALL = "launcher-tray-install-windows";
 const std::string WizardInstall::E2E_INSTALL = "launcher-chrome-e2e-install-windows";
 const std::string WizardInstall::PEER_INSTALL = "launcher-peer-install-windows";
+const std::string WizardInstall::RH_INSTALL = "launcher-rh-install-windows";
 #else
 const std::string WizardInstall::P2P_INSTALL = "launcher-p2p-install-darwin";
 const std::string WizardInstall::TRAY_INSTALL = "launcher-tray-install-darwin";
 const std::string WizardInstall::E2E_INSTALL = "launcher-chrome-e2e-install-darwin";
 const std::string WizardInstall::PEER_INSTALL = "launcher-peer-install-darwin";
+const std::string WizardInstall::RH_INSTALL = "launcher-rh-install-darwin";
 #endif
 
 WizardInstall::WizardInstall() :
@@ -93,6 +96,7 @@ void WizardInstall::start(const std::string& name)
 	else if (name == "Tray") _script = TRAY_INSTALL;
 	else if (name == "Browser Plugin") _script = E2E_INSTALL;
 	else if (name == "Peer") _script = PEER_INSTALL;
+  else if (name == "RH") _script = RH_INSTALL;
 
 	_logger->debug("Installation initializator has been finished");
 }
@@ -209,13 +213,9 @@ void WizardInstall::runImpl()
 					addLine(msg, true);
 				}
 			}
-#if LAUNCHER_LINUX || LAUNCHER_MACOS
-			usleep(100);
-#else
-			Sleep(100);
-#endif
-		}
-		pScriptThread.join();
+      std::this_thread::sleep_for(std::chrono::microseconds(100));
+    }
+    pScriptThread.join();
 	}
 	catch (SubutaiLauncher::SLException& e)
 	{
