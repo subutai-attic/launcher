@@ -1134,10 +1134,10 @@ namespace SubutaiLauncher
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
-    std::string app = Session::instance()->getSettings()->SL_GetInstallDir();
+	std::string app = Session::instance()->getSettings()->getInstallationPath();
     app.append("\\tray\\SubutaiTray.exe");
 
-    CreateProcess(app.c_str(),   // the path
+    CreateProcessA(app.c_str(),   // the path
             "",        // Command line
             NULL,           // Process handle not inheritable
             NULL,           // Thread handle not inheritable

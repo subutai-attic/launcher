@@ -119,7 +119,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>LIGHT_MODE=1;POCO_STATIC;BUILD_SCHEME_DEV;BUILD_SCHEME="dev";WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LAUNCHER_VERSION="5.0.2-SNAPSHOT";LIGHT_MODE=1;POCO_STATIC;BUILD_SCHEME_DEV;BUILD_SCHEME="dev";WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -153,6 +153,8 @@
     <ClCompile Include="..\..\..\src\Core.cpp" />
     <ClCompile Include="..\..\..\src\Downloader.cpp" />
     <ClCompile Include="..\..\..\src\Environment.cpp" />
+    <ClCompile Include="..\..\..\src\EnvironmentImpl.cpp" />
+    <ClCompile Include="..\..\..\src\EnvironmentImpl_Windows.cpp" />
     <ClCompile Include="..\..\..\src\FileSystem.cpp" />
     <ClCompile Include="..\..\..\src\Hub.cpp" />
     <ClCompile Include="..\..\..\src\NotificationCenter.cpp" />
@@ -178,6 +180,8 @@
     <ClInclude Include="..\..\..\include\Downloader.h" />
     <ClInclude Include="..\..\..\include\E2E.h" />
     <ClInclude Include="..\..\..\include\Environment.h" />
+    <ClInclude Include="..\..\..\include\EnvironmentImpl.h" />
+    <ClInclude Include="..\..\..\include\EnvironmentImpl_Windows.h" />
     <ClInclude Include="..\..\..\include\FileSystem.h" />
     <ClInclude Include="..\..\..\include\Hub.h" />
     <ClInclude Include="..\..\..\include\NotificationCenter.h" />
