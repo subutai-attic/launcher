@@ -47,7 +47,6 @@ class UIApplication : public juce::JUCEApplication
         std::thread runSplashBackgroundTask();
         void runSplashBackgroundTaskImpl();
 
-        std::thread gatherSystemInfo();
         void gatherSystemInfoImpl();
 };
 

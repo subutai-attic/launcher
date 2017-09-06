@@ -93,8 +93,9 @@ namespace SubutaiLauncher
 
     std::string EnvironmentImpl::cpuArch() 
     {
-        _logger->trace("Environment: Getting OS Architecture");
+        //_logger->trace("Environment: Getting OS Architecture");
         std::string ar = Poco::Environment::osArchitecture();
+		//_logger->trace("Environment: Getting OS Architecture");
         return ar;
     }
 
@@ -762,6 +763,7 @@ namespace SubutaiLauncher
 
     const std::string& EnvironmentImpl::getNetworkConfiguration() const
     {
+		_logger->trace("Getting network configuration");
         Poco::Process::Args pArgs;
         pArgs.push_back("/all");
         Poco::Pipe pOut;
@@ -770,6 +772,7 @@ namespace SubutaiLauncher
         std::string pBuffer;
         Poco::PipeInputStream istr(pOut);
         Poco::StreamCopier::copyToString(istr, pBuffer);
+		_logger->trace("ipconfig: %s", pBuffer);
         return pBuffer;
     }
 

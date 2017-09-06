@@ -432,6 +432,7 @@ namespace SubutaiLauncher
         {
             std::string pErr = "Failed to determine IP of Resource Host";
             Poco::Logger::get("subutai").error(pErr);
+			Poco::Logger::get("subutai").error(exc.displayText());
         }
         p->disconnect();
         delete p;
@@ -708,6 +709,7 @@ namespace SubutaiLauncher
         }
         catch (std::exception& e)
         {
+			Poco::Logger::get("subutai").error(std::string(e.what()));
             return Py_BuildValue("i", 2);
         }
     }

@@ -197,11 +197,6 @@ void UIApplication::runSplashBackgroundTaskImpl()
     //    _assetsReady = true;
 }
 
-std::thread UIApplication::gatherSystemInfo()
-{
-
-}
-
 void UIApplication::gatherSystemInfoImpl()
 {
     SubutaiLauncher::Environment env;
@@ -218,4 +213,23 @@ void UIApplication::gatherSystemInfoImpl()
     hub->addInfo(SI_NETSTAT, env.getNetstat());
 }
 
-START_JUCE_APPLICATION (UIApplication)
+void launcherTerminate()
+{
+	Poco::Logger::get("subutai").fatal("Unhandled exception");
+	//std::printf("Unhandled exception");
+	std::abort();
+}
+
+static juce::JUCEApplicationBase* juce_CreateApplication() { return new UIApplication(); }
+#if LAUNCHER_WINDOWS
+int __stdcall WinMain(struct HINSTANCE__*, struct HINSTANCE__*, char*, int)
+#else
+int main(int argc, char* argv[])
+#endif
+{
+	std::set_terminate(launcherTerminate);
+	juce::JUCEApplicationBase::createInstance = &juce_CreateApplication;
+	return juce::JUCEApplicationBase::main(JUCE_MAIN_FUNCTION_ARGS);
+}
+
+//START_JUCE_APPLICATION (UIApplication)
