@@ -85,6 +85,7 @@ class ComponentChooser : public juce::Component,
         bool _rh;
         int _cpu;
         int _mem;
+        bool _triggered;
 
         bool _vtxStatus;
         int _maxCpu;

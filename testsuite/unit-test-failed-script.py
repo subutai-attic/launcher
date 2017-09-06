@@ -1,6 +1,5 @@
 import subutai
-import failetai
 
 def subutaistart():
-
-    return
+    rc = makemefail()
+    return rc

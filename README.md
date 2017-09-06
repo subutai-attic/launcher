@@ -15,12 +15,20 @@ Building on Windows
 Building on Linux
 =================
 
-1. Download and compile Poco C++ Libraries
-```./configure --static --shared --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL --no-tests --no-samples```
-2. Download and compile cpython
-```./configure --prefix=/opt/subutai/python```
-3. Install libssh, libx11-dev, libfreetype6-dev, libxrandr-dev, libxinerama-dev, libxcomposite-dev, libxcursor-dev
-4. Configure with ./configure script. Use `--help` option to see available configuration options
+1. Download and compile Poco C++ Libraries [https://github.com/pocoproject/poco]
+```
+./configure --static --shared --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL --no-tests --no-samples
+make 
+make install
+```
+2. Download and compile cpython [https://github.com/python/cpython]
+```
+./configure --prefix=/opt/subutai/python
+make 
+make install
+```
+3. Install libssh, libx11-dev, libfreetype6-dev, libxrandr-dev, libxinerama-dev, libxcomposite-dev, libxcursor-dev (Ubuntu)
+4. Configure with ./configure script. Use `--help` option to see available configuration options. Most probably you need to specify python version with `--python=` option.
 5. Build with make
 ```
 make ui

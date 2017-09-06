@@ -121,6 +121,7 @@ void SubutaiLauncher::SL::execute()
     _module = PyImport_Import(_name);
     if (!_module) {
         _logger->error("Can't find specified module");
+        ncenter->add(SCRIPT_FINISHED);
         ncenter->stop();
         PyErr_Print();
         throw SLException("Cannot find specified module", 7);
@@ -128,6 +129,7 @@ void SubutaiLauncher::SL::execute()
     Py_XDECREF(_name);
 
     if (_module == NULL || _module == 0) {
+        ncenter->add(SCRIPT_FINISHED);
         ncenter->stop();
         _logger->debug("SL::execute Can't find module %s", _module);
         throw SLException("Cannot find specified module", 7);
@@ -144,8 +146,19 @@ void SubutaiLauncher::SL::execute()
 
         if (pFunc && PyCallable_Check(pFunc))
         {
-            _logger->debug("subutaistart() entry point was not found");
-            PyErr_Print();
+            if (PyErr_Occurred())
+            {
+                // TODO: Add ptype and ptraceback
+                PyObject *ptype, *pvalue, *ptraceback;
+                PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+                char *pErrorMessage = PyBytes_AsString(PyUnicode_AsEncodedString(pvalue, "utf-8", ""));
+                std::string pErr = Poco::format("%s", std::string(pErrorMessage));
+                _logger->critical("Script Error [a]: %s", pErr);
+                ncenter->add(SCRIPT_FINISHED);
+                ncenter->stop();
+                _running = false;
+                throw SLException(pErr);
+            }
             pArgs = PyTuple_New(0);
             pValue = PyObject_CallObject(pFunc, pArgs);
             Py_DECREF(pArgs);
@@ -158,19 +171,36 @@ void SubutaiLauncher::SL::execute()
             {
                 Py_DECREF(pFunc);
                 Py_DECREF(_module);
-                PyErr_Print();
-                ncenter->stop();
-                _logger->error("Execution exit code: %ld", _exitCode);
-                PyErr_Print();
-                pErrorText = "Script execution failed";
-                //throw SLException("Script execution failed", 5);
+                if (PyErr_Occurred())
+                {
+                    // TODO: Add ptype and ptraceback
+                    PyObject *ptype, *pvalue, *ptraceback;
+                    PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+                    char *pErrorMessage = PyBytes_AsString(PyUnicode_AsEncodedString(pvalue, "utf-8", ""));
+                    std::string pErr = Poco::format("%s", std::string(pErrorMessage));
+                    _logger->critical("Script Error [b]: %s", pErr);
+                    ncenter->add(SCRIPT_FINISHED);
+                    ncenter->stop();
+                    _running = false;
+                    throw SLException(pErr);
+                }
             }
         }
         else
         {
-            if (PyErr_Occurred()) PyErr_Print();
-            ncenter->stop();
-            throw SLException("Cannot find subutaistart() function", 6);
+            if (PyErr_Occurred())
+            {
+                // TODO: Add ptype and ptraceback
+                PyObject *ptype, *pvalue, *ptraceback;
+                PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+                char *pErrorMessage = PyBytes_AsString(PyUnicode_AsEncodedString(pvalue, "utf-8", ""));
+                std::string pErr = Poco::format("%s", std::string(pErrorMessage));
+                _logger->critical("Script Error [d]: Cannot find specified module: %s", pErr);
+                ncenter->add(SCRIPT_FINISHED);
+                ncenter->stop();
+                _running = false;
+                throw SLException(pErr);
+            }
         }
         Py_XDECREF(pFunc);
         Py_DECREF(_module);
@@ -182,7 +212,26 @@ void SubutaiLauncher::SL::execute()
         PyErr_Print();
         throw SLException("Cannot find specified module", 7);
     }
-    _logger->information("Script execution completed without any errors: %ld", _exitCode);
+    if (_exitCode != 0)
+    {
+        _logger->critical("Script execution failed: %ld", _exitCode);
+        if (PyErr_Occurred())
+        {
+            PyObject *ptype, *pvalue, *ptraceback;
+            PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+            char *pErrorMessage = PyBytes_AsString(PyUnicode_AsEncodedString(pvalue, "utf-8", ""));
+            std::string pErr = Poco::format("%s", std::string(pErrorMessage));
+            _logger->critical("Script Error [c]: %s", pErr);
+            ncenter->add(SCRIPT_FINISHED);
+            ncenter->stop();
+            _running = false;
+            throw SLException(pErr);
+        }
+    }
+    else
+    {
+        _logger->information("Script execution completed without any errors: %ld", _exitCode);
+    }
     ncenter->stop();
     _running = false;
 }

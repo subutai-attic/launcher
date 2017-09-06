@@ -12,6 +12,7 @@
 
 #include "Poco/Logger.h"
 #include "Poco/String.h"
+#include "Poco/Format.h"
 
 #if LAUNCHER_LINUX
 #include <sys/stat.h>
