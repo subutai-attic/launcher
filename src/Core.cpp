@@ -1,7 +1,7 @@
 #include "Core.h"
 
 #if LAUNCHER_WINDOWS
-#pragma comment (lib, "crypt32");
+#pragma comment (lib, "crypt32")
 #endif
 
 SubutaiLauncher::Core::Core(std::vector<std::string> args) : 

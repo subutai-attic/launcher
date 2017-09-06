@@ -44,6 +44,11 @@
     #endif
 #endif
 
+#if LAUNCHER_WINDOWS
+#define WINVER 0x0601 // Allow use of features specific to Windows 7 or later.
+#define _WIN32_WINNT 0x0601
+#endif
+
 // System information
 #define SI_LAUNCHER_VERSION         "LauncherVersion"
 #define SI_SYSTEM_INFO              "SystemInfo"

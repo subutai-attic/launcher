@@ -1,11 +1,11 @@
-#define WINVER 0x0601 // Allow use of features specific to Windows 7 or later.
-#define _WIN32_WINNT 0x0601
 #include "EnvironmentImpl.h"
 #include "Session.h"
 #include <Shlobj.h>
 #include <VersionHelpers.h>
 #include <Windows.h>
-#pragma comment (lib, "Ntdll.lib")
+#pragma comment(lib, "Ntdll.lib")
+#pragma comment(lib, "Shell32.lib")
+
 
 namespace SubutaiLauncher
 {
