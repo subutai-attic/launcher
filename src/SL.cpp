@@ -121,29 +121,37 @@ namespace SubutaiLauncher
         _module = PyImport_Import(_name);
         if (!_module) {
             _logger->error("Can't find specified module [a]");
-            ncenter->add(SCRIPT_FINISHED);
-            ncenter->stop();
             if (PyErr_Occurred())
             {
-                PyErr_Print();
-                /*
+                //PyErr_Print();
+                
                 // TODO: Add ptype and ptraceback
                 PyObject *ptype, *pvalue, *ptraceback;
                 PyErr_Fetch(&ptype, &pvalue, &ptraceback);
-                char *pErrorMessage = PyBytes_AsString(PyUnicode_AsEncodedString(pvalue, "utf-8", ""));
-                std::string pErr = Poco::format("%s", std::string(pErrorMessage));
-                _logger->critical("Script Error [f]: %s", pErr);
-                ncenter->add(SCRIPT_FINISHED);
-                ncenter->stop();
-                _running = false;
-                throw SLException(pErr);
-                */
+				if (pvalue != NULL)
+				{
+					PyObject* pValueStr = PyUnicode_AsEncodedString(pvalue, "utf-8", "");
+					std::string pErr("Can't extract error");
+					if (pValueStr != NULL)
+					{
+						char *pErrorMessage = PyBytes_AsString(pValueStr);
+						pErr = Poco::format("%s", std::string(pErrorMessage));
+					}
+					handleTraceback((PyTracebackObject*)ptraceback, 5);
+					_logger->critical("Script Error [f]: %s", pErr);
+					ncenter->add(SCRIPT_FINISHED);
+					ncenter->stop();
+					_running = false;
+					throw SLException(pErr);
+				}
             }
             else
             {
                 PyErr_Print();
                 throw SLException("Cannot find specified module", 7);
             }
+			ncenter->add(SCRIPT_FINISHED);
+			ncenter->stop();
         }
         Py_XDECREF(_name);
 

@@ -778,12 +778,14 @@ namespace SubutaiLauncher
 
     const std::string& EnvironmentImpl::getNetstat() const
     {
-        return "";
+		std::string pOut("_");
+		return pOut;
     }
 
     const std::string& EnvironmentImpl::getSystemInfo() const
     {
-        return "";
+		std::string pOut("_");
+        return pOut;
     }
 
 }

@@ -419,7 +419,7 @@ namespace SubutaiLauncher
 #elif LAUNCHER_LINUX
         return Py_BuildValue("s", "l");
 #elif LAUNCHER_WINDOWS
-        return Py_BuildValue("s", "d");
+        return Py_BuildValue("s", "w");
 #endif
     }
 

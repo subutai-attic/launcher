@@ -208,9 +208,9 @@ void UIApplication::gatherSystemInfoImpl()
     hub->addInfo(SI_OS_NAME, env.versionOS());
     hub->addInfo(SI_CPU_ARCH, env.cpuArch());
     hub->addInfo(SI_CORE_NUM, pCoresNum);
-    hub->addInfo(SI_SYSTEM_INFO, env.getSystemInfo());
-    hub->addInfo(SI_IP, env.getNetworkConfiguration());
-    hub->addInfo(SI_NETSTAT, env.getNetstat());
+    //hub->addInfo(SI_SYSTEM_INFO, env.getSystemInfo());
+    //hub->addInfo(SI_IP, env.getNetworkConfiguration());
+    //hub->addInfo(SI_NETSTAT, env.getNetstat());
 }
 
 void launcherTerminate()

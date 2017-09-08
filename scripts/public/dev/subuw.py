@@ -100,9 +100,7 @@ class P2P:
             subutai.ProcessKill("nssm.exe")
             subutai.ProcessKill("p2p.exe")
             
-
         self.__installTuntap()    
-
         subutai.download(self.RemoteP2PFile)
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
@@ -132,7 +130,7 @@ class P2P:
         return 0
 
     def __checkNssm(self):
-        if os.path.exists(self.install+self.NssmFile):
+        if os.path.exists(self.install+"bin/"+self.NssmFile):
             return True
         return False
 

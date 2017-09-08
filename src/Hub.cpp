@@ -193,7 +193,8 @@ namespace SubutaiLauncher
 
     void Hub::addInfo(const std::string& key, const std::string& value)
     {
-        if (key.empty() || value.empty()) return;
+		_logger->trace("New System information: %s=>%s", key, value);
+        if (key.empty() || value.empty() || value == "_") return;
         InfoMessage m;
         m.key = key;
         m.value = Poco::replace(value, "\n", "\\n");
