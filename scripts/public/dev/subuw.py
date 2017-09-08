@@ -4,7 +4,7 @@ import hashlib
 import datetime
 import os
 import stat
-import tarfile
+import zipfile
 from shutil import copyfile
 from subprocess import call
 from time import sleep
@@ -18,120 +18,46 @@ from subprocess import Popen, PIPE
 def GetVirtualMachineName():
     m = hashlib.md5()
     m.update(datetime.datetime.now().isoformat().encode('utf-8'))
-    return "subutai-dd-" + m.hexdigest()[:5]
+    return "subutai-dw-" + m.hexdigest()[:5]
 
 
 def CleanSSHKeys(host, port):
-    call(['ssh-keygen', '-R', '['+host+']:'+port])
-
-
-def CheckCocoasudo(install):
-    if not os.path.exists(install+"bin/cocoasudo"):
-        return False
-    return True
-
-
-def InstallCocoasudo(tmp, install, progress):
-    subutai.AddStatus("Downloading cocoasudo application")
-    subutai.download("cocoasudo")
-    while subutai.isDownloadComplete() != 1:
-        sleep(0.05)
-
     try:
-        copyfile(tmp+"cocoasudo", install+"bin/cocoasudo")
-        st = os.stat(install+"bin/cocoasudo")
-        os.chmod(install+"bin/cocoasudo", st.st_mode | stat.S_IEXEC)
+        call(['ssh-keygen', '-R', '['+host+']:'+port])
     except:
-        subutai.RaiseError("Failed to install cocoasudo. Aborting")
-        return -87
+        subutai.RaiseError("Failed to clean SSH keys")
+        return 78
+    return 0
 
 
 def CheckVirtualBox():
-    if not os.path.exists("/Applications/VirtualBox.app"):
+    if subutai.IsVBoxInstalled() != 0:
         return False
     return True
-
-
-def CheckAndKillVirtualBox():
-    p = Popen(['ps', 'aux'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-    stdout, stderr = p.communicate('')
-    count = 0
-    index = 1
-    substr = 'VBoxHeadless'
-    while index >= 0:
-        index = stdout.find(substr, index+len(substr), len(stdout))
-        print(index)
-        count = count + 1
-        if count > 10:
-            break
-
-    if (count > 1):
-        p = Popen(['killall', '-9', substr], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-        stdout, stderr = p.communicate('')
-    
-    return 0
 
 
 def InstallVirtualBox(tmp, install, progress):
     subutai.AddStatus("Downloading VirtualBox")
-    subutai.download("VirtualBox.pkg")
+    vboxfile = "VirtualBox.exe"
+    subutai.download(vboxfile)
     while subutai.isDownloadComplete() != 1:
-        sleep(0.05)
         progress.setVboxProgress(subutai.GetBytesDownload())
         progress.updateProgress()
 
     subutai.AddStatus("Installing VirtualBox")
     try:
-        CheckAndKillVirtualBox()
-        if not CheckOsascript():
-            returnCode = call([install+"bin/cocoasudo",
-                               '--prompt="Install VirtualBox"',
-                               'installer',
-                               '-pkg',
-                               tmp+'VirtualBox.pkg',
-                               '-target',
-                               '/'])
-            if returnCode != 0:
-                return 21
-        else:
-            ins = 'do shell script "installer -pkg '+tmp+'VirtualBox.pkg -target /" with administrator privileges'
-            p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-            stdout, stderr = p.communicate(ins)
-            if p.returncode != 0:
-                return 23
-
+        call([tmp+vboxfile, '-silent'])
     except:
         subutai.RaiseError("Failed to install VirtualBox. Aborting")
-        sleep(10)
         return 45
-
-    progress.setVboxProgress(progress.getVboxSize())
-    progress.updateProgress()
-    if not os.path.exists("/Applications/VirtualBox.app"):
-        subutai.AddStatus("Failed to install VirtualBox. Aborting")
-        return 24
 
     return 0
 
 
-def CheckOsascript():
-    p = Popen(['which', 'osascript'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-    stdout, stderr = p.communicate('')
-    if p.returncode != 0:
-        return False
-    return True
-
-
 def InstallPeerPrerequisites(tmp, install, progress):
     rc = 0
-    if not CheckOsascript() and not CheckCocoasudo(install):
-        rc = InstallCocoasudo(tmp, install, progress)
-        if rc != 0:
-            return rc
-
     if not CheckVirtualBox():
         rc = InstallVirtualBox(tmp, install, progress)
-
     return rc
 
 
@@ -144,27 +70,46 @@ class P2P:
         self.tmp = tmp
         self.install = install
         self.progress = subuco.Progress()
-        self.Daemon = 'io.subutai.p2p.daemon.plist'
-        self.LogConf = 'p2p.conf'
 
     def PreInstall(self):
-        self.progress.setP2P(self.P2PRemoteFile)
-        self.progress.setNssm(self.NssmFile)
+        self.progress.setP2P(self.RemoteP2PFile)
         self.progress.setTuntap(self.TapFile)
-        self.progress.setCocoasudo(self.CocoasudoFile)
-        self.calculateTotal()
+        self.progress.setNssm(self.NssmFile)
+        self.progress.calculateTotal()
+        return 0
 
     def Download(self):
         rc = 0
-        
-        self.__installTuntap(self.progress)    
+        subutai.AddStatus("Installing")
+        if not self.__checkNssm():
+            subutai.download(self.NssmFile)
+            while subutai.isDownloadComplete() != 1:
+                sleep(0.05)
+                self.progress.setNssmProgress(subutai.GetBytesDownload())
+                self.progress.updateProgress()
+
+            self.progress.setNssmProgress(self.progress.getNssmSize())
+            self.progress.updateProgress()
+            try:
+                copyfile(self.tmp+self.NssmFile, self.install+"bin/"+self.NssmFile)
+            except:
+                subutai.RaiseError("Failed to move NSSM file to it's destination")
+                return 14
+        else:
+            subutai.UnregisterService("Subutai P2P")
+            subutai.ProcessKill("nssm.exe")
+            subutai.ProcessKill("p2p.exe")
+            
+
+        self.__installTuntap()    
 
         subutai.download(self.RemoteP2PFile)
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
             self.progress.setP2PProgress(subutai.GetBytesDownload())
+            self.progress.updateProgress()
 
-        self.progress.setP2PProgress(progress.getP2PSize())
+        self.progress.setP2PProgress(self.progress.getP2PSize())
         self.progress.updateProgress()
         try:
             copyfile(self.tmp+self.RemoteP2PFile, self.install+"bin/"+self.P2PFile)
@@ -180,105 +125,36 @@ class P2P:
             subutai.RaiseError("Failed to make p2p binary executable")
             return 31
 
-        if not os.path.exists(self.install+self.NssmFile):
-            subutai.download(self.NssmFile)
-            while subutai.isDownloadComplete() != 1:
-                sleep(0.05)
-                self.progress.setNssmProgress(subutai.GetBytesDownload())
-                self.updateProgress()
-
-            self.progress.setNssmProgress(self.progress.getNssmSize())
-            self.progress.updateProgress()
-
-            try:
-                copyfile(self.tmp+self.NssmFile, self.install+self.NssmFile)
-            except:
-                subutai.RaiseError("Failed to move NSSM")
-
         return rc
 
-    def Install(self):
-        pass
-
     def PostInstall(self):
-        self.__writeConfiguration()
-        postinst = subuco.PostInstall(self.tmp)
-        postinst.append('cp '+self.tmp+self.Daemon+' /Library/LaunchDaemons/'+self.daemon)
-        postinst.append('cp '+self.tmp+self.LogConf+' /etc/newsyslog.d/'+self.LogConf)
-        postinst.append('launchctl load /Library/LaunchDaemons/'+self.daemon)
-        postinst.append('installer -pkg '+self.tmp+self.TapFile+' -target /')
-        postinst.append('ln -s '+self.install+'bin/p2p /usr/local/bin/p2p')
-        ins = 'do shell script "/bin/sh '+postinst.get()+'" with administrator privileges'
-        p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-        stdout, stderr = p.communicate(ins)
-        if p.returncode != 0:
-            return 91
+        subutai.RegisterService("Subutai P2P", self.install+"bin/p2p.exe|daemon")
         return 0
 
-    def __checkTuntap(self):
-        if not os.path.exists('/dev/tap0'):
-            return False
-        return True
+    def __checkNssm(self):
+        if os.path.exists(self.install+self.NssmFile):
+            return True
+        return False
 
     def __installTuntap(self):
+        subutai.AddStatus("Downloading TUN/TAP driver")
+        subutai.download(self.TapFile)
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
             self.progress.setTuntapProgress(subutai.GetBytesDownload())
-
-        self.progress.setTuntapProgress(progress.getTuntapSize())
+            self.progress.updateProgress()
+        
+        self.progress.setTuntapProgress(self.progress.getTuntapSize())
         self.progress.updateProgress()
+        subutai.AddStatus("Installing TUN/TAP driver")
+        call([self.tmp+self.TapFile, '/S'])
         return 0
 
-    def __writeConfiguration(self):
-        service = '''
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-        <plist version="1.0">
-        <dict>
-        <key>Label</key>
-        <string>io.subutai.p2p.daemon</string>
-
-        <key>ProgramArguments</key>
-        <array>
-        <string>/usr/local/bin/p2p</string>
-        <string>daemon</string>
-        </array>
-
-        <key>KeepAlive</key>
-        <true/>
-
-        <key>StandardOutPath</key>
-        <string>/var/log/p2p.log</string>
-
-        <key>StandardErrorPath</key>
-        <string>/var/log/p2p.log</string>
-
-        <key>Debug</key>
-        <true/>
-        </dict>
-        </plist>
-        '''.strip()
-
-        daemonFile = 'io.subutai.p2p.daemon.plist'
-
-        f = open(self.tmp+daemonFile, 'w')
-        f.write(service)
-        f.close()
-
-        syslog = '''
-        # logfilename          [owner:group]    mode count size when  flags [/pid_file] [sig_num]
-        /var/log/p2p.log                       644  7     *    $D0   J
-        '''.strip()
-        sf = open(self.tmp+'p2p.conf', 'w')
-        sf.write(syslog)
-        sf.close()
-        return 0
 
 class Tray:
     def __init__(self, tmp, install):
-        self.TrayFile = 'SubutaiTray_libs_osx.tar.gz'
-        self.CocoasudoFile = 'cocoasudo'
-        self.LibsshFile = 'libssh2-1.6.0-0_osx.pkg'
+        self.TrayFile = 'SubutaiTray_libs.zip'
+        self.LibsshFile = 'ssh.zip'
         self.tmp = tmp
         self.install = install
         self.progress = subuco.Progress()
@@ -286,31 +162,25 @@ class Tray:
     def GetTrayFile(self):
         return self.TrayFile
 
-    def GetCocoasudoFile(self):
-        return self.CocoasudoFile
-
     def GetLibsshFile(self):
         return self.LibsshFile
         
     def Download(self):
         rc = 0
-        
-        if not CheckOsascript() and not CheckCocoasudo(self.install):
-        rc = InstallCocoasudo(self.tmp, self.install, self.progress)
-        if rc != 0:
-            return rc
-
-        if not self.__checkLibssh():
-            subutai.AddStatus("Downloading libssh2")
-            subutai.download(self.LibsshFile)
-            while subutai.isDownloadComplete() != 1:
-                sleep(0.05)
-                self.progress.setLibsshProgress(subutai.GetBytesDownload())
-                self.progress.updateProgress()
-
-            self.progress.setLibsshProgress(self.progress.getLibsshSize())
+        subutai.AddStatus("Downloading libssh2")
+        subutai.download(self.LibsshFile)
+        while subutai.isDownloadComplete() != 1:
+            sleep(0.05)
+            self.progress.setLibsshProgress(subutai.GetBytesDownload())
             self.progress.updateProgress()
+
+        self.progress.setLibsshProgress(self.progress.getLibsshSize())
+        self.progress.updateProgress()
         
+        subutai.ProcessKill("SubutaiTray.exe")
+        subutai.ProcessKill("ssh.exe")
+        subutai.ProcessKill("ssh-keygen.exe")
+
         subutai.download(self.TrayFile)
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
@@ -319,66 +189,55 @@ class Tray:
 
         self.progress.setTrayProgress(self.progress.getTraySize())
         self.progress.updateProgress()
+
+        try:
+            zf = zipfile.ZipFile(self.tmp+self.TrayFile, 'r')
+            zf.extractall(self.install)
+            zf.close()
+            zfl = zipfile.ZipFile(self.tmp+self.LibsshFile, 'r')
+            zfl.extractall(self.install+"/bin")
+            zfl.close()
+        except:
+            subutai.RaiseError("Failed to replace tray")
+
         return rc
 
     def PreInstall(self):
         self.progress.setTray(self.TrayFile)
-        self.progress.setCocoasudo(self.CocoasudoFile)
         self.progress.setLibssh(self.LibsshFile)
         self.progress.calculateTotal()
-
-    def PostInstall(self):
-        try:
-            tar = tarfile.open(self.tmp+self.TrayFile, "r:gz")
-            tar.extractall("/Applications/Subutai")
-            tar.close()
-        except:
-            subutai.RaiseError("Failed to unpack Tray archive. Aborting")
-            return 86
-        postinst = subuco.PostInstall(self.tmp)
-        postinst.append('installer -pkg '+self.tmp+self.LibsshFile+' -target /')
-        ins = 'do shell script "/bin/sh '+postinst.get()+'" with administrator privileges'
-        p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-        stdout, stderr = p.communicate(ins)
-        if p.returncode != 0:
-            return 91
-
-        try:
-            launch = 'tell application "SubutaiTray.app" to activate'
-            p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-            stdout, stderr = p.communicate(launch)
-        except:
-            subutai.RaiseError("Failed to launch Subutai Tray application")
-
         return 0
 
-    def __checkLibssh():
-        if not os.path.exists('/usr/local/lib/libssh2.dylib'):
-            return False
-        return True
+    def PostInstall(self):
+        subutai.AddStatus("Writing configuration")
+        unPath = self.install.replace('\\', '/')
+        unVBoxPath = subutai.GetVBoxPath().replace('\\', '/')
+        f = open(unPath+"/tray/subutai_tray.ini", "w")
+        f.write("P2P_Path="+unPath+"/bin/p2p.exe\n")
+        if unVBoxPath != "":
+            f.write("VBoxManage_Path="+unVBoxPath+"\n")
+        f.write("Ssh_Path="+unPath+"/bin/ssh.exe\n")
+        f.write("Ssh_Keygen_Cmd="+unPath+"/bin/ssh-keygen.exe\n")
+        f.close()
+
+        return 0
 
 
 class E2E:
     def __init__(self, tmp, install):
-        self.GoogleChromeFile = 'GoogleChrome_osx.tar.gz'
-        self.CocoasudoFile = 'cocoasudo'
+        self.GoogleChromeFile = 'GoogleChromeStandaloneEnterprise64.msi'
         self.tmp = tmp
         self.install = install
         self.progress = subuco.Progress()
 
     def PreInstall(self):
-        self.progress.SetChrome(self.GoogleChromeFile)
-        self.progress.setCocoasudo(self.cocoasudoFile)
+        self.progress.setChrome(self.GoogleChromeFile)
         self.progress.calculateTotal()
+        return 0
 
     def Download(self):
         rc = 0
-        if not CheckOsascript() and not CheckCocoasudo(self.install):
-        rc = InstallCocoasudo(self.tmp, self.install, self.progress)
-        if rc != 0:
-            return rc
-
-        if not _checkGoogleChrome():
+        if not self.__checkGoogleChrome():
             subutai.AddStatus("Downloading Google Chrome")
             subutai.download(self.GoogleChromeFile)
             while subutai.isDownloadComplete() != 1:
@@ -387,41 +246,25 @@ class E2E:
                 self.progress.updateProgress()
 
             self.progress.setChromeProgress(self.progress.getChromeSize())
-            self.updateProgress()
-        
+            self.progress.updateProgress()
+            
         return rc
 
     def Install(self):
+        subutai.AddStatus("Installing Chrome")
         try:
-            script = 'do shell script "/usr/bin/tar -xf '+
-                     self.tmp+
-                     self.GoogleChromeFile+
-                     ' -C /Applications" with administrator privileges'
-            p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-            stdout, stderr = p.communicate(script)
+            call(['msiexec', '/qn', '/i', self.tmp+self.GoogleChromeFile])
         except:
             subutai.RaiseError("Failed to install Google Chrome")
-            return 64
+            return 28
         return 0
 
     def PostInstall(self):
-        location = os.environ['HOME'] + '/Library/Application Support/Google/Chrome/External Extensions'
-        if not os.path.exists(location):
-            os.makedirs(location)
-
-        ete = '{\n\t"external_update_url": "https://clients2.google.com/service/update2/crx"\n}'
-
-        try:
-            f = open(location+"/kpmiofpmlciacjblommkcinncmneeoaa.json", 'w')
-            f.write(ete)
-            f.close()
-        except:
-            subutai.RaiseError("Can't write plugin to Extensions directory")
-            return 68
-
+        subutai.AddStatus("Installing Browser Plugin")
+        subutai.RegisterPlugin()
         return 0
 
     def __checkGoogleChrome(self):
-        if not os.path.exists('/Applications/Google Chrome.app'):
+        if subutai.IsChromeInstalled() != 0:
             return False
         return True
