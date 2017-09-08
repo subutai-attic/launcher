@@ -22,7 +22,12 @@ def GetVirtualMachineName():
 
 
 def CleanSSHKeys(host, port):
-    call(['ssh-keygen', '-R', '['+host+']:'+port])
+    try:
+        call(['ssh-keygen', '-R', '['+host+']:'+port])
+    except:
+        subutai.RaiseError("Failed to clean SSH keys")
+        return 78
+    return 0
 
 
 def CheckCocoasudo(install):
@@ -36,7 +41,13 @@ def InstallCocoasudo(tmp, install, progress):
     subutai.download("cocoasudo")
     while subutai.isDownloadComplete() != 1:
         sleep(0.05)
+        progress.setCocoasudoProgress(subutai.GetBytesDownload())
+        progress.updateProgress()
 
+    progress.setCocoasudoProgress(progress.getCocoasudoSize())
+    progress.updateProgress()
+
+    subutai.AddStatus("Installing cocoasudo")
     try:
         copyfile(tmp+"cocoasudo", install+"bin/cocoasudo")
         st = os.stat(install+"bin/cocoasudo")
@@ -44,7 +55,7 @@ def InstallCocoasudo(tmp, install, progress):
     except:
         subutai.RaiseError("Failed to install cocoasudo. Aborting")
         return -87
-
+    return 0
 
 def CheckVirtualBox():
     if not os.path.exists("/Applications/VirtualBox.app"):
@@ -148,27 +159,29 @@ class P2P:
         self.LogConf = 'p2p.conf'
 
     def PreInstall(self):
-        self.progress.setP2P(self.P2PRemoteFile)
+        self.progress.setP2P(self.RemoteP2PFile)
         self.progress.setTuntap(self.TapFile)
         self.progress.setCocoasudo(self.CocoasudoFile)
-        self.calculateTotal()
+        self.progress.calculateTotal()
+        return 0
 
     def Download(self):
         rc = 0
+        subutai.AddStatus("Installing")
         if not CheckOsascript() and not CheckCocoasudo(self.install):
             rc = InstallCocoasudo(self.tmp, self.install, self.progress)
             if rc != 0:
                 return rc
 
         if not self.__checkTuntap():
-            self.__installTuntap(self.progress)    
+            self.__installTuntap()    
 
         subutai.download(self.RemoteP2PFile)
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
             self.progress.setP2PProgress(subutai.GetBytesDownload())
 
-        self.progress.setP2PProgress(progress.getP2PSize())
+        self.progress.setP2PProgress(self.progress.getP2PSize())
         self.progress.updateProgress()
         try:
             copyfile(self.tmp+self.RemoteP2PFile, self.install+"bin/"+self.P2PFile)
@@ -189,9 +202,9 @@ class P2P:
     def PostInstall(self):
         self.__writeConfiguration()
         postinst = subuco.PostInstall(self.tmp)
-        postinst.append('cp '+self.tmp+self.Daemon+' /Library/LaunchDaemons/'+self.daemon)
+        postinst.append('cp '+self.tmp+self.Daemon+' /Library/LaunchDaemons/'+self.Daemon)
         postinst.append('cp '+self.tmp+self.LogConf+' /etc/newsyslog.d/'+self.LogConf)
-        postinst.append('launchctl load /Library/LaunchDaemons/'+self.daemon)
+        postinst.append('launchctl load /Library/LaunchDaemons/'+self.Daemon)
         postinst.append('installer -pkg '+self.tmp+self.TapFile+' -target /')
         postinst.append('ln -s '+self.install+'bin/p2p /usr/local/bin/p2p')
         ins = 'do shell script "/bin/sh '+postinst.get()+'" with administrator privileges'
@@ -211,7 +224,7 @@ class P2P:
             sleep(0.05)
             self.progress.setTuntapProgress(subutai.GetBytesDownload())
 
-        self.progress.setTuntapProgress(progress.getTuntapSize())
+        self.progress.setTuntapProgress(self.progress.getTuntapSize())
         self.progress.updateProgress()
         return 0
 
@@ -282,7 +295,7 @@ class Tray:
         rc = 0
         
         if not CheckOsascript() and not CheckCocoasudo(self.install):
-        rc = InstallCocoasudo(self.tmp, self.install, self.progress)
+            rc = InstallCocoasudo(self.tmp, self.install, self.progress)
         if rc != 0:
             return rc
 
@@ -312,6 +325,7 @@ class Tray:
         self.progress.setCocoasudo(self.CocoasudoFile)
         self.progress.setLibssh(self.LibsshFile)
         self.progress.calculateTotal()
+        return 0
 
     def PostInstall(self):
         try:
@@ -338,7 +352,7 @@ class Tray:
 
         return 0
 
-    def __checkLibssh():
+    def __checkLibssh(self):
         if not os.path.exists('/usr/local/lib/libssh2.dylib'):
             return False
         return True
@@ -353,18 +367,19 @@ class E2E:
         self.progress = subuco.Progress()
 
     def PreInstall(self):
-        self.progress.SetChrome(self.GoogleChromeFile)
-        self.progress.setCocoasudo(self.cocoasudoFile)
+        self.progress.setChrome(self.GoogleChromeFile)
+        self.progress.setCocoasudo(self.CocoasudoFile)
         self.progress.calculateTotal()
+        return 0
 
     def Download(self):
         rc = 0
         if not CheckOsascript() and not CheckCocoasudo(self.install):
-        rc = InstallCocoasudo(self.tmp, self.install, self.progress)
+            rc = InstallCocoasudo(self.tmp, self.install, self.progress)
         if rc != 0:
             return rc
 
-        if not _checkGoogleChrome():
+        if not self.__checkGoogleChrome():
             subutai.AddStatus("Downloading Google Chrome")
             subutai.download(self.GoogleChromeFile)
             while subutai.isDownloadComplete() != 1:
@@ -379,10 +394,7 @@ class E2E:
 
     def Install(self):
         try:
-            script = 'do shell script "/usr/bin/tar -xf '+
-                     self.tmp+
-                     self.GoogleChromeFile+
-                     ' -C /Applications" with administrator privileges'
+            script = 'do shell script "/usr/bin/tar -xf '+self.tmp+self.GoogleChromeFile+' -C /Applications" with administrator privileges'
             p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
             stdout, stderr = p.communicate(script)
         except:
@@ -392,10 +404,33 @@ class E2E:
 
     def PostInstall(self):
         location = os.environ['HOME'] + '/Library/Application Support/Google/Chrome/External Extensions'
-        if not os.path.exists(location):
-            os.makedirs(location)
+        rc = 0
+        try:
+            if not os.path.exists(location):
+                os.makedirs(location)
+        except:
+            subutai.RaiseError("Failed to create extensions directory")
+            rc = 31
+
+        if rc != 0:
+            subutai.AddStatus("Trying to create directories as root")
+            try:
+                script = 'do shell script "mkdir -p '+location+' && chown -R ' + os.environ['USER'] + ' ' + location + '" with administrator privileges'
+                p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+                stdout, stderr = p.communicate(script)
+                rc = 0
+            except:
+                subutai.RaiseError("Failed to create directory")
+
+        if rc != 0:
+            sleep(5)
+            return rc
 
         ete = '{\n\t"external_update_url": "https://clients2.google.com/service/update2/crx"\n}'
+
+        if not os.path.exists(location):
+            subutai.RaiseError("Failed to create extensions directory. Aborting")
+            return 84
 
         try:
             f = open(location+"/kpmiofpmlciacjblommkcinncmneeoaa.json", 'w')

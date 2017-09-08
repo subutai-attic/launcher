@@ -4,7 +4,7 @@ if subutai.GetOS() == 'w':
     import subuw as subup
 elif subutai.GetOS() == 'l':
     import subul as subup
-elif subutai.GetIS() == 'd':
+elif subutai.GetOS() == 'd':
     import subud as subup
 
 

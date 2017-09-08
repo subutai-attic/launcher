@@ -1,16 +1,12 @@
 import subutai
 import subuco
+from time import sleep
 if subutai.GetOS() == 'w':
     import subuw as subup
 elif subutai.GetOS() == 'l':
     import subul as subup
 elif subutai.GetOS() == 'd':
     import subud as subup
-from time import sleep
-from shutil import copyfile
-import os
-import stat
-from subprocess import Popen, PIPE
 
 
 def subutaistart():

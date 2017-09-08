@@ -71,6 +71,8 @@ namespace SubutaiLauncher
             try 
             {
                 generateID();
+                _logger->notice("User logged in");
+                Session::instance()->setAction("SYSC");
             }
             catch (SubutaiException& e)
             {

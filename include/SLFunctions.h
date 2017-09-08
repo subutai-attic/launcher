@@ -276,7 +276,7 @@ namespace SubutaiLauncher
     static PyObject* SL_Error(PyObject* self, PyObject* args, PyObject* keywords)
     {
         if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", desc_keywords, &sl_string))
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
             return NULL;
         Poco::Logger::get("subutai").error("%s", std::string(sl_string));
         return Py_BuildValue("i", 0);
@@ -287,7 +287,7 @@ namespace SubutaiLauncher
     static PyObject* SL_Fatal(PyObject* self, PyObject* args, PyObject* keywords)
     {
         if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", desc_keywords, &sl_string))
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
             return NULL;
         Poco::Logger::get("subutai").fatal("%s", std::string(sl_string));
         return Py_BuildValue("i", 0);
@@ -637,7 +637,7 @@ namespace SubutaiLauncher
     static PyObject* SL_Information(PyObject* self, PyObject* args, PyObject* keywords)
     {
         if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", desc_keywords, &sl_string))
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
             return NULL;
         Poco::Logger::get("subutai").information("%s", std::string(sl_string));
         return Py_BuildValue("i", 0);
@@ -817,7 +817,7 @@ namespace SubutaiLauncher
     static PyObject* SL_Warning(PyObject* self, PyObject* args, PyObject* keywords)
     {
         if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", desc_keywords, &sl_string))
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
             return NULL;
         Poco::Logger::get("subutai").warning("%s", std::string(sl_string));
         return Py_BuildValue("i", 0);
@@ -1298,7 +1298,7 @@ static PyObject* SL_MakeLink(PyObject* self, PyObject* args, PyObject* keywords)
     static PyObject* SL_Notice(PyObject* self, PyObject* args, PyObject* keywords)
     {
         if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
-        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", desc_keywords, &sl_string))
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", string_keywords, &sl_string))
             return NULL;
         Poco::Logger::get("subutai").notice("%s", std::string(sl_string));
         return Py_BuildValue("i", 0);

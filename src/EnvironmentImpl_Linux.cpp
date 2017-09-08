@@ -123,7 +123,8 @@ namespace SubutaiLauncher
     std::string EnvironmentImpl::cpuArch() 
     {
         _logger->trace("Environment: Getting OS Architecture");
-        std::string ar = Poco::Environment::osArchitecture();
+        std::string ar("");
+        ar = Poco::Environment::osArchitecture();
         return ar;
     }
 

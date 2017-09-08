@@ -1,5 +1,11 @@
+import datetime
 import subutai
+import hashlib
+import os
+import stat
 from time import sleep
+from shutil import copyfile
+from subprocess import Popen, PIPE
 
 
 # This file provides common classes and functions used during installation
@@ -97,6 +103,10 @@ class Progress:
         self.traySize = subutai.GetFileSize(tray)
         self.trayProgress = 0
 
+    def setLibssh(self, libssh):
+        self.libsshSize = subutai.GetFileSize(libssh)
+        self.libsshProgress = 0
+
     def setChrome(self, chrome):
         self.chromeSize = subutai.GetFileSize(chrome)
         self.chromeProgress = 0
@@ -120,6 +130,7 @@ class Progress:
         t = t + self.chromeSize
         t = t + self.nssmSize
         self.totalSize = t
+        subutai.Information("Total size calculated")
 
     def getCoreSize(self):
         return self.coreSize
@@ -306,13 +317,13 @@ class SubutaiPeer:
         return rc
 
     def PreconfigureNetwork(self):
-        subutai.VBox("modifyvm " + machineName + " --nic1 nat")
-        subutai.VBox("modifyvm " + machineName + " --cableconnected1 on")
-        subutai.VBox("modifyvm " + machineName + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
-        subutai.VBox("modifyvm " + machineName + " --rtcuseutc on")
-        adapterName = subutai.GetVBoxHostOnlyInterface()
-        if adapterName != 'undefined':
-            subutai.VBox("modifyvm " + machineName + " --nic3 hostonly --hostonlyadapter3 " + adapterName)
+        subutai.VBox("modifyvm " + self.name + " --nic1 nat")
+        subutai.VBox("modifyvm " + self.name + " --cableconnected1 on")
+        subutai.VBox("modifyvm " + self.name + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
+        subutai.VBox("modifyvm " + self.name + " --rtcuseutc on")
+        adapter = subutai.GetVBoxHostOnlyInterface()
+        if adapter != 'undefined':
+            subutai.VBox("modifyvm " + self.name + " --nic3 hostonly --hostonlyadapter3 " + adapter)
         
         return 0
 
@@ -534,13 +545,13 @@ class PostInstall:
         self.tmpdir = tmp
         m = hashlib.md5()
         m.update(datetime.datetime.now().isoformat().encode('utf-8'))
-        self.filename = "postinst-" + m.hexdigest()[:5]
+        self.filename = "postinst-" + m.hexdigest()[:5]+'.sh'
         if os.path.exists(tmp+self.filename):
             os.remove(tmp+self.filename)
-        append("#!/bin/bash\n\n")
+        self.append("#!/bin/bash\n\n")
 
     def append(self, line):
-        f = open(self.tmpdir+self.filename+"\n", 'a')
+        f = open(self.tmpdir+self.filename, 'a')
         f.write(line)
         f.close()
         

@@ -234,7 +234,6 @@ namespace SubutaiLauncher
             PyErr_Print();
             if (PyErr_Occurred())
             {
-                std::printf("5\n");
                 PyObject *ptype, *pvalue, *ptraceback;
                 PyErr_Fetch(&ptype, &pvalue, &ptraceback);
                 char *pErrorMessage = PyBytes_AsString(PyUnicode_AsEncodedString(pvalue, "utf-8", ""));
@@ -252,12 +251,12 @@ namespace SubutaiLauncher
             _logger->critical("Script execution failed: %ld", _exitCode);
             if (PyErr_Occurred())
             {
-                std::printf("6\n");
                 PyObject *ptype, *pvalue, *ptraceback;
                 PyErr_Fetch(&ptype, &pvalue, &ptraceback);
                 char *pErrorMessage = PyBytes_AsString(PyUnicode_AsEncodedString(pvalue, "utf-8", ""));
                 std::string pErr = Poco::format("%s", std::string(pErrorMessage));
                 _logger->critical("Script Error [c]: %s", pErr);
+                handleTraceback((PyTracebackObject*)ptraceback, 5);
                 ncenter->add(SCRIPT_FINISHED);
                 ncenter->stop();
                 _running = false;

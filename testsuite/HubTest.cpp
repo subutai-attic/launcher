@@ -54,6 +54,11 @@ void HubTest::testSendLog()
     h.setLogin("m.savochkin@gmail.com");
     h.setPassword("testhubpassword");
     h.auth();
+    h.sendLog(Poco::Message::Priority::PRIO_WARNING, "Test Warning");
+    h.sendLog(Poco::Message::Priority::PRIO_NOTICE, "Test Notice");
+    h.sendLog(Poco::Message::Priority::PRIO_ERROR, "Test Error");
+    h.sendLog(Poco::Message::Priority::PRIO_CRITICAL, "Test Critical");
+    h.sendLog(Poco::Message::Priority::PRIO_FATAL, "Test Fatal");
     //h.sendLog(SubutaiLauncher::HL_INFO, "Launcher Testsuite: Log INFO");
     //h.sendLog(SubutaiLauncher::HL_WARNING, "Launcher Testsuite: Log WARNING");
     //h.sendLog(SubutaiLauncher::HL_ERROR, "Launcher Testsuite: Log ERROR");
