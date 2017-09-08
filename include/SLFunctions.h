@@ -201,11 +201,23 @@ namespace SubutaiLauncher
 
     // ========================================================================
 
+    static PyObject* SL_Critical(PyObject* self, PyObject* args, PyObject* keywords)
+    {
+        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", desc_keywords, &sl_string))
+            return NULL;
+        Poco::Logger::get("subutai").critical("%s", std::string(sl_string));
+        return Py_BuildValue("i", 0);
+    }
+
+    // ========================================================================
+
     static PyObject* SL_Debug(PyObject* self, PyObject* args)
     {
         if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_Debug");
         return Py_BuildValue("s", "Debug");
+        return Py_BuildValue("i", 0);
     }
 
     static PyObject* SL_DesktopFileInstall(PyObject* self, PyObject* args, PyObject* keywords)
@@ -258,6 +270,30 @@ namespace SubutaiLauncher
         }
         return Py_BuildValue("s", sl_filename);
     }
+
+    // ========================================================================
+
+    static PyObject* SL_Error(PyObject* self, PyObject* args, PyObject* keywords)
+    {
+        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", desc_keywords, &sl_string))
+            return NULL;
+        Poco::Logger::get("subutai").error("%s", std::string(sl_string));
+        return Py_BuildValue("i", 0);
+    }
+
+    // ========================================================================
+
+    static PyObject* SL_Fatal(PyObject* self, PyObject* args, PyObject* keywords)
+    {
+        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", desc_keywords, &sl_string))
+            return NULL;
+        Poco::Logger::get("subutai").fatal("%s", std::string(sl_string));
+        return Py_BuildValue("i", 0);
+    }
+
+    // ========================================================================
 
     static PyObject* SL_GetBytesDownload(PyObject* self, PyObject* args)
     {
@@ -371,6 +407,20 @@ namespace SubutaiLauncher
 
         int size = Session::instance()->getSettings()->getMemSize();
         return Py_BuildValue("i", size);
+    }
+
+    // ========================================================================
+
+    static PyObject* SL_GetOS(PyObject* self, PyObject* args)
+    {
+        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+#if LAUNCHER_MACOS
+        return Py_BuildValue("s", "d");
+#elif LAUNCHER_LINUX
+        return Py_BuildValue("s", "l");
+#elif LAUNCHER_WINDOWS
+        return Py_BuildValue("s", "d");
+#endif
     }
 
     // ========================================================================
@@ -584,6 +634,17 @@ namespace SubutaiLauncher
 
     // ========================================================================
 
+    static PyObject* SL_Information(PyObject* self, PyObject* args, PyObject* keywords)
+    {
+        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", desc_keywords, &sl_string))
+            return NULL;
+        Poco::Logger::get("subutai").information("%s", std::string(sl_string));
+        return Py_BuildValue("i", 0);
+    }
+
+    // ========================================================================
+
     static PyObject* SL_InstallSSHKey(PyObject* self, PyObject* args)
     {
         if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
@@ -749,6 +810,17 @@ namespace SubutaiLauncher
         if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
         //Poco::Logger::get("subutai").information("SL_Version");
         return Py_BuildValue("s", "Version: 0.1.0");
+    }
+
+    // ========================================================================
+
+    static PyObject* SL_Warning(PyObject* self, PyObject* args, PyObject* keywords)
+    {
+        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", desc_keywords, &sl_string))
+            return NULL;
+        Poco::Logger::get("subutai").warning("%s", std::string(sl_string));
+        return Py_BuildValue("i", 0);
     }
 
     // ========================================================================
@@ -1223,6 +1295,17 @@ static PyObject* SL_MakeLink(PyObject* self, PyObject* args, PyObject* keywords)
 
 // ========================================================================
 
+    static PyObject* SL_Notice(PyObject* self, PyObject* args, PyObject* keywords)
+    {
+        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s", desc_keywords, &sl_string))
+            return NULL;
+        Poco::Logger::get("subutai").notice("%s", std::string(sl_string));
+        return Py_BuildValue("i", 0);
+    }
+
+// ========================================================================
+
 static PyObject* SL_RegisterService(PyObject* self, PyObject* args, PyObject* keywords)
 {
     if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
@@ -1369,11 +1452,14 @@ static PyMethodDef SubutaiSLMethods[] = {
     { "CheckVMExists",              (PyCFunction)   SL_CheckVMExists,               METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name exists" },
     { "CheckVMRunning",             (PyCFunction)   SL_CheckVMRunning,              METH_VARARGS | METH_KEYWORDS, "Checks if VM with this name running" },
     { "CreateDesktopShortcut",      (PyCFunction)   SL_CreateDesktopShortcut,       METH_VARARGS | METH_KEYWORDS, "Creates a shortcut on a desktop" },
+    { "Critical",                   (PyCFunction)   SL_Critical,                    METH_VARARGS | METH_KEYWORDS, "Log critical error", },
     { "debug",                                      SL_Debug,                       METH_VARARGS, "Shows debug information about current launcher instance and environment" },
 #if LAUNCHER_LINUX
     { "DesktopFileInstall",         (PyCFunction)   SL_DesktopFileInstall,          METH_VARARGS | METH_KEYWORDS, "Runs desktop-file-install" },
 #endif
     { "download",                   (PyCFunction)   SL_Download,                    METH_VARARGS | METH_KEYWORDS, "Downloads a file from Subutai CDN" },
+    { "Error",                      (PyCFunction)   SL_Error,                       METH_VARARGS | METH_KEYWORDS, "Log error" },
+    { "Fatal",                      (PyCFunction)   SL_Fatal,                       METH_VARARGS | METH_KEYWORDS, "Log fatal error" },
     { "GetBytesDownload",                           SL_GetBytesDownload,            METH_VARARGS, "Returns number of bytes downloaded" },
     { "GetCoreNum",                                 SL_GetCoreNum,                  METH_VARARGS, "Returns choosen amount of cores" },
     { "GetDefaultRoutingInterface",                 SL_GetDefaultRoutingInterface,  METH_VARARGS, "Returns name of default network interface" },
@@ -1384,6 +1470,7 @@ static PyMethodDef SubutaiSLMethods[] = {
     { "GetInstallDir",                              SL_GetInstallDir,               METH_VARARGS, "Returns installation directory" },
     { "GetMasterVersion",                           SL_GetMasterVersion,            METH_VARARGS, "Returns master version of a product" },
     { "GetMemSize",                                 SL_GetMemSize,                  METH_VARARGS, "Return amount of memory" },
+    { "GetOS",                                      SL_GetOS,                       METH_VARARGS, "Returns one letter representation of OS name" },
     { "GetOSVersionNumber",                         SL_GetOSVersionNumber,          METH_VARARGS, "Returns number of OS version" },
     { "GetPeerFileSize",            (PyCFunction)   SL_GetPeerFileSize,             METH_VARARGS | METH_KEYWORDS, "Retrieves a file size for a file inside a peer over SSH" },
     { "GetPeerIP",                                  SL_GetPeerIP,                   METH_VARARGS, "Returns Peer IP address" },
@@ -1396,7 +1483,8 @@ static PyMethodDef SubutaiSLMethods[] = {
     { "GetVBoxBridgedInterface",    (PyCFunction)   SL_GetVBoxBridgedInterface,     METH_VARARGS | METH_KEYWORDS, "Returns name of default network interface" },
     { "GetVBoxHostOnlyInterface",   (PyCFunction)   SL_GetVBoxHostOnlyInterface,    METH_VARARGS, "Returns name of the VB HO interface" },
     { "GetVBoxPath",                                SL_GetVBoxPath,                 METH_VARARGS, "Returns path to a vboxmanage binary" },
-    { "HelloWorld",                                      SL_HelloWorld,                  METH_VARARGS, "Hello World method of subutai scripting language" },
+    { "HelloWorld",                                 SL_HelloWorld,                  METH_VARARGS, "Hello World method of subutai scripting language" },
+    { "Information",                (PyCFunction)   SL_Information,                 METH_VARARGS | METH_KEYWORDS, "Log Information" },
     { "InstallSSHKey",              (PyCFunction)   SL_InstallSSHKey,               METH_VARARGS, "Install SSH public key" },
 #if LAUNCHER_LINUX
     { "InstallVBox",                (PyCFunction)   SL_InstallVBox,                 METH_VARARGS | METH_KEYWORDS, "Install virtualbox as root" },
@@ -1409,6 +1497,7 @@ static PyMethodDef SubutaiSLMethods[] = {
     { "IsVBoxInstalled",                            SL_IsVBoxInstalled,             METH_VARARGS, "Returns 0 if vbox is installed" },
     { "log",                        (PyCFunction)   SL_Log,                         METH_VARARGS | METH_KEYWORDS, "Writes to log" },
     { "MakeLink",                   (PyCFunction)   SL_MakeLink,                    METH_VARARGS | METH_KEYWORDS, "Executes ln -s on root behalf" },
+    { "Notice",                     (PyCFunction)   SL_Notice,                      METH_VARARGS | METH_KEYWORDS, "Log notice message" },
     { "ProcessKill",                (PyCFunction)   SL_ProcessKill,                 METH_VARARGS | METH_KEYWORDS, "Kills a Windows process" },
     { "RaiseError",                 (PyCFunction)   SL_RaiseError,                  METH_VARARGS | METH_KEYWORDS, "Raising error" },
     { "RaiseInfo",                  (PyCFunction)   SL_RaiseInfo,                   METH_VARARGS | METH_KEYWORDS, "Raising info" },
@@ -1441,6 +1530,7 @@ static PyMethodDef SubutaiSLMethods[] = {
     { "VBox",                       (PyCFunction)   SL_VBox,                        METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something" },
     { "VBoxS",                      (PyCFunction)   SL_VBoxS,                       METH_VARARGS | METH_KEYWORDS, "Tells vboxmanage to do something and returns status" },
     { "version",                                    SL_Version,                     METH_VARARGS, "Display launcher version" },
+    { "Warning",                    (PyCFunction)   SL_Warning,                     METH_VARARGS | METH_KEYWORDS, "Log warning message" },
     { NULL,                                         NULL,                           0, NULL }
 };
 

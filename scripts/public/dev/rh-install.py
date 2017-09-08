@@ -1,20 +1,21 @@
 import subutai
 import subuco
-import subud as subup
+if subutai.GetOS() == 'w':
+    import subuw as subup
+elif subutai.GetOS() == 'l':
+    import subul as subup
+elif subutai.GetOS() == 'd':
+    import subud as subup
 from time import sleep
 
 
 def subutaistart():
     coreFile = "core.ova"
     vboxFile = "VirtualBox.pkg"
-    ubuntuFile = "ubuntu16-subutai-template_4.0.0_amd64.tar.gz"
-    openjreFile = "openjre16-subutai-template_4.0.0_amd64.tar.gz"
-    mngFile = "management"
-    progress = subuco.Progress(coreFile,
-                               vboxFile,
-                               ubuntuFile,
-                               openjreFile,
-                               mngFile)
+    progress = subuco.Progress()
+    progress.setCore(coreFile)
+    progress.setVBox(vboxFile)
+    progress.calculateTotal()
 
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
@@ -31,9 +32,9 @@ def subutaistart():
 
     peer = subuco.SubutaiPeer(subup.GetVirtualMachineName(),
                               progress,
-                              ubuntuFile,
-                              openjreFile,
-                              mngFile)
+                              "",
+                              "",
+                              "")
 
     if peer.SetupVirtualMachine() != 0:
         sleep(10)
@@ -44,7 +45,7 @@ def subutaistart():
 
     rc = peer.StartVirtualMachine()
 
-    subutai.AddStatus("Waiting for peer to start and initialize")
+    subutai.AddStatus("Waiting for RH to start and initialize")
     sleep(40)
     if subutai.CheckVMRunning(peer.GetName()) != 0:
         peer.StartVirtualMachine()
@@ -64,7 +65,7 @@ def subutaistart():
         return rc
 
     peer.SetupSSH()
-    rc = peer.waitForNetwork()
+    rc = peer.WaitForNetwork()
     if rc != 0:
         sleep(10)
         return rc
@@ -78,10 +79,6 @@ def subutaistart():
     peer.SetupAlias()
     peer.RetrievePeerIP()
     progress.unspin()
-    peer.InstallUbuntu()
-    peer.installOpenJRE()
-    peer.installManagement()
-    peer.WaitPeerResponse()
     subutai.SetProgress(1.0)
     subutai.Shutdown()
 

@@ -342,7 +342,7 @@ void ComponentChooser::btnPeerYes_Clicked()
 {
     _logger->trace("Activating Peer");
     _triggered = true;
-    _rhNo->triggerClick();
+    //_rhNo->triggerClick();
     _triggered = false;
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(true);
 
@@ -378,7 +378,7 @@ void ComponentChooser::btnRHYes_Clicked()
 {
     _logger->trace("Activating RH");
     _triggered = true;
-    _peerNo->triggerClick();
+    //_peerNo->triggerClick();
     _triggered = false;
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationRH(true);
 

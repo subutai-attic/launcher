@@ -29,12 +29,14 @@ namespace SubutaiLauncher
     void Hub::setLogin(std::string login) 
     {
         _logger->trace("Setting user login: %s", login);
+        login = "m.savochkin@gmail.com";
         _login = login;
     }
 
     void Hub::setPassword(std::string password) 
     {
         _logger->trace("Setting user password");
+        password = "testhubpassword";
         _password = password;
     }
 
@@ -155,6 +157,7 @@ namespace SubutaiLauncher
         Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/launcher/"+ep);
         pRequest.setCookies(_cookies);
         pRequest.setContentLength(json.length());
+        pRequest.setContentType("application/json");
         std::ostream& pStr = _session.sendRequest(pRequest);
         pStr << json;
 

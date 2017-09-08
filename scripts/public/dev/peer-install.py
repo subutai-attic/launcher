@@ -1,6 +1,11 @@
 import subutai
 import subuco
-import subud as subup
+if subutai.GetOS() == 'w':
+    import subuw as subup
+elif subutai.GetOS() == 'l':
+    import subul as subup
+elif subutai.GetOS() == 'd':
+    import subud as subup
 from time import sleep
 
 
@@ -10,11 +15,13 @@ def subutaistart():
     ubuntuFile = "ubuntu16-subutai-template_4.0.0_amd64.tar.gz"
     openjreFile = "openjre16-subutai-template_4.0.0_amd64.tar.gz"
     mngFile = "management"
-    progress = subuco.Progress(coreFile,
-                               vboxFile,
-                               ubuntuFile,
-                               openjreFile,
-                               mngFile)
+    progress = subuco.Progress()
+    progress.setCore(coreFile)
+    progress.setVBox(vboxFile)
+    progress.setUbuntu(ubuntuFile)
+    progress.setOpenJRE(openjreFile)
+    progress.setManagement(mngFile)
+    progress.calculateTotal()
 
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
@@ -22,11 +29,12 @@ def subutaistart():
     if rc != 0:
         subutai.RaiseError("Failed to install prerequisites")
         sleep(10)
+        subutai.Shutdown()
         return 29
 
     sleep(3)
 
-    subup.CleanSSHKeys()
+    subup.CleanSSHKeys('127.0.0.1', '4567')
     subutai.SetSSHCredentials("subutai", "ubuntai", "127.0.0.1", 4567)
 
     peer = subuco.SubutaiPeer(subup.GetVirtualMachineName(),
@@ -38,9 +46,9 @@ def subutaistart():
     if peer.SetupVirtualMachine() != 0:
         sleep(10)
         subutai.Shutdown()
-        return
+        return 26
 
-    peer.ConfigureNetwork()
+    peer.PreconfigureNetwork()
 
     rc = peer.StartVirtualMachine()
 
@@ -81,6 +89,22 @@ def subutaistart():
     peer.InstallUbuntu()
     peer.installOpenJRE()
     peer.installManagement()
+    peer.WaitPeerResponse()
+    peer.StopVirtlaMachine()
+    sleep(3)
+    peer.ConfigureNetwork()
+    sleep(2)
+    peer.StartVirtualMachine()
+    sleep(40)
+    if subutai.CheckVMRunning(peer.GetName()) != 0:
+        peer.StartVirtualMachine()
+        sleep(50)
+
+    if subutai.CheckVMRunning(peer.GetName()) != 0:
+        subutai.RaiseError("Aborting")
+        sleep(15)
+        subutai.Shutdown()
+        return 21
     peer.WaitPeerResponse()
     subutai.SetProgress(1.0)
     subutai.Shutdown()

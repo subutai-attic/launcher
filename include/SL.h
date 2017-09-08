@@ -5,6 +5,7 @@
 
 #include <string>
 #include <Python.h>
+#include "frameobject.h"
 #include "SubutaiException.h"
 #include "SLException.h"
 #include "FileSystem.h"
@@ -38,6 +39,8 @@ namespace SubutaiLauncher {
 		long exitCode();
 		bool running();
 	private:
+        int handleTraceback(PyTracebackObject* tb, long limit);
+        int tracebackLine(PyObject *filename, int lineno, PyObject *name);
 		bool _running;
 		Poco::Logger* _logger;
 		PyObject* _name;

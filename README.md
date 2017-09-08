@@ -37,6 +37,15 @@ make ui
 Building on MacOS
 =================
 
+To package you need a linux machine with the following tools installed: autoconf, xar, bomutils
+To build xar:
+```
+./autogen.sh
+./configure
+make
+make install
+```
+
 File System
 ===========
 

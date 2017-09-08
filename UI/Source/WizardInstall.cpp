@@ -1,25 +1,11 @@
 #include "WizardInstall.h"
 #include "Wizard.h"
 
-#if LAUNCHER_LINUX
-const std::string WizardInstall::P2P_INSTALL = "launcher-p2p-install-linux";
-const std::string WizardInstall::TRAY_INSTALL = "launcher-tray-install-linux";
-const std::string WizardInstall::E2E_INSTALL = "launcher-chrome-e2e-install-linux";
-const std::string WizardInstall::PEER_INSTALL = "launcher-peer-install-linux";
-const std::string WizardInstall::RH_INSTALL = "launcher-rh-install-linux";
-#elif LAUNCHER_WINDOWS
-const std::string WizardInstall::P2P_INSTALL = "launcher-p2p-install-windows";
-const std::string WizardInstall::TRAY_INSTALL = "launcher-tray-install-windows";
-const std::string WizardInstall::E2E_INSTALL = "launcher-chrome-e2e-install-windows";
-const std::string WizardInstall::PEER_INSTALL = "launcher-peer-install-windows";
-const std::string WizardInstall::RH_INSTALL = "launcher-rh-install-windows";
-#else
-const std::string WizardInstall::P2P_INSTALL = "launcher-p2p-install-darwin";
-const std::string WizardInstall::TRAY_INSTALL = "launcher-tray-install-darwin";
-const std::string WizardInstall::E2E_INSTALL = "launcher-chrome-e2e-install-darwin";
-const std::string WizardInstall::PEER_INSTALL = "launcher-peer-install-darwin";
-const std::string WizardInstall::RH_INSTALL = "launcher-rh-install-darwin";
-#endif
+const std::string WizardInstall::P2P_INSTALL = "p2p-install";
+const std::string WizardInstall::TRAY_INSTALL = "tray-install";
+const std::string WizardInstall::E2E_INSTALL = "e2e-install";
+const std::string WizardInstall::PEER_INSTALL = "peer-install";
+const std::string WizardInstall::RH_INSTALL = "rh-install";
 
 WizardInstall::WizardInstall() :
     _succeed(false),
