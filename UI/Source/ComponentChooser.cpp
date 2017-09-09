@@ -264,8 +264,6 @@ void ComponentChooser::resized()
 
 void ComponentChooser::buttonClicked(juce::Button* button)
 {
-  _logger->trace("*** buttonClicked ***");
-
     struct btnClickedHandler {
         juce::TextButton* btn;
         void (ComponentChooser::*handler)();
@@ -467,7 +465,7 @@ void ComponentChooser::btnDiskSizePlus_Clicked()
 
 void ComponentChooser::btnDiskSizeMinus_Clicked()
 {
-  if (--_disk < 1) _disk = 1;
+  if (--_disk < 8) _disk = 8;
   char t[4];
   std::sprintf(t, "%d", _disk);
   _diskSize->setButtonText(t);
@@ -481,4 +479,7 @@ void ComponentChooser::auxSetPlusMinusComponentsEnabled(bool enabled)
   _memSize->setEnabled(enabled);
   _memPlus->setEnabled(enabled);
   _memMinus->setEnabled(enabled);
+  _diskMinus->setEnabled(enabled);
+  _diskPlus->setEnabled(enabled);
+  _diskSize->setEnabled(enabled);
 }
