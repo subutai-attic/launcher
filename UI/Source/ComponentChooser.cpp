@@ -1,32 +1,35 @@
 #include "ComponentChooser.h"
 
 ComponentChooser::ComponentChooser() :
-    _ptp(true),
-    _tray(true),
-    _ete(true),
-    _peer(true),
-    _rh(false),
-    _cpu(2),
-    _mem(2)
+  _ptp(true),
+  _tray(true),
+  _ete(true),
+  _peer(true),
+  _rh(false),
+  _cpu(2),
+  _mem(2),
+  _disk(8),
+  _triggered(false),
+  _ptpNo(nullptr),
+  _ptpYes(nullptr),
+  _trayNo(nullptr),
+  _trayYes(nullptr),
+  _eteNo(nullptr),
+  _eteYes(nullptr),
+  _peerNo(nullptr),
+  _peerYes(nullptr),
+  _rhNo(nullptr),
+  _rhYes(nullptr),
+  _cpuNum(nullptr),
+  _cpuPlus(nullptr),
+  _cpuMinus(nullptr),
+  _memPlus(nullptr),
+  _memSize(nullptr),
+  _memMinus(nullptr),
+  _diskPlus(nullptr),
+  _diskSize(nullptr),
+  _diskMinus(nullptr)
 {
-    _triggered = false;
-    _ptpNo = nullptr;
-    _ptpYes = nullptr;
-    _trayNo = nullptr;
-    _trayYes = nullptr;
-    _eteNo = nullptr;
-    _eteYes = nullptr;
-    _peerNo = nullptr;
-    _peerYes = nullptr;
-    _rhNo = nullptr;
-    _rhYes = nullptr;
-    _cpuNum = nullptr;
-    _cpuPlus = nullptr;
-    _cpuMinus = nullptr;
-    _memPlus = nullptr;
-    _memSize = nullptr;
-    _memMinus = nullptr;
-
     SubutaiLauncher::Environment pEnv;
     _vtxStatus = false;
     if (pEnv.vtxEnabled()) _vtxStatus = true;
@@ -146,19 +149,26 @@ ComponentChooser::ComponentChooser() :
     };
 
     std::vector<PlusMinusBtn> lst_pm = {
-        PlusMinusBtn {
-            (&_cpuMinus), (&_cpuPlus), (&_cpuNum),
-            &_cpuLabel, &_cpuInfo, "2",
-            "Remove one core", "Add one core",
-            "Number of CPUs", "Choose how many CPUs you would like to share with peer"
-        },
+      PlusMinusBtn {
+        (&_cpuMinus), (&_cpuPlus), (&_cpuNum),
+        &_cpuLabel, &_cpuInfo, "2",
+        "Remove one core", "Add one core",
+        "Number of CPUs", "Choose how many CPUs you would like to share with peer"
+      },
 
-        PlusMinusBtn {
-            (&_memMinus), (&_memPlus), (&_memSize),
-            &_memLabel, &_memInfo, "2",
-            "Remove one GB", "Add one GB",
-            "Memory Limit (GB)", "How many of RAM you would like to share with peer in GB"
-        }
+      PlusMinusBtn {
+        (&_memMinus), (&_memPlus), (&_memSize),
+        &_memLabel, &_memInfo, "2",
+        "Remove one GB", "Add one GB",
+        "Memory Limit (GB)", "How many of RAM you would like to share with peer in GB"
+      },
+
+      PlusMinusBtn {
+        (&_diskMinus), (&_diskPlus), (&_diskSize),
+        &_diskLabel, &_diskInfo, "8",
+        "Remove one GB", "Add one GB",
+        "Disk size (GB)", "How much of disk size would you like to share with peer in GB"
+      },
     };
 
     lineY = 15 + lstBtnItemsCont.size() * 40;
@@ -213,10 +223,8 @@ ComponentChooser::ComponentChooser() :
     _cpuPlus->setEnabled(_vtxStatus);
     _memPlus->setEnabled(_vtxStatus);
     _memMinus->setEnabled(_vtxStatus);
-
-	_rhNo->setEnabled(false);
-	_rhYes->setEnabled(false);
-
+    _diskMinus->setEnabled(_vtxStatus);
+    _diskPlus->setEnabled(_vtxStatus);
     _logger->trace("Component Chooser UI Component created");
 }
 
@@ -239,6 +247,9 @@ ComponentChooser::~ComponentChooser()
     if (_memPlus) delete _memPlus;
     if (_memSize) delete _memSize;
     if (_memMinus) delete _memMinus;
+    if (_diskPlus) delete _diskPlus;
+    if (_diskSize) delete _diskSize;
+    if (_diskMinus) delete _diskMinus;
 }
 
 void ComponentChooser::paint(juce::Graphics& g)
@@ -253,31 +264,34 @@ void ComponentChooser::resized()
 
 void ComponentChooser::buttonClicked(juce::Button* button)
 {
-    typedef void (ComponentChooser::*fpBtnHandler)();
-    struct btnHandler {
+  _logger->trace("*** buttonClicked ***");
+
+    struct btnClickedHandler {
         juce::TextButton* btn;
-        fpBtnHandler handler;
+        void (ComponentChooser::*handler)();
     };
 
-    std::vector<btnHandler> lstHandlers = {
-        {_ptpYes,   &ComponentChooser::btnPtpYes_Clicked},
-        {_ptpNo,    &ComponentChooser::btnPtpNo_Clicked},
-        {_trayYes,  &ComponentChooser::btnTrayYes_Clicked},
-        {_trayNo,   &ComponentChooser::btnTrayNo_Clicked},
-        {_eteYes,   &ComponentChooser::btnETEYes_Clicked},
-        {_eteNo,    &ComponentChooser::btnETENo_Clicked},
-        {_peerYes,  &ComponentChooser::btnPeerYes_Clicked},
-        {_peerNo,   &ComponentChooser::btnPeerNo_Clicked},
-        {_rhYes,    &ComponentChooser::btnRHYes_Clicked},
-        {_rhNo,     &ComponentChooser::btnRHNo_Clicked},
+    std::vector<btnClickedHandler> lstHandlers = {
+      {_ptpYes,   &ComponentChooser::btnPtpYes_Clicked},
+      {_ptpNo,    &ComponentChooser::btnPtpNo_Clicked},
+      {_trayYes,  &ComponentChooser::btnTrayYes_Clicked},
+      {_trayNo,   &ComponentChooser::btnTrayNo_Clicked},
+      {_eteYes,   &ComponentChooser::btnETEYes_Clicked},
+      {_eteNo,    &ComponentChooser::btnETENo_Clicked},
+      {_peerYes,  &ComponentChooser::btnPeerYes_Clicked},
+      {_peerNo,   &ComponentChooser::btnPeerNo_Clicked},
+      {_rhYes,    &ComponentChooser::btnRHYes_Clicked},
+      {_rhNo,     &ComponentChooser::btnRHNo_Clicked},
 
-        {_cpuPlus,  &ComponentChooser::btnCPUPlus_Clicked},
-        {_cpuMinus, &ComponentChooser::btnCPUMinus_Clicked},
-        {_memPlus,  &ComponentChooser::btnMemPlus_Clicked},
-        {_memMinus, &ComponentChooser::btnMemMinus_Clicked},
+      {_cpuPlus,  &ComponentChooser::btnCPUPlus_Clicked},
+      {_cpuMinus, &ComponentChooser::btnCPUMinus_Clicked},
+      {_memPlus,  &ComponentChooser::btnMemPlus_Clicked},
+      {_memMinus, &ComponentChooser::btnMemMinus_Clicked},
+      {_diskPlus,  &ComponentChooser::btnDiskSizePlus_Clicked},
+      {_diskMinus, &ComponentChooser::btnDiskSizeMinus_Clicked},
     };
 
-    for (btnHandler item : lstHandlers) {
+    for (btnClickedHandler item : lstHandlers) {
         if (item.btn != button) continue;
         (this->*item.handler)();
         return;
@@ -343,75 +357,56 @@ void ComponentChooser::btnETENo_Clicked()
 
 void ComponentChooser::btnPeerYes_Clicked()
 {
-    _logger->trace("Activating Peer");
-    _triggered = true;
-    //_rhNo->triggerClick();
-    _triggered = false;
+    _logger->trace("btnPeerYes_Clicked");
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(true);
+    SubutaiLauncher::Session::instance()->getSettings()->setInstallationRH(false);
+
+    _rhNo->removeListener(this);
+    _rhNo->triggerClick();
+    _rhNo->addListener(this);
 
     _peerLabel.setColour(Label::textColourId, Colour(105, 116, 144));
     _cpuLabel.setColour(Label::textColourId, Colour(105, 116, 144));
     _memLabel.setColour(Label::textColourId, Colour(105, 116, 144));
-    _cpuNum->setEnabled(true);
-    _cpuPlus->setEnabled(true);
-    _cpuMinus->setEnabled(true);
-    _memSize->setEnabled(true);
-    _memPlus->setEnabled(true);
-    _memMinus->setEnabled(true);
+    auxSetPlusMinusComponentsEnabled(true);
 }
 
 void ComponentChooser::btnPeerNo_Clicked()
 {
-    _logger->trace("Deactivating Peer");
-    SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(false);
-    if (_triggered) return;
+    _logger->trace("btnPeerNo_Clicked");
+    SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(false);    
 
     _peerLabel.setColour(Label::textColourId, Colours::grey);
     _cpuLabel.setColour(Label::textColourId, Colours::grey);
     _memLabel.setColour(Label::textColourId, Colours::grey);
-    _cpuNum->setEnabled(false);
-    _cpuPlus->setEnabled(false);
-    _cpuMinus->setEnabled(false);
-    _memSize->setEnabled(false);
-    _memPlus->setEnabled(false);
-    _memMinus->setEnabled(false);
+    auxSetPlusMinusComponentsEnabled(false);
 }
 
 void ComponentChooser::btnRHYes_Clicked()
 {
-	return;
-    _logger->trace("Activating RH");
-    _triggered = true;
-    //_peerNo->triggerClick();
-    _triggered = false;
+    _logger->trace("btnRHYes_Clicked");
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationRH(true);
+    SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(false);
+
+    _peerNo->removeListener(this);
+    _peerNo->triggerClick();
+    _peerNo->addListener(this);
 
     _rhLabel.setColour(Label::textColourId, Colour(105, 116, 144));
     _cpuLabel.setColour(Label::textColourId, Colour(105, 116, 144));
     _memLabel.setColour(Label::textColourId, Colour(105, 116, 144));
-    _cpuNum->setEnabled(true);
-    _cpuPlus->setEnabled(true);
-    _cpuMinus->setEnabled(true);
-    _memSize->setEnabled(true);
-    _memPlus->setEnabled(true);
-    _memMinus->setEnabled(true);
+    auxSetPlusMinusComponentsEnabled(true);
 }
 
 void ComponentChooser::btnRHNo_Clicked()
 {
-	return;
-    _logger->trace("Deactivating RH");
+    _logger->trace("btnRHNo_Clicked");
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationRH(false);
-    if (_triggered) return;
     _rhLabel.setColour(Label::textColourId, Colours::grey);
     _cpuLabel.setColour(Label::textColourId, Colours::grey);
     _memLabel.setColour(Label::textColourId, Colours::grey);
-    _cpuNum->setEnabled(false);
-    _cpuPlus->setEnabled(false);
-    _cpuMinus->setEnabled(false);
-    _memSize->setEnabled(false);
-    _memPlus->setEnabled(false);
-    _memMinus->setEnabled(false);
+
+    auxSetPlusMinusComponentsEnabled(false);
 }
 
 void ComponentChooser::btnCPUPlus_Clicked()
@@ -454,4 +449,30 @@ void ComponentChooser::btnMemMinus_Clicked()
     char t[4];
     std::sprintf(t, "%d", _mem);
     _memSize->setButtonText(t);
+}
+
+void ComponentChooser::btnDiskSizePlus_Clicked()
+{
+  ++_disk;
+  char t[4];
+  std::sprintf(t, "%d", _disk);
+  _diskSize->setButtonText(t);
+}
+
+void ComponentChooser::btnDiskSizeMinus_Clicked()
+{
+  if (--_disk < 1) _disk = 1;
+  char t[4];
+  std::sprintf(t, "%d", _disk);
+  _diskSize->setButtonText(t);
+}
+
+void ComponentChooser::auxSetPlusMinusComponentsEnabled(bool enabled)
+{
+  _cpuNum->setEnabled(enabled);
+  _cpuPlus->setEnabled(enabled);
+  _cpuMinus->setEnabled(enabled);
+  _memSize->setEnabled(enabled);
+  _memPlus->setEnabled(enabled);
+  _memMinus->setEnabled(enabled);
 }

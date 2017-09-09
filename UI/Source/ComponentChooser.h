@@ -27,6 +27,7 @@ class ComponentChooser : public juce::Component,
         void buttonClicked(juce::Button* button) override;
         ChosenComponents getComponents();
     private:
+        /*button clicked handlers*/
         void btnPtpYes_Clicked();
         void btnPtpNo_Clicked();
         void btnTrayYes_Clicked();
@@ -41,7 +42,11 @@ class ComponentChooser : public juce::Component,
         void btnCPUMinus_Clicked();
         void btnMemPlus_Clicked();
         void btnMemMinus_Clicked();
+        void btnDiskSizePlus_Clicked();
+        void btnDiskSizeMinus_Clicked();
+        //
 
+        void auxSetPlusMinusComponentsEnabled(bool enabled);
         Poco::Logger *_logger;
 
         juce::Label _ptpLabel;
@@ -58,6 +63,8 @@ class ComponentChooser : public juce::Component,
         juce::Label _cpuInfo;
         juce::Label _memLabel;
         juce::Label _memInfo;
+        juce::Label _diskLabel;
+        juce::Label _diskInfo;
 
         juce::TextButton* _ptpNo;
         juce::TextButton* _ptpYes;
@@ -78,6 +85,10 @@ class ComponentChooser : public juce::Component,
         juce::TextButton* _memSize;
         juce::TextButton* _memMinus;
 
+        juce::TextButton* _diskPlus;
+        juce::TextButton* _diskSize;
+        juce::TextButton* _diskMinus;
+
         bool _ptp;
         bool _tray;
         bool _ete;
@@ -85,6 +96,7 @@ class ComponentChooser : public juce::Component,
         bool _rh;
         int _cpu;
         int _mem;
+        int _disk;
         bool _triggered;
 
         bool _vtxStatus;
