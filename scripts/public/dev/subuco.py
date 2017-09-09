@@ -76,15 +76,15 @@ class Progress:
         self.vboxProgress = 0
 
     def setUbuntu(self, ubuntu):
-        self.ubuntuSize = subutai.GetFileSize(ubuntu)
+        self.ubuntuSize = subutai.GetTemplateSize(ubuntu)
         self.ubuntuProgress = 0
 
     def setOpenJRE(self, openjre):
-        self.openjreSize = subutai.GetFileSize(openjre)
+        self.openjreSize = subutai.GetTemplateSize(openjre)
         self.openjreProgress = 0
 
     def setManagement(self, management):
-        self.managementSize = subutai.GetFileSize(management)
+        self.managementSize = subutai.GetTemplateSize(management)
         self.managementProgress = 0
 
     def setP2P(self, p2p):
@@ -247,10 +247,10 @@ class SubutaiPeer:
         return self.name
 
     def WaitForNetwork(self):
+        subutai.AddStatus("Waiting for network")
         subutai.SetAction("NETWAIT")
         ping = ('if [ $(timeout 3 ping 8.8.8.8 -c1 2>/dev/null | grep -c "1 received") -ne 1 ]; '
                 'then echo 1; else echo 0; fi')
-        subutai.AddStatus("Waiting for network")
         attempts = 0
         while True:
             out = subutai.SSHRunOut(ping)
@@ -265,6 +265,7 @@ class SubutaiPeer:
         return 0
 
     def SetupVirtualMachine(self):
+        subutai.AddStatus("Setting up virtual machine")
         subutai.SetAction("INSTVM")
         rc = 0
         subutai.AddStatus("Installing VM")
@@ -294,11 +295,12 @@ class SubutaiPeer:
         return rc
 
     def ConfigureNetwork(self):
+        subutai.AddStatus("(Re)configuring Network")
         subutai.SetAction("NETCONF")
         rc = 0
-        subutai.AddStatus("Configuring Network")
         gateway = subutai.GetDefaultRoutingInterface()
         bridged = subutai.GetVBoxBridgedInterface(gateway)
+        bridged = bridged.replace(' ', '+++')
         subutai.VBox("modifyvm " + self.name + ' --nic1 bridged --bridgeadapter1 ' + bridged)
         subutai.VBox("modifyvm " + self.name + " --cableconnected1 on")
         subutai.VBox("modifyvm " + self.name + " --nic2 nat")
@@ -306,6 +308,7 @@ class SubutaiPeer:
         subutai.VBox("modifyvm " + self.name + ' --natpf2 ssh-fwd,tcp,,4567,,22 --natpf2 https-fwd,tcp,,9999,,8443')
 
         adapter = subutai.GetVBoxHostOnlyInterface()
+        adapter = adapter.replace(' ', '+++')
         ret = subutai.VBoxS("hostonlyif ipconfig " + adapter + " --ip 192.168.56.1")
 
         if ret == 1:
@@ -320,12 +323,14 @@ class SubutaiPeer:
         return rc
 
     def PreconfigureNetwork(self):
+        subutai.AddStatus("Configuring Network")
         subutai.SetAction("NETPCONF")
         subutai.VBox("modifyvm " + self.name + " --nic1 nat")
         subutai.VBox("modifyvm " + self.name + " --cableconnected1 on")
         subutai.VBox("modifyvm " + self.name + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
         subutai.VBox("modifyvm " + self.name + " --rtcuseutc on")
         adapter = subutai.GetVBoxHostOnlyInterface()
+        adapter = adapter.replace(' ', '+++')
         if adapter != 'undefined':
             subutai.VBox("modifyvm " + self.name + " --nic3 hostonly --hostonlyadapter3 " + adapter)
         
@@ -333,7 +338,6 @@ class SubutaiPeer:
 
     def StartVirtualMachine(self):
         subutai.SetAction("STARTVM")
-        subutai.log("info", "Starting virtual machine")
         rc = 0
         if subutai.CheckVMRunning(self.name) != 0:
             rc = subutai.VBoxS("startvm --type headless " + self.name)
@@ -355,7 +359,6 @@ class SubutaiPeer:
 
     def WaitSSH(self):
         subutai.SetAction("WAITSSH")
-        subutai.log("info", "Waiting for machine to bring SSH")
         attempts = 0
         while subutai.TestSSH() != 0:
             sleep(1)
@@ -391,6 +394,8 @@ class SubutaiPeer:
         subutai.SetAction("GETIP")
         self.PeerIP = subutai.GetPeerIP()
         self.LocalIP = '127.0.0.1'
+        # Fixing peer ip
+        self.PeerIP = self.LocalIP
 
         if self.PeerIP == "":
             subutai.RaiseError("Failed to determine peer IP address")
@@ -497,7 +502,7 @@ class SubutaiPeer:
         subutai.SSHStopSession("mng-setup2")
         return 0
 
-    def installManagement(self):
+    def InstallManagement(self):
         subutai.SetAction("INSTMNG")
         td = "/var/snap/subutai-dev/common/lxc/tmpdir/"
         awk = " | awk '{print $5}'"
@@ -565,6 +570,8 @@ class PostInstall:
         if os.path.exists(tmp+self.filename):
             os.remove(tmp+self.filename)
         self.append("#!/bin/bash\n\n")
+        st = os.stat(self.tmpdir+self.filename)
+        os.chmod(self.tmpdir+self.filename, st.st_mode | stat.S_IEXEC)
 
     def append(self, line):
         f = open(self.tmpdir+self.filename, 'a')

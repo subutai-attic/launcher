@@ -11,7 +11,7 @@ from time import sleep
 
 def subutaistart():
     coreFile = "core.ova"
-    vboxFile = "VirtualBox.pkg"
+    vboxFile = subup.GetVirtualBoxName()
     ubuntuFile = "ubuntu16-subutai-template_4.0.0_amd64.tar.gz"
     openjreFile = "openjre16-subutai-template_4.0.0_amd64.tar.gz"
     mngFile = "management"
@@ -49,8 +49,7 @@ def subutaistart():
         return 26
 
     peer.PreconfigureNetwork()
-
-    rc = peer.StartVirtualMachine()
+    peer.StartVirtualMachine()
 
     subutai.AddStatus("Waiting for peer to start and initialize")
     sleep(40)
@@ -72,7 +71,7 @@ def subutaistart():
         return rc
 
     peer.SetupSSH()
-    rc = peer.waitForNetwork()
+    rc = peer.WaitForNetwork()
     if rc != 0:
         sleep(10)
         return rc
@@ -87,10 +86,10 @@ def subutaistart():
     peer.RetrievePeerIP()
     progress.unspin()
     peer.InstallUbuntu()
-    peer.installOpenJRE()
-    peer.installManagement()
+    peer.InstallOpenJRE()
+    peer.InstallManagement()
     peer.WaitPeerResponse()
-    peer.StopVirtlaMachine()
+    peer.StopVirtualMachine()
     sleep(3)
     peer.ConfigureNetwork()
     sleep(2)

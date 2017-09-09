@@ -12,7 +12,7 @@ from subprocess import Popen, PIPE
 
 
 # This file provides functions and classes specific to
-# Darwin platform
+# Windows platform
 
 
 def GetVirtualMachineName():
@@ -23,11 +23,15 @@ def GetVirtualMachineName():
 
 def CleanSSHKeys(host, port):
     try:
-        call(['ssh-keygen', '-R', '['+host+']:'+port])
+        call([subutai.GetInstallDir()+'bin/ssh-keygen.exe', '-R', '['+host+']:'+port])
     except:
         subutai.RaiseError("Failed to clean SSH keys")
         return 78
     return 0
+
+
+def GetVirtualBoxName():
+    return 'VirtualBox.exe'
 
 
 def CheckVirtualBox():
@@ -217,6 +221,9 @@ class Tray:
         f.write("Ssh_Path="+unPath+"/bin/ssh.exe\n")
         f.write("Ssh_Keygen_Cmd="+unPath+"/bin/ssh-keygen.exe\n")
         f.close()
+
+        subutai.CreateDesktopShortcut(self.install+"/tray/SubutaiTray.exe", "Subutai Tray")
+
 
         return 0
 
