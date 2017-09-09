@@ -217,7 +217,8 @@ void launcherTerminate()
 {
 	Poco::Logger::get("subutai").fatal("Unhandled exception");
 	//std::printf("Unhandled exception");
-	std::abort();
+	//std::abort();
+	std::exit(0);
 }
 
 static juce::JUCEApplicationBase* juce_CreateApplication() { return new UIApplication(); }
