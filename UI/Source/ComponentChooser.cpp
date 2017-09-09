@@ -79,7 +79,7 @@ ComponentChooser::ComponentChooser() :
 
         RadioBtnComponentItem{&_peerNo, &_peerYes, 20004, true, &_peerLabel, "Create Subutai Peer",
             &_peerInfo, "Create new virtual machine with Subutai"},
-
+		
         RadioBtnComponentItem{&_rhNo, &_rhYes, 20005, false, &_rhLabel, "Create Subutai RH",
             &_rhInfo, "Create new virtual machine with RH only"},
     };
@@ -213,6 +213,9 @@ ComponentChooser::ComponentChooser() :
     _cpuPlus->setEnabled(_vtxStatus);
     _memPlus->setEnabled(_vtxStatus);
     _memMinus->setEnabled(_vtxStatus);
+
+	_rhNo->setEnabled(false);
+	_rhYes->setEnabled(false);
 
     _logger->trace("Component Chooser UI Component created");
 }
@@ -376,6 +379,7 @@ void ComponentChooser::btnPeerNo_Clicked()
 
 void ComponentChooser::btnRHYes_Clicked()
 {
+	return;
     _logger->trace("Activating RH");
     _triggered = true;
     //_peerNo->triggerClick();
@@ -395,6 +399,7 @@ void ComponentChooser::btnRHYes_Clicked()
 
 void ComponentChooser::btnRHNo_Clicked()
 {
+	return;
     _logger->trace("Deactivating RH");
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationRH(false);
     if (_triggered) return;

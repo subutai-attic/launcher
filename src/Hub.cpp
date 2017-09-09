@@ -29,14 +29,12 @@ namespace SubutaiLauncher
     void Hub::setLogin(std::string login) 
     {
         _logger->trace("Setting user login: %s", login);
-        login = "m.savochkin@gmail.com";
         _login = login;
     }
 
     void Hub::setPassword(std::string password) 
     {
         _logger->trace("Setting user password");
-        password = "testhubpassword";
         _password = password;
     }
 
@@ -71,7 +69,7 @@ namespace SubutaiLauncher
             try 
             {
                 generateID();
-                _logger->notice("User logged in");
+                _logger->warning("User logged in");
                 Session::instance()->setAction("SYSC");
             }
             catch (SubutaiException& e)
