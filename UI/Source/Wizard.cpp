@@ -109,9 +109,9 @@ Wizard::Wizard() :
 	_peerInstall->setBounds(300, 0, 500, 600);
 	addChildComponent(_peerInstall);
 
-  _rhInstall = new WizardInstall();
-  _rhInstall->setBounds(300, 0, 500, 600);
-  addChildComponent(_rhInstall);
+	_rhInstall = new WizardInstall();
+	_rhInstall->setBounds(300, 0, 500, 600);
+	addChildComponent(_rhInstall);
 
 	_finishPage = new WizardFinish();
 	_finishPage->setBounds(300, 0, 500, 600);
@@ -301,12 +301,13 @@ void Wizard::runInstall()
 		_logger->debug("pSettings.installPeer = %d,  _peerInstalled = %d", pSettings.installPeer, _peerInstalled);
 	}
 
-  if (pSettings.installRh && !_rhInstalled) {
-    _rhInstall->activate();
-    _logger->debug("RH Component has been choosen");
-    _rhInstall->start("RH");
-    _rhInstall->run();
-  }
+	if (pSettings.installRh && !_rhInstalled) {
+		_rhInstall->activate();
+		_logger->debug("RH Component has been choosen");
+		_rhInstall->start("RH");
+		_rhInstall->run();
+		return;
+	}
 
 	_logger->debug("Nothing to install");
 	finish();

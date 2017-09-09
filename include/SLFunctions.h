@@ -1176,6 +1176,7 @@ namespace SubutaiLauncher
             return NULL;
 
         Session::instance()->setAction(std::string(sl_string));
+		Poco::Logger::get("subutai").notice("Switched to next action");
 
         return Py_BuildValue("i", 0);
     }

@@ -33,8 +33,6 @@ namespace SubutaiLauncher {
     static const std::string DEFAULT_TMP;
     Settings();
     ~Settings();
-    void load();
-    void save();
     std::string getInstallationPath() const;
     std::string getTmpPath() const;
     std::string getDefaultTmpPath() const;

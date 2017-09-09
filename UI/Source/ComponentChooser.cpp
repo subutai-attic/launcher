@@ -41,7 +41,7 @@ ComponentChooser::ComponentChooser() :
     if (_vtxStatus)
     {
         SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(true);
-        SubutaiLauncher::Session::instance()->getSettings()->setInstallationRH(true);
+        SubutaiLauncher::Session::instance()->getSettings()->setInstallationRH(false);
     }
     else
     {
