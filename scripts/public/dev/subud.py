@@ -180,6 +180,7 @@ class P2P:
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
             self.progress.setP2PProgress(subutai.GetBytesDownload())
+            self.progress.updateProgress()
 
         self.progress.setP2PProgress(self.progress.getP2PSize())
         self.progress.updateProgress()
