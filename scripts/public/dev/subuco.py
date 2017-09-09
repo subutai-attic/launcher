@@ -247,6 +247,7 @@ class SubutaiPeer:
         return self.name
 
     def WaitForNetwork(self):
+        subutai.SetAction("NETWAIT")
         ping = ('if [ $(timeout 3 ping 8.8.8.8 -c1 2>/dev/null | grep -c "1 received") -ne 1 ]; '
                 'then echo 1; else echo 0; fi')
         subutai.AddStatus("Waiting for network")
@@ -264,6 +265,7 @@ class SubutaiPeer:
         return 0
 
     def SetupVirtualMachine(self):
+        subutai.SetAction("INSTVM")
         rc = 0
         subutai.AddStatus("Installing VM")
         if subutai.CheckVMExists(self.name) != 0:
@@ -292,6 +294,7 @@ class SubutaiPeer:
         return rc
 
     def ConfigureNetwork(self):
+        subutai.SetAction("NETCONF")
         rc = 0
         subutai.AddStatus("Configuring Network")
         gateway = subutai.GetDefaultRoutingInterface()
@@ -317,6 +320,7 @@ class SubutaiPeer:
         return rc
 
     def PreconfigureNetwork(self):
+        subutai.SetAction("NETPCONF")
         subutai.VBox("modifyvm " + self.name + " --nic1 nat")
         subutai.VBox("modifyvm " + self.name + " --cableconnected1 on")
         subutai.VBox("modifyvm " + self.name + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
@@ -328,6 +332,7 @@ class SubutaiPeer:
         return 0
 
     def StartVirtualMachine(self):
+        subutai.SetAction("STARTVM")
         subutai.log("info", "Starting virtual machine")
         rc = 0
         if subutai.CheckVMRunning(self.name) != 0:
@@ -339,6 +344,7 @@ class SubutaiPeer:
         return rc
 
     def StopVirtualMachine(self):
+        subutai.SetAction("STOPVM")
         subutai.SSHRun("sync")
         subutai.log("info", "Stopping Virtual machine")
         rc = 0
@@ -348,6 +354,7 @@ class SubutaiPeer:
         return rc
 
     def WaitSSH(self):
+        subutai.SetAction("WAITSSH")
         subutai.log("info", "Waiting for machine to bring SSH")
         attempts = 0
         while subutai.TestSSH() != 0:
@@ -369,16 +376,19 @@ class SubutaiPeer:
         return 0
 
     def InitBTRFS(self):
+        subutai.SetAction("INITBTRFS")
         subutai.AddStatus("Initializing BTRFS")
         subutai.SSHRun("sudo subutai-dev.btrfsinit /dev/sdb")
         return 0
 
     def SetupAlias(self):
+        subutai.SetAction("SETALIAS")
         subutai.log("info", "Setting Alias")
         subutai.SSHRun("sudo bash -c 'snap alias subutai-dev subutai'")
         return 0
 
     def RetrievePeerIP(self):
+        subutai.SetAction("GETIP")
         self.PeerIP = subutai.GetPeerIP()
         self.LocalIP = '127.0.0.1'
 
@@ -395,6 +405,7 @@ class SubutaiPeer:
         return self.LocalIP
 
     def WaitPeerResponse(self):
+        subutai.SetAction("WAITREST")
         ip = self.LocalIP
         if self.PeerIP != '':
             ip = self.PeerIP
@@ -409,6 +420,7 @@ class SubutaiPeer:
         return 0
 
     def InstallUbuntu(self):
+        subutai.SetAction("INSTUB")
         td = "/var/snap/subutai-dev/common/lxc/tmpdir/"
         awk = " | awk '{print $5}'"
 
@@ -448,6 +460,7 @@ class SubutaiPeer:
         return 0
 
     def InstallOpenJRE(self):
+        subutai.SetAction("INSTJRE")
         td = "/var/snap/subutai-dev/common/lxc/tmpdir/"
         awk = " | awk '{print $5}'"
 
@@ -485,6 +498,7 @@ class SubutaiPeer:
         return 0
 
     def installManagement(self):
+        subutai.SetAction("INSTMNG")
         td = "/var/snap/subutai-dev/common/lxc/tmpdir/"
         awk = " | awk '{print $5}'"
 
@@ -522,6 +536,7 @@ class SubutaiPeer:
         return 0
 
     def InstallSnap(self):
+        subutai.SetAction("INSTSNAP")
         subutai.AddStatus("Installing Subutai. This may take a few minutes")
         subutai.SSHRun("sudo snap install --beta --devmode subutai-dev > /tmp/subutai-snap.log 2>&1")
 
@@ -532,6 +547,7 @@ class SubutaiPeer:
         return 0
 
     def SetupSSH(self):
+        subutai.SetAction("SETUPSSH")
         subutai.log("info", "Setting up SSH")
         subutai.SSHRun("mkdir -p /home/subutai/.ssh")
         subutai.InstallSSHKey()

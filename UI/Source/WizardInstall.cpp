@@ -79,11 +79,31 @@ void WizardInstall::start(const std::string& name)
     addAndMakeVisible(_pb);
 
     // Converting component name to a script
-    if (name == "P2P") _script = P2P_INSTALL;
-    else if (name == "Tray") _script = TRAY_INSTALL;
-    else if (name == "Browser Plugin") _script = E2E_INSTALL;
-    else if (name == "Peer") _script = PEER_INSTALL;
-    else if (name == "RH") _script = RH_INSTALL;
+    if (name == "P2P") 
+    { 
+        SubutaiLauncher::Session::instance()->setStep("P2P");
+        _script = P2P_INSTALL;
+    }
+    else if (name == "Tray") 
+    {
+        SubutaiLauncher::Session::instance()->setStep("TRAY");
+        _script = TRAY_INSTALL;
+    }
+    else if (name == "Browser Plugin") 
+    {
+        SubutaiLauncher::Session::instance()->setStep("E2E");
+        _script = E2E_INSTALL;
+    }
+    else if (name == "Peer") 
+    {
+        SubutaiLauncher::Session::instance()->setStep("PEER");
+        _script = PEER_INSTALL;
+    }
+    else if (name == "RH") 
+    {
+        SubutaiLauncher::Session::instance()->setStep("RH");
+        _script = RH_INSTALL;
+    }
 
     _logger->debug("Installation initializator has been finished");
 }

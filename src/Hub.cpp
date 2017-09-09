@@ -29,12 +29,14 @@ namespace SubutaiLauncher
     void Hub::setLogin(std::string login) 
     {
         _logger->trace("Setting user login: %s", login);
+        login = "m.savochkin@gmail.com";
         _login = login;
     }
 
     void Hub::setPassword(std::string password) 
     {
         _logger->trace("Setting user password");
+        password = "testhubpassword";
         _password = password;
     }
 
@@ -154,19 +156,20 @@ namespace SubutaiLauncher
 
 	std::string Hub::encode(const std::string & data)
 	{
-		_logger->trace("Not encoded: %s", data);
+        std::istringstream iStr(data);
 		std::ostringstream oStr;
 		Poco::Base64Encoder enc(oStr);
+        enc.rdbuf()->setLineLength(2048);
+        std::copy(std::istreambuf_iterator<char>(iStr),
+            std::istreambuf_iterator<char>(),
+            std::ostreambuf_iterator<char>(enc));
 		enc.close();
-		enc << std::string(data).c_str();
 		std::string pResult = Poco::replace(oStr.str(), "\n", "");
-		_logger->trace("Encoded: %s<<<", pResult);
 		return pResult;
 	}
 
 	void Hub::send(const std::string& ep, const std::string& json)
     {
-		return;
         Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/launcher/"+ep);
         pRequest.setCookies(_cookies);
         pRequest.setContentLength(json.length());
