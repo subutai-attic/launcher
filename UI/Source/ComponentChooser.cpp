@@ -355,27 +355,30 @@ void ComponentChooser::btnETENo_Clicked()
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationE2E(false);
 }
 
+
+static volatile bool btnYesNoInProgress = false;
 void ComponentChooser::btnPeerYes_Clicked()
 {
     _logger->trace("btnPeerYes_Clicked");
+    if (btnYesNoInProgress) {
+      _logger->trace("*** in progress ***");
+      return;
+    }
+    btnYesNoInProgress = true;
+    _rhNo->setToggleState(true, sendNotificationSync);
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(true);
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationRH(false);
-
-    _rhNo->removeListener(this);
-    _rhNo->triggerClick();
-    _rhNo->addListener(this);
-
     _peerLabel.setColour(Label::textColourId, Colour(105, 116, 144));
     _cpuLabel.setColour(Label::textColourId, Colour(105, 116, 144));
     _memLabel.setColour(Label::textColourId, Colour(105, 116, 144));
     auxSetPlusMinusComponentsEnabled(true);
+    btnYesNoInProgress = false;
 }
 
 void ComponentChooser::btnPeerNo_Clicked()
 {
     _logger->trace("btnPeerNo_Clicked");
-    SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(false);    
-
+    SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(false);
     _peerLabel.setColour(Label::textColourId, Colours::grey);
     _cpuLabel.setColour(Label::textColourId, Colours::grey);
     _memLabel.setColour(Label::textColourId, Colours::grey);
@@ -385,17 +388,21 @@ void ComponentChooser::btnPeerNo_Clicked()
 void ComponentChooser::btnRHYes_Clicked()
 {
     _logger->trace("btnRHYes_Clicked");
+    if (btnYesNoInProgress) {
+      _logger->trace("*** in progress ***");
+      return;
+    }
+
+    btnYesNoInProgress = true;
+    _peerNo->setToggleState(true, sendNotificationSync);
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationRH(true);
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationPeer(false);
-
-    _peerNo->removeListener(this);
-    _peerNo->triggerClick();
-    _peerNo->addListener(this);
 
     _rhLabel.setColour(Label::textColourId, Colour(105, 116, 144));
     _cpuLabel.setColour(Label::textColourId, Colour(105, 116, 144));
     _memLabel.setColour(Label::textColourId, Colour(105, 116, 144));
     auxSetPlusMinusComponentsEnabled(true);
+    btnYesNoInProgress = false;
 }
 
 void ComponentChooser::btnRHNo_Clicked()
@@ -405,7 +412,6 @@ void ComponentChooser::btnRHNo_Clicked()
     _rhLabel.setColour(Label::textColourId, Colours::grey);
     _cpuLabel.setColour(Label::textColourId, Colours::grey);
     _memLabel.setColour(Label::textColourId, Colours::grey);
-
     auxSetPlusMinusComponentsEnabled(false);
 }
 
