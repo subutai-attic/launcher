@@ -69,7 +69,7 @@ namespace SubutaiLauncher
             try 
             {
                 generateID();
-                _logger->warning("User logged in");
+				sendLog(Poco::Message::Priority::PRIO_NOTICE, "New installation starting");
                 Session::instance()->setAction("SYSC");
             }
             catch (SubutaiException& e)
@@ -136,7 +136,7 @@ namespace SubutaiLauncher
         json.append("\"id\": \""+_id+"\",");
         json.append("\"step\": \""+pStep+"\",");
         json.append("\"act\": \""+pAction+"\",");
-        json.append("\"log\": \""+message+"\",");
+        json.append("\"log\": \""+encode(message)+"\",");
         json.append("\"lvl\": \""+pPrio+"\"");
         json.append("}");
         send("status", json);
@@ -147,13 +147,26 @@ namespace SubutaiLauncher
         std::string json("{");
         json.append("\"id\": \""+_id+"\",");
         json.append("\"key\": \""+key+"\",");
-        json.append("\"value\": \""+value+"\"");
+        json.append("\"value\": \""+encode(value)+"\"");
         json.append("}");
         send("info", json);
     }
 
-    void Hub::send(const std::string& ep, const std::string& json)
+	std::string Hub::encode(const std::string & data)
+	{
+		_logger->trace("Not encoded: %s", data);
+		std::ostringstream oStr;
+		Poco::Base64Encoder enc(oStr);
+		enc.close();
+		enc << std::string(data).c_str();
+		std::string pResult = Poco::replace(oStr.str(), "\n", "");
+		_logger->trace("Encoded: %s<<<", pResult);
+		return pResult;
+	}
+
+	void Hub::send(const std::string& ep, const std::string& json)
     {
+		return;
         Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/launcher/"+ep);
         pRequest.setCookies(_cookies);
         pRequest.setContentLength(json.length());

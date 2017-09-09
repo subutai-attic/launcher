@@ -39,6 +39,7 @@ namespace SubutaiLauncher {
 		long exitCode();
 		bool running();
 	private:
+		void handleError(const std::string& id);
         int handleTraceback(PyTracebackObject* tb, long limit);
         int tracebackLine(PyObject *filename, int lineno, PyObject *name);
 		bool _running;
