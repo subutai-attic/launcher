@@ -37,6 +37,12 @@ class WizardFinish :
 		juce::Label _eteResult;
 		juce::Label _peerResult;
         juce::HyperlinkButton _peerLink;
+        
+        juce::ImageComponent _crashBot;
+        juce::Label _crashWarning;
+        juce::Label _crashText;
+        juce::Label _installId;
+
         LauncherButton _finish;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WizardFinish)
 };

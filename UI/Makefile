@@ -50,6 +50,7 @@ OBJS = $(BUILD_DIR)/BannerComponent.o \
 	   $(BUILD_DIR)/WizardIntro.o \
 	   $(BUILD_DIR)/LauncherButton.o \
 	   $(BUILD_DIR)/Splash.o \
+	   $(BUILD_DIR)/Crash.o \
 	   $(BUILD_DIR)/WizardWindow.o
 
 $(BUILD_DIR)/BannerComponent.o: $(SRC_DIR)/BannerComponent.cpp $(SRC_DIR)/BannerComponent.h
@@ -125,6 +126,9 @@ $(BUILD_DIR)/LauncherButton.o: $(SRC_DIR)/LauncherButton.cpp $(SRC_DIR)/Launcher
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/Splash.o: $(SRC_DIR)/Splash.cpp $(SRC_DIR)/Splash.h
+	$(CC) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/Crash.o: $(SRC_DIR)/Crash.cpp $(SRC_DIR)/Crash.h
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/WizardWindow.o: $(SRC_DIR)/WizardWindow.cpp $(SRC_DIR)/WizardWindow.h

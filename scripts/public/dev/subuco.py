@@ -558,6 +558,19 @@ class SubutaiPeer:
         subutai.InstallSSHKey()
         return 0
 
+    def EnableHostonlyif():
+        adapterName = subutai.GetVBoxHostOnlyInterface()
+        if adapterName == 'undefined':
+            adapterNAme = adapterName.replace(' ', '+++')
+            subutai.VBox("hostonlyif create")
+            adapterName = subutai.GetVBoxHostOnlyInterface()
+            subutai.VBox("hostonlyif ipconfig " + adapterName + " --ip 192.168.56.1")
+            out = subutai.VBox("list dhcpservers")
+            if out == '':
+                subutai.VBox("dhcpserver add --ifname " + adapterName + " --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
+                subutai.VBox("dhcpserver modify --ifname " + adapterName + " --enable")
+        return 0
+
 
 class PostInstall:
     filename = ''

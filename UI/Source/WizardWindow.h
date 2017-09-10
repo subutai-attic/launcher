@@ -3,6 +3,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Wizard.h"
+#include "Crash.h"
 #include "Poco/Logger.h"
 
 #if LIGHT_MODE
@@ -16,6 +17,7 @@ class WizardWindow : public juce::DialogWindow
         ~WizardWindow();
         void closeButtonPressed();
         bool escapeKeyPressed();
+        void crash();
     private:
         Poco::Logger* _logger;
         Wizard* _wizard;

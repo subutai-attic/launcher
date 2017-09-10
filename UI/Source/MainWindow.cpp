@@ -34,3 +34,9 @@ void MainWindow::closeButtonPressed()
     juce::JUCEApplication::getInstance()->systemRequestedQuit();
     _logger->trace("System Quit Requested");
 }
+
+void MainWindow::crash()
+{
+    Crash* crash = new Crash();
+    setContentOwned(crash, true);
+}

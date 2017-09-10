@@ -43,6 +43,8 @@ def subutaistart():
                               openjreFile,
                               mngFile)
 
+    peer.EnableHostonlyif()
+
     if peer.SetupVirtualMachine() != 0:
         sleep(10)
         subutai.Shutdown()

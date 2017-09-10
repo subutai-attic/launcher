@@ -147,6 +147,19 @@ void UIApplication::anotherInstanceStarted(const juce::String& commandLine)
 
 }
 
+void UIApplication::unhandledException(const std::exception* e, const juce::String& sourceFilename, int lineNumber)
+{
+    std::printf("111111111111111111111111\n");
+    /*
+#if LIGHT_MODE
+        _wizardWindow->crash();
+#else
+        _mainWindow->crash();
+#endif
+*/
+
+}
+
 void UIApplication::startMainWindow()
 {    
     std::string pTitle = "SubutaiLauncher ";
@@ -156,11 +169,22 @@ void UIApplication::startMainWindow()
 #endif
 
     _splashScreen->deleteAfterDelay(juce::RelativeTime::seconds(1), false);
+    try 
+    {
 #if LIGHT_MODE
     _wizardWindow = new WizardWindow(pTitle);
 #else
     _mainWindow = new MainWindow(pTitle);
 #endif
+    } 
+    catch (std::exception& e)
+    {
+#if LIGHT_MODE
+        _wizardWindow->crash();
+#else
+        _mainWindow->crash();
+#endif
+    }
 }
 
 volatile bool initializationFinished = false;
@@ -229,8 +253,21 @@ int main(int argc, char* argv[])
 #endif
 {
 	std::set_terminate(launcherTerminate);
-	juce::JUCEApplicationBase::createInstance = &juce_CreateApplication;
-	return juce::JUCEApplicationBase::main(JUCE_MAIN_FUNCTION_ARGS);
+    /*try
+    {*/
+	    juce::JUCEApplicationBase::createInstance = &juce_CreateApplication;
+	    return juce::JUCEApplicationBase::main(JUCE_MAIN_FUNCTION_ARGS);
+    /*
+    } 
+    catch (Poco::Exception& e)
+    {
+        std::printf("%s\n", e.displayText().c_str());
+    }
+    catch (std::exception& e)
+    {
+        std::printf("1234\n");
+    }
+    */
 }
 
 //START_JUCE_APPLICATION (UIApplication)

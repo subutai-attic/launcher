@@ -227,4 +227,9 @@ namespace SubutaiLauncher
         return _messages;
     }
 
+    const std::string& Hub::getId() const
+    {
+        return _id;
+    }
+
 }

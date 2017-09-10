@@ -84,7 +84,7 @@ def InstallVirtualBox(tmp, install, progress):
     except:
         subutai.RaiseError("Failed to install VirtualBox. Aborting")
         return 45
-    if CheckVirtualBox() != 0:
+    if not CheckVirtualBox():
         subutai.AddStatus("Failed to install VirtualBox. Aborting")
         return 24
 

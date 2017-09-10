@@ -134,6 +134,7 @@ void LoginScreen::resized()
 
 void LoginScreen::buttonClicked(juce::Button* button) 
 {
+    //throw Poco::SystemException("!!!!!!!!!!!!!!!!!!!!!");
     if (button == &_button) 
     {
         _button.setEnabled(false);

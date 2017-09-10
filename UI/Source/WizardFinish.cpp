@@ -81,6 +81,45 @@ WizardFinish::WizardFinish() :
     _peerLink.setBounds(-1, -1, 1, 1);
     _peerLink.setURL(URL("https://localhost:9999"));
     addAndMakeVisible(_peerLink);
+    
+    std::string pCrashBot(SubutaiLauncher::Session::instance()->getSettings()->getTmpPath() + "launcher-robot.png");
+    Poco::File pLogo(pCrashBot);
+    if (pLogo.exists())
+    {
+        _crashBot.setImage(juce::ImageCache::getFromFile(juce::File(pCrashBot)));
+    }
+    else
+    {
+        _logger->error("launcher-robot.png doesn't exists");
+    }
+    addChildComponent(_crashBot);
+    // 256x167
+    _crashBot.setBounds(122, 200, 256, 167);
+    _crashBot.setVisible(true);
+
+    auto font2 = juce::Font("Encode Sans", 21, 1);
+	_crashWarning.setText("Something went wrong!", juce::dontSendNotification);
+	_crashWarning.setColour(juce::Label::textColourId, juce::Colour(105, 116, 144));
+	_crashWarning.setBounds(0, 380, 500, 40);
+	_crashWarning.setFont(font2);
+	_crashWarning.setJustificationType(juce::Justification::centred);
+	addAndMakeVisible(_crashWarning);
+    
+	_crashText.setText("Use the code below if you're going to contact us about these problems", juce::dontSendNotification);
+	_crashText.setColour(juce::Label::textColourId, juce::Colour(105, 116, 144));
+	_crashText.setBounds(0, 420, 500, 40);
+	_crashText.setFont(font);
+	_crashText.setJustificationType(juce::Justification::centred);
+	addAndMakeVisible(_crashText);
+
+    auto font3 = juce::Font("Encode Sans", 24, 1);
+	_installId.setText("", juce::dontSendNotification);
+	_installId.setColour(juce::Label::textColourId, juce::Colours::black);
+	_installId.setBounds(0, 460, 500, 40);
+	_installId.setFont(font3);
+	_installId.setJustificationType(juce::Justification::centred);
+	addAndMakeVisible(_installId);
+
 }
 
 WizardFinish::~WizardFinish()
@@ -128,6 +167,7 @@ void WizardFinish::addPTPResult(bool installed, bool succeed)
 	{
 		_ptpResult.setText("Failed", juce::dontSendNotification);
 	}
+    _installId.setText(SubutaiLauncher::Session::instance()->getHub()->getId(), juce::dontSendNotification);
 }
 
 void WizardFinish::addTrayResult(bool installed, bool succeed)
@@ -145,6 +185,7 @@ void WizardFinish::addTrayResult(bool installed, bool succeed)
 	{
 		_trayResult.setText("Failed", juce::dontSendNotification);
 	}
+    _installId.setText(SubutaiLauncher::Session::instance()->getHub()->getId(), juce::dontSendNotification);
 }
 
 void WizardFinish::addETEResult(bool installed, bool succeed)
@@ -162,6 +203,7 @@ void WizardFinish::addETEResult(bool installed, bool succeed)
 	{
 		_eteResult.setText("Failed", juce::dontSendNotification);
 	}
+    _installId.setText(SubutaiLauncher::Session::instance()->getHub()->getId(), juce::dontSendNotification);
 }
 
 void WizardFinish::addPeerResult(bool installed, bool succeed)
@@ -180,6 +222,7 @@ void WizardFinish::addPeerResult(bool installed, bool succeed)
 	{
 		_peerResult.setText("Failed", juce::dontSendNotification);
 	}
+    _installId.setText(SubutaiLauncher::Session::instance()->getHub()->getId(), juce::dontSendNotification);
 }
 
 void WizardFinish::finalize()
