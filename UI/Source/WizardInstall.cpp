@@ -146,7 +146,15 @@ void WizardInstall::executeScriptImpl()
     }
     catch (SubutaiLauncher::SLException& e)
     {
-
+        _logger->critical("Script execution failed: %s", e.displayText());
+    }
+    catch (Poco::Exception& e)
+    {
+        _logger->critical("Script execution failed: %s", e.displayText());
+    }
+    catch (std::exception& e)
+    {
+        _logger->critical("Script execution failed due to unknown error");
     }
     _scriptExitCode = sl.exitCode();
 }
@@ -161,20 +169,40 @@ void WizardInstall::runImpl()
 
     auto script = _script;
     script.append(".py");
-    downloader->reset();
-    downloader->setFilename(script);
-    if (!downloader->retrieveFileInfo())
+    try 
     {
-        _logger->critical("Failed to download %s installation script", script);
-        addLine("Failed to download installation script", true);
+        downloader->reset();
+        downloader->setFilename(script);
+        if (!downloader->retrieveFileInfo())
+        {
+            _logger->critical("Failed to download %s installation script", script);
+            addLine("Failed to download installation script", true);
+        }
+        else
+        {
+            _logger->information("Downloaded %s installation script", script);
+            addLine("Installation script downloaded");
+        }
+        downloader->downloadImpl();
     }
-    else
+    catch (Poco::Exception& e)
     {
-        _logger->information("Downloaded %s installation script", script);
-        addLine("Installation script downloaded");
+        _logger->critical("Failed to download installation script: %s", e.displayText());
+        _running = false;
+        auto parent = (Wizard*)getParentComponent();
+        parent->stepCompleted(_name);
+        _logger->trace("Parent notified");
+        return;
     }
-    std::thread pDownloadThread = downloader->download();
-    pDownloadThread.join();
+    catch (std::exception& e)
+    {
+        _logger->critical("Failed to download installation script: Unknown error");
+        _running = false;
+        auto parent = (Wizard*)getParentComponent();
+        parent->stepCompleted(_name);
+        _logger->trace("Parent notified");
+        return;
+    }
 
     std::thread pScriptThread = executeScript();
     auto nc = SubutaiLauncher::Session::instance()->getNotificationCenter();

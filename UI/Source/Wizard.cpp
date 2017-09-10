@@ -14,19 +14,7 @@ Wizard::Wizard() :
 {
 	_logger = &Poco::Logger::get("subutai");
 	SubutaiLauncher::Session::instance()->start();
-#if LAUNCHER_LINUX
-	SubutaiLauncher::RootProcess* rp = new SubutaiLauncher::RootProcess();
-	rp->addCommand("mkdir -p /opt/subutai");
-	rp->addCommand("mkdir -p /opt/subutai/bin");
-	rp->addCommand("mkdir -p /opt/subutai/etc");
-	rp->addCommand("mkdir -p /opt/subutai/resources");
-	std::string chown("chown -R ");
-	chown.append(Poco::Environment::get("USER"));
-	chown.append(" /opt/subutai");
-	rp->addCommand(chown);
-	rp->execute("Creating installation directories requires root privileges");
-	delete rp;
-#elif LAUNCHER_MACOS
+#if LAUNCHER_MACOS
 	Poco::File bin("/usr/local/share/subutai/bin");
 	bin.createDirectories();
 	bin = Poco::File("/usr/local/share/subutai/etc");

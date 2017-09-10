@@ -43,7 +43,7 @@ def subutaistart():
                               openjreFile,
                               mngFile)
 
-    peer.EnableHostonlyif()
+    peer.EnableHostonlyInterface()
 
     if peer.SetupVirtualMachine() != 0:
         sleep(10)

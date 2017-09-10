@@ -558,7 +558,7 @@ class SubutaiPeer:
         subutai.InstallSSHKey()
         return 0
 
-    def EnableHostonlyif():
+    def EnableHostonlyInterface(self):
         adapterName = subutai.GetVBoxHostOnlyInterface()
         if adapterName == 'undefined':
             adapterNAme = adapterName.replace(' ', '+++')

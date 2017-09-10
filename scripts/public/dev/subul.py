@@ -123,22 +123,19 @@ class P2P:
 
         self.progress.setP2PProgress(self.progress.getP2PSize())
         self.progress.updateProgress()
-
-        try:
-            st = os.stat(self.install+"/bin/"+self.P2PFile)
-            os.chmod(self.install+"/bin/"+self.P2PFile, st.st_mode | stat.S_IEXEC)
-        except:
-            subutai.RaiseError("Failed to make p2p binary executable")
-            return 31
-
         return rc
 
     def PostInstall(self):
         self.__writeConfiguration()
         postinst = subuco.PostInstall(self.tmp)
+        postinst.append('mkdir -p /opt/subutai/bin')
+        postinst.append('mkdir -p /opt/subutai/etc')
+        postinst.append('mkdir -p /opt/subutai/resources')
+        postinst.append('chown -R '+os.environ['USER']+':'+os.environ['USER']+' /opt/subutai')
         postinst.append('systemctl stop p2p.service')
         postinst.append('systemctl disable p2p.service')
         postinst.append('cp '+self.tmp+self.RemoteP2PFile+' '+self.install+self.P2PFile)
+        postinst.append('chmod +x '+self.install+self.P2PFile)
         postinst.append('cp '+self.tmp+self.Daemon+' /etc/systemd/system/'+self.Daemon)
         postinst.append('systemctl enable '+self.Daemon)
         postinst.append('systemctl start'+self.Daemon)
@@ -208,6 +205,10 @@ class Tray:
 
         self.__writeDesktopFile()
         postinst = subuco.PostInstall(self.tmp)
+        postinst.append('mkdir -p /opt/subutai/bin')
+        postinst.append('mkdir -p /opt/subutai/etc')
+        postinst.append('mkdir -p /opt/subutai/resources')
+        postinst.append('chown -R '+os.environ['USER']+':'+os.environ['USER']+' /opt/subutai')
         postinst.append('ln -s '+self.install+'bin/SubutaiTray /usr/local/bin/SubutaiTray')
         postinst.append('desktop-file-install '+self.tmp+'SubutaiTray.desktop')
         try:
@@ -268,14 +269,14 @@ class E2E:
 
     def Install(self):
         subutai.SetAction("INST")
-        pass
+        return 0
 
     def PostInstall(self):
         subutai.SetAction("POSINST")
         location = '/opt/google/chrome/extensions/'
         postinst = subuco.PostInstall(self.tmp)
         postinst.append('dpkg -i '+self.tmp+self.GoogleChromeFile)
-        postinst.append('apt-get install -f')
+        postinst.append('apt-get install -f -y')
         if not os.path.exists(location):
             postinst.append('mkdir -p '+location)
         postinst.append('cp '+self.tmp+self.Plugin+' '+location)
