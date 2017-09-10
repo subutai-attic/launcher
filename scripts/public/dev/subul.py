@@ -52,7 +52,7 @@ def CheckAndKillVirtualBox():
     if (count > 1):
         p = Popen(['killall', '-9', substr], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
         stdout, stderr = p.communicate('')
-    
+
     return 0
 
 
@@ -115,7 +115,6 @@ class P2P:
     def Download(self):
         rc = 0
         subutai.AddStatus("Downloading")
-        
         subutai.download(self.RemoteP2PFile)
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
@@ -124,12 +123,6 @@ class P2P:
 
         self.progress.setP2PProgress(self.progress.getP2PSize())
         self.progress.updateProgress()
-        try:
-            copyfile(self.tmp+self.RemoteP2PFile, self.install+"bin/"+self.P2PFile)
-        except:
-            subutai.RaiseError("Failed to move p2p binary to " +
-                            self.install + "bin/"+self.P2PFile)
-            return 19
 
         try:
             st = os.stat(self.install+"/bin/"+self.P2PFile)
@@ -143,11 +136,14 @@ class P2P:
     def PostInstall(self):
         self.__writeConfiguration()
         postinst = subuco.PostInstall(self.tmp)
+        postinst.append('systemctl stop p2p.service')
+        postinst.append('systemctl disable p2p.service')
+        postinst.append('cp '+self.tmp+self.RemoteP2PFile+' '+self.install+self.P2PFile)
         postinst.append('cp '+self.tmp+self.Daemon+' /etc/systemd/system/'+self.Daemon)
+        postinst.append('systemctl enable '+self.Daemon)
+        postinst.append('systemctl start'+self.Daemon)
         p = Popen(['/usr/bin/gksudo', '--message', 'Finalize P2P Installation', postinst.get()], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
         stdout, stderr = p.communicate('')
-        if p.returncode != 0:
-            return 91
         return 0
 
     def __writeConfiguration(self):
@@ -183,7 +179,7 @@ class Tray:
 
     def GetTrayFile(self):
         return self.TrayFile
-        
+
     def Download(self):
         rc = 0
         subutai.download(self.TrayFile)
@@ -214,12 +210,6 @@ class Tray:
         postinst = subuco.PostInstall(self.tmp)
         postinst.append('ln -s '+self.install+'bin/SubutaiTray /usr/local/bin/SubutaiTray')
         postinst.append('desktop-file-install '+self.tmp+'SubutaiTray.desktop')
-        ins = 'do shell script "/bin/sh '+postinst.get()+'" with administrator privileges'
-        p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-        stdout, stderr = p.communicate(ins)
-        if p.returncode != 0:
-            return 91
-
         try:
             p = Popen(['/usr/bin/gksudo', '--message', 'Finalize Tray Installation', postinst.get()], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
             stdout, stderr = p.communicate('')
@@ -242,7 +232,7 @@ Icon=/usr/share/icons/launcher-logo.png
 Categories=GNOME;Network;
 StartupNotify=true
         '''.strip()
-        f = open(self+"SubutaiTray.desktop", 'w')
+        f = open(self.tmp+"SubutaiTray.desktop", 'w')
         f.write(desktop)
         f.close()
 
@@ -255,13 +245,14 @@ class E2E:
         self.progress = subuco.Progress()
 
     def PreInstall(self):
+        subutai.SetAction("PREINST")
         self.progress.setChrome(self.GoogleChromeFile)
         self.progress.calculateTotal()
         return 0
 
     def Download(self):
         rc = 0
-
+        subutai.SetAction("DWL")
         if not self.__checkGoogleChrome():
             subutai.AddStatus("Downloading Google Chrome")
             subutai.download(self.GoogleChromeFile)
@@ -272,13 +263,15 @@ class E2E:
 
             self.progress.setChromeProgress(self.progress.getChromeSize())
             self.progress.updateProgress()
-        
+
         return rc
 
     def Install(self):
+        subutai.SetAction("INST")
         pass
 
     def PostInstall(self):
+        subutai.SetAction("POSINST")
         location = '/opt/google/chrome/extensions/'
         postinst = subuco.PostInstall(self.tmp)
         postinst.append('dpkg -i '+self.tmp+self.GoogleChromeFile)

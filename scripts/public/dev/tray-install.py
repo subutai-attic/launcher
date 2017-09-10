@@ -7,8 +7,6 @@ elif subutai.GetOS() == 'l':
 elif subutai.GetOS() == 'd':
     import subud as subup
 
-
-
 def subutaistart():
     tmpDir = subutai.GetTmpDir()
     installDir = subutai.GetInstallDir()
