@@ -27,7 +27,6 @@ def subutaistart():
     installDir = subutai.GetInstallDir()
     rc = subup.InstallPeerPrerequisites(tmpDir, installDir, progress)
     if rc != 0:
-        subutai.RaiseError("Failed to install prerequisites")
         sleep(10)
         subutai.Shutdown()
         return 29

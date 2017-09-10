@@ -8,7 +8,7 @@ import tarfile
 from shutil import copyfile
 from subprocess import call
 from time import sleep
-from subprocess import Popen, PIPE
+from subprocess import run, Popen, PIPE
 
 
 # This file provides functions and classes specific to
@@ -77,15 +77,26 @@ def InstallVirtualBox(tmp, install, progress):
 
     progress.setVboxProgress(progress.getVboxSize())
     progress.updateProgress()
-    subutai.AddStatus("Installing VirtualBox")
     try:
         subutai.AddStatus("Installing VirtualBox")
-        subutai.InstallVBox(tmp+GetVirtualBoxName())
+        postinst = subuco.PostInstall(tmp)
+        postinst.append('dpkg -i '+tmp+GetVirtualBoxName())
+        postinst.append('modprobe vboxdrv >> /tmp/subutai/vbox.log 2>&1')                                                                                                                             
+        postinst.append('modprobe vboxnetflt >> /tmp/subutai/vbox.log 2>&1')
+        postinst.append('modprobe vboxnetadp >> /tmp/subutai/vbox.log 2>&1')
+        postinst.append('modprobe vboxpci >> /tmp/subutai/vbox.log 2>&1')
+        postinst.append("apt-get install -f -y")
+        postinst.append('cat /tmp/subutai/vbox.log')
+        p = run(['/usr/bin/gksudo', '--message', 'Install VirtualBox', postinst.get()], stdout=PIPE, stderr=PIPE, encoding="utf-8")
+        if p.stdout != '':
+            subutai.Information(p.stdout)
+        if p.stderr != '':
+            subutai.Error(p.stderr)
     except:
         subutai.RaiseError("Failed to install VirtualBox. Aborting")
         return 45
     if not CheckVirtualBox():
-        subutai.AddStatus("Failed to install VirtualBox. Aborting")
+        subutai.RaiseError("Failed to install VirtualBox. Aborting")
         return 24
 
     return 0

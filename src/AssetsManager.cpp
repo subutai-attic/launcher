@@ -32,8 +32,9 @@ namespace SubutaiLauncher
             "launcher-templates-inactive.png",
             "launcher-community-active.png",
             "launcher-community-inactive.png",
-#endif
             "launcher-robot.png"
+#endif
+            "crashbot.png"
             });
 
     AssetsManager::AssetsManager()

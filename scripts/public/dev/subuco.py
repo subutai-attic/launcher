@@ -306,20 +306,6 @@ class SubutaiPeer:
         subutai.VBox("modifyvm " + self.name + " --nic2 nat")
         subutai.VBox("modifyvm " + self.name + " --cableconnected2 on")
         subutai.VBox("modifyvm " + self.name + ' --natpf2 ssh-fwd,tcp,,4567,,22 --natpf2 https-fwd,tcp,,9999,,8443')
-
-        adapter = subutai.GetVBoxHostOnlyInterface()
-        adapter = adapter.replace(' ', '+++')
-        ret = subutai.VBoxS("hostonlyif ipconfig " + adapter + " --ip 192.168.56.1")
-
-        if ret == 1:
-            subutai.VBox("hostonlyif create")
-            subutai.VBox("hostonlyif ipconfig " + adapter + " --ip 192.168.56.1")
-            subutai.VBox("dhcpserver add --ifname " +
-                         adapter +
-                         " --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
-            subutai.VBox("dhcpserver modify --ifname " + adapter + " --enable")
-
-        subutai.VBox("modifyvm " + self.name + " --nic3 hostonly --hostonlyadapter3 " + adapter)
         return rc
 
     def PreconfigureNetwork(self):
@@ -329,11 +315,28 @@ class SubutaiPeer:
         subutai.VBox("modifyvm " + self.name + " --cableconnected1 on")
         subutai.VBox("modifyvm " + self.name + " --natpf1 ssh-fwd,tcp,,4567,,22 --natpf1 https-fwd,tcp,,9999,,8443")
         subutai.VBox("modifyvm " + self.name + " --rtcuseutc on")
-        adapter = subutai.GetVBoxHostOnlyInterface()
-        adapter = adapter.replace(' ', '+++')
+        adapterName = subutai.GetVBoxHostOnlyInterface()
+        adapter = adapterName.replace(' ', '+++')
         if adapter != 'undefined':
+            subutai.Information("Enabling host-only adapter " + adapterName)
             subutai.VBox("modifyvm " + self.name + " --nic3 hostonly --hostonlyadapter3 " + adapter)
         
+        return 0
+
+    def EnableHostonlyInterface(self):
+        subutai.Information("Enabling host-only interface")
+        adapterName = subutai.GetVBoxHostOnlyInterface()
+        if adapterName == 'undefined':
+            subutai.Information("Setting up host-only interface " + adapterName)
+            adapter = adapterName.replace(' ', '+++')
+            subutai.VBox("hostonlyif create")
+            adapter = subutai.GetVBoxHostOnlyInterface()
+            subutai.VBox("hostonlyif ipconfig " + adapter + " --ip 192.168.56.1")
+            out = subutai.VBox("list dhcpservers")
+            if out == '':
+                subutai.Information("Configuring DHCP server on " + adapterName)
+                subutai.VBox("dhcpserver add --ifname " + adapter + " --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
+                subutai.VBox("dhcpserver modify --ifname " + adapter + " --enable")
         return 0
 
     def StartVirtualMachine(self):
@@ -543,32 +546,24 @@ class SubutaiPeer:
     def InstallSnap(self):
         subutai.SetAction("INSTSNAP")
         subutai.AddStatus("Installing Subutai. This may take a few minutes")
-        subutai.SSHRun("sudo snap install --beta --devmode subutai-dev > /tmp/subutai-snap.log 2>&1")
+        command = 'sudo snap install --beta --devmode subutai-dev > /tmp/subutai-snap.log 2>&1'
+        attempts = 0
+        while attempts < 10:
+            subutai.SSHRun("sudo snap install --beta --devmode subutai-dev > /tmp/subutai-snap.log 2>&1")
 
-        out = subutai.SSHRunOut("which subutai-dev >/dev/null; echo $?")
-        if out != '0':
-            return 55
+            out = subutai.SSHRunOut("which subutai-dev >/dev/null; echo $?")
+            if out == '0':
+                return 0
+            sleep(30)
+            attempts = attempts + 1
 
-        return 0
+        return 55
 
     def SetupSSH(self):
         subutai.SetAction("SETUPSSH")
         subutai.log("info", "Setting up SSH")
         subutai.SSHRun("mkdir -p /home/subutai/.ssh")
         subutai.InstallSSHKey()
-        return 0
-
-    def EnableHostonlyInterface(self):
-        adapterName = subutai.GetVBoxHostOnlyInterface()
-        if adapterName == 'undefined':
-            adapterNAme = adapterName.replace(' ', '+++')
-            subutai.VBox("hostonlyif create")
-            adapterName = subutai.GetVBoxHostOnlyInterface()
-            subutai.VBox("hostonlyif ipconfig " + adapterName + " --ip 192.168.56.1")
-            out = subutai.VBox("list dhcpservers")
-            if out == '':
-                subutai.VBox("dhcpserver add --ifname " + adapterName + " --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200")
-                subutai.VBox("dhcpserver modify --ifname " + adapterName + " --enable")
         return 0
 
 
@@ -588,7 +583,7 @@ class PostInstall:
 
     def append(self, line):
         f = open(self.tmpdir+self.filename, 'a')
-        f.write(line)
+        f.write(line+"\n")
         f.close()
         
     def get(self):

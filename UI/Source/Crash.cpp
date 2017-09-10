@@ -2,7 +2,7 @@
 
 Crash::Crash()
 {
-    std::string pCrashBot(SubutaiLauncher::Session::instance()->getSettings()->getTmpPath() + "launcher-robot.png");
+    std::string pCrashBot(SubutaiLauncher::Session::instance()->getSettings()->getTmpPath() + "crashbot.png");
     Poco::File pLogo(pCrashBot);
     if (pLogo.exists())
     {

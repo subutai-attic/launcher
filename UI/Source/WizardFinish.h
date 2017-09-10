@@ -21,6 +21,7 @@ class WizardFinish :
 		void addETEResult(bool installed, bool succeed);
 		void addPeerResult(bool installed, bool succeed);
 		void finalize();
+        void activateCrash();
     private:
         Poco::Logger* _logger;
         juce::Label _thanks;

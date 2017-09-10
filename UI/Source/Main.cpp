@@ -74,6 +74,14 @@ void UIApplication::initialise(const juce::String& commandLine)
     {
         std::printf("Couldn't open log file: %s", e.displayText().c_str());
     }
+    catch (Poco::FileAccessDeniedException& e)
+    {
+
+    }
+    catch (Poco::Exception& e)
+    {
+        std::printf("%s", e.displayText().c_str());
+    }
 
     _logger = &Poco::Logger::get("subutai");
     _logger->trace("UI Started with: %s", commandLine.toStdString());
@@ -253,21 +261,19 @@ int main(int argc, char* argv[])
 #endif
 {
 	std::set_terminate(launcherTerminate);
-    /*try
-    {*/
+    try
+    {
 	    juce::JUCEApplicationBase::createInstance = &juce_CreateApplication;
 	    return juce::JUCEApplicationBase::main(JUCE_MAIN_FUNCTION_ARGS);
-    /*
     } 
     catch (Poco::Exception& e)
     {
-        std::printf("%s\n", e.displayText().c_str());
+        std::printf("%s\n", e.name(), e.displayText().c_str());
     }
     catch (std::exception& e)
     {
-        std::printf("1234\n");
+        std::printf("Unknown error has occurred\n");
     }
-    */
 }
 
 //START_JUCE_APPLICATION (UIApplication)
