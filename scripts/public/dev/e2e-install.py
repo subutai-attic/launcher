@@ -38,5 +38,4 @@ def subutaistart():
         return rc
 
     subutai.Shutdown()
-
     return 0

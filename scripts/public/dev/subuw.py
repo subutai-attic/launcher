@@ -42,15 +42,17 @@ def CheckVirtualBox():
 
 def InstallVirtualBox(tmp, install, progress):
     subutai.AddStatus("Downloading VirtualBox")
-    vboxfile = "VirtualBox.exe"
-    subutai.download(vboxfile)
+    subutai.download(GetVirtualBoxName())
     while subutai.isDownloadComplete() != 1:
+        sleep(0.05)
         progress.setVboxProgress(subutai.GetBytesDownload())
         progress.updateProgress()
 
+    progress.setVboxProgress(progress.getVboxSize())
+    progress.updateProgress()
     subutai.AddStatus("Installing VirtualBox")
     try:
-        call([tmp+vboxfile, '-silent'])
+        call([tmp+GetVirtualBoxName(), '-silent'])
     except:
         subutai.RaiseError("Failed to install VirtualBox. Aborting")
         return 45
