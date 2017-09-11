@@ -232,7 +232,6 @@ namespace SubutaiLauncher
         std::string path;
         try
         {
-            //_downloadStream = std::unique_ptr<std::istream>(Poco::URIStreamOpener::defaultOpener().open(uri));
             std::unique_ptr<std::istream> pStr(Poco::URIStreamOpener::defaultOpener().open(uri));
             path.append(_outputDir);
             path.append(PATH_DELIM);
@@ -294,10 +293,6 @@ namespace SubutaiLauncher
     {
         if (_outStream) 
         {
-            if (Session::instance()->isTerminating())
-            {
-                //_downloadStream.close();
-            }
             _bytes = (long)_outStream->chars();
             _percent = (100 * _bytes) / _file.size;
         }

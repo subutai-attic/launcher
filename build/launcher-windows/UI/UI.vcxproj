@@ -177,6 +177,7 @@
     <ClCompile Include="..\..\..\UI\Source\BannerComponent.cpp" />
     <ClCompile Include="..\..\..\UI\Source\CommunityComponent.cpp" />
     <ClCompile Include="..\..\..\UI\Source\ComponentChooser.cpp" />
+    <ClCompile Include="..\..\..\UI\Source\Crash.cpp" />
     <ClCompile Include="..\..\..\UI\Source\HubComponent.cpp" />
     <ClCompile Include="..\..\..\UI\Source\InstallationComponent.cpp" />
     <ClCompile Include="..\..\..\UI\Source\InstallationDialog.cpp" />
@@ -206,6 +207,7 @@
     <ClInclude Include="..\..\..\UI\Source\BannerComponent.h" />
     <ClInclude Include="..\..\..\UI\Source\CommunityComponent.h" />
     <ClInclude Include="..\..\..\UI\Source\ComponentChooser.h" />
+    <ClInclude Include="..\..\..\UI\Source\Crash.h" />
     <ClInclude Include="..\..\..\UI\Source\HubComponent.h" />
     <ClInclude Include="..\..\..\UI\Source\InstallationComponent.h" />
     <ClInclude Include="..\..\..\UI\Source\InstallationDialog.h" />

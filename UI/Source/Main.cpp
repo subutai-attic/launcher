@@ -157,7 +157,7 @@ void UIApplication::anotherInstanceStarted(const juce::String& commandLine)
 
 void UIApplication::unhandledException(const std::exception* e, const juce::String& sourceFilename, int lineNumber)
 {
-    std::printf("111111111111111111111111\n");
+	Poco::Logger::get("subutai").fatal("Unhandled Exception");
     /*
 #if LIGHT_MODE
         _wizardWindow->crash();
@@ -249,8 +249,8 @@ void launcherTerminate()
 {
 	Poco::Logger::get("subutai").fatal("Unhandled exception");
 	//std::printf("Unhandled exception");
-	//std::abort();
-	std::exit(0);
+	std::abort();
+//	std::exit(0);
 }
 
 static juce::JUCEApplicationBase* juce_CreateApplication() { return new UIApplication(); }

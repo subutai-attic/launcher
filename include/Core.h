@@ -11,6 +11,7 @@
 #include "Poco/Message.h"
 #include "Poco/Channel.h"
 #include "Poco/ConsoleChannel.h"
+#include "Poco/WindowsConsoleChannel.h"
 #include "Poco/FileChannel.h"
 #include "Poco/SplitterChannel.h"
 #include "Poco/FormattingChannel.h"

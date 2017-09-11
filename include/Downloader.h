@@ -104,7 +104,6 @@ namespace SubutaiLauncher
 		Poco::Logger* _logger;
         // 5.0.1
         std::shared_ptr<Poco::CountingOutputStream> _outStream;
-        std::unique_ptr<std::istream> _downloadStream;
         long _bytes;
         int _percent;
 	};

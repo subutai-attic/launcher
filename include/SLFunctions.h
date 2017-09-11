@@ -265,8 +265,15 @@ namespace SubutaiLauncher
         {
             Session::instance()->getNotificationCenter()->add(DOWNLOAD_STARTED);
             std::printf("File info retrieved\n");
-            auto t = downloader->download();
-            t.detach();
+			try
+			{
+				auto t = downloader->download();
+				t.detach();
+			}
+			catch (std::exception& e)
+			{
+				Poco::Logger::get("subutai").critical("Failed to download file: %s", std::string(e.what()));
+			}
         }
         return Py_BuildValue("s", sl_filename);
     }
