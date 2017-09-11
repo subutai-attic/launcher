@@ -29,7 +29,7 @@ def subutaistart():
     if rc != 0:
         sleep(10)
         subutai.Shutdown()
-        return 29
+        return rc
 
     sleep(3)
 

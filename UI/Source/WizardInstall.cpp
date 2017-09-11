@@ -147,14 +147,17 @@ void WizardInstall::executeScriptImpl()
     catch (SubutaiLauncher::SLException& e)
     {
         _logger->critical("Script execution failed: %s", e.displayText());
+		SubutaiLauncher::Session::instance()->getNotificationCenter()->add(SubutaiLauncher::SCRIPT_FINISHED);
     }
     catch (Poco::Exception& e)
     {
         _logger->critical("Script execution failed: %s", e.displayText());
+		SubutaiLauncher::Session::instance()->getNotificationCenter()->add(SubutaiLauncher::SCRIPT_FINISHED);
     }
     catch (std::exception& e)
     {
         _logger->critical("Script execution failed due to unknown error");
+		SubutaiLauncher::Session::instance()->getNotificationCenter()->add(SubutaiLauncher::SCRIPT_FINISHED);
     }
     _scriptExitCode = sl.exitCode();
 }
@@ -232,7 +235,15 @@ void WizardInstall::runImpl()
 
         if (!nc->notificationEmpty())
         {
-            auto pNotification = nc->dispatchNotification();
+			SubutaiLauncher::NotificationMessage pNotification;
+			try
+			{
+				pNotification = nc->dispatchNotification();
+			}
+			catch (std::exception& e)
+			{
+				continue;
+			}
             if (pNotification.type == SubutaiLauncher::N_DOUBLE_DATA)
             {
                 double val = 0.0;

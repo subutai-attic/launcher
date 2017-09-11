@@ -241,60 +241,70 @@ void Wizard::runInstall()
 
 	cleanInstallers();
 
-	if (pSettings.installP2P && !_ptpInstalled)
-	{
-		_ptpInstall->activate();
-		_logger->debug("P2P Component has been choosen");
-		_ptpInstall->start("P2P");
-		_ptpInstall->run();
-		return;
-	}
-	else {
-		_logger->debug("pSettings.installP2P = %d,  _ptpInstalled = %d", pSettings.installP2P, _ptpInstalled);
-	}
+	try {
+		if (pSettings.installP2P && !_ptpInstalled)
+		{
+			_ptpInstall->activate();
+			_logger->debug("P2P Component has been choosen");
+			_ptpInstall->start("P2P");
+			_ptpInstall->run();
+			return;
+		}
+		else {
+			_logger->debug("pSettings.installP2P = %d,  _ptpInstalled = %d", pSettings.installP2P, _ptpInstalled);
+		}
 
-	if (pSettings.installTray && !_trayInstalled)
-	{
-		_trayInstall->activate();
-		_logger->debug("Tray Component has been choosen");
-		_trayInstall->start("Tray");
-		_trayInstall->run();
-		return;
-	}
-	else {
-		_logger->debug("pSettings.installTray = %d,  _trayInstalled = %d", pSettings.installTray, _trayInstalled);
-	}
+		if (pSettings.installTray && !_trayInstalled)
+		{
+			_trayInstall->activate();
+			_logger->debug("Tray Component has been choosen");
+			_trayInstall->start("Tray");
+			_trayInstall->run();
+			return;
+		}
+		else {
+			_logger->debug("pSettings.installTray = %d,  _trayInstalled = %d", pSettings.installTray, _trayInstalled);
+		}
 
-	if (pSettings.installE2E && !_eteInstalled)
-	{
-		_eteInstall->activate();
-		_logger->debug("Browser Plugin Component has been choosen");
-		_eteInstall->start("Browser Plugin");
-		_eteInstall->run();
-		return;
-	}
-	else {
-		_logger->debug("pSettings.installE2E = %d,  _eteInstalled = %d", pSettings.installE2E, _eteInstalled);
-	}
+		if (pSettings.installE2E && !_eteInstalled)
+		{
+			_eteInstall->activate();
+			_logger->debug("Browser Plugin Component has been choosen");
+			_eteInstall->start("Browser Plugin");
+			_eteInstall->run();
+			return;
+		}
+		else {
+			_logger->debug("pSettings.installE2E = %d,  _eteInstalled = %d", pSettings.installE2E, _eteInstalled);
+		}
 
-	if (pSettings.installPeer && !_peerInstalled)
-	{
-		_peerInstall->activate();
-		_logger->debug("Peer Component has been choosen");
-		_peerInstall->start("Peer");
-		_peerInstall->run();
-		return;
-	}
-	else {
-		_logger->debug("pSettings.installPeer = %d,  _peerInstalled = %d", pSettings.installPeer, _peerInstalled);
-	}
+		if (pSettings.installPeer && !_peerInstalled)
+		{
+			_peerInstall->activate();
+			_logger->debug("Peer Component has been choosen");
+			_peerInstall->start("Peer");
+			_peerInstall->run();
+			return;
+		}
+		else {
+			_logger->debug("pSettings.installPeer = %d,  _peerInstalled = %d", pSettings.installPeer, _peerInstalled);
+		}
 
-	if (pSettings.installRh && !_rhInstalled) {
-		_rhInstall->activate();
-		_logger->debug("RH Component has been choosen");
-		_rhInstall->start("RH");
-		_rhInstall->run();
-		return;
+		if (pSettings.installRh && !_rhInstalled) {
+			_rhInstall->activate();
+			_logger->debug("RH Component has been choosen");
+			_rhInstall->start("RH");
+			_rhInstall->run();
+			return;
+		}
+	} 
+	catch (Poco::Exception& e)
+	{
+		_logger->critical("%s", e.displayText());
+	}
+	catch (std::exception& e)
+	{
+		_logger->critical("Unknown error during installation step");
 	}
 
 	_logger->debug("Nothing to install");
