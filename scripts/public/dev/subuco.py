@@ -364,7 +364,7 @@ class SubutaiPeer:
         subutai.SetAction("WAITSSH")
         attempts = 0
         while subutai.TestSSH() != 0:
-            sleep(1)
+            sleep(5)
             attempts = attempts + 1
             if attempts == 30:
                 subutai.RaiseError("SSH connection failed after 30 attempts")
