@@ -283,6 +283,7 @@ class E2E:
         return 0
 
     def PostInstall(self):
+        self.__writeJson()
         subutai.SetAction("POSINST")
         location = '/opt/google/chrome/extensions/'
         postinst = subuco.PostInstall(self.tmp)
