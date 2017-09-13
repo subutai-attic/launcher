@@ -30,6 +30,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -70,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>..\..\..\bin\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>SubutaiLauncherd</TargetName>
@@ -103,7 +104,9 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>POCO_STATIC;BUILD_SCHEME="dev";-D_WINSOCK_=;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LAUNCHER_VERSION="5.0.2-SNAPSHOT";LIGHT_MODE=1;BUILD_SCHEME_PRODUCTION;POCO_STATIC;BUILD_SCHEME="production";-D_WINSOCK_=;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -134,7 +137,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>LIGHT_MODE=1;BUILD_SCHEME_DEV;POCO_STATIC;BUILD_SCHEME="dev";-D_WINSOCK_=;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LAUNCHER_VERSION="5.0.2-SNAPSHOT";LIGHT_MODE=1;BUILD_SCHEME_DEV;POCO_STATIC;BUILD_SCHEME="dev";-D_WINSOCK_=;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -174,6 +177,7 @@
     <ClCompile Include="..\..\..\UI\Source\BannerComponent.cpp" />
     <ClCompile Include="..\..\..\UI\Source\CommunityComponent.cpp" />
     <ClCompile Include="..\..\..\UI\Source\ComponentChooser.cpp" />
+    <ClCompile Include="..\..\..\UI\Source\Crash.cpp" />
     <ClCompile Include="..\..\..\UI\Source\HubComponent.cpp" />
     <ClCompile Include="..\..\..\UI\Source\InstallationComponent.cpp" />
     <ClCompile Include="..\..\..\UI\Source\InstallationDialog.cpp" />
@@ -203,6 +207,7 @@
     <ClInclude Include="..\..\..\UI\Source\BannerComponent.h" />
     <ClInclude Include="..\..\..\UI\Source\CommunityComponent.h" />
     <ClInclude Include="..\..\..\UI\Source\ComponentChooser.h" />
+    <ClInclude Include="..\..\..\UI\Source\Crash.h" />
     <ClInclude Include="..\..\..\UI\Source\HubComponent.h" />
     <ClInclude Include="..\..\..\UI\Source\InstallationComponent.h" />
     <ClInclude Include="..\..\..\UI\Source\InstallationDialog.h" />

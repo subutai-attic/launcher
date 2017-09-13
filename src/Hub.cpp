@@ -69,6 +69,8 @@ namespace SubutaiLauncher
             try 
             {
                 generateID();
+				sendLog(Poco::Message::Priority::PRIO_NOTICE, "New installation starting");
+                Session::instance()->setAction("SYSC");
             }
             catch (SubutaiException& e)
             {
@@ -134,7 +136,7 @@ namespace SubutaiLauncher
         json.append("\"id\": \""+_id+"\",");
         json.append("\"step\": \""+pStep+"\",");
         json.append("\"act\": \""+pAction+"\",");
-        json.append("\"log\": \""+message+"\",");
+        json.append("\"log\": \""+encode(message)+"\",");
         json.append("\"lvl\": \""+pPrio+"\"");
         json.append("}");
         send("status", json);
@@ -145,16 +147,31 @@ namespace SubutaiLauncher
         std::string json("{");
         json.append("\"id\": \""+_id+"\",");
         json.append("\"key\": \""+key+"\",");
-        json.append("\"value\": \""+value+"\"");
+        json.append("\"value\": \""+encode(value)+"\"");
         json.append("}");
         send("info", json);
     }
 
-    void Hub::send(const std::string& ep, const std::string& json)
+	std::string Hub::encode(const std::string & data)
+	{
+        std::istringstream iStr(data);
+		std::ostringstream oStr;
+		Poco::Base64Encoder enc(oStr);
+        enc.rdbuf()->setLineLength(2048);
+        std::copy(std::istreambuf_iterator<char>(iStr),
+            std::istreambuf_iterator<char>(),
+            std::ostreambuf_iterator<char>(enc));
+		enc.close();
+		std::string pResult = Poco::replace(oStr.str(), "\n", "");
+		return pResult;
+	}
+
+	void Hub::send(const std::string& ep, const std::string& json)
     {
         Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/launcher/"+ep);
         pRequest.setCookies(_cookies);
         pRequest.setContentLength(json.length());
+        pRequest.setContentType("application/json");
         std::ostream& pStr = _session.sendRequest(pRequest);
         pStr << json;
 
@@ -188,7 +205,8 @@ namespace SubutaiLauncher
 
     void Hub::addInfo(const std::string& key, const std::string& value)
     {
-        if (key.empty() || value.empty()) return;
+		_logger->trace("New System information: %s=>%s", key, value);
+        if (key.empty() || value.empty() || value == "_") return;
         InfoMessage m;
         m.key = key;
         m.value = Poco::replace(value, "\n", "\\n");
@@ -207,6 +225,11 @@ namespace SubutaiLauncher
     std::deque<InfoMessage> Hub::getInfo()
     {
         return _messages;
+    }
+
+    const std::string& Hub::getId() const
+    {
+        return _id;
     }
 
 }

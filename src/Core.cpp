@@ -179,7 +179,11 @@ void SubutaiLauncher::Core::parseArgs()
 void SubutaiLauncher::Core::setupLogger()
 {
     Poco::AutoPtr<Poco::FileChannel>            pChannel(new Poco::FileChannel);
+#if LAUNCHER_WINDOWS
+	Poco::AutoPtr<Poco::WindowsConsoleChannel>  cConsole(new Poco::WindowsConsoleChannel);
+#else
     Poco::AutoPtr<Poco::ConsoleChannel>         cConsole(new Poco::ConsoleChannel);
+#endif
     Poco::AutoPtr<HubChannel>                   pHub(new HubChannel);
     Poco::AutoPtr<Poco::SplitterChannel>        pSplitter(new Poco::SplitterChannel);
     Poco::AutoPtr<Poco::PatternFormatter>       pFormatter(new Poco::PatternFormatter);

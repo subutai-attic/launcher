@@ -74,6 +74,14 @@ void UIApplication::initialise(const juce::String& commandLine)
     {
         std::printf("Couldn't open log file: %s", e.displayText().c_str());
     }
+    catch (Poco::FileAccessDeniedException& e)
+    {
+
+    }
+    catch (Poco::Exception& e)
+    {
+        std::printf("%s", e.displayText().c_str());
+    }
 
     _logger = &Poco::Logger::get("subutai");
     _logger->trace("UI Started with: %s", commandLine.toStdString());
@@ -147,6 +155,19 @@ void UIApplication::anotherInstanceStarted(const juce::String& commandLine)
 
 }
 
+void UIApplication::unhandledException(const std::exception* e, const juce::String& sourceFilename, int lineNumber)
+{
+	Poco::Logger::get("subutai").fatal("Unhandled Exception");
+    /*
+#if LIGHT_MODE
+        _wizardWindow->crash();
+#else
+        _mainWindow->crash();
+#endif
+*/
+
+}
+
 void UIApplication::startMainWindow()
 {    
     std::string pTitle = "SubutaiLauncher ";
@@ -156,11 +177,22 @@ void UIApplication::startMainWindow()
 #endif
 
     _splashScreen->deleteAfterDelay(juce::RelativeTime::seconds(1), false);
+    try 
+    {
 #if LIGHT_MODE
     _wizardWindow = new WizardWindow(pTitle);
 #else
     _mainWindow = new MainWindow(pTitle);
 #endif
+    } 
+    catch (std::exception& e)
+    {
+#if LIGHT_MODE
+        _wizardWindow->crash();
+#else
+        _mainWindow->crash();
+#endif
+    }
 }
 
 volatile bool initializationFinished = false;
@@ -197,11 +229,6 @@ void UIApplication::runSplashBackgroundTaskImpl()
     //    _assetsReady = true;
 }
 
-std::thread UIApplication::gatherSystemInfo()
-{
-
-}
-
 void UIApplication::gatherSystemInfoImpl()
 {
     SubutaiLauncher::Environment env;
@@ -213,9 +240,40 @@ void UIApplication::gatherSystemInfoImpl()
     hub->addInfo(SI_OS_NAME, env.versionOS());
     hub->addInfo(SI_CPU_ARCH, env.cpuArch());
     hub->addInfo(SI_CORE_NUM, pCoresNum);
-    hub->addInfo(SI_SYSTEM_INFO, env.getSystemInfo());
-    hub->addInfo(SI_IP, env.getNetworkConfiguration());
-    hub->addInfo(SI_NETSTAT, env.getNetstat());
+    //hub->addInfo(SI_SYSTEM_INFO, env.getSystemInfo());
+    //hub->addInfo(SI_IP, env.getNetworkConfiguration());
+    //hub->addInfo(SI_NETSTAT, env.getNetstat());
 }
 
-START_JUCE_APPLICATION (UIApplication)
+void launcherTerminate()
+{
+	Poco::Logger::get("subutai").fatal("Unhandled exception");
+	//std::printf("Unhandled exception");
+	std::abort();
+//	std::exit(0);
+}
+
+static juce::JUCEApplicationBase* juce_CreateApplication() { return new UIApplication(); }
+#if LAUNCHER_WINDOWS
+int __stdcall WinMain(struct HINSTANCE__*, struct HINSTANCE__*, char*, int)
+#else
+int main(int argc, char* argv[])
+#endif
+{
+	std::set_terminate(launcherTerminate);
+    try
+    {
+	    juce::JUCEApplicationBase::createInstance = &juce_CreateApplication;
+	    return juce::JUCEApplicationBase::main(JUCE_MAIN_FUNCTION_ARGS);
+    } 
+    catch (Poco::Exception& e)
+    {
+        std::printf("%s\n", e.name(), e.displayText().c_str());
+    }
+    catch (std::exception& e)
+    {
+        std::printf("Unknown error has occurred\n");
+    }
+}
+
+//START_JUCE_APPLICATION (UIApplication)

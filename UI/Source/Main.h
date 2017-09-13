@@ -29,6 +29,7 @@ class UIApplication : public juce::JUCEApplication
         void shutdown() override;
         void systemRequestedQuit() override;
         void anotherInstanceStarted (const juce::String& commandLine) override;
+        void unhandledException(const std::exception* e, const juce::String& sourceFilename, int lineNumber) override;
     private:
         Poco::Logger* _logger;
 #if LIGHT_MODE
@@ -47,7 +48,6 @@ class UIApplication : public juce::JUCEApplication
         std::thread runSplashBackgroundTask();
         void runSplashBackgroundTaskImpl();
 
-        std::thread gatherSystemInfo();
         void gatherSystemInfoImpl();
 };
 

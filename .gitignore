@@ -10,6 +10,7 @@ trash
 bui.sh
 kurjun/*
 python_src
+.vscode
 
 # extra libs
 /third-party/python*

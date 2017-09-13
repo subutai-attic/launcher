@@ -29,7 +29,14 @@ void SLTest::testGetScheme()
     c->initializePython();
     SubutaiLauncher::SL sl("/tmp/subutai");
     sl.open("unit-test-get-scheme");
-    sl.execute();
+    try 
+    {
+        sl.execute();
+    } 
+    catch (SubutaiLauncher::SLException& e)
+    {
+        std::printf("Catched: %s", e.displayText().c_str());
+    }
     delete c;
 }
 
@@ -45,8 +52,9 @@ void SLTest::testFailedScript()
     }
     catch (SubutaiLauncher::SLException& e)
     {
-        std::printf("%s", e.displayText().c_str());
+        std::printf("Catched: %s", e.displayText().c_str());
     }
+    assert(sl.exitCode() != 0);
     /*
        std::thread t;
        try 

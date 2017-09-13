@@ -27,14 +27,7 @@ namespace SubutaiLauncher
     unsigned EnvironmentImpl::is64() 
     {
         _logger->trace("Environment: Determining architecture");
-#if ( __WORDSIZE == 64 )
-#define BUILD_64 1
-
-#ifdef BUILD_64
         return 1;
-#else 
-        return 0;
-#endif
     }
 
     ULORAMSIZE_T EnvironmentImpl::ramSize() 
@@ -53,15 +46,7 @@ namespace SubutaiLauncher
 
     unsigned EnvironmentImpl::versionVBox() 
     {
-
-#if ( __WORDSIZE == 64 )
-#define BUILD_64 1
-
-#ifdef BUILD_64
         return 1;
-#else 
-        return 0;
-#endif
     }
 
     bool EnvironmentImpl::vtxEnabled() 
@@ -123,7 +108,8 @@ namespace SubutaiLauncher
     std::string EnvironmentImpl::cpuArch() 
     {
         _logger->trace("Environment: Getting OS Architecture");
-        std::string ar = Poco::Environment::osArchitecture();
+        std::string ar("");
+        ar = Poco::Environment::osArchitecture();
         return ar;
     }
 

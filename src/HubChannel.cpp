@@ -21,7 +21,6 @@ namespace SubutaiLauncher
         {
             return;
         }
-        if ((int)msg.getPriority() < (int)Poco::Message::PRIO_INFORMATION) return;
         if (!Session::isInstanced()) return;
         if (!Session::instance()->getHub()->isLoggedIn()) return;
         Session::instance()->getHub()->sendLog(msg.getPriority(), msg.getText());

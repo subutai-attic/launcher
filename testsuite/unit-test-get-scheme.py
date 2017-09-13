@@ -3,4 +3,4 @@ import subutai
 def subutaistart():
     print(subutai.GetScheme())
 
-    return;
+    return 0
