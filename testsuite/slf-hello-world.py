@@ -8,3 +8,5 @@ def subutaistart():
     if rc[1] != "Hello, World!":
         printf("Tuple problem: != Hello, World!")
         return -2
+
+    return 0

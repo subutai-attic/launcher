@@ -18,6 +18,8 @@ class HubTest : public CppUnit::TestCase
         void testAuth();
         void testBalance();
         void testSendLog();
+        void testAddInfo();
+        void testEncode();
         
 	    static CppUnit::Test* suite();
 };

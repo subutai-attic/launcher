@@ -52,3 +52,9 @@ bool WizardWindow::escapeKeyPressed()
 {
 	return false;
 }
+
+void WizardWindow::crash()
+{
+    Crash* crash = new Crash();
+    setContentOwned(crash, true);
+}

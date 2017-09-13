@@ -23,7 +23,6 @@ class LoginScreen :
         juce::Label _version;
         juce::Label _error;
         LauncherButton _button;
-        LauncherButton _skipButton;
         juce::TextEditor _login;
         juce::TextEditor _password;
 		juce::ImageComponent _logo;

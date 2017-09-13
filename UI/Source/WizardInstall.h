@@ -12,6 +12,7 @@ public:
 	static const std::string TRAY_INSTALL;
 	static const std::string E2E_INSTALL;
 	static const std::string PEER_INSTALL;
+  static const std::string RH_INSTALL;
 	WizardInstall();
 	~WizardInstall();
 	void paint(juce::Graphics&) override;
@@ -25,6 +26,8 @@ public:
 	void deactivate();
 	bool succeed();
 private:
+    std::thread executeScript();
+    void executeScriptImpl();
 	std::thread runThread();
 	void runImpl();
 	void addLine(const std::string& text, bool error = false);
@@ -41,6 +44,7 @@ private:
 	std::string _script;
 	std::string _name;
 	std::thread _installThread;
+    int _scriptExitCode;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WizardInstall)
 };

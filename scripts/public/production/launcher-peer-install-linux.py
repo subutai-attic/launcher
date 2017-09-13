@@ -264,7 +264,7 @@ def WaitForPeer(ip):
 
 
 def installUbuntu(ubuntuFile, progress):
-    td = "/var/snap/subutai-dev/common/lxc/tmpdir/"
+    td = "/var/snap/subutai/common/lxc/tmpdir/"
     awk = " | awk '{print $5}'"
 
     subutai.AddStatus("Downloading Ubuntu Linux")
@@ -304,7 +304,7 @@ def installUbuntu(ubuntuFile, progress):
 
 
 def installOpenjre(openjreFile, progress):
-    td = "/var/snap/subutai-dev/common/lxc/tmpdir/"
+    td = "/var/snap/subutai/common/lxc/tmpdir/"
     awk = " | awk '{print $5}'"
 
     rc = subutai.SSHStartSession("mng-setup2")
@@ -341,7 +341,7 @@ def installOpenjre(openjreFile, progress):
 
 
 def installManagement(mngFile, progress):
-    td = "/var/snap/subutai-dev/common/lxc/tmpdir/"
+    td = "/var/snap/subutai/common/lxc/tmpdir/"
     awk = " | awk '{print $5}'"
 
     rc = subutai.SSHStartSession("mng-setup3")
@@ -381,10 +381,10 @@ def installManagement(mngFile, progress):
 def installSnapFromStore():
     subutai.AddStatus("Installing Subutai")
     subutai.log("info", "Installing subutai snap")
-    subutai.SSHRun("sudo snap install --beta --devmode subutai-dev > /tmp/subutai-snap.log 2>&1")
+    subutai.SSHRun("sudo snap install --beta --devmode subutai > /tmp/subutai-snap.log 2>&1")
 
     sleep(5)
-    out = subutai.SSHRunOut("which subutai-dev >/dev/null; echo $?")
+    out = subutai.SSHRunOut("which subutai >/dev/null; echo $?")
     if out != '0':
         return 55
 
@@ -394,14 +394,13 @@ def installSnapFromStore():
 def initBtrfs():
     subutai.log("info", "Initializing BTRFS")
     subutai.AddStatus("Initializing BTRFS")
-    subutai.SSHRun("sudo subutai-dev.btrfsinit /dev/sdb")
+    subutai.SSHRun("sudo subutai.btrfsinit /dev/sdb")
 
     return
 
 
 def setAlias():
     subutai.log("info", "Setting Alias")
-    subutai.SSHRun("sudo bash -c 'snap alias subutai-dev subutai'")
     return
 
 

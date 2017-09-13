@@ -48,6 +48,7 @@ class Wizard :
         WizardInstall* _trayInstall;
         WizardInstall* _eteInstall;
         WizardInstall* _peerInstall;
+        WizardInstall* _rhInstall;
         WizardFinish* _finishPage;
 
         LoginScreen _login;
@@ -56,6 +57,7 @@ class Wizard :
         bool _ptpInstalled;
         bool _eteInstalled;
         bool _peerInstalled;
+        bool _rhInstalled;
         bool _trayInstalled;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Wizard)
