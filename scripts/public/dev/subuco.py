@@ -352,11 +352,14 @@ class SubutaiPeer:
 
     def StopVirtualMachine(self):
         subutai.SetAction("STOPVM")
-        subutai.SSHRun("sync")
+        subutai.SSHRun("sync && poweroff")
         subutai.log("info", "Stopping Virtual machine")
+        sleep(15)
         rc = 0
         if subutai.CheckVMRunning(self.name) == 0:
-            rc = subutai.VBoxS("controlvm " + self.name + " poweroff soft")
+            sleep(15)
+            if subutai.CheckVMRunning(self.name) == 0:
+                rc = subutai.VBoxS("controlvm " + self.name + " poweroff soft")
 
         return rc
 

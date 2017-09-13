@@ -24,6 +24,7 @@ namespace SubutaiLauncher {
     bool installRh;
     int cpuNum;
     int memSize;
+    int diskSize;
   };
 
   class Settings {
@@ -41,8 +42,10 @@ namespace SubutaiLauncher {
     void setTmpPath(const std::string& path);
     void setCoreNum(int num);
     void setMemSize(int size);
+    void setDiskSize(int size);
     int getCoreNum();
     int getMemSize();
+    int getDiskSize();
 
     void setInstallationP2P(bool p2p);
     void setInstallationTray(bool tray);
@@ -51,6 +54,7 @@ namespace SubutaiLauncher {
     void setInstallationRH(bool rh);
     void setInstallationCpuNum(int num);
     void setInstallationMemSize(int mem);
+    void setInstallationDiskSize(int size);
     InstallationSettings getInstallationSettings();
   private:
     InstallationSettings _installSettings;
@@ -58,6 +62,7 @@ namespace SubutaiLauncher {
     std::string _tmpPath;
     int _coreNum;
     int _memSize;
+    int _diskSize;
     Poco::Logger* _logger;
   };
 }

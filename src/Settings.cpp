@@ -99,6 +99,11 @@ namespace SubutaiLauncher
         _memSize = size;
     }
 
+    void Settings::setDiskSize(int size)
+    {
+        _diskSize = size;
+    }
+
     int Settings::getCoreNum()
     {
         return _coreNum;
@@ -107,6 +112,11 @@ namespace SubutaiLauncher
     int Settings::getMemSize()
     {
         return _memSize;
+    }
+
+    int Settings::getDiskSize()
+    {
+        return _diskSize;
     }
 
     void Settings::setInstallationP2P(bool p2p)
@@ -178,6 +188,12 @@ namespace SubutaiLauncher
     {
         _logger->trace("Settings -> Setting memory size ot %d", size);
         _installSettings.memSize = size;
+    }
+
+    void Settings::setInstallationDiskSize(int size)
+    {
+        _logger->trace("Settings -> Setting disk size ot %d", size);
+        _installSettings.diskSize = size;
     }
 
     InstallationSettings Settings::getInstallationSettings()

@@ -418,6 +418,16 @@ namespace SubutaiLauncher
 
     // ========================================================================
 
+    static PyObject* SL_GetDiskSize(PyObject* self, PyObject* args)
+    {
+        if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }
+
+        int size = Session::instance()->getSettings()->getDiskSize();
+        return Py_BuildValue("i", size);
+    }
+
+    // ========================================================================
+
     static PyObject* SL_GetOS(PyObject* self, PyObject* args)
     {
         if (Session::instance()->isTerminating()) { return Py_BuildValue("i", 0); }

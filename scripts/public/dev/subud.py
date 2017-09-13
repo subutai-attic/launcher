@@ -29,6 +29,9 @@ def CleanSSHKeys(host, port):
         return 78
     return 0
 
+def GetVirtualBoxName():
+    return 'VirtualBox.pkg'
+
 
 def CheckCocoasudo(install):
     if not os.path.exists(install+"bin/cocoasudo"):
@@ -203,10 +206,16 @@ class P2P:
     def PostInstall(self):
         self.__writeConfiguration()
         postinst = subuco.PostInstall(self.tmp)
+        postinst.append('if [ -e /Library/LaunchDaemons/'+self.Daemon+' ]; then')
+        postinst.append('launchctl unload /Library/LaunchDaemons/'+self.Daemon)
+        postinst.append('fi')
         postinst.append('cp '+self.tmp+self.Daemon+' /Library/LaunchDaemons/'+self.Daemon)
         postinst.append('cp '+self.tmp+self.LogConf+' /etc/newsyslog.d/'+self.LogConf)
         postinst.append('launchctl load /Library/LaunchDaemons/'+self.Daemon)
         postinst.append('installer -pkg '+self.tmp+self.TapFile+' -target /')
+        postinst.append('if [ -e /usr/local/bin/p2p ]; then')
+        postinst.append('rm -f /usr/local/bin/p2p')
+        postinst.append('fi')
         postinst.append('ln -s '+self.install+'bin/p2p /usr/local/bin/p2p')
         ins = 'do shell script "/bin/sh '+postinst.get()+'" with administrator privileges'
         p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
@@ -368,12 +377,14 @@ class E2E:
         self.progress = subuco.Progress()
 
     def PreInstall(self):
+        subutai.SetAction('PREINST')
         self.progress.setChrome(self.GoogleChromeFile)
         self.progress.setCocoasudo(self.CocoasudoFile)
         self.progress.calculateTotal()
         return 0
 
     def Download(self):
+        subutai.SetAction('DWL')
         rc = 0
         if not CheckOsascript() and not CheckCocoasudo(self.install):
             rc = InstallCocoasudo(self.tmp, self.install, self.progress)
@@ -394,6 +405,9 @@ class E2E:
         return rc
 
     def Install(self):
+        subutai.SetAction('INST')
+        if not os.path.exists(self.tmp+self.GoogleChromeFile):
+            return 0
         try:
             script = 'do shell script "/usr/bin/tar -xf '+self.tmp+self.GoogleChromeFile+' -C /Applications" with administrator privileges'
             p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
@@ -404,43 +418,24 @@ class E2E:
         return 0
 
     def PostInstall(self):
+        subutai.SetAction('POSTINST')
+        pfile = 'kpmiofpmlciacjblommkcinncmneeoaa.json'
         location = os.environ['HOME'] + '/Library/Application Support/Google/Chrome/External Extensions'
-        rc = 0
-        try:
-            if not os.path.exists(location):
-                os.makedirs(location)
-        except:
-            subutai.RaiseError("Failed to create extensions directory")
-            rc = 31
-
-        if rc != 0:
-            subutai.AddStatus("Trying to create directories as root")
-            try:
-                script = 'do shell script "mkdir -p '+location+' && chown -R ' + os.environ['USER'] + ' ' + location + '" with administrator privileges'
-                p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-                stdout, stderr = p.communicate(script)
-                rc = 0
-            except:
-                subutai.RaiseError("Failed to create directory")
-
-        if rc != 0:
-            sleep(5)
-            return rc
-
-        ete = '{\n\t"external_update_url": "https://clients2.google.com/service/update2/crx"\n}'
-
-        if not os.path.exists(location):
-            subutai.RaiseError("Failed to create extensions directory. Aborting")
-            return 84
-
-        try:
-            f = open(location+"/kpmiofpmlciacjblommkcinncmneeoaa.json", 'w')
-            f.write(ete)
-            f.close()
-        except:
-            subutai.RaiseError("Can't write plugin to Extensions directory")
-            return 68
-
+        slocation = os.environ['HOME'] + '/Library/Application\ Support/Google/Chrome/External\ Extensions/'
+        script = 'tell application "Google Chrome" to quit'
+        p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+        stdout, stderr = p.communicate(script)
+        postinst = subuco.PostInstall(self.tmp)
+        postinst.append('if [ ! -d "'+location+'" ]; then')
+        postinst.append('mkdir -p ' + slocation)
+        postinst.append('fi')
+        postinst.append('cp '+self.tmp+pfile+' '+slocation)
+        postinst.append('chown -R '+os.environ['USER']+' '+os.environ['HOME']+'/Library/Application\ Support/Google' )
+        ins = 'do shell script "/bin/sh '+postinst.get()+'" with administrator privileges'
+        p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+        stdout, stderr = p.communicate(ins)
+        if p.returncode != 0:
+            return 95
         return 0
 
     def __checkGoogleChrome(self):

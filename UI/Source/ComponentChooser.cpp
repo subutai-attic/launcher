@@ -1,34 +1,34 @@
 #include "ComponentChooser.h"
 
 ComponentChooser::ComponentChooser() :
-  _ptp(true),
-  _tray(true),
-  _ete(true),
-  _peer(true),
-  _rh(false),
-  _cpu(2),
-  _mem(2),
-  _disk(8),
-  _triggered(false),
-  _ptpNo(nullptr),
-  _ptpYes(nullptr),
-  _trayNo(nullptr),
-  _trayYes(nullptr),
-  _eteNo(nullptr),
-  _eteYes(nullptr),
-  _peerNo(nullptr),
-  _peerYes(nullptr),
-  _rhNo(nullptr),
-  _rhYes(nullptr),
-  _cpuNum(nullptr),
-  _cpuPlus(nullptr),
-  _cpuMinus(nullptr),
-  _memPlus(nullptr),
-  _memSize(nullptr),
-  _memMinus(nullptr),
-  _diskPlus(nullptr),
-  _diskSize(nullptr),
-  _diskMinus(nullptr)
+    _ptp(true),
+    _tray(true),
+    _ete(true),
+    _peer(true),
+    _rh(false),
+    _cpu(2),
+    _mem(2),
+    _disk(8),
+    _triggered(false),
+    _ptpNo(nullptr),
+    _ptpYes(nullptr),
+    _trayNo(nullptr),
+    _trayYes(nullptr),
+    _eteNo(nullptr),
+    _eteYes(nullptr),
+    _peerNo(nullptr),
+    _peerYes(nullptr),
+    _rhNo(nullptr),
+    _rhYes(nullptr),
+    _cpuNum(nullptr),
+    _cpuPlus(nullptr),
+    _cpuMinus(nullptr),
+    _memPlus(nullptr),
+    _memSize(nullptr),
+    _memMinus(nullptr),
+    _diskPlus(nullptr),
+    _diskSize(nullptr),
+    _diskMinus(nullptr)
 {
     SubutaiLauncher::Environment pEnv;
     _vtxStatus = false;
@@ -82,7 +82,7 @@ ComponentChooser::ComponentChooser() :
 
         RadioBtnComponentItem{&_peerNo, &_peerYes, 20004, true, &_peerLabel, "Create Subutai Peer",
             &_peerInfo, "Create new virtual machine with Subutai"},
-		
+
         RadioBtnComponentItem{&_rhNo, &_rhYes, 20005, false, &_rhLabel, "Create Subutai RH",
             &_rhInfo, "Create new virtual machine with RH only"},
     };
@@ -149,26 +149,26 @@ ComponentChooser::ComponentChooser() :
     };
 
     std::vector<PlusMinusBtn> lst_pm = {
-      PlusMinusBtn {
-        (&_cpuMinus), (&_cpuPlus), (&_cpuNum),
-        &_cpuLabel, &_cpuInfo, "2",
-        "Remove one core", "Add one core",
-        "Number of CPUs", "Choose how many CPUs you would like to share with peer"
-      },
+        PlusMinusBtn {
+            (&_cpuMinus), (&_cpuPlus), (&_cpuNum),
+            &_cpuLabel, &_cpuInfo, "2",
+            "Remove one core", "Add one core",
+            "Number of CPUs", "Choose how many CPUs you would like to share with peer"
+        },
 
-      PlusMinusBtn {
-        (&_memMinus), (&_memPlus), (&_memSize),
-        &_memLabel, &_memInfo, "2",
-        "Remove one GB", "Add one GB",
-        "Memory Limit (GB)", "How many of RAM you would like to share with peer in GB"
-      },
+        PlusMinusBtn {
+            (&_memMinus), (&_memPlus), (&_memSize),
+            &_memLabel, &_memInfo, "2",
+            "Remove one GB", "Add one GB",
+            "Memory Limit (GB)", "How many of RAM you would like to share with peer in GB"
+        },
 
-      PlusMinusBtn {
-        (&_diskMinus), (&_diskPlus), (&_diskSize),
-        &_diskLabel, &_diskInfo, "8",
-        "Remove one GB", "Add one GB",
-        "Disk size (GB)", "How much of disk size would you like to share with peer in GB"
-      },
+        PlusMinusBtn {
+            (&_diskMinus), (&_diskPlus), (&_diskSize),
+            &_diskLabel, &_diskInfo, "8",
+            "Remove one GB", "Add one GB",
+            "Disk size (GB)", "How much of disk size would you like to share with peer in GB"
+        },
     };
 
     lineY = 15 + lstBtnItemsCont.size() * 40;
@@ -270,23 +270,23 @@ void ComponentChooser::buttonClicked(juce::Button* button)
     };
 
     std::vector<btnClickedHandler> lstHandlers = {
-      {_ptpYes,   &ComponentChooser::btnPtpYes_Clicked},
-      {_ptpNo,    &ComponentChooser::btnPtpNo_Clicked},
-      {_trayYes,  &ComponentChooser::btnTrayYes_Clicked},
-      {_trayNo,   &ComponentChooser::btnTrayNo_Clicked},
-      {_eteYes,   &ComponentChooser::btnETEYes_Clicked},
-      {_eteNo,    &ComponentChooser::btnETENo_Clicked},
-      {_peerYes,  &ComponentChooser::btnPeerYes_Clicked},
-      {_peerNo,   &ComponentChooser::btnPeerNo_Clicked},
-      {_rhYes,    &ComponentChooser::btnRHYes_Clicked},
-      {_rhNo,     &ComponentChooser::btnRHNo_Clicked},
+        {_ptpYes,   &ComponentChooser::btnPtpYes_Clicked},
+        {_ptpNo,    &ComponentChooser::btnPtpNo_Clicked},
+        {_trayYes,  &ComponentChooser::btnTrayYes_Clicked},
+        {_trayNo,   &ComponentChooser::btnTrayNo_Clicked},
+        {_eteYes,   &ComponentChooser::btnETEYes_Clicked},
+        {_eteNo,    &ComponentChooser::btnETENo_Clicked},
+        {_peerYes,  &ComponentChooser::btnPeerYes_Clicked},
+        {_peerNo,   &ComponentChooser::btnPeerNo_Clicked},
+        {_rhYes,    &ComponentChooser::btnRHYes_Clicked},
+        {_rhNo,     &ComponentChooser::btnRHNo_Clicked},
 
-      {_cpuPlus,  &ComponentChooser::btnCPUPlus_Clicked},
-      {_cpuMinus, &ComponentChooser::btnCPUMinus_Clicked},
-      {_memPlus,  &ComponentChooser::btnMemPlus_Clicked},
-      {_memMinus, &ComponentChooser::btnMemMinus_Clicked},
-      {_diskPlus,  &ComponentChooser::btnDiskSizePlus_Clicked},
-      {_diskMinus, &ComponentChooser::btnDiskSizeMinus_Clicked},
+        {_cpuPlus,  &ComponentChooser::btnCPUPlus_Clicked},
+        {_cpuMinus, &ComponentChooser::btnCPUMinus_Clicked},
+        {_memPlus,  &ComponentChooser::btnMemPlus_Clicked},
+        {_memMinus, &ComponentChooser::btnMemMinus_Clicked},
+        {_diskPlus,  &ComponentChooser::btnDiskSizePlus_Clicked},
+        {_diskMinus, &ComponentChooser::btnDiskSizeMinus_Clicked},
     };
 
     for (btnClickedHandler item : lstHandlers) {
@@ -359,8 +359,8 @@ void ComponentChooser::btnPeerYes_Clicked()
 {
     _logger->trace("btnPeerYes_Clicked");
     if (btnYesNoInProgress) {
-      _logger->trace("*** in progress ***");
-      return;
+        _logger->trace("*** in progress ***");
+        return;
     }
     btnYesNoInProgress = true;
     _rhNo->setToggleState(true, sendNotificationSync);
@@ -387,8 +387,8 @@ void ComponentChooser::btnRHYes_Clicked()
 {
     _logger->trace("btnRHYes_Clicked");
     if (btnYesNoInProgress) {
-      _logger->trace("*** in progress ***");
-      return;
+        _logger->trace("*** in progress ***");
+        return;
     }
 
     btnYesNoInProgress = true;
@@ -417,6 +417,7 @@ void ComponentChooser::btnCPUPlus_Clicked()
 {
     _cpu++;
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationCpuNum(_cpu);
+    SubutaiLauncher::Session::instance()->getSettings()->setCoreNum(_cpu);
     char t[4];
     std::sprintf(t, "%d", _cpu);
     _cpuNum->setButtonText(t);
@@ -429,6 +430,7 @@ void ComponentChooser::btnCPUMinus_Clicked()
         _cpu = 1;
     }
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationCpuNum(_cpu);
+    SubutaiLauncher::Session::instance()->getSettings()->setCoreNum(_cpu);
     char t[4];
     std::sprintf(t, "%d", _cpu);
     _cpuNum->setButtonText(t);
@@ -438,6 +440,7 @@ void ComponentChooser::btnMemPlus_Clicked()
 {
     _mem++;
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationMemSize(_mem);
+    SubutaiLauncher::Session::instance()->getSettings()->setMemSize(_mem);
     char t[4];
     std::sprintf(t, "%d", _mem);
     _memSize->setButtonText(t);
@@ -450,6 +453,7 @@ void ComponentChooser::btnMemMinus_Clicked()
         _mem = 1;
     }
     SubutaiLauncher::Session::instance()->getSettings()->setInstallationMemSize(_mem);
+    SubutaiLauncher::Session::instance()->getSettings()->setMemSize(_mem);
     char t[4];
     std::sprintf(t, "%d", _mem);
     _memSize->setButtonText(t);
@@ -457,29 +461,32 @@ void ComponentChooser::btnMemMinus_Clicked()
 
 void ComponentChooser::btnDiskSizePlus_Clicked()
 {
-  ++_disk;
-  char t[4];
-  std::sprintf(t, "%d", _disk);
-  _diskSize->setButtonText(t);
+    _disk += 100;
+    SubutaiLauncher::Session::instance()->getSettings()->setDiskSize(_disk);
+    char t[4];
+    std::sprintf(t, "%d", _disk);
+    _diskSize->setButtonText(t);
 }
 
 void ComponentChooser::btnDiskSizeMinus_Clicked()
 {
-  if (--_disk < 8) _disk = 8;
-  char t[4];
-  std::sprintf(t, "%d", _disk);
-  _diskSize->setButtonText(t);
+    _disk -= 100;
+    if (_disk < 100) _disk = 100;
+    SubutaiLauncher::Session::instance()->getSettings()->setDiskSize(_disk);
+    char t[4];
+    std::sprintf(t, "%d", _disk);
+    _diskSize->setButtonText(t);
 }
 
 void ComponentChooser::auxSetPlusMinusComponentsEnabled(bool enabled)
 {
-  _cpuNum->setEnabled(enabled);
-  _cpuPlus->setEnabled(enabled);
-  _cpuMinus->setEnabled(enabled);
-  _memSize->setEnabled(enabled);
-  _memPlus->setEnabled(enabled);
-  _memMinus->setEnabled(enabled);
-  _diskMinus->setEnabled(enabled);
-  _diskPlus->setEnabled(enabled);
-  _diskSize->setEnabled(enabled);
+    _cpuNum->setEnabled(enabled);
+    _cpuPlus->setEnabled(enabled);
+    _cpuMinus->setEnabled(enabled);
+    _memSize->setEnabled(enabled);
+    _memPlus->setEnabled(enabled);
+    _memMinus->setEnabled(enabled);
+    _diskMinus->setEnabled(enabled);
+    _diskPlus->setEnabled(enabled);
+    _diskSize->setEnabled(enabled);
 }
