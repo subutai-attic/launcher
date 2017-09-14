@@ -106,7 +106,7 @@ class P2P:
             subutai.ProcessKill("nssm.exe")
             subutai.ProcessKill("p2p.exe")
             
-        self.__installTuntap()    
+        rc = self.__installTuntap()    
         subutai.download(self.RemoteP2PFile)
         while subutai.isDownloadComplete() != 1:
             sleep(0.05)
@@ -141,6 +141,7 @@ class P2P:
         return False
 
     def __installTuntap(self):
+        subutai.SetStep("TAPINST")
         subutai.AddStatus("Downloading TUN/TAP driver")
         subutai.download(self.TapFile)
         while subutai.isDownloadComplete() != 1:
@@ -150,9 +151,12 @@ class P2P:
         
         self.progress.setTuntapProgress(self.progress.getTuntapSize())
         self.progress.updateProgress()
+        subutai.Information("Running TAP installation")
         subutai.AddStatus("Installing TUN/TAP driver")
-        call([self.tmp+self.TapFile, '/S'])
-        return 0
+        r = call([self.tmp+self.TapFile, '/S'])
+        if r != 0:
+            subutai.RaiseError("Failed to install TUN/TAP Driver")
+        return r
 
 
 class Tray:

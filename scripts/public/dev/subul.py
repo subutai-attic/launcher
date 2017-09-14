@@ -252,7 +252,7 @@ StartupNotify=true
 class E2E:
     def __init__(self, tmp, install):
         self.GoogleChromeFile = 'google-chrome-stable_current_amd64.deb'
-        self.Plugin = 'kpmiofpmlciacjblommkcinncmneeoaa.json'
+        self.Plugin = 'ffddnlbamkjlbngpekmdpnoccckapcnh.json'
         self.tmp = tmp
         self.install = install
         self.progress = subuco.Progress()

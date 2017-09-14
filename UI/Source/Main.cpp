@@ -27,7 +27,8 @@ class InitTimer : public juce::Timer {
 
 UIApplication::UIApplication() :
     _core(nullptr),
-    _initTimer(nullptr)
+    _initTimer(nullptr),
+    _crashMode(false)
 {
     /*
        SubutaiLauncher::AssetsManager pAssets;
@@ -158,6 +159,7 @@ void UIApplication::anotherInstanceStarted(const juce::String& commandLine)
 void UIApplication::unhandledException(const std::exception* e, const juce::String& sourceFilename, int lineNumber)
 {
 	Poco::Logger::get("subutai").fatal("Unhandled Exception");
+    std::exit(0);
     /*
 #if LIGHT_MODE
         _wizardWindow->crash();
@@ -181,6 +183,7 @@ void UIApplication::startMainWindow()
     {
 #if LIGHT_MODE
     _wizardWindow = new WizardWindow(pTitle);
+    if (_crashMode) _wizardWindow->crash();
 #else
     _mainWindow = new MainWindow(pTitle);
 #endif
@@ -219,6 +222,14 @@ void UIApplication::runSplashBackgroundTaskImpl()
     try
     {
         pAssets.verify();
+    }
+    catch (Poco::Net::NetException& e)
+    {
+        Poco::Logger::get("subutai").error("Failed to download assets :%s", e.displayText());
+    }
+    catch (Poco::Exception& e)
+    {
+        Poco::Logger::get("subutai").error("Failed to download assets :%s", e.displayText());
     }
     catch (std::exception& e)
     {
