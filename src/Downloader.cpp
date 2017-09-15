@@ -134,6 +134,15 @@ namespace SubutaiLauncher
             _logger->fatal("Failed to retrieve file info: %s", e.displayText());
             return false;
         }
+        catch (Poco::Net::HostNotFoundException& e)
+        {
+            e.rethrow();
+        }
+        catch (Poco::Exception& e)
+        {
+            e.rethrow();
+            return false;
+        }
 
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result;

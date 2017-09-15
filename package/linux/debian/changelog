@@ -1,3 +1,11 @@
+subutai-launcher (5.0.2-SNAPSHOT-0ubuntu1~trusty) trusty; urgency=medium
+
+  * Fixed for multiple installation issues
+  * Improved overall stability
+  * Added net-tools dependency
+
+ -- Mikhail Savochkin <i@crioto.com>  Thu, 15 Sep 2017 16:52:17 +0600
+
 subutai-launcher (5.0.1-0ubuntu1~trusty) trusty; urgency=medium
 
   * Multiple fixes of progress bar

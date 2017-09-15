@@ -49,6 +49,7 @@ class UIApplication : public juce::JUCEApplication
         void runSplashBackgroundTaskImpl();
 
         void gatherSystemInfoImpl();
+        bool _crashMode;
 };
 
 #endif  // MAIN_H_INCLUDED

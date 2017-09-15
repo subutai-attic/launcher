@@ -144,9 +144,9 @@ class P2P:
         postinst.append('mkdir -p /opt/subutai/bin')
         postinst.append('mkdir -p /opt/subutai/etc')
         postinst.append('mkdir -p /opt/subutai/resources')
-        postinst.append('cp '+self.tmp+self.RemoteP2PFile+' '+self.install+self.P2PFile)
+        postinst.append('cp '+self.tmp+self.RemoteP2PFile+' '+self.install+"bin/"+self.P2PFile)
         postinst.append('chown -R '+os.environ['USER']+':'+os.environ['USER']+' /opt/subutai')
-        postinst.append('chmod +x '+self.install+self.P2PFile)
+        postinst.append('chmod +x '+self.install+"bin/"+self.P2PFile)
         postinst.append('cp '+self.tmp+self.Daemon+' /etc/systemd/system/'+self.Daemon)
         postinst.append('chmod +x /etc/systemd/system/'+self.Daemon)
         postinst.append('systemctl enable '+self.Daemon)
@@ -252,7 +252,7 @@ StartupNotify=true
 class E2E:
     def __init__(self, tmp, install):
         self.GoogleChromeFile = 'google-chrome-stable_current_amd64.deb'
-        self.Plugin = 'kpmiofpmlciacjblommkcinncmneeoaa.json'
+        self.Plugin = 'ffddnlbamkjlbngpekmdpnoccckapcnh.json'
         self.tmp = tmp
         self.install = install
         self.progress = subuco.Progress()

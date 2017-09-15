@@ -8,7 +8,7 @@ ComponentChooser::ComponentChooser() :
     _rh(false),
     _cpu(2),
     _mem(2),
-    _disk(8),
+    _disk(100),
     _triggered(false),
     _ptpNo(nullptr),
     _ptpYes(nullptr),
@@ -165,7 +165,7 @@ ComponentChooser::ComponentChooser() :
 
         PlusMinusBtn {
             (&_diskMinus), (&_diskPlus), (&_diskSize),
-            &_diskLabel, &_diskInfo, "8",
+            &_diskLabel, &_diskInfo, "100",
             "Remove one GB", "Add one GB",
             "Disk size (GB)", "How much of disk size would you like to share with peer in GB"
         },

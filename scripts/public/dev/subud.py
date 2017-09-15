@@ -419,7 +419,7 @@ class E2E:
 
     def PostInstall(self):
         subutai.SetAction('POSTINST')
-        pfile = 'kpmiofpmlciacjblommkcinncmneeoaa.json'
+        pfile = 'ffddnlbamkjlbngpekmdpnoccckapcnh.json'
         location = os.environ['HOME'] + '/Library/Application Support/Google/Chrome/External Extensions'
         slocation = os.environ['HOME'] + '/Library/Application\ Support/Google/Chrome/External\ Extensions/'
         script = 'tell application "Google Chrome" to quit'
@@ -429,7 +429,8 @@ class E2E:
         postinst.append('if [ ! -d "'+location+'" ]; then')
         postinst.append('mkdir -p ' + slocation)
         postinst.append('fi')
-        postinst.append('cp '+self.tmp+pfile+' '+slocation)
+        postinst.append('rm -f '+slocation+pfile)
+        postinst.append('cp '+self.tmp+pfile+' '+slocation+pfile)
         postinst.append('chown -R '+os.environ['USER']+' '+os.environ['HOME']+'/Library/Application\ Support/Google' )
         ins = 'do shell script "/bin/sh '+postinst.get()+'" with administrator privileges'
         p = Popen(['osascript', '-'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
