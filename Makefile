@@ -5,9 +5,8 @@ SHARED_TARGET = libsubutai-launcher.$(LIB_EXT)
 STATIC_TARGET = libsubutai-launcher.a
 TEST_TARGET=testsuite
 INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_HEADERS_DIR) -I/usr/local/include
-LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -Xlinker -export-dynamic -lssh -L$(PYLIB_DIR) -lPocoNet -lPocoNetSSL -lPocoFoundation -lPocoJSON
-#LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) -lssh -L$(PYLIB_DIR) -lPocoNet -lPocoNetSSL -lPocoFoundation -lPocoJSON
-CXXFLAGS = -g $(INCLUDES) -std=c++11 -DLIGHT_MODE -DRT_OS_LINUX -DNDEBUG $(BUILD_SCHEME_DEF) $(EXTRA_DEFINES)
+LIBS = -g -ggdb -lm $(SYSLIBS) -l$(PYTHON_VER) $(LINKER_OPTIONS) -lssh -L$(PYLIB_DIR) -lPocoNet -lPocoNetSSL -lPocoFoundation -lPocoJSON
+CXXFLAGS = -g $(INCLUDES) -std=c++11 -DLIGHT_MODE -DRT_OS_LINUX -DNDEBUG $(DEFINES) $(BUILD_SCHEME_DEF) $(EXTRA_DEFINES)
 LDFLAGS = -s $(LIBS)
 
 SRC_DIR = src
@@ -55,9 +54,9 @@ endif
 ifdef BUILD_TESTS
 test: directories
 test: lib
+	$(MAKE) -C ./testsuite
 #test: $(OUTPUT_DIR)/$(TEST_TARGET)
 #test: directories lib
-#	$(MAKE) -C ./testsuite
 #test:
 #	@cp testsuite/*.py bin/
 
@@ -84,6 +83,9 @@ $(BUILD_DIR)/Core.o: $(SRC_DIR)/Core.cpp $(INCLUDE_DIR)/Core.h
 	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/Downloader.o: $(SRC_DIR)/Downloader.cpp $(INCLUDE_DIR)/Downloader.h
+	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/EnvironmentImpl.o: $(SRC_DIR)/EnvironmentImpl.cpp $(INCLUDE_DIR)/EnvironmentImpl.h
 	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/Environment.o: $(SRC_DIR)/Environment.cpp $(INCLUDE_DIR)/Environment.h
@@ -143,8 +145,12 @@ $(BUILD_DIR)/SS.o: $(SRC_DIR)/SS.cpp $(INCLUDE_DIR)/SS.h
 $(BUILD_DIR)/AssetsManager.o: $(SRC_DIR)/AssetsManager.cpp $(INCLUDE_DIR)/AssetsManager.h
 	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
 
+$(BUILD_DIR)/HubChannel.o: $(SRC_DIR)/HubChannel.cpp $(INCLUDE_DIR)/HubChannel.h
+	$(CC) -fPIC $(CXXFLAGS) -c $< -o $@
+
 OBJS = $(BUILD_DIR)/Core.o \
 								 	 $(BUILD_DIR)/Downloader.o \
+									 $(BUILD_DIR)/EnvironmentImpl.o \
 									 $(BUILD_DIR)/Environment.o \
 									 $(BUILD_DIR)/FileSystem.o \
 									 $(BUILD_DIR)/Hub.o \
@@ -163,7 +169,8 @@ OBJS = $(BUILD_DIR)/Core.o \
 									 $(BUILD_DIR)/Tray.o \
 									 $(BUILD_DIR)/VirtualBox.o \
 									 $(BUILD_DIR)/SS.o \
-									 $(BUILD_DIR)/AssetsManager.o
+									 $(BUILD_DIR)/AssetsManager.o \
+									 $(BUILD_DIR)/HubChannel.o
 
 $(OUTPUT_DIR)/$(SHARED_TARGET): $(OBJS)
 	$(CC) -shared $^ $(LDFLAGS) -o $@

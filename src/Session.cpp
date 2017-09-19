@@ -11,7 +11,10 @@ namespace SubutaiLauncher
         _sshUser(""),
         _sshPass(""),
         _sshHostname(""),
-        _sshPort(0)
+        _sshPort(0),
+        _step("INIT"),
+        _action("INIT"),
+        _hub(nullptr)
     {
         _settings = new Settings();
         _downloader = new Downloader();
@@ -40,6 +43,11 @@ namespace SubutaiLauncher
     {
         if (!_instance) _instance = new Session();
         return _instance;
+    }
+    
+    bool Session::isInstanced()
+    {
+        return (_instance != nullptr);
     }
 
     void Session::destroyInstance()
@@ -176,6 +184,26 @@ namespace SubutaiLauncher
                 return;
             }
         }
+    }
+
+    void Session::setStep(const std::string& step)
+    {
+        _step = step;
+    }
+
+    void Session::setAction(const std::string& action)
+    {
+        _action = action;
+    }
+
+    std::string Session::getStep()
+    {
+        return _step;
+    }
+
+    std::string Session::getAction()
+    {
+        return _action;
     }
 
 }

@@ -15,28 +15,36 @@ SLTest::~SLTest()
 
 void SLTest::setUp()
 {
+    Poco::Logger::get("subutai").setLevel("fatal");
 }
 
 void SLTest::tearDown()
 {
-    std::printf("\n==========================================================\n");
+
 }
 
 void SLTest::testGetScheme() 
 {
-    SubutaiLauncher::Core *c = new SubutaiLauncher::Core(std::vector<std::string>());
+    SubutaiLauncher::Core *c = new SubutaiLauncher::Core("bin/testsuite");
     c->initializePython();
-    SubutaiLauncher::SL sl("../testsuite");
+    SubutaiLauncher::SL sl("/tmp/subutai");
     sl.open("unit-test-get-scheme");
-    sl.execute();
+    try 
+    {
+        sl.execute();
+    } 
+    catch (SubutaiLauncher::SLException& e)
+    {
+        std::printf("Catched: %s", e.displayText().c_str());
+    }
     delete c;
 }
 
 void SLTest::testFailedScript()
 {
-    SubutaiLauncher::Core *c = new SubutaiLauncher::Core(std::vector<std::string>());
+    SubutaiLauncher::Core *c = new SubutaiLauncher::Core("bin/testsuite");
     c->initializePython();
-    SubutaiLauncher::SL sl("../testsuite");
+    SubutaiLauncher::SL sl("/tmp/subutai");
     sl.open("unit-test-failed-script");
     try 
     {
@@ -44,8 +52,9 @@ void SLTest::testFailedScript()
     }
     catch (SubutaiLauncher::SLException& e)
     {
-        std::printf("%s", e.displayText().c_str());
+        std::printf("Catched: %s", e.displayText().c_str());
     }
+    assert(sl.exitCode() != 0);
     /*
        std::thread t;
        try 
@@ -67,17 +76,20 @@ void SLTest::testFailedScriptThread()
 
 void SLTest::testSLF_SetProgress()
 {
-    std::printf("SetProgress SL Function test started\n");
-    SubutaiLauncher::Core *c = new SubutaiLauncher::Core(std::vector<std::string>());
+    SubutaiLauncher::Core *c = new SubutaiLauncher::Core("bin/testsuite");
     c->initializePython();
     SubutaiLauncher::Session::instance();
-    SubutaiLauncher::SL sl("../testsuite");
+    SubutaiLauncher::SL sl("/tmp/subutai");
     sl.open("slf-set-progress");
     sl.execute();
 
     SubutaiLauncher::NotificationCenter* nc = SubutaiLauncher::Session::instance()->getNotificationCenter();
     SubutaiLauncher::NotificationMessage n;
     n.type = SubutaiLauncher::N_INFO;
+    bool t10 = true;
+    bool t50 = true;
+    bool t70 = true;
+    bool t100 = true;
     while (n.type != SubutaiLauncher::N_EMPTY)
     {
         n = nc->dispatchNotification();
@@ -85,38 +97,75 @@ void SLTest::testSLF_SetProgress()
         {
             double d;
             n.message.convert(d);
-            std::printf("Progress: %f\n", d);
-        }
-        else
-        {
-            std::printf("Unknown type\n");
+            if (t10)
+            {
+                assert(d == 10.0);
+                t10 = false;
+            }
+            else if (t50)
+            {
+                assert(d == 50.0);
+                t50 = false;
+            }
+            else if (t70)
+            {
+                assert(d == 70.0);
+                t70 = false;
+            }
+            else if (t100)
+            {
+                assert(d == 100.0);
+                t100 = false;
+            }
         }
     }
     delete c;
-    std::printf("SetProgress SL Function test finished\n");
 }
 
 void SLTest::testSLF_HelloWorld()
 {
     try 
     {
-        std::printf("SetProgress SL Function test started\n");
-        SubutaiLauncher::Core *c = new SubutaiLauncher::Core(std::vector<std::string>());
+        SubutaiLauncher::Core *c = new SubutaiLauncher::Core("bin/testsuite");
         c->initializePython();
         SubutaiLauncher::Session::instance();
-        SubutaiLauncher::SL sl;
+        SubutaiLauncher::SL sl("/tmp/subutai");
         sl.open("slf-hello-world");
         sl.execute();
         assert(sl.exitCode() == 0);
     } 
     catch (SubutaiLauncher::SubutaiException& exc)
     {
-        std::printf("Exception: %s", exc.displayText().c_str());
+        assert(false);
     }
     catch (SubutaiLauncher::SLException& exc)
     {
-        std::printf("Exception: %s", exc.displayText().c_str());
+        assert(false);
     }
+}
+
+// Test importing another python file
+void SLTest::testSLF_Import()
+{
+    try 
+    {
+        SubutaiLauncher::Core *c = new SubutaiLauncher::Core("bin/testsuite");
+        c->initializePython();
+        SubutaiLauncher::Session::instance();
+        SubutaiLauncher::SL sl("/tmp/subutai");
+        sl.open("slf-import");
+        sl.execute();
+        assert(sl.exitCode() == 0);
+    } 
+    catch (SubutaiLauncher::SubutaiException& exc)
+    {
+        assert(false);
+    }
+    catch (SubutaiLauncher::SLException& exc)
+    {
+        assert(false);
+    }
+
 }
 
 CppUnit::Test * SLTest::suite()
@@ -125,6 +174,7 @@ CppUnit::Test * SLTest::suite()
 
     CppUnit_addTest(pSuite, SLTest, testSLF_SetProgress);
     CppUnit_addTest(pSuite, SLTest, testSLF_HelloWorld);
+    CppUnit_addTest(pSuite, SLTest, testSLF_Import);
     CppUnit_addTest(pSuite, SLTest, testGetScheme);
     CppUnit_addTest(pSuite, SLTest, testFailedScript);
     //CppUnit_addTest(pSuite, SLTest, testFailedScriptThread);

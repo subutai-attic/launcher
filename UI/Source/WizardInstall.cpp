@@ -1,67 +1,57 @@
 #include "WizardInstall.h"
 #include "Wizard.h"
 
-#if LAUNCHER_LINUX
-const std::string WizardInstall::P2P_INSTALL = "launcher-p2p-install-linux";
-const std::string WizardInstall::TRAY_INSTALL = "launcher-tray-install-linux";
-const std::string WizardInstall::E2E_INSTALL = "launcher-chrome-e2e-install-linux";
-const std::string WizardInstall::PEER_INSTALL = "launcher-peer-install-linux";
-#elif LAUNCHER_WINDOWS
-const std::string WizardInstall::P2P_INSTALL = "launcher-p2p-install-windows";
-const std::string WizardInstall::TRAY_INSTALL = "launcher-tray-install-windows";
-const std::string WizardInstall::E2E_INSTALL = "launcher-chrome-e2e-install-windows";
-const std::string WizardInstall::PEER_INSTALL = "launcher-peer-install-windows";
-#else
-const std::string WizardInstall::P2P_INSTALL = "launcher-p2p-install-darwin";
-const std::string WizardInstall::TRAY_INSTALL = "launcher-tray-install-darwin";
-const std::string WizardInstall::E2E_INSTALL = "launcher-chrome-e2e-install-darwin";
-const std::string WizardInstall::PEER_INSTALL = "launcher-peer-install-darwin";
-#endif
+const std::string WizardInstall::P2P_INSTALL = "p2p-install";
+const std::string WizardInstall::TRAY_INSTALL = "tray-install";
+const std::string WizardInstall::E2E_INSTALL = "e2e-install";
+const std::string WizardInstall::PEER_INSTALL = "peer-install";
+const std::string WizardInstall::RH_INSTALL = "rh-install";
 
 WizardInstall::WizardInstall() :
-	_succeed(false),
-	_running(false),
-	_active(false)
+    _succeed(false),
+    _running(false),
+    _active(false),
+    _scriptExitCode(-100)
 {
-	_pb = nullptr;
-	_logger = &Poco::Logger::get("subutai");
-	_logger->trace("Creating Wizard Install UI Component");
-	auto font = juce::Font("Encode Sans", 20, 1);
-	_title = new juce::Label();
-	_title->setText("Initializing", juce::dontSendNotification);
-	_title->setColour(juce::Label::textColourId, juce::Colour(105, 116, 144));
-	_title->setBounds(20, 20, 480, 40);
-	_title->setFont(font);
-	_title->setJustificationType(juce::Justification::top);
-	addAndMakeVisible(_title);
+    _pb = nullptr;
+    _logger = &Poco::Logger::get("subutai");
+    _logger->trace("Creating Wizard Install UI Component");
+    auto font = juce::Font("Encode Sans", 20, 1);
+    _title = new juce::Label();
+    _title->setText("Initializing", juce::dontSendNotification);
+    _title->setColour(juce::Label::textColourId, juce::Colour(105, 116, 144));
+    _title->setBounds(20, 20, 480, 40);
+    _title->setFont(font);
+    _title->setJustificationType(juce::Justification::top);
+    addAndMakeVisible(_title);
 }
 
 WizardInstall::~WizardInstall()
 {
-	_logger->trace("Waiting for installation thread to complete");
-	int rc = wait();
-	if (rc == 0)
-	{
-		_logger->trace("Thread finished");
-	}
-	else
-	{
-		_logger->trace("Thread was not running");
-	}
-	_logger->trace("Destroying Wizard Install UI Component");
-	for (auto it = _lines.begin(); it != _lines.end(); it++)
-	{
-		if ((*it) != nullptr) delete (*it);
-	}
-	_lines.clear();
-	if (_title != nullptr) delete _title;
-	if (_pb != nullptr) delete _pb;
-	_logger->trace("Wizard Install UI Component has been destroyed");
+    _logger->trace("Waiting for installation thread to complete");
+    int rc = wait();
+    if (rc == 0)
+    {
+        _logger->trace("Thread finished");
+    }
+    else
+    {
+        _logger->trace("Thread was not running");
+    }
+    _logger->trace("Destroying Wizard Install UI Component");
+    for (auto it = _lines.begin(); it != _lines.end(); it++)
+    {
+        if ((*it) != nullptr) delete (*it);
+    }
+    _lines.clear();
+    if (_title != nullptr) delete _title;
+    if (_pb != nullptr) delete _pb;
+    _logger->trace("Wizard Install UI Component has been destroyed");
 }
 
 void WizardInstall::paint(juce::Graphics& g)
 {
-	g.fillAll(juce::Colour(255, 255, 255));
+    g.fillAll(juce::Colour(255, 255, 255));
 }
 
 void WizardInstall::resized()
@@ -71,164 +61,229 @@ void WizardInstall::resized()
 
 void WizardInstall::start(const std::string& name)
 {
-	_logger->information("Starting %s installation", name);
-	_name = name;
-	if (_pb != nullptr)
-	{
-		_logger->trace("Destroying progress bar");
-		delete _pb;
-		_logger->trace("Progress bar deleted");
-	}
-	_logger->trace("Recreating progress bar");
-	std::string nt("Installing ");
-	nt.append(name);
-	_title->setText(nt, juce::dontSendNotification);
-	_progress = 0.0;
-	_pb = new juce::ProgressBar(_progress);
-	_pb->setBounds(20, 60, 460, 25);
-	addAndMakeVisible(_pb);
+    _logger->information("Starting %s installation", name);
+    _name = name;
+    if (_pb != nullptr)
+    {
+        _logger->trace("Destroying progress bar");
+        delete _pb;
+        _logger->trace("Progress bar deleted");
+    }
+    _logger->trace("Recreating progress bar");
+    std::string nt("Installing ");
+    nt.append(name);
+    _title->setText(nt, juce::dontSendNotification);
+    _progress = 0.0;
+    _pb = new juce::ProgressBar(_progress);
+    _pb->setBounds(20, 60, 460, 25);
+    addAndMakeVisible(_pb);
 
-	// Converting component name to a script
-	if (name == "P2P") _script = P2P_INSTALL;
-	else if (name == "Tray") _script = TRAY_INSTALL;
-	else if (name == "Browser Plugin") _script = E2E_INSTALL;
-	else if (name == "Peer") _script = PEER_INSTALL;
+    // Converting component name to a script
+    if (name == "P2P") 
+    { 
+        SubutaiLauncher::Session::instance()->setStep("P2P");
+        _script = P2P_INSTALL;
+    }
+    else if (name == "Tray") 
+    {
+        SubutaiLauncher::Session::instance()->setStep("TRAY");
+        _script = TRAY_INSTALL;
+    }
+    else if (name == "Browser Plugin") 
+    {
+        SubutaiLauncher::Session::instance()->setStep("E2E");
+        _script = E2E_INSTALL;
+    }
+    else if (name == "Peer") 
+    {
+        SubutaiLauncher::Session::instance()->setStep("PEER");
+        _script = PEER_INSTALL;
+    }
+    else if (name == "RH") 
+    {
+        SubutaiLauncher::Session::instance()->setStep("RH");
+        _script = RH_INSTALL;
+    }
 
-	_logger->debug("Installation initializator has been finished");
+    _logger->debug("Installation initializator has been finished");
 }
 
 int WizardInstall::wait()
 {
-	_logger->trace("WizardInstall::wait()");
-	if (_installThread.joinable())
-	{
-		_installThread.join();
-		_logger->trace("Install thread has been stopped");
-		return 0;
-	}
-	_logger->trace("Install thread is not running");
-	return 1;
+    _logger->trace("WizardInstall::wait()");
+    if (_installThread.joinable())
+    {
+        _installThread.join();
+        _logger->trace("Install thread has been stopped");
+        return 0;
+    }
+    _logger->trace("Install thread is not running");
+    return 1;
 }
 
 void WizardInstall::run()
 {
-	_installThread = runThread();
+    _installThread = runThread();
 }
 
 std::thread WizardInstall::runThread()
 {
-	return std::thread([=] { runImpl(); });
+    return std::thread([=] { runImpl(); });
+}
+
+std::thread WizardInstall::executeScript()
+{
+    return std::thread([=] { executeScriptImpl(); });
+}
+
+void WizardInstall::executeScriptImpl()
+{
+    SubutaiLauncher::SL sl(SubutaiLauncher::Session::instance()->getDownloader()->getOutputDirectory());
+    sl.open(_script);
+    try 
+    {
+        sl.execute();
+    }
+    catch (SubutaiLauncher::SLException& e)
+    {
+        _logger->critical("Script execution failed: %s", e.displayText());
+		SubutaiLauncher::Session::instance()->getNotificationCenter()->add(SubutaiLauncher::SCRIPT_FINISHED);
+    }
+    catch (Poco::Exception& e)
+    {
+        _logger->critical("Script execution failed: %s", e.displayText());
+		SubutaiLauncher::Session::instance()->getNotificationCenter()->add(SubutaiLauncher::SCRIPT_FINISHED);
+    }
+    catch (std::exception& e)
+    {
+        _logger->critical("Script execution failed due to unknown error");
+		SubutaiLauncher::Session::instance()->getNotificationCenter()->add(SubutaiLauncher::SCRIPT_FINISHED);
+    }
+    _scriptExitCode = sl.exitCode();
 }
 
 void WizardInstall::runImpl()
 {
-	_running = true;
-	_logger->information("%s installation started", _name);
-	// Download installation script
-	auto downloader = SubutaiLauncher::Session::instance()->getDownloader();
+    SubutaiLauncher::Session::instance()->getHub()->flushInfo();
+    _running = true;
+    _logger->information("%s installation started", _name);
+    // Download installation script
+    auto downloader = SubutaiLauncher::Session::instance()->getDownloader();
 
-	auto script = _script;
-	script.append(".py");
-	downloader->reset();
-	downloader->setFilename(script);
-	if (!downloader->retrieveFileInfo())
-	{
-		_logger->error("Failed to download %s installation script", script);
-		addLine("Failed to download installation script", true);
-	}
-	else
-	{
-		_logger->information("Downloaded %s installation script", script);
-		addLine("Installation script downloaded");
-	}
-	std::thread pDownloadThread = downloader->download();
-	pDownloadThread.join();
+    auto script = _script;
+    script.append(".py");
+    try 
+    {
+        downloader->reset();
+        downloader->setFilename(script);
+        if (!downloader->retrieveFileInfo())
+        {
+            _logger->critical("Failed to download %s installation script", script);
+            addLine("Failed to download installation script", true);
+        }
+        else
+        {
+            _logger->information("Downloaded %s installation script", script);
+            addLine("Installation script downloaded");
+        }
+        downloader->downloadImpl();
+    }
+    catch (Poco::Exception& e)
+    {
+        _logger->critical("Failed to download installation script: %s", e.displayText());
+        _running = false;
+        auto parent = (Wizard*)getParentComponent();
+        parent->stepCompleted(_name);
+        _logger->trace("Parent notified");
+        return;
+    }
+    catch (std::exception& e)
+    {
+        _logger->critical("Failed to download installation script: Unknown error");
+        _running = false;
+        auto parent = (Wizard*)getParentComponent();
+        parent->stepCompleted(_name);
+        _logger->trace("Parent notified");
+        return;
+    }
 
-	SubutaiLauncher::SL sl(downloader->getOutputDirectory());
-	sl.open(_script);
-	std::thread pScriptThread;
-	try
-	{
-        //MessageManagerLock mmLock;
-		pScriptThread = sl.executeInThread();
-		auto nc = SubutaiLauncher::Session::instance()->getNotificationCenter();
-		//        bool download = false;
-		while (_running)
-		{
-			auto st = SubutaiLauncher::Session::instance()->getStatus();
-			if (st != "") addLine(st);
-			auto e = nc->dispatch();
-			if (e == SubutaiLauncher::SCRIPT_FINISHED || SubutaiLauncher::Session::instance()->isTerminating() || !sl.running())
-			{
-				//pScriptThread.join();
-				addLine("Script execution completed");
-				_logger->information("%s script execution completed", script);
-				_progress = 100.0;
-				_running = false;
-				if (sl.exitCode() == 0) _succeed = true;
-			}
-			else if (e == SubutaiLauncher::DOWNLOAD_STARTED)
-			{
-				//                download = true;
-			}
-			else if (e == SubutaiLauncher::DOWNLOAD_FINISHED)
-			{
-				//                download = false;
-			}
+    std::thread pScriptThread = executeScript();
+    auto nc = SubutaiLauncher::Session::instance()->getNotificationCenter();
+    //        bool download = false;
+    while (_running)
+    {
+        auto st = SubutaiLauncher::Session::instance()->getStatus();
+        if (st != "") addLine(st);
+        auto e = nc->dispatch();
+        if (e == SubutaiLauncher::SCRIPT_FINISHED || SubutaiLauncher::Session::instance()->isTerminating())
+        {
+            if (pScriptThread.joinable()) pScriptThread.join();
+            addLine("Script execution completed");
+            _logger->information("%s script execution completed", script);
+            _progress = 100.0;
+            _running = false;
+            if (_scriptExitCode == 0) _succeed = true;
+        }
+        else if (e == SubutaiLauncher::DOWNLOAD_STARTED)
+        {
+            //                download = true;
+        }
+        else if (e == SubutaiLauncher::DOWNLOAD_FINISHED)
+        {
+            //                download = false;
+        }
 
-			if (!nc->notificationEmpty())
+        if (!nc->notificationEmpty())
+        {
+			SubutaiLauncher::NotificationMessage pNotification;
+			try
 			{
-				auto pNotification = nc->dispatchNotification();
-				if (pNotification.type == SubutaiLauncher::N_DOUBLE_DATA)
-				{
-					double val = 0.0;
-					try
-					{
-						pNotification.message.convert(val);
-					}
-					catch (Poco::BadCastException& e)
-					{
-						_logger->error("Failed to convert progress value: %s", e.displayText());
-						_progress = -1.0;
-					}
-					_progress = val;
-				}
-				else if (pNotification.type == SubutaiLauncher::N_ERROR)
-				{
-					std::string msg("");
-					try
-					{
-						pNotification.message.convert(msg);
-					}
-					catch (Poco::BadCastException& e)
-					{
-						_logger->error("Failed to convert error: %s", e.displayText());
-						msg = "Unknown error occured";
-					}
-					addLine(msg, true);
-				}
+				pNotification = nc->dispatchNotification();
 			}
-#if LAUNCHER_LINUX || LAUNCHER_MACOS
-			usleep(100);
-#else
-			Sleep(100);
-#endif
-		}
-		pScriptThread.join();
-	}
-	catch (SubutaiLauncher::SLException& e)
-	{
-		pScriptThread.join();
-		_running = false;
-		_progress = 100.0;
-		_logger->error(e.displayText());
-	}
+			catch (std::exception& e)
+			{
+				continue;
+			}
+            if (pNotification.type == SubutaiLauncher::N_DOUBLE_DATA)
+            {
+                double val = 0.0;
+                try
+                {
+                    pNotification.message.convert(val);
+                }
+                catch (Poco::BadCastException& e)
+                {
+                    _logger->error("Failed to convert progress value: %s", e.displayText());
+                    _progress = -1.0;
+                }
+                _progress = val;
+            }
+            else if (pNotification.type == SubutaiLauncher::N_ERROR)
+            {
+                std::string msg("");
+                try
+                {
+                    pNotification.message.convert(msg);
+                }
+                catch (Poco::BadCastException& e)
+                {
+                    _logger->error("Failed to convert error: %s", e.displayText());
+                    msg = "Unknown error occured";
+                }
+                addLine(msg, true);
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::microseconds(100));
+    }
+    //pScriptThread.join();
+    if (pScriptThread.joinable()) pScriptThread.join();
 
-	_logger->debug("Stopping installation process and notifying parent");
-	_running = false;
-	auto parent = (Wizard*)getParentComponent();
-	parent->stepCompleted(_name);
-	_logger->trace("Parent notified");
+
+    _logger->debug("Stopping installation process and notifying parent");
+    _running = false;
+    auto parent = (Wizard*)getParentComponent();
+    parent->stepCompleted(_name);
+    _logger->trace("Parent notified");
 }
 
 void WizardInstall::replaceLine(const std::string& text, bool error)
@@ -242,54 +297,54 @@ void WizardInstall::replaceLine(const std::string& text, bool error)
 void WizardInstall::addLine(const std::string& text, bool error)
 {
     MessageManagerLock mmLock;
-	auto font = juce::Font("Encode Sans", 14, 0);
-	auto line = new juce::Label();
-	std::string t = _name;
-	t.append(": ");
-	t.append(text);
-	line->setText(t, dontSendNotification);
-	if (error) line->setColour(Label::textColourId, Colours::red);
-	else line->setColour(Label::textColourId, Colour(105, 116, 144));
-	line->setBounds(20, 100 + (_lines.size() * 30), 480, 30);
-	line->setFont(font);
-	line->setJustificationType(Justification::top);
-	addAndMakeVisible(line);
-	_lines.push_back(line);
+    auto font = juce::Font("Encode Sans", 14, 0);
+    auto line = new juce::Label();
+    std::string t = _name;
+    t.append(": ");
+    t.append(text);
+    line->setText(t, dontSendNotification);
+    if (error) line->setColour(Label::textColourId, Colours::red);
+    else line->setColour(Label::textColourId, Colour(105, 116, 144));
+    line->setBounds(20, 100 + (_lines.size() * 30), 480, 30);
+    line->setFont(font);
+    line->setJustificationType(Justification::top);
+    addAndMakeVisible(line);
+    _lines.push_back(line);
 }
 
 bool WizardInstall::isRunning()
 {
-	return _running;
+    return _running;
 }
 
 bool WizardInstall::isActive()
 {
-	return _active;
+    return _active;
 }
 
 void WizardInstall::activate()
 {
-	if (_active)
-	{
-		_logger->error("Tried to activate installation screen that is already active");
-		return;
-	}
-	_active = true;
-	this->setVisible(true);
+    if (_active)
+    {
+        _logger->error("Tried to activate installation screen that is already active");
+        return;
+    }
+    _active = true;
+    this->setVisible(true);
 }
 
 void WizardInstall::deactivate()
 {
-	if (!_active)
-	{
-		_logger->error("Tried to deactivate installation screen that is inactive");
-		return;
-	}
-	_active = false;
-	this->setVisible(false);
+    if (!_active)
+    {
+        _logger->error("Tried to deactivate installation screen that is inactive");
+        return;
+    }
+    _active = false;
+    this->setVisible(false);
 }
 
 bool WizardInstall::succeed()
 {
-	return _succeed;
+    return _succeed;
 }

@@ -27,7 +27,8 @@ class InitTimer : public juce::Timer {
 
 UIApplication::UIApplication() :
     _core(nullptr),
-    _initTimer(nullptr)
+    _initTimer(nullptr),
+    _crashMode(false)
 {
     /*
        SubutaiLauncher::AssetsManager pAssets;
@@ -50,7 +51,7 @@ const juce::String UIApplication::getApplicationName()
 
 const juce::String UIApplication::getApplicationVersion()
 {
-    return "4.0.15";
+    return LAUNCHER_VERSION;
 }
 
 bool UIApplication::moreThanOneInstanceAllowed()
@@ -73,6 +74,14 @@ void UIApplication::initialise(const juce::String& commandLine)
     catch (Poco::OpenFileException& e)
     {
         std::printf("Couldn't open log file: %s", e.displayText().c_str());
+    }
+    catch (Poco::FileAccessDeniedException& e)
+    {
+
+    }
+    catch (Poco::Exception& e)
+    {
+        std::printf("%s", e.displayText().c_str());
     }
 
     _logger = &Poco::Logger::get("subutai");
@@ -98,23 +107,17 @@ void UIApplication::initialise(const juce::String& commandLine)
     {
         _logger->error(e.displayText());
     }
+    _logger->information("Starting up the UI");
     SubutaiLauncher::Environment env;
     env.updatePath(SubutaiLauncher::Session::instance()->getSettings()->getInstallationPath() + "bin");
 
     Poco::Logger::get("subutai").information("Downloading assets");
 
     _initTimer = new InitTimer(&UIApplication::checkInitialization, this);
-    // This method is where you should put your application's initialisation code..
-    //
-    //
-    //uid_t cuser = getuid();
-    //if (cuser !=0) {
-
-    //}
     SubutaiLauncher::AssetsManager pAssets;
-    pAssets.download("launcher-logo.png");
+    pAssets.download("launcher-splash.png");
     std::string pLogoFile(SubutaiLauncher::Session::instance()->getSettings()->getTmpPath() +
-            "launcher-logo.png");
+            "launcher-splash.png");
     Poco::File pLogo(pLogoFile);
 
     if (pLogo.exists()) {
@@ -122,7 +125,7 @@ void UIApplication::initialise(const juce::String& commandLine)
                 getApplicationName(),
                 juce::ImageCache::getFromFile(juce::File(pLogoFile)),
                 true);
-        getAssets().detach();
+        runSplashBackgroundTask().detach();
     }
     //_logger->debug("UI Initialization completed");
 }
@@ -153,17 +156,46 @@ void UIApplication::anotherInstanceStarted(const juce::String& commandLine)
 
 }
 
+void UIApplication::unhandledException(const std::exception* e, const juce::String& sourceFilename, int lineNumber)
+{
+	Poco::Logger::get("subutai").fatal("Unhandled Exception");
+    std::exit(0);
+    /*
+#if LIGHT_MODE
+        _wizardWindow->crash();
+#else
+        _mainWindow->crash();
+#endif
+*/
+
+}
+
 void UIApplication::startMainWindow()
 {    
-    std::string pTitle = "SubutaiLauncher -> ";
+    std::string pTitle = "SubutaiLauncher ";
+    pTitle.append(LAUNCHER_VERSION);
+#if !BUILD_SCHEME_PRODUCTION
     pTitle.append(BUILD_SCHEME);
+#endif
 
     _splashScreen->deleteAfterDelay(juce::RelativeTime::seconds(1), false);
+    try 
+    {
 #if LIGHT_MODE
     _wizardWindow = new WizardWindow(pTitle);
+    if (_crashMode) _wizardWindow->crash();
 #else
     _mainWindow = new MainWindow(pTitle);
 #endif
+    } 
+    catch (std::exception& e)
+    {
+#if LIGHT_MODE
+        _wizardWindow->crash();
+#else
+        _mainWindow->crash();
+#endif
+    }
 }
 
 volatile bool initializationFinished = false;
@@ -174,16 +206,16 @@ void UIApplication::checkInitialization()
     startMainWindow();
 }
 
-std::thread UIApplication::getAssets()
+std::thread UIApplication::runSplashBackgroundTask()
 {
     _initTimer->startTimer(1000); //run timer in main thread. then run initialization thread
     return std::thread([=] {
-            getAssetsImpl();
+            runSplashBackgroundTaskImpl();
             initializationFinished = true;
             });
 }
 
-void UIApplication::getAssetsImpl()
+void UIApplication::runSplashBackgroundTaskImpl()
 {
     SubutaiLauncher::AssetsManager pAssets;
 
@@ -191,12 +223,68 @@ void UIApplication::getAssetsImpl()
     {
         pAssets.verify();
     }
+    catch (Poco::Net::NetException& e)
+    {
+        Poco::Logger::get("subutai").error("Failed to download assets :%s", e.displayText());
+    }
+    catch (Poco::Exception& e)
+    {
+        Poco::Logger::get("subutai").error("Failed to download assets :%s", e.displayText());
+    }
     catch (std::exception& e)
     {
         Poco::Logger::get("subutai").error("Failed to download assets");
         SubutaiLauncher::Session::instance()->getDownloader()->reset();
     }
+    gatherSystemInfoImpl();
     //    _assetsReady = true;
 }
 
-START_JUCE_APPLICATION (UIApplication)
+void UIApplication::gatherSystemInfoImpl()
+{
+    SubutaiLauncher::Environment env;
+    auto hub = SubutaiLauncher::Session::instance()->getHub();
+    // Send launcher information
+    if (hub == nullptr) return;
+    std::string pCoresNum = Poco::format("%u", env.cpuNum());
+    hub->addInfo(SI_LAUNCHER_VERSION, LAUNCHER_VERSION);
+    hub->addInfo(SI_OS_NAME, env.versionOS());
+    hub->addInfo(SI_CPU_ARCH, env.cpuArch());
+    hub->addInfo(SI_CORE_NUM, pCoresNum);
+    //hub->addInfo(SI_SYSTEM_INFO, env.getSystemInfo());
+    //hub->addInfo(SI_IP, env.getNetworkConfiguration());
+    //hub->addInfo(SI_NETSTAT, env.getNetstat());
+}
+
+void launcherTerminate()
+{
+	Poco::Logger::get("subutai").fatal("Unhandled exception");
+	//std::printf("Unhandled exception");
+	std::abort();
+//	std::exit(0);
+}
+
+static juce::JUCEApplicationBase* juce_CreateApplication() { return new UIApplication(); }
+#if LAUNCHER_WINDOWS
+int __stdcall WinMain(struct HINSTANCE__*, struct HINSTANCE__*, char*, int)
+#else
+int main(int argc, char* argv[])
+#endif
+{
+	std::set_terminate(launcherTerminate);
+    try
+    {
+	    juce::JUCEApplicationBase::createInstance = &juce_CreateApplication;
+	    return juce::JUCEApplicationBase::main(JUCE_MAIN_FUNCTION_ARGS);
+    } 
+    catch (Poco::Exception& e)
+    {
+        std::printf("%s\n", e.name(), e.displayText().c_str());
+    }
+    catch (std::exception& e)
+    {
+        std::printf("Unknown error has occurred\n");
+    }
+}
+
+//START_JUCE_APPLICATION (UIApplication)

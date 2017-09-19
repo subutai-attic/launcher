@@ -6,6 +6,14 @@ namespace SubutaiLauncher
             "launcher-logo.png",
             "user.png",
             "password.png",
+            "subuco.py",
+#if LAUNCHER_WINDOWS
+            "subuw.py",
+#elif LAUNCHER_LINUX
+            "subul.py",
+#elif LAUNCHER_MACOS
+            "subud.py",
+#endif
 #if !LIGHT_MODE
             "launcher-facebook-active.png",
             "launcher-facebook-inactive.png",
@@ -24,8 +32,9 @@ namespace SubutaiLauncher
             "launcher-templates-inactive.png",
             "launcher-community-active.png",
             "launcher-community-inactive.png",
-#endif
             "launcher-robot.png"
+#endif
+            "crashbot.png"
             });
 
     AssetsManager::AssetsManager()

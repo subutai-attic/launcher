@@ -30,6 +30,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -93,7 +94,10 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>BUILD_SCHEME_DEV;BUILD_SCHEME="dev";WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LAUNCHER_VERSION="5.0.2-SNAPSHOT";LIGHT_MODE=1;POCO_STATIC;BUILD_SCHEME_PRODUCTION;BUILD_SCHEME="production";WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -119,7 +123,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>LIGHT_MODE=1;POCO_STATIC;BUILD_SCHEME_DEV;BUILD_SCHEME="dev";WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LAUNCHER_VERSION="5.0.2-SNAPSHOT";LIGHT_MODE=1;POCO_STATIC;BUILD_SCHEME_DEV;BUILD_SCHEME="dev";WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -153,8 +157,11 @@
     <ClCompile Include="..\..\..\src\Core.cpp" />
     <ClCompile Include="..\..\..\src\Downloader.cpp" />
     <ClCompile Include="..\..\..\src\Environment.cpp" />
+    <ClCompile Include="..\..\..\src\EnvironmentImpl.cpp" />
+    <ClCompile Include="..\..\..\src\EnvironmentImpl_Windows.cpp" />
     <ClCompile Include="..\..\..\src\FileSystem.cpp" />
     <ClCompile Include="..\..\..\src\Hub.cpp" />
+    <ClCompile Include="..\..\..\src\HubChannel.cpp" />
     <ClCompile Include="..\..\..\src\NotificationCenter.cpp" />
     <ClCompile Include="..\..\..\src\P2P.cpp" />
     <ClCompile Include="..\..\..\src\RootProcess.cpp" />
@@ -165,6 +172,7 @@
     <ClCompile Include="..\..\..\src\SLFunctions.cpp" />
     <ClCompile Include="..\..\..\src\SS.cpp" />
     <ClCompile Include="..\..\..\src\SSH.cpp" />
+    <ClCompile Include="..\..\..\src\SSHException.cpp" />
     <ClCompile Include="..\..\..\src\SubutaiException.cpp" />
     <ClCompile Include="..\..\..\src\SubutaiString.cpp" />
     <ClCompile Include="..\..\..\src\Tray.cpp" />
@@ -178,8 +186,11 @@
     <ClInclude Include="..\..\..\include\Downloader.h" />
     <ClInclude Include="..\..\..\include\E2E.h" />
     <ClInclude Include="..\..\..\include\Environment.h" />
+    <ClInclude Include="..\..\..\include\EnvironmentImpl.h" />
+    <ClInclude Include="..\..\..\include\EnvironmentImpl_Windows.h" />
     <ClInclude Include="..\..\..\include\FileSystem.h" />
     <ClInclude Include="..\..\..\include\Hub.h" />
+    <ClInclude Include="..\..\..\include\HubChannel.h" />
     <ClInclude Include="..\..\..\include\NotificationCenter.h" />
     <ClInclude Include="..\..\..\include\P2P.h" />
     <ClInclude Include="..\..\..\include\RootProcess.h" />
@@ -190,6 +201,7 @@
     <ClInclude Include="..\..\..\include\SLFunctions.h" />
     <ClInclude Include="..\..\..\include\SS.h" />
     <ClInclude Include="..\..\..\include\SSH.h" />
+    <ClInclude Include="..\..\..\include\SSHException.h" />
     <ClInclude Include="..\..\..\include\SubutaiException.h" />
     <ClInclude Include="..\..\..\include\SubutaiLauncher.h" />
     <ClInclude Include="..\..\..\include\SubutaiString.h" />

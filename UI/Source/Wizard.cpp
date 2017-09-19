@@ -9,23 +9,12 @@ Wizard::Wizard() :
 	_ptpInstalled(false),
 	_eteInstalled(false),
 	_peerInstalled(false),
+  _rhInstalled(false),
 	_trayInstalled(false)
 {
 	_logger = &Poco::Logger::get("subutai");
 	SubutaiLauncher::Session::instance()->start();
-#if LAUNCHER_LINUX
-	SubutaiLauncher::RootProcess* rp = new SubutaiLauncher::RootProcess();
-	rp->addCommand("mkdir -p /opt/subutai");
-	rp->addCommand("mkdir -p /opt/subutai/bin");
-	rp->addCommand("mkdir -p /opt/subutai/etc");
-	rp->addCommand("mkdir -p /opt/subutai/resources");
-	std::string chown("chown -R ");
-	chown.append(Poco::Environment::get("USER"));
-	chown.append(" /opt/subutai");
-	rp->addCommand(chown);
-	rp->execute("Creating installation directories requires root privileges");
-	delete rp;
-#elif LAUNCHER_MACOS
+#if LAUNCHER_MACOS
 	Poco::File bin("/usr/local/share/subutai/bin");
 	bin.createDirectories();
 	bin = Poco::File("/usr/local/share/subutai/etc");
@@ -108,6 +97,10 @@ Wizard::Wizard() :
 	_peerInstall->setBounds(300, 0, 500, 600);
 	addChildComponent(_peerInstall);
 
+	_rhInstall = new WizardInstall();
+	_rhInstall->setBounds(300, 0, 500, 600);
+	addChildComponent(_rhInstall);
+
 	_finishPage = new WizardFinish();
 	_finishPage->setBounds(300, 0, 500, 600);
 	addChildComponent(_finishPage);
@@ -149,6 +142,8 @@ Wizard::~Wizard()
 	if (_eteInstall != nullptr) delete _eteInstall;
 	_logger->trace("Requesting Peer Installation page destroy");
 	if (_peerInstall != nullptr) delete _peerInstall;
+  _logger->trace("Requesting RH Installation page destroy");
+  if (_rhInstall != nullptr) delete _rhInstall;
 	_logger->trace("Requesting Finish page destroy");
 	if (_finishPage != nullptr) delete _finishPage;
 }
@@ -193,6 +188,7 @@ void Wizard::buttonClicked(juce::Button* button)
 			_step = 4;
 			_back.setEnabled(false);
 			_next.setEnabled(false);
+            SubutaiLauncher::Session::instance()->getHub()->flushInfo();
 			runInstall();
 			break;
 		default:
@@ -245,52 +241,70 @@ void Wizard::runInstall()
 
 	cleanInstallers();
 
-	if (pSettings.installP2P && !_ptpInstalled)
-	{
-		_ptpInstall->activate();
-		_logger->debug("P2P Component has been choosen");
-		_ptpInstall->start("P2P");
-		_ptpInstall->run();
-		return;
-	}
-	else {
-		_logger->debug("pSettings.installP2P = %d,  _ptpInstalled = %d", pSettings.installP2P, _ptpInstalled);
-	}
+	try {
+		if (pSettings.installP2P && !_ptpInstalled)
+		{
+			_ptpInstall->activate();
+			_logger->debug("P2P Component has been choosen");
+			_ptpInstall->start("P2P");
+			_ptpInstall->run();
+			return;
+		}
+		else {
+			_logger->debug("pSettings.installP2P = %d,  _ptpInstalled = %d", pSettings.installP2P, _ptpInstalled);
+		}
 
-	if (pSettings.installTray && !_trayInstalled)
-	{
-		_trayInstall->activate();
-		_logger->debug("Tray Component has been choosen");
-		_trayInstall->start("Tray");
-		_trayInstall->run();
-		return;
-	}
-	else {
-		_logger->debug("pSettings.installTray = %d,  _trayInstalled = %d", pSettings.installTray, _trayInstalled);
-	}
+		if (pSettings.installTray && !_trayInstalled)
+		{
+			_trayInstall->activate();
+			_logger->debug("Tray Component has been choosen");
+			_trayInstall->start("Tray");
+			_trayInstall->run();
+			return;
+		}
+		else {
+			_logger->debug("pSettings.installTray = %d,  _trayInstalled = %d", pSettings.installTray, _trayInstalled);
+		}
 
-	if (pSettings.installE2E && !_eteInstalled)
-	{
-		_eteInstall->activate();
-		_logger->debug("Browser Plugin Component has been choosen");
-		_eteInstall->start("Browser Plugin");
-		_eteInstall->run();
-		return;
-	}
-	else {
-		_logger->debug("pSettings.installE2E = %d,  _eteInstalled = %d", pSettings.installE2E, _eteInstalled);
-	}
+		if (pSettings.installE2E && !_eteInstalled)
+		{
+			_eteInstall->activate();
+			_logger->debug("Browser Plugin Component has been choosen");
+			_eteInstall->start("Browser Plugin");
+			_eteInstall->run();
+			return;
+		}
+		else {
+			_logger->debug("pSettings.installE2E = %d,  _eteInstalled = %d", pSettings.installE2E, _eteInstalled);
+		}
 
-	if (pSettings.installPeer && !_peerInstalled)
+		if (pSettings.installPeer && !_peerInstalled)
+		{
+			_peerInstall->activate();
+			_logger->debug("Peer Component has been choosen");
+			_peerInstall->start("Peer");
+			_peerInstall->run();
+			return;
+		}
+		else {
+			_logger->debug("pSettings.installPeer = %d,  _peerInstalled = %d", pSettings.installPeer, _peerInstalled);
+		}
+
+		if (pSettings.installRh && !_rhInstalled) {
+			_rhInstall->activate();
+			_logger->debug("RH Component has been choosen");
+			_rhInstall->start("RH");
+			_rhInstall->run();
+			return;
+		}
+	} 
+	catch (Poco::Exception& e)
 	{
-		_peerInstall->activate();
-		_logger->debug("Peer Component has been choosen");
-		_peerInstall->start("Peer");
-		_peerInstall->run();
-		return;
+		_logger->critical("%s", e.displayText());
 	}
-	else {
-		_logger->debug("pSettings.installPeer = %d,  _peerInstalled = %d", pSettings.installPeer, _peerInstalled);
+	catch (std::exception& e)
+	{
+		_logger->critical("Unknown error during installation step");
 	}
 
 	_logger->debug("Nothing to install");
@@ -328,7 +342,11 @@ void Wizard::stepCompleted(const std::string& name)
 	// Determine if we need to install something else
 	_logger->debug("Looking for next component");
 	auto c = _componentChooserPage->getComponents();
-	if ((c.ptp && !_ptpInstalled) || (c.tray && !_trayInstalled) || (c.ete && !_eteInstalled) || (c.peer && !_peerInstalled))
+  if ((c.ptp && !_ptpInstalled) ||
+      (c.tray && !_trayInstalled) ||
+      (c.ete && !_eteInstalled) || (
+        c.peer && !_peerInstalled) ||
+      c.rh && !_rhInstalled)
 	{
 		_logger->debug("Next component found");
 		runInstall();

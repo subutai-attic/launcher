@@ -51,7 +51,6 @@ namespace SubutaiLauncher
 
     void NotificationCenter::notificationRaised(NotificationType t, Poco::Dynamic::Var v)
 	{
-		//_logger->debug("Notification raised");
         NotificationMessage m;
         m.type = t;
         m.message = v;
@@ -61,7 +60,7 @@ namespace SubutaiLauncher
     NotificationMessage NotificationCenter::dispatchNotification()
     {
         if (_npool.empty()) return NotificationMessage{N_EMPTY, Poco::Dynamic::Var(0)};
-        auto m = _npool.front();
+        NotificationMessage m = _npool.front();
         _npool.pop_front();
         return m;
     }

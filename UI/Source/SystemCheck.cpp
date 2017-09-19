@@ -41,6 +41,10 @@ SystemCheck::SystemCheck()
     }
 #endif
 
+    // Gather system information
+    std::string pCoresNum = Poco::format("%u", env.cpuNum());
+    std::string pCPUArch = env.cpuArch();
+
     _osValue.setText(pOs, dontSendNotification);
     if (osSupported) _osValue.setColour(Label::textColourId, Colour(105, 116, 144));
     else _osValue.setColour(Label::textColourId, Colours::red);
@@ -63,7 +67,7 @@ SystemCheck::SystemCheck()
     _archLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_archLabel);
 
-    _archValue.setText(env.cpuArch(), dontSendNotification);
+    _archValue.setText(pCPUArch, dontSendNotification);
     _archValue.setColour(Label::textColourId, Colour(105, 116, 144));
     _archValue.setBounds(150, 55, 500, 40);
     _archValue.setFont(font);
@@ -84,9 +88,8 @@ SystemCheck::SystemCheck()
     _cpuLabel.setJustificationType(Justification::top);
     addAndMakeVisible(_cpuLabel);
 
-    std::string cores = Poco::format("%u", env.cpuNum());
 
-    _cpuValue.setText(cores, dontSendNotification);
+    _cpuValue.setText(pCoresNum, dontSendNotification);
     _cpuValue.setColour(Label::textColourId, Colour(105, 116, 144));
     _cpuValue.setBounds(150, 95, 500, 40);
     _cpuValue.setFont(font);

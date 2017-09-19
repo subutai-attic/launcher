@@ -2,10 +2,11 @@ CC = g++
 TARGET = subutai-launcher
 INCLUDES = -Iinclude -I$(PYLIB_HEADER_DIR) -I$(PYCONFIG_HEADER_DIR) -I$(OPENSSL_HEADERS_DIR) -I../include
 #MACOS ONLY
-#ST_LIBS = -g -ggdb $(LIBDIRS) $(WLSH) $(EXTRA_LIBS) -lm $(WLST) -Wl,--whole-archive -l$(PYTHON_VER) -Wl,--no-whole-archive $(WLSH) -ldl -lpthread $(WLST) -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation $(WLSH) $(SYSLIBS) -lssl -lcrypto -lssh -lutil -Xlinker -export-dynamic
-ST_LIBS = -g -ggdb $(LIBDIRS) $(WLSH) $(EXTRA_LIBS) -lm $(WLST) -l$(PYTHON_VER) $(WLSH) -ldl -lpthread $(WLST) -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation $(WLSH) $(SYSLIBS) -lssl -lcrypto -lssh -lutil
+ST_LIBS = -g -ggdb $(LIBDIRS) $(WLSH) $(EXTRA_LIBS) -lm $(WLST) $(WLWA) -l$(PYTHON_VER) $(WLNWA) $(WLSH) -ldl -lpthread $(WLST) -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation $(WLSH) $(SYSLIBS) -lssl -lcrypto -lssh -lutil $(LINKER_OPTIONS)
+#ST_LIBS = -g -ggdb $(LIBDIRS) $(WLSH) $(EXTRA_LIBS) -lm $(WLST) -l$(PYTHON_VER) $(WLSH) -ldl -lpthread $(WLST) -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation $(WLSH) $(SYSLIBS) -lssl -lcrypto -lssh -lutil
 SH_LIBS = -g -ggdb $(LIBDIRS) $(EXTRA_LIBS) -lm -l$(PYTHON_VER) -ldl -lpthread -lsubutai-launcher -lPocoNetSSL -lPocoCrypto -lPocoNet -lPocoUtil -lPocoXML -lPocoJSON -lPocoFoundation $(SYSLIBS) -lssl -lcrypto -lssh
-CXXFLAGS = -g -Wall $(EXTRA_DEFINES) $(BUILD_SCHEME_DEF) -DLIGHT_MODE=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 $(INCLUDES) -I/usr/include -I/usr/include/freetype2 -IJuceLibraryCode -IJuceLibraryCode/modules -std=gnu++11 -Wno-unused-result -Wsign-compare -DNDEBUG -fwrapv -O0
+#CXXFLAGS = -g -Wall $(EXTRA_DEFINES) $(BUILD_SCHEME_DEF) -DLIGHT_MODE=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 $(INCLUDES) -I/usr/include -I/usr/include/freetype2 -IJuceLibraryCode -IJuceLibraryCode/modules -std=gnu++11 -Wno-unused-result -Wsign-compare -DNDEBUG -fwrapv -O0 $(DEFINES)
+CXXFLAGS = -g -Wall -DLIGHT_MODE=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 $(INCLUDES) -I/usr/include -I/usr/include/freetype2 -IJuceLibraryCode -IJuceLibraryCode/modules -std=gnu++11 -Wno-unused-result -Wsign-compare -DNDEBUG -fwrapv -O0 $(DEFINES)
 LDFLAGS = -g $(BLDFLAGS)
 
 JUCE = JuceLibraryCode
@@ -49,6 +50,7 @@ OBJS = $(BUILD_DIR)/BannerComponent.o \
 	   $(BUILD_DIR)/WizardIntro.o \
 	   $(BUILD_DIR)/LauncherButton.o \
 	   $(BUILD_DIR)/Splash.o \
+	   $(BUILD_DIR)/Crash.o \
 	   $(BUILD_DIR)/WizardWindow.o
 
 $(BUILD_DIR)/BannerComponent.o: $(SRC_DIR)/BannerComponent.cpp $(SRC_DIR)/BannerComponent.h
@@ -124,6 +126,9 @@ $(BUILD_DIR)/LauncherButton.o: $(SRC_DIR)/LauncherButton.cpp $(SRC_DIR)/Launcher
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/Splash.o: $(SRC_DIR)/Splash.cpp $(SRC_DIR)/Splash.h
+	$(CC) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/Crash.o: $(SRC_DIR)/Crash.cpp $(SRC_DIR)/Crash.h
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/WizardWindow.o: $(SRC_DIR)/WizardWindow.cpp $(SRC_DIR)/WizardWindow.h
