@@ -6,13 +6,14 @@ namespace SubutaiLauncher
     const std::string Settings::CONFIG_FILE = "lnchr.conf";
 #if LAUNCHER_LINUX
     const std::string Settings::DEFAULT_PATH = "/opt/subutai/";
+    const std::string Settings::DEFAULT_TMP = "/tmp/subutai/";
 #elif LAUNCHER_WINDOWS
-    const std::string Settings::DEFAULT_PATH = "C:\Subutai";
+    const std::string Settings::DEFAULT_PATH = "C:\\ProgramData\\subutai\\";
+    const std::string Settings::DEFAULT_TMP = "C:\\ProgramData\\subutai\\tmp\\";
 #elif LAUNCHER_MACOS
     const std::string Settings::DEFAULT_PATH = "/usr/local/share/subutai/";
-#endif
-
     const std::string Settings::DEFAULT_TMP = "/tmp/subutai/";
+#endif
 
     Settings::Settings() :
         _coreNum(2),
@@ -44,41 +45,12 @@ namespace SubutaiLauncher
 
     std::string Settings::getDefaultTmpPath() const
     {
-#if LAUNCHER_LINUX || LAUNCHER_MACOS
         return DEFAULT_TMP;
-#else
-        std::string drive;
-        try
-        {
-            drive = Poco::Environment::get("USERPROFILE");
-            drive.append("\\subutai\\");
-            drive.append("\\tmp\\");
-        }
-        catch (Poco::NotFoundException& e)
-        {
-            std::printf("Failed to extract home directory: %s\n", e.displayText());
-        }
-        return drive;
-#endif
     }
 
     std::string Settings::getDefaultInstallationPath() const
     {
-#if LAUNCHER_LINUX || LAUNCHER_MACOS
         return DEFAULT_PATH;
-#else
-        std::string drive;
-        try
-        {
-            drive = Poco::Environment::get("USERPROFILE");
-            drive.append("\\subutai\\");
-        }
-        catch (Poco::NotFoundException& e)
-        {
-            std::printf("Failed to extract home directory: %s\n", e.displayText());
-        }
-        return drive;
-#endif
     }
 
     void Settings::setInstallationPath(const std::string& path) {
