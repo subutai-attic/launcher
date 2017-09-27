@@ -29,7 +29,7 @@ mkdir -p root/usr/local/share/subutai/python; cp -r $pythondir/* root/usr/local/
 cp PkgInfo.tmpl root/Applications/SubutaiLauncher.app/Contents/PkgInfo
 cp Info.plist.tmpl root/Applications/SubutaiLauncher.app/Contents/Info.plist
 
-cp ./SubutaiLauncher.icns root/Applications/SubutaiLauncher.app/Contents/Resources/
+cp ../../assets/dev/launcher-logo.icns root/Applications/SubutaiLauncher.app/Contents/Resources/SubutaiLauncher.icns
 cp ../../assets/dev/*.ttf root/Applications/SubutaiLauncher.app/Contents/Resources/
 
 # Determine sizes and modify PackageInfo
