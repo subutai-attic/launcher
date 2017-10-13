@@ -92,7 +92,6 @@ LoginScreen::LoginScreen() :
     _version.setJustificationType(Justification::centred);
     addAndMakeVisible(_version);
 
-    _error.setText("Email or password is invalid", dontSendNotification);
     _error.setColour(Label::textColourId, juce::Colours::red);
     _error.setBounds(0, 0, 0, 0);
     _error.setFont(font);
@@ -140,18 +139,40 @@ void LoginScreen::buttonClicked(juce::Button* button)
         _button.setEnabled(false);
         _error.setVisible(false);
         // Loggin user in
-        SubutaiLauncher::Hub* _pHub = SubutaiLauncher::Session::instance()->getHub();
-        _pHub->setLogin(_login.getText().toStdString());
-        _pHub->setPassword(_password.getText().toStdString());
-        bool rc = _pHub->auth();
-        if (rc)
+        try 
         {
-            setVisible(false);
+            SubutaiLauncher::Hub* _pHub = SubutaiLauncher::Session::instance()->getHub();
+            _pHub->setLogin(_login.getText().toStdString());
+            _pHub->setPassword(_password.getText().toStdString());
+            bool rc = _pHub->auth();
+            if (rc)
+            {
+                setVisible(false);
+            }
+            else
+            {
+                _error.setText("Email or password is invalid", dontSendNotification);
+                _error.setVisible(true);
+                _button.setEnabled(true);
+            }
         }
-        else
+        catch (Poco::Net::DNSException& err)
         {
+            _error.setText("Please check internet connection!", dontSendNotification);
             _error.setVisible(true);
             _button.setEnabled(true);
+            _logger->error("catch: %s", err.displayText());            
+        }
+        catch (Poco::TimeoutException& err)
+        {
+            _error.setText("Server connection time out", dontSendNotification);
+            _error.setVisible(true);
+            _button.setEnabled(true);
+            _logger->error("catch %s", err.displayText());
+        }
+        catch (Poco::Exception& err) 
+        {
+            _logger->error("catch %s", err.displayText());
         }
     }
 }
