@@ -156,12 +156,12 @@ void LoginScreen::buttonClicked(juce::Button* button)
                 _button.setEnabled(true);
             }
         }
-        catch (Poco::Net::DNSException& err)
+        catch (Poco::Net::DNSException& exc)
         {
-            _error.setText("Please check internet connection!", dontSendNotification);
+            _error.setText("Please check internet connection", dontSendNotification);
             _error.setVisible(true);
             _button.setEnabled(true);
-            _logger->error("catch: %s", err.displayText());            
+            _logger->error("Exception: %s", exc.displayText());            
         }
         catch (Poco::FileNotFoundException& exc) 
         {
@@ -170,16 +170,16 @@ void LoginScreen::buttonClicked(juce::Button* button)
             _button.setEnabled(true);
             _logger->error("Exception: %s", exc.displayText());            
         }
-        catch (Poco::TimeoutException& err)
+        catch (Poco::TimeoutException& exc)
         {
             _error.setText("Server connection time out", dontSendNotification);
             _error.setVisible(true);
             _button.setEnabled(true);
-            _logger->error("catch %s", err.displayText());
+            _logger->error("Exception: %s", exc.displayText());
         }
-        catch (Poco::Exception& err) 
+        catch (Poco::Exception& exc) 
         {
-            _logger->error("catch %s", err.displayText());
+            _logger->error("Exception: %s", exc.displayText());
         }
     }
 }
