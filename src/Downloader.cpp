@@ -183,12 +183,11 @@ namespace SubutaiLauncher
             Poco::JSON::Object::Ptr obj = arr->getObject(0);
             _file.id = obj->get("id").toString();
             _file.name = obj->get("filename").toString();
-            _file.size = obj->get("size").extract<long>();
+            _file.size = (long)obj->get("size").extract<int>();
                 
             Poco::JSON::Object::Ptr hashObj = obj->getObject("hash");
             _file.md5 = hashObj->get("md5").toString();
-            _file.owner = obj->get("owner").extract<Poco::JSON::Array::Ptr>()
-            ->get(0).extract<std::string>();
+            _file.owner = obj->get("owner").extract<Poco::JSON::Array::Ptr>()->get(0).extract<std::string>();
     
             _logger->debug("Owner: %s", _file.owner);
             _logger->debug("Name: %s", _file.name);
@@ -196,9 +195,10 @@ namespace SubutaiLauncher
             _logger->debug("Size: %ld", _file.size);
             _logger->debug("Hash: %s", _file.md5);    
         }
-        catch(Poco::BadCastException &err) 
+        catch(Poco::BadCastException &e) 
         {
-            _logger->error("catch: %s", err.displayText());
+            _logger->error("Exception: %s", e.displayText());
+            return false;
         }
 
         return true;
@@ -310,8 +310,20 @@ namespace SubutaiLauncher
     {
         if (_outStream) 
         {
-            _bytes = (long)_outStream->chars();
-            _percent = (100 * _bytes) / _file.size;
+            try 
+            {
+                if (_file.size == 0) return;
+                _bytes = (long)_outStream->chars();
+                _percent = (100 * _bytes) / _file.size;
+            } 
+            catch (Poco::Exception& e)
+            {
+                _logger->error("Exception: %s", e.displayText());
+            }
+            catch (std::exception& e) 
+            {
+                _logger->error("Unknown exception: %s", e.what());
+            }
         }
     }
 
