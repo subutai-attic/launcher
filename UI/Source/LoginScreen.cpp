@@ -163,6 +163,13 @@ void LoginScreen::buttonClicked(juce::Button* button)
             _button.setEnabled(true);
             _logger->error("catch: %s", err.displayText());            
         }
+        catch (Poco::FileNotFoundException& exc) 
+        {
+            _error.setText("Service currently unavailable", dontSendNotification);
+            _error.setVisible(true);
+            _button.setEnabled(true);
+            _logger->error("Exception: %s", exc.displayText());            
+        }
         catch (Poco::TimeoutException& err)
         {
             _error.setText("Server connection time out", dontSendNotification);

@@ -40,7 +40,7 @@ namespace SubutaiLauncher
 
     bool Hub::auth() 
     {
-        Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/tray/slogin", Poco::Net::HTTPRequest::HTTP_1_0);
+        Poco::Net::HTTPRequest pRequest(Poco::Net::HTTPRequest::HTTP_POST, REST+"/tray/login", Poco::Net::HTTPRequest::HTTP_1_0);
         _logger->debug("Authenticating at %s%s/tray/login", URL, REST);
 
         Poco::URI u;
@@ -79,6 +79,10 @@ namespace SubutaiLauncher
             }
             _loggedIn = true;
             return true;
+        } 
+        if (pResponse.getStatus() == Poco::Net::HTTPResponse::HTTP_NOT_FOUND) 
+        {
+            throw Poco::FileNotFoundException("Requested URL was not found");
         }
         return false;
     }
