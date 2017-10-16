@@ -79,6 +79,10 @@ namespace SubutaiLauncher
             }
             _loggedIn = true;
             return true;
+        } 
+        if (pResponse.getStatus() == Poco::Net::HTTPResponse::HTTP_NOT_FOUND) 
+        {
+            throw Poco::FileNotFoundException("Requested URL was not found");
         }
         return false;
     }

@@ -169,29 +169,37 @@ namespace SubutaiLauncher
             _logger->error("File info is empty after parsing JSON");
             return false;
         }
-
-        Poco::JSON::Array::Ptr arr = result.extract<Poco::JSON::Array::Ptr>();
-        if (arr->size() == 0)
+        
+        try 
         {
-            _logger->error("JSON Array is empty");
+            Poco::JSON::Array::Ptr arr = result.extract<Poco::JSON::Array::Ptr>();
+            if (arr->size() == 0)
+            {
+                _logger->error("JSON Array is empty");
+                return false;
+            }
+           
+            // Get the first element
+            Poco::JSON::Object::Ptr obj = arr->getObject(0);
+            _file.id = obj->get("id").toString();
+            _file.name = obj->get("filename").toString();
+            _file.size = (long)obj->get("size").extract<int>();
+                
+            Poco::JSON::Object::Ptr hashObj = obj->getObject("hash");
+            _file.md5 = hashObj->get("md5").toString();
+            _file.owner = obj->get("owner").extract<Poco::JSON::Array::Ptr>()->get(0).extract<std::string>();
+    
+            _logger->debug("Owner: %s", _file.owner);
+            _logger->debug("Name: %s", _file.name);
+            _logger->debug("ID: %s", _file.id);
+            _logger->debug("Size: %ld", _file.size);
+            _logger->debug("Hash: %s", _file.md5);    
+        }
+        catch(Poco::BadCastException &e) 
+        {
+            _logger->error("Exception: %s", e.displayText());
             return false;
         }
-
-        // Get the first element
-        Poco::JSON::Object::Ptr obj = arr->getObject(0);
-        _file.id = obj->get("id").toString();
-        _file.name = obj->get("filename").toString();
-        _file.size = obj->get("size").extract<int>();
-        Poco::JSON::Object::Ptr hashObj = obj->getObject("hash");
-        _file.md5 = hashObj->get("md5").toString();
-        _file.owner = obj->get("owner").extract<Poco::JSON::Array::Ptr>()
-            ->get(0).extract<std::string>();
-
-        _logger->debug("Owner: %s", _file.owner);
-        _logger->debug("Name: %s", _file.name);
-        _logger->debug("ID: %s", _file.id);
-        _logger->debug("Size: %ld", _file.size);
-        _logger->debug("Hash: %s", _file.md5);
 
         return true;
     }
@@ -302,8 +310,20 @@ namespace SubutaiLauncher
     {
         if (_outStream) 
         {
-            _bytes = (long)_outStream->chars();
-            _percent = (100 * _bytes) / _file.size;
+            try 
+            {
+                if (_file.size == 0) return;
+                _bytes = (long)_outStream->chars();
+                _percent = (100 * _bytes) / _file.size;
+            } 
+            catch (Poco::Exception& e)
+            {
+                _logger->error("Exception: %s", e.displayText());
+            }
+            catch (std::exception& e) 
+            {
+                _logger->error("Unknown exception: %s", e.what());
+            }
         }
     }
 
